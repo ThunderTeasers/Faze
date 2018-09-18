@@ -1,0 +1,35 @@
+.tooltip {
+  position: absolute;
+
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  color: #fff;
+
+  &:before {
+    content: '';
+
+    display: block;
+    width: 0;
+    height: 0;
+
+    position: absolute;
+  }
+
+  &.tooltip-top, &.tooltip-bottom {
+    &:before {
+      left: 50%;
+      bottom: -0.5rem;
+
+      transform: translateX(-50%);
+    }
+  }
+
+  &.tooltip-top {
+    &:before {
+      border-left: 0.25rem solid transparent;
+      border-right: 0.25rem solid transparent;
+      border-top: 0.5rem solid rgba(0, 0, 0, 0.5);
+    }
+  }
+}

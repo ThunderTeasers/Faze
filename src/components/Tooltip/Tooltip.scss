@@ -1,3 +1,13 @@
+/**
+ * Стили для плагина тултипа
+ *
+ * Автор: Ерохин Максим, plarson.ru
+ * Дата: 23.09.2018
+ */
+
+$width: 0.5rem;
+$height: 0.5rem;
+
 .tooltip {
   position: absolute;
 
@@ -19,17 +29,56 @@
   &.tooltip-top, &.tooltip-bottom {
     &:before {
       left: 50%;
-      bottom: -0.5rem;
 
       transform: translateX(-50%);
     }
   }
 
+  &.tooltip-left, &.tooltip-right {
+    &:before {
+      top: 50%;
+
+      transform: translateY(-50%);
+    }
+  }
+
   &.tooltip-top {
     &:before {
-      border-left: 0.25rem solid transparent;
-      border-right: 0.25rem solid transparent;
-      border-top: 0.5rem solid rgba(0, 0, 0, 0.5);
+      bottom: -$height;
+
+      border-left: $width solid transparent;
+      border-right: $width solid transparent;
+      border-top: $height solid rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  &.tooltip-bottom {
+    &:before {
+      top: -$height;
+
+      border-left: $width solid transparent;
+      border-right: $width solid transparent;
+      border-bottom: $height solid rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  &.tooltip-left {
+    &:before {
+      right: -$width;
+
+      border-top: $height solid transparent;
+      border-bottom: $height solid transparent;
+      border-left: $width solid rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  &.tooltip-right {
+    &:before {
+      left: -$width;
+
+      border-top: $height solid transparent;
+      border-bottom: $height solid transparent;
+      border-right: $width solid rgba(0, 0, 0, 0.5);
     }
   }
 }

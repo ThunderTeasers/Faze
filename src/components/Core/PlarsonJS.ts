@@ -61,6 +61,16 @@ class PlarsonJS {
   // Переменная, содержащая в себе всю информацию о плагинах, а так же их тела для дальнейшего исполнения
   static plugins: PluginsData = {};
 
+  // Резервирование статических переменных под заводские плагины
+  static Tooltip: any;
+  static Modal: any;
+  static Carousel: any;
+  static Zoom: any;
+  static Gallery: any;
+  static Scroll: any;
+  static Page: any;
+  static Filter: any;
+
   /**
    * Метод добавления нового плагина по предоставленному конфигу.
    * Метод 'callback' будет выполняться только если указанный селектор присутствует на странице,

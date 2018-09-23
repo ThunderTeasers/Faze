@@ -1,19 +1,20 @@
 /**
- * Пример использования:
+ * Пример использования
+ *
  * В JS:
- *  PlarsonJS.add({
- *    pluginName: 'ProductTooltips',
- *    plugins: ['Tooltip'],
- *    condition: document.querySelectorAll('.informer').length,
- *    callback: () => {
- *      for (const informer of document.querySelectorAll('.informer')) {
- *        new PlarsonJS.Tooltip(informer);
- *      }
- *    }
- *  });
+ *   PlarsonJS.add({
+ *     pluginName: 'ProductTooltips',
+ *     plugins: ['Tooltip'],
+ *     condition: document.querySelectorAll('.informer').length,
+ *     callback: () => {
+ *       for (const informer of document.querySelectorAll('.informer')) {
+ *         new PlarsonJS.Tooltip(informer);
+ *       }
+ *     }
+ *   });
  *
  * В HTML:
- *  <div class="informer" data-tooltip-text="Я подсказка!">Наведите для подсказки</div>
+ *   <div class="informer" data-tooltip-text="Я подсказка!">Наведите для подсказки</div>
  */
 
 import './Tooltip.scss';
@@ -21,11 +22,12 @@ import './Tooltip.scss';
 /**
  * Структура конфига тултипа
  *
- * side   - сторона с которой должен появляться тултип
- * text   - текст тултипа
- * margin - отступ от выбранной стороны(side) в пикселях
- * callbacks
- *  opened  - пользовательский метод, срабатывающий при вызове тултипа
+ * Содержит:
+ *   side   - сторона с которой должен появляться тултип
+ *   text   - текст тултипа
+ *   margin - отступ от выбранной стороны(side) в пикселях
+ *   callbacks
+ *     opened  - пользовательский метод, срабатывающий при вызове тултипа
  */
 interface Config {
   side: string;

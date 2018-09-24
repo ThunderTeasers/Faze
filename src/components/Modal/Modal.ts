@@ -10,6 +10,7 @@ interface Config {
   title?: string;
   url: string;
   class?: string;
+  delayToClose?: number;
   callbacks: {
     success?: () => void,
     error?: () => void,
@@ -23,6 +24,7 @@ interface ModalParts {
   body: HTMLElement;
   footer: HTMLElement;
   full: HTMLElement;
+  wrapper: HTMLElement;
 }
 
 class Modal {
@@ -44,6 +46,7 @@ class Modal {
       title: '',
       url: '',
       class: '',
+      delayToClose: 0,
       callbacks: {
         success: undefined,
         error: undefined,
@@ -60,19 +63,17 @@ class Modal {
       body: document.createElement('main'),
       footer: document.createElement('footer'),
       full: document.createElement('div'),
+      wrapper: document.createElement('div'),
     };
 
-    this.initialize();
     this.bind();
-  }
-
-  initialize(): void {
-
   }
 
   bind(): void {
     this.node.addEventListener('click', (event) => {
       event.preventDefault();
+
+      document.body.classList.add('modal-opened');
 
       this.getContent()
         .then((responseText) => {
@@ -89,8 +90,12 @@ class Modal {
     this.buildHeader();
     this.buildBody(content);
     this.buildFooter();
+    this.buildFull();
 
-    document.body.appendChild(this.modalParts.full);
+    this.modalParts.wrapper.className = 'modal-wrapper';
+    this.modalParts.wrapper.appendChild(this.modalParts.full);
+
+    document.body.appendChild(this.modalParts.wrapper);
   }
 
   buildHeader(): void {
@@ -113,7 +118,7 @@ class Modal {
       event.preventDefault();
 
       this.modalParts.full.classList.add('closing');
-      setTimeout(this.modalParts.full.remove(), 200);
+      setTimeout(() => this.modalParts.wrapper.remove(), this.config.delayToClose);
     });
   }
 
@@ -156,6 +161,14 @@ class Modal {
 
       this.modalParts.footer.appendChild(buttonsNode);
     }
+  }
+
+  buildFull(): void {
+    this.modalParts.full.className = 'modal';
+
+    this.modalParts.full.appendChild(this.modalParts.header);
+    this.modalParts.full.appendChild(this.modalParts.body);
+    this.modalParts.full.appendChild(this.modalParts.footer);
   }
 
   async getContent(): Promise<string> {

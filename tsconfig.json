@@ -14,7 +14,8 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "strict": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "strictPropertyInitialization": false
   },
   "exclude": [
     "node_modules"

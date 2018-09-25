@@ -65,7 +65,19 @@
         &:after {
           transform: translate(50%) rotateZ(135deg);
         }
+        
+        &:hover {
+          cursor: pointer;
+        }
       }
+    }
+
+    main {
+      margin-top: 1rem;
+    }
+
+    footer {
+      margin-top: 1rem;
     }
   }
 }

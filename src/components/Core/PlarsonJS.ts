@@ -64,6 +64,7 @@ class PlarsonJS {
   // Резервирование статических переменных под заводские плагины
   static Tooltip: any;
   static Modal: any;
+  static Tab: any;
   static Carousel: any;
   static Zoom: any;
   static Gallery: any;

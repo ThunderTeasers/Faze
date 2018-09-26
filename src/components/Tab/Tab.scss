@@ -1,0 +1,49 @@
+/**
+ * Стили для плагина табов
+ *
+ * Автор: Ерохин Максим, plarson.ru
+ * Дата: 26.09.2018
+ */
+
+.tabs {
+  // Заголовки табов
+  .tabs-headers {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    border-bottom: 0.1rem solid #000;
+
+    .tab-header {
+      padding: 1rem;
+
+      border: 0.1rem solid #000;
+      border-bottom: none;
+
+      &:not(:first-child) {
+        border-left: none;
+      }
+
+      &.active {
+        background-color: #efefef;
+      }
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+
+  // Тела табов
+  .tabs-bodies {
+    .tab-body {
+      padding: 1rem;
+
+      display: none;
+
+      &:first-child {
+        display: block;
+      }
+    }
+  }
+}

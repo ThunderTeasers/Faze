@@ -3,6 +3,7 @@ import Tooltip from './components/Tooltip/Tooltip';
 import Modal from './components/Modal/Modal';
 import Tab from './components/Tab/Tab';
 import Dropdown from './components/Dropdown/Dropdown';
+import Select from './components/Select/Select';
 
 // @ts-ignore
 window.PlarsonJS = PlarsonJS;
@@ -39,8 +40,16 @@ PlarsonJS.add({
 });
 
 PlarsonJS.add({
+  pluginName: 'Select',
+  callback: () => {
+    PlarsonJS.Select = Select;
+  },
+});
+
+// Тесты
+PlarsonJS.add({
   pluginName: 'TooltipTest',
-  plugins: ['Dropdown', 'Tab', 'Modal', 'Tooltip'],
+  plugins: ['Select', 'Dropdown', 'Tab', 'Modal', 'Tooltip'],
   condition: document.querySelectorAll('#button').length > 0,
   callback: () => {
     new PlarsonJS.Tooltip(document.querySelector('#button'), {
@@ -65,5 +74,7 @@ PlarsonJS.add({
     new PlarsonJS.Tab(document.querySelector('.tabs'));
 
     new PlarsonJS.Dropdown(document.querySelector('.dropdown'));
+
+    new PlarsonJS.Select(document.querySelector('.select'));
   },
 });

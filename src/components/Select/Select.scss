@@ -1,0 +1,9 @@
+.select {
+  & > .title {
+    z-index: 2;
+  }
+
+  & > .body {
+    z-index: 3;
+  }
+}

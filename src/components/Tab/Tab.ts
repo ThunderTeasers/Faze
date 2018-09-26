@@ -71,7 +71,7 @@ class Tab {
     }
 
     // Конфиг по умолчанию
-    const defaultConfig = {
+    const defaultConfig: Config = {
       selectors: {
         headers: '.tabs-headers .tab-header',
         bodies: '.tabs-bodies .tab-body',

@@ -71,6 +71,7 @@ class PlarsonJS {
   static Scroll: any;
   static Page: any;
   static Filter: any;
+  static Dropdown: any;
 
   /**
    * Метод добавления нового плагина по предоставленному конфигу.

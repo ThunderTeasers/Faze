@@ -153,6 +153,16 @@ class Dropdown {
         }
       }
     });
+
+    // Проверка на нажатие за пределами селекта
+    document.addEventListener('click', (event: any) => {
+      const path = event.path || (event.composedPath && event.composedPath());
+      if (path) {
+        if (!path.find((element: any) => element === this.node)) {
+          this.node.classList.remove('active');
+        }
+      }
+    });
   }
 
   /**

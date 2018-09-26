@@ -22,6 +22,8 @@
     -ms-user-select: none;
     user-select: none;
 
+    z-index: 2;
+
     &:hover {
       cursor: pointer;
     }
@@ -35,6 +37,8 @@
     padding: 1rem;
 
     border: 0.1rem solid #000;
+
+    z-index: 3;
   }
 
   &.active {

@@ -1,9 +1,49 @@
 .select {
+  position: relative;
+
   & > .title {
+    display: inline-flex;
+
+    padding: 0.5rem 1rem;
+
+    border: 0.1rem solid #000;
+
+    line-height: 1;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
     z-index: 2;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   & > .body {
+    position: absolute;
+
+    display: none;
+
+    padding: 1rem;
+
+    background-color: #fff;
+    border: 0.1rem solid #000;
+
     z-index: 3;
+
+    & > .option {
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+
+  &.active {
+    & > .body {
+      display: block;
+    }
   }
 }

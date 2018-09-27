@@ -85,6 +85,9 @@ PlarsonJS.add({
 
     new PlarsonJS.Select(document.querySelector('.select'));
 
-    new PlarsonJS.Carousel(document.querySelector('.carousel-test'));
+    new PlarsonJS.Carousel(document.querySelector('.carousel-test'), {
+      autoplay: false,
+      pages: true,
+    });
   },
 });

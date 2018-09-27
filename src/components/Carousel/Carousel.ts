@@ -155,6 +155,28 @@ class Carousel {
   bind(): void {
     // Сбросить счетчик автоматического переключения слайдов
     this.resetInterval();
+
+    // Навешиваем события на переключения слайдов по нажатии на элементы пагинации
+    if (this.config.pages) {
+      this.bindPagination();
+    }
+  }
+
+  /**
+   * Навешивание событий на нажитие по страницам пагинации слайдов для их переключения
+   */
+  bindPagination(): void {
+    this.pagesNodes.forEach((page) => {
+      page.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        const index = page.getAttribute('data-index');
+        if (index) {
+          this.index = parseInt(index, 10);
+          this.changeSlide(null);
+        }
+      });
+    });
   }
 
   /**
@@ -174,6 +196,9 @@ class Carousel {
     }
     this.pagesNode.innerHTML = pagesHTML;
     this.pagesNodes = this.pagesNode.querySelectorAll('.page');
+
+    // Активируем первую по умолчанию
+    this.pagesNodes[0].classList.add('active');
   }
 
   /**
@@ -217,7 +242,7 @@ class Carousel {
    *
    * @param direction - направление изменения(нужно только для анимации slide)
    */
-  changeSlide(direction: string) {
+  changeSlide(direction: string | null) {
     // Сброс предыдущей анимации
     this.resetInterval();
 
@@ -308,6 +333,11 @@ class Carousel {
         break;
     }
 
+    // Если есть пагинация, изменяем её активный элемент
+    if (this.config.pages) {
+      this.changePagination();
+    }
+
     // Выполнение кастомной функции
     if (typeof this.config.callbacks.changed === 'function') {
       try {
@@ -323,6 +353,19 @@ class Carousel {
         console.error('Ошибка исполнения пользовательского метода "changed":', error);
       }
     }
+  }
+
+  /**
+   * Изменение активной точки в пагинации
+   */
+  changePagination() {
+    this.pagesNodes.forEach((indicator, i) => {
+      if (this.index === i) {
+        indicator.classList.add('active');
+      } else {
+        indicator.classList.remove('active');
+      }
+    });
   }
 }
 

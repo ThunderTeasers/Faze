@@ -9,6 +9,8 @@
   position: relative;
 
   .carousel-holder {
+    position: relative;
+
     &.animation-fade {
       .item {
         display: flex;

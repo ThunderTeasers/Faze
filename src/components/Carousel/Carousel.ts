@@ -45,6 +45,21 @@ class Carousel {
   // DOM элементы пагинации
   pagesNodes: NodeListOf<HTMLElement>;
 
+  // DOM элемент который содержит все дополнительные части карусели(пагинацию, стрелки, счетчик)
+  readonly controlsNode: HTMLElement;
+
+  // DOM элемент содержащий стрелки переключения слайдов
+  readonly arrowsNode: HTMLElement;
+
+  // DOM элементы стрелок переключения слайдов
+  readonly arrowsNodes: {
+    left: HTMLElement;
+    right: HTMLElement;
+  };
+
+  // DOM элемент счетчика слайдов
+  readonly counterNode: HTMLElement;
+
   // Общее количество слайдов
   readonly totalSlides: number;
 
@@ -93,12 +108,29 @@ class Carousel {
     this.node = node;
 
     // Инициализация переменных
+    // Общих
     this.slidesNodes = <HTMLElement[]>Array.from(this.node.children);
     this.totalSlides = this.slidesNodes.length;
     this.itemsHolderNode = document.createElement('div');
+    this.controlsNode = document.createElement('div');
 
+    // Для пагинации
     if (this.config.pages) {
       this.pagesNode = document.createElement('div');
+    }
+
+    // Для стрелок
+    if (this.config.arrows) {
+      this.arrowsNode = document.createElement('div');
+      this.arrowsNodes = {
+        left: document.createElement('div'),
+        right: document.createElement('div'),
+      };
+    }
+
+    // Для счетчика
+    if (this.config.counter) {
+      this.counterNode = document.createElement('div');
     }
 
     // Время работы анимации
@@ -143,10 +175,8 @@ class Carousel {
     // Активания первого слайда по умолчанию
     this.slidesNodes[0].classList.add('active');
 
-    // Создании пагинации, если это сказано в конфиге
-    if (this.config.pages) {
-      this.createPagination();
-    }
+    // Создание дополнительных элементов карусели
+    this.createInfo();
   }
 
   /**
@@ -180,6 +210,29 @@ class Carousel {
   }
 
   /**
+   * Создание дополнительных элементов карусели, таких как: пагинация, стрелки, счетчик
+   */
+  createInfo() {
+    this.controlsNode.className = 'carousel-controls';
+    this.node.appendChild(this.controlsNode);
+
+    // Создание пагинации, если это указанов конфиге
+    if (this.config.pages) {
+      this.createPagination();
+    }
+
+    // Создание стрелок переключения, если это указано в конфиге
+    if (this.config.arrows) {
+      this.createArrows();
+    }
+
+    // Создание счетчика, если это указано в конфиге
+    if (this.config.counter) {
+      this.createSlidesCounter();
+    }
+  }
+
+  /**
    * Создание пагинации по слайдам
    */
   createPagination(): void {
@@ -196,9 +249,46 @@ class Carousel {
     }
     this.pagesNode.innerHTML = pagesHTML;
     this.pagesNodes = this.pagesNode.querySelectorAll('.page');
+    this.controlsNode.appendChild(this.pagesNode);
 
     // Активируем первую по умолчанию
     this.pagesNodes[0].classList.add('active');
+  }
+
+  /**
+   * Создание счетчика слайдов
+   */
+  createSlidesCounter(): void {
+    this.counterNode.className = 'carousel-counter';
+    this.changeCounter();
+
+    // Если у карусели есть стрелки, то вставляем между них
+    if (this.config.arrows) {
+      this.arrowsNode.insertBefore(this.counterNode, this.arrowsNodes.right);
+    } else {
+      this.controlsNode.appendChild(this.counterNode);
+    }
+  }
+
+  /**
+   * Изменение назписи счетчика в соответствии с текущим индексом
+   */
+  changeCounter() {
+    this.counterNode.innerHTML = `<span class="carousel-counter-current">${this.index + 1}</span> / <span class="carousel-counter-total">${this.totalSlides}</span>`;
+  }
+
+  /**
+   * Создание стрелок переключения слайдов вперед/назад(либо вверх вниз в вертикальном виде)
+   */
+  createArrows(): void {
+    this.arrowsNode.className = 'carousel-arrows';
+    this.controlsNode.appendChild(this.arrowsNode);
+
+    this.arrowsNodes.left.className = 'carousel-arrow-prev';
+    this.arrowsNode.appendChild(this.arrowsNodes.left);
+
+    this.arrowsNodes.right.className = 'carousel-arrow-next';
+    this.arrowsNode.appendChild(this.arrowsNodes.right);
   }
 
   /**
@@ -336,6 +426,11 @@ class Carousel {
     // Если есть пагинация, изменяем её активный элемент
     if (this.config.pages) {
       this.changePagination();
+    }
+
+    // Если есть счетчик, изменяем его
+    if (this.config.counter) {
+      this.changeCounter();
     }
 
     // Выполнение кастомной функции

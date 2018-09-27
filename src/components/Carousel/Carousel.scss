@@ -46,4 +46,38 @@
       }
     }
   }
+
+  .carousel-pages {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    position: absolute;
+    left: 50%;
+    bottom: 2rem;
+
+    transform: translateX(-50%);
+
+    z-index: 3;
+
+    & > .page {
+      width: 1.2rem;
+      height: 1.2rem;
+
+      background-color: #fff;
+      border-radius: 50%;
+
+      & + .page {
+        margin-left: 0.5rem;
+      }
+
+      &.active {
+        background-color: #000;
+      }
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
 }

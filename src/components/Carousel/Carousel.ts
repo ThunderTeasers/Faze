@@ -12,9 +12,18 @@ interface Config {
     direction: string;
   };
   callbacks: {
-    created?: () => void;
-    changed?: () => void;
+    created?: (data: CallbackData) => void;
+    changed?: (data: CallbackData) => void;
   };
+}
+
+interface CallbackData {
+  holderNode: HTMLElement;
+  carouselNode: HTMLElement;
+  slidesNodes: HTMLElement[];
+  totalSlides: number;
+  index: number;
+  currentSlideNode: HTMLElement | null;
 }
 
 class Carousel {
@@ -30,11 +39,32 @@ class Carousel {
   // DOM элемент который содержит все
   readonly itemsHolderNode: HTMLElement;
 
+  // DOM элемент содержащий пагинацию по слайдам
+  readonly pagesNode: HTMLElement | null;
+
+  // DOM элементы пагинации
+  pagesNodes: NodeListOf<HTMLElement>;
+
   // Общее количество слайдов
   readonly totalSlides: number;
 
   // Индекс текущего слайда
   index: number;
+
+  // ID таймера переключения слайдов
+  timer: number;
+
+  // Определяет состояние карусели, в состоянии покоя или проигрывается анимация
+  isIdle: boolean;
+
+  // CSS стиль времени анимации
+  readonly transitionDuration: string;
+
+  // Ширина слайда, нужна для анимации "slide" по горизонтали
+  slideWidth: number;
+
+  // Ширина слайда, нужна для анимации "slide" по вертикали
+  slideHeight: number;
 
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
@@ -62,9 +92,21 @@ class Carousel {
     this.config = Object.assign(defaultConfig, config);
     this.node = node;
 
+    // Инициализация переменных
     this.slidesNodes = <HTMLElement[]>Array.from(this.node.children);
     this.totalSlides = this.slidesNodes.length;
     this.itemsHolderNode = document.createElement('div');
+
+    if (this.config.pages) {
+      this.pagesNode = document.createElement('div');
+    }
+
+    // Время работы анимации
+    this.transitionDuration = `${this.config.animation.time / 1000}s`;
+
+    // Получение параметров слайда
+    this.slideWidth = this.slidesNodes[0].offsetWidth;
+    this.slideHeight = this.slidesNodes[0].offsetHeight;
 
     this.initialize();
     this.bind();
@@ -77,9 +119,6 @@ class Carousel {
     // Изначально индекс равен нулю
     this.index = 0;
 
-    // Время работы анимации
-    const transitionDuration = `${this.config.animation.time / 1000}s`;
-
     // Инициализируем держатель для элементов карусели и перемещаем их в него
     this.itemsHolderNode.className = 'carousel-holder';
     this.slidesNodes.forEach((slide: HTMLElement, i: number) => {
@@ -89,7 +128,7 @@ class Carousel {
       slide.classList.add('item');
 
       // Задаем время анимации слайда
-      slide.style.transitionDuration = transitionDuration;
+      slide.style.transitionDuration = this.transitionDuration;
 
       // Перевещаем слайд в родителя
       this.itemsHolderNode.appendChild(slide);
@@ -99,17 +138,42 @@ class Carousel {
     // Присвоение DOM объекту карусели необходимых классов и стилей для работы самой карусели
     this.node.classList.add('carousel');
     this.itemsHolderNode.classList.add(`animation-${this.config.animation.type}`, `direction-${this.config.animation.direction}`);
-    this.itemsHolderNode.style.transitionDuration = transitionDuration;
+    this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
 
     // Активания первого слайда по умолчанию
     this.slidesNodes[0].classList.add('active');
+
+    // Создании пагинации, если это сказано в конфиге
+    if (this.config.pages) {
+      this.createPagination();
+    }
   }
 
   /**
    * Навешивание событий
    */
   bind(): void {
+    // Сбросить счетчик автоматического переключения слайдов
+    this.resetInterval();
+  }
 
+  /**
+   * Создание пагинации по слайдам
+   */
+  createPagination(): void {
+    if (!this.pagesNode) {
+      throw new Error('Родительский элемент пагинации не найден');
+    }
+
+    this.pagesNode.className = 'carousel-pages';
+    this.node.appendChild(this.pagesNode);
+
+    let pagesHTML = '';
+    for (let i = 0; i < this.totalSlides; i += 1) {
+      pagesHTML += `<div class="page" data-index="${i}"></div>`;
+    }
+    this.pagesNode.innerHTML = pagesHTML;
+    this.pagesNodes = this.pagesNode.querySelectorAll('.page');
   }
 
   /**
@@ -137,12 +201,128 @@ class Carousel {
   }
 
   /**
+   * Сброс таймера автоматического переключения слайдов
+   */
+  resetInterval(): void {
+    clearInterval(this.timer);
+    if (this.config.autoplay) {
+      this.timer = setInterval(() => {
+        this.next();
+      }, this.config.duration);
+    }
+  }
+
+  /**
    * Метод изменения текущего слайда
    *
    * @param direction - направление изменения(нужно только для анимации slide)
    */
   changeSlide(direction: string) {
+    // Сброс предыдущей анимации
+    this.resetInterval();
 
+    let currentSlide = null;
+    switch (this.config.animation.type) {
+      // Анимация 'fade', заключается в исчезновении предыдущего и появлении следующего слайда
+      case 'fade':
+        // Изменение происходит следующим образом, пробегаемся по всем слайдам, у кого из них
+        // индекс совпадает с текущим индексом, ставим класс 'current', у остальных же этот
+        // класс удаляем.
+        // Вся анимация происходит за счет CSS.
+        this.slidesNodes.forEach((slide, index) => {
+          if (this.index === index) {
+            slide.classList.add('active');
+
+            // Задаем текущий слайд для передачи в кастомную функцию
+            currentSlide = slide;
+          } else {
+            slide.classList.remove('active');
+          }
+        });
+        break;
+      // Анимация 'slide', заключается в плавном смещении одного слайда другим в бок.
+      // Вся анимация выполняется средствами CSS
+      case 'slide':
+        // Проверяем, если карусель в спокойном состоянии,
+        // то есть анимация не идет, то переключаем
+        if (this.isIdle) {
+          // Ставится флаг что карусель активна
+          this.isIdle = false;
+
+          // Определение направления, относительно него разное поведение и стили у карусели
+          if (direction === 'next') {
+            // Задаем карусели необходимые стили для сдвига влево
+            this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
+            if (this.config.animation.direction === 'horizontal') {
+              this.itemsHolderNode.style.left = `-${this.slideWidth}px`;
+            } else if (this.config.animation.direction === 'vertical') {
+              this.itemsHolderNode.style.top = `-${this.slideHeight}px`;
+            }
+
+            // После того как CSS анимация выполнилась,
+            // стили сбрасываются в первоначальное состояние
+            setTimeout(() => {
+              this.itemsHolderNode.style.transitionDuration = null;
+              if (this.config.animation.direction === 'horizontal') {
+                this.itemsHolderNode.style.left = '0';
+              } else if (this.config.animation.direction === 'vertical') {
+                this.itemsHolderNode.style.top = '0';
+              }
+
+              // Так же крайний левый слайд перемещается в конец
+              this.itemsHolderNode.appendChild(this.slidesNodes[0]);
+
+              // Выставление флага, что карусель в простое и готова к новой анимации
+              this.isIdle = true;
+            }, this.config.animation.time);
+          } else if (direction === 'prev') {
+            // При направлении влево, сначала перемещаем крайний правый слайд в начало
+            this.itemsHolderNode.insertBefore(this.slidesNodes[this.totalSlides - 1], this.slidesNodes[0]);
+
+            // Задаем стили
+            if (this.config.animation.direction === 'horizontal') {
+              this.itemsHolderNode.style.left = `-${this.slideWidth}px`;
+            } else if (this.config.animation.direction === 'vertical') {
+              this.itemsHolderNode.style.top = `-${this.slideHeight}px`;
+            }
+            this.itemsHolderNode.style.transitionDuration = null;
+
+            // Хак для включения транзишина
+            setTimeout(() => {
+              if (this.config.animation.direction === 'horizontal') {
+                this.itemsHolderNode.style.left = '0';
+              } else if (this.config.animation.direction === 'vertical') {
+                this.itemsHolderNode.style.top = '0';
+              }
+              this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
+            }, 1);
+
+            // И после выполнения анимации, ставится флаг, что карусель свободна
+            setTimeout(() => {
+              this.isIdle = true;
+            }, this.config.animation.time);
+          }
+        }
+        break;
+      default:
+        break;
+    }
+
+    // Выполнение кастомной функции
+    if (typeof this.config.callbacks.changed === 'function') {
+      try {
+        this.config.callbacks.changed({
+          holderNode: this.itemsHolderNode,
+          carouselNode: this.node,
+          slidesNodes: this.slidesNodes,
+          totalSlides: this.totalSlides,
+          index: this.index,
+          currentSlideNode: currentSlide,
+        });
+      } catch (error) {
+        console.error('Ошибка исполнения пользовательского метода "changed":', error);
+      }
+    }
   }
 }
 

@@ -1,0 +1,22 @@
+/**
+ * Стили для плагина скрола
+ *
+ * Автор: Ерохин Максим, plarson.ru
+ * Дата: 29.09.2018
+ */
+
+.scroll {
+  position: relative;
+
+  overflow: hidden;
+
+  .scroll-vertical, .scroll-horizontal {
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    background-color: #000;
+
+    width: 0.5rem;
+  }
+}

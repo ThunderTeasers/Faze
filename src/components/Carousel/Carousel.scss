@@ -11,69 +11,168 @@
   .carousel-holder {
     position: relative;
 
-    &.animation-fade {
-      .item {
-        display: flex;
+    display: flex;
+  }
 
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+  // Анимация появления-исчезновения
+  &.animation-fade {
+    .item {
+      display: flex;
 
-        width: 100%;
-        height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
 
-        transition-property: opacity;
+      width: 100%;
+      height: 100%;
 
-        z-index: 1;
+      transition-property: opacity;
 
-        &.active {
-          position: relative;
+      z-index: 1;
 
-          opacity: 1;
+      &.active {
+        position: relative;
 
-          z-index: 2;
-        }
+        opacity: 1;
 
-        &:not(.active) {
-          opacity: 0;
-        }
+        z-index: 2;
+      }
+
+      &:not(.active) {
+        opacity: 0;
       }
     }
   }
 
-  .carousel-pages {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+  // Анимация слайда
+  &.animation-slide {
+    position: relative;
 
-    position: absolute;
-    left: 50%;
-    bottom: 2rem;
+    overflow: hidden;
 
-    transform: translateX(-50%);
+    &.direction-horizontal {
+      & > .carousel-holder {
+        left: 0;
 
-    z-index: 3;
+        width: 5000%;
 
-    & > .page {
-      width: 1.2rem;
-      height: 1.2rem;
-
-      background-color: #fff;
-      border-radius: 50%;
-
-      & + .page {
-        margin-left: 0.5rem;
+        transition-property: left;
       }
+    }
 
-      &.active {
-        background-color: #000;
-      }
+    &.direction-vertical {
+      & > .carousel-holder {
+        top: 0;
 
-      &:hover {
-        cursor: pointer;
+        height: 5000%;
+
+        transition-property: top;
       }
+    }
+  }
+
+  // Элементы управления
+  & > .carousel-controls {
+    // Пагинация
+    .carousel-pages {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      position: absolute;
+      left: 50%;
+      bottom: 2rem;
+
+      transform: translateX(-50%);
+
+      z-index: 3;
+
+      & > .page {
+        width: 1.2rem;
+        height: 1.2rem;
+
+        background-color: #fff;
+        border-radius: 50%;
+
+        & + .page {
+          margin-left: 0.5rem;
+        }
+
+        &.active {
+          background-color: #000;
+        }
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
+
+    // Стрелки переключения
+    & > .carousel-arrows {
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      width: 100%;
+      height: 100%;
+
+      & > .carousel-arrow {
+        position: absolute;
+        top: 0;
+
+        width: 10rem;
+        height: 100%;
+
+        &:after {
+          content: '';
+
+          display: block;
+          width: 2rem;
+          height: 2rem;
+
+          position: absolute;
+          top: 50%;
+          left: 50%;
+
+          border-top: 0.3rem solid #000;
+        }
+
+        &.carousel-arrow-prev {
+          left: 0;
+
+          &:after {
+            border-left: 0.3rem solid #000;
+
+            transform: translate(-50%, -50%) rotateZ(-45deg);
+          }
+        }
+
+        &.carousel-arrow-next {
+          right: 0;
+
+          &:after {
+            border-right: 0.3rem solid #000;
+
+            transform: translate(-50%, -50%) rotateZ(45deg);
+          }
+        }
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
+
+    // Счетчик
+    .carousel-counter {
+      position: absolute;
+      right: 0.5rem;
+      bottom: 0.5rem;
+
+      line-height: 1;
     }
   }
 }

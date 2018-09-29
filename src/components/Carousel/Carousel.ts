@@ -136,15 +136,16 @@ class Carousel {
     // Время работы анимации
     this.transitionDuration = `${this.config.animation.time / 1000}s`;
 
-    // Получение параметров слайда
-    this.slideWidth = this.slidesNodes[0].offsetWidth;
-    this.slideHeight = this.slidesNodes[0].offsetHeight;
-
     // Карусель в простое
     this.isIdle = true;
 
     this.initialize();
     this.bind();
+
+    // Получение параметров слайда, ВАЖНО делать после инициализации, т.к. на слайды могут быть повешаны CSS модификаторы изменяющие его
+    // размеры
+    this.slideWidth = this.slidesNodes[0].offsetWidth;
+    this.slideHeight = this.slidesNodes[0].offsetHeight;
   }
 
   /**
@@ -175,8 +176,10 @@ class Carousel {
     this.node.classList.add(`animation-${this.config.animation.type}`, `direction-${this.config.animation.direction}`);
     this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
 
-    // Активания первого слайда по умолчанию
-    this.slidesNodes[0].classList.add('active');
+    // Активания первого слайда по умолчанию, нужно только для анимации "fade"
+    if (this.config.animation.type === 'fade') {
+      this.slidesNodes[0].classList.add('active');
+    }
 
     // Создание дополнительных элементов карусели
     this.createControls();

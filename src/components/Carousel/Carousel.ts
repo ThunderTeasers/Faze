@@ -34,7 +34,7 @@ class Carousel {
   readonly config: Config;
 
   // DOM элменты слайдов
-  readonly slidesNodes: HTMLElement[];
+  slidesNodes: HTMLElement[];
 
   // DOM элемент который содержит все
   readonly itemsHolderNode: HTMLElement;
@@ -397,6 +397,11 @@ class Carousel {
         if (this.isIdle) {
           // Ставится флаг что карусель активна
           this.isIdle = false;
+
+          // Снова получаем все слайды, т.к. при анимации "slide" DOM элементы слайдов перемещаются внутри родителя, что в свою очередь
+          // говорит о том, что изначальный массим this.slidesNodes будет содержать неправельные ссылки на элемент когда мы обращаемся
+          // по индексу, например [0]
+          this.slidesNodes = <HTMLElement[]>Array.from(this.itemsHolderNode.children);
 
           // Определение направления, относительно него разное поведение и стили у карусели
           if (direction === 'next') {

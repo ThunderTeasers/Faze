@@ -162,6 +162,10 @@
 
         &:hover {
           cursor: pointer;
+
+          &:after {
+            border-color: #666;
+          }
         }
       }
     }

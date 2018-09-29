@@ -1,5 +1,62 @@
+/**
+ * Плагин карусели
+ *
+ * Карусель в текущем варианте имеет две анимации изменения слайдов, а именно:
+ *   slide - где следующий слайд плавно сдвигает текущий в указанном направлении
+ *   fade  - где текущий слайд плавно исчезает, а на его месте плавно появляется следующий
+ *
+ * Так же, карусель имеет элементы управления, а именно:
+ *   пагинация  - точки которые сигнализируют какой слайд активен, так же есть возможность нажать на точку и перейти на слайд
+ *   стрелки    - стрелки переключения слайдов вперед/назад
+ *   счетчик    - счетчик слайдов, показывает текущий слайд и сколько слайдов всего
+ *
+ * Автор: Ерохин Максим, plarson.ru
+ * Дата: 29.09.2018
+ *
+ *
+ * Пример использования
+ * В JS:
+ *   PlarsonJS.add({
+ *     pluginName: 'ProductCarousel',
+ *     plugins: ['Carousel'],
+ *     condition: document.querySelectorAll('.carousel-product').length,
+ *     callback: () => {
+ *       new PlarsonJS.Carousel(document.querySelector('.carousel-product'), {
+ *         autoplay: true,
+ *         pages: true,
+ *         counter: true,
+ *       });
+ *     }
+ *   });
+ *
+ * В HTML:
+ *   <div class="carousel-test">
+ *     <img src="https://via.placeholder.com/350x150">
+ *     <img src="https://via.placeholder.com/350x150">
+ *     <img src="https://via.placeholder.com/350x150">
+ *     <img src="https://via.placeholder.com/350x150">
+ *   </div>
+ */
+
 import './Carousel.scss';
 
+/**
+ * Структура конфига карусели
+ *
+ * Содержит:
+ *   autoplay   - флаг авто воспроизведения карусели
+ *   counter    - отображать ли счетчик слайдов
+ *   pages      - отображать ли пагинацию слайдов
+ *   arrows     - отображать ли стрелки переключения
+ *   duration   - время смены слайдов, в мс.
+ *   animation
+ *     type     - тип анимации, может быть: 'slide', 'fade'
+ *     time     - длительность анимации в миллисекундах
+ *     direction - направление смены слайдов, может быть: 'vertical', 'horizontal'. Используется только для анимации 'slide'
+ *   callbacks
+ *     changed  - пользовательская функция, исполняющаяся при создании карусели
+ *     changed  - пользовательская функция, исполняющаяся при изменении слайда
+ */
 interface Config {
   autoplay: boolean;
   counter: boolean;
@@ -17,6 +74,17 @@ interface Config {
   };
 }
 
+/**
+ * Структура возвращаемого объекта в пользовательских функциях
+ *
+ * Содержит:
+ *   holderNode   - DOM элемент содержащий слайды
+ *   carouselNode - DOM элемент в котором находится всё, что относится карусели
+ *   slidesNodes  - DOM элементы слайдов
+ *   totalSlides  - общее число слайдов
+ *   index        - индекс активного слайда
+ *   currentSlideNode - DOM элемент активного слайда
+ */
 interface CallbackData {
   holderNode: HTMLElement;
   carouselNode: HTMLElement;
@@ -26,6 +94,9 @@ interface CallbackData {
   currentSlideNode: HTMLElement | null;
 }
 
+/**
+ * Класс карусели
+ */
 class Carousel {
   // DOM элемент при наведении на который появляется тултип
   readonly node: HTMLElement;

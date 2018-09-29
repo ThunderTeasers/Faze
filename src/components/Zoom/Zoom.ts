@@ -120,8 +120,21 @@ class Zoom {
     this.bigImageWrapperNode.style.width = `${this.config.width}px`;
     this.bigImageWrapperNode.style.height = `${this.config.height}px`;
 
+    // Позиционирование окна для увеличения в соответствии с выбранной стороной
     switch (this.config.side) {
+      case 'bottom':
+        this.bigImageWrapperNode.style.left = '0';
+        this.bigImageWrapperNode.style.bottom = `-${this.config.height}px`;
+        break;
+      case 'top':
+        this.bigImageWrapperNode.style.left = '0';
+        this.bigImageWrapperNode.style.top = `${this.config.height}px`;
+        break;
       case 'left':
+        this.bigImageWrapperNode.style.top = '0';
+        this.bigImageWrapperNode.style.right = `${this.config.width}px`;
+        break;
+      case 'right':
       default:
         this.bigImageWrapperNode.style.top = '0';
         this.bigImageWrapperNode.style.right = `-${this.config.width}px`;

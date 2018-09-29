@@ -5,6 +5,8 @@ import Tab from './components/Tab/Tab';
 import Dropdown from './components/Dropdown/Dropdown';
 import Select from './components/Select/Select';
 import Carousel from './components/Carousel/Carousel';
+import Zoom from './components/Zoom/Zoom';
+import Scroll from './components/Scroll/Scroll';
 
 // @ts-ignore
 window.PlarsonJS = PlarsonJS;
@@ -54,10 +56,24 @@ PlarsonJS.add({
   },
 });
 
+PlarsonJS.add({
+  pluginName: 'Zoom',
+  callback: () => {
+    PlarsonJS.Zoom = Zoom;
+  },
+});
+
+PlarsonJS.add({
+  pluginName: 'Scroll',
+  callback: () => {
+    PlarsonJS.Scroll = Scroll;
+  },
+});
+
 // Тесты
 PlarsonJS.add({
   pluginName: 'TooltipTest',
-  plugins: ['Carousel', 'Select', 'Dropdown', 'Tab', 'Modal', 'Tooltip'],
+  plugins: ['Zoom', 'Carousel', 'Select', 'Dropdown', 'Tab', 'Modal', 'Tooltip'],
   condition: document.querySelectorAll('#button').length > 0,
   callback: () => {
     new PlarsonJS.Tooltip(document.querySelector('#button'), {
@@ -88,6 +104,17 @@ PlarsonJS.add({
     new PlarsonJS.Carousel(document.querySelector('.carousel-test'), {
       autoplay: false,
       pages: true,
+      arrows: true,
+      counter: true,
+      animation: {
+        type: 'fade',
+        time: 1000,
+        direction: 'horizontal',
+      },
+    });
+
+    new PlarsonJS.Zoom(document.querySelector('.image'), {
+      side: 'bottom',
     });
   },
 });

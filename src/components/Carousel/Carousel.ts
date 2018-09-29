@@ -193,6 +193,11 @@ class Carousel {
     if (this.config.pages) {
       this.bindPagination();
     }
+
+    // Навешиваем события на переключение слайдов при нажатии на стрелки
+    if (this.config.arrows) {
+      this.bindArrows();
+    }
   }
 
   /**
@@ -209,6 +214,25 @@ class Carousel {
           this.changeSlide(null);
         }
       });
+    });
+  }
+
+  /**
+   * Навешивание событий на нажатие стрелок для переключения слайдов
+   */
+  bindArrows(): void {
+    // Стрелка влево
+    this.arrowsNodes.left.addEventListener('click', (event) => {
+      event.preventDefault();
+
+      this.prev();
+    });
+
+    // Стрелка вправо
+    this.arrowsNodes.right.addEventListener('click', (event) => {
+      event.preventDefault();
+
+      this.next();
     });
   }
 
@@ -298,9 +322,11 @@ class Carousel {
    * Переключение карусели влево
    */
   next(): void {
-    this.index += 1;
-    if (this.index >= this.totalSlides) {
-      this.index = 0;
+    if (this.isIdle) {
+      this.index += 1;
+      if (this.index >= this.totalSlides) {
+        this.index = 0;
+      }
     }
 
     this.changeSlide('next');
@@ -310,9 +336,11 @@ class Carousel {
    * Переключение карусели вправо
    */
   prev(): void {
-    this.index -= 1;
-    if (this.index < 0) {
-      this.index = this.totalSlides - 1;
+    if (this.isIdle) {
+      this.index -= 1;
+      if (this.index < 0) {
+        this.index = this.totalSlides - 1;
+      }
     }
 
     this.changeSlide('prev');
@@ -426,15 +454,8 @@ class Carousel {
         break;
     }
 
-    // Если есть пагинация, изменяем её активный элемент
-    if (this.config.pages) {
-      this.changePagination();
-    }
-
-    // Если есть счетчик, изменяем его
-    if (this.config.counter) {
-      this.changeCounter();
-    }
+    // Инменяем индикаторы
+    this.changeControls();
 
     // Выполнение кастомной функции
     if (typeof this.config.callbacks.changed === 'function') {
@@ -450,6 +471,21 @@ class Carousel {
       } catch (error) {
         console.error('Ошибка исполнения пользовательского метода "changed":', error);
       }
+    }
+  }
+
+  /**
+   * Метод управления изменениями элементами управления
+   */
+  changeControls(): void {
+    // Если есть пагинация, изменяем её активный элемент
+    if (this.config.pages) {
+      this.changePagination();
+    }
+
+    // Если есть счетчик, изменяем его
+    if (this.config.counter) {
+      this.changeCounter();
     }
   }
 

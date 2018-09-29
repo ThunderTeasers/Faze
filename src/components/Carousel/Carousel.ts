@@ -30,7 +30,7 @@
  *   });
  *
  * В HTML:
- *   <div class="carousel-test">
+ *   <div class="carousel-product">
  *     <img src="https://via.placeholder.com/350x150">
  *     <img src="https://via.placeholder.com/350x150">
  *     <img src="https://via.placeholder.com/350x150">

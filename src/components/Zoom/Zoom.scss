@@ -6,5 +6,39 @@
  */
 
 .zoom {
+  position: relative;
 
+  // Изначальное изображение
+  .zoom-initial-image, .zoom-pointer {
+    &:hover {
+      cursor: crosshair;
+    }
+  }
+
+  // Указатель, показывающий область увеличения
+  .zoom-pointer {
+    position: absolute;
+
+    display: none;
+
+    border: 0.1rem solid #000;
+  }
+
+  // Обертка для показа области увеличения
+  .zoom-image-wrapper {
+    position: absolute;
+
+    display: none;
+
+    overflow: hidden;
+
+    z-index: 5;
+
+    // Большое изображение
+    .zoom-big-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
 }

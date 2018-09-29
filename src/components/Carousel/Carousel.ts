@@ -140,6 +140,9 @@ class Carousel {
     this.slideWidth = this.slidesNodes[0].offsetWidth;
     this.slideHeight = this.slidesNodes[0].offsetHeight;
 
+    // Карусель в простое
+    this.isIdle = true;
+
     this.initialize();
     this.bind();
   }
@@ -169,14 +172,14 @@ class Carousel {
 
     // Присвоение DOM объекту карусели необходимых классов и стилей для работы самой карусели
     this.node.classList.add('carousel');
-    this.itemsHolderNode.classList.add(`animation-${this.config.animation.type}`, `direction-${this.config.animation.direction}`);
+    this.node.classList.add(`animation-${this.config.animation.type}`, `direction-${this.config.animation.direction}`);
     this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
 
     // Активания первого слайда по умолчанию
     this.slidesNodes[0].classList.add('active');
 
     // Создание дополнительных элементов карусели
-    this.createInfo();
+    this.createControls();
   }
 
   /**
@@ -212,7 +215,7 @@ class Carousel {
   /**
    * Создание дополнительных элементов карусели, таких как: пагинация, стрелки, счетчик
    */
-  createInfo() {
+  createControls() {
     this.controlsNode.className = 'carousel-controls';
     this.node.appendChild(this.controlsNode);
 
@@ -284,10 +287,10 @@ class Carousel {
     this.arrowsNode.className = 'carousel-arrows';
     this.controlsNode.appendChild(this.arrowsNode);
 
-    this.arrowsNodes.left.className = 'carousel-arrow-prev';
+    this.arrowsNodes.left.className = 'carousel-arrow carousel-arrow-prev';
     this.arrowsNode.appendChild(this.arrowsNodes.left);
 
-    this.arrowsNodes.right.className = 'carousel-arrow-next';
+    this.arrowsNodes.right.className = 'carousel-arrow carousel-arrow-next';
     this.arrowsNode.appendChild(this.arrowsNodes.right);
   }
 

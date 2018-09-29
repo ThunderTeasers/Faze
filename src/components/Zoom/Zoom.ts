@@ -1,3 +1,27 @@
+/**
+ * Плагин зума
+ *
+ * Модуль зума, позволяет просматривать увеличенное изображение исходной картинки в отдельном окне расположенного в указанной стороне от неё
+ *
+ * Автор: Ерохин Максим, plarson.ru
+ * Дата: 29.09.2018
+ *
+ *
+ * Пример использования
+ * В JS:
+ *   PlarsonJS.add({
+ *     pluginName: 'ProductsZoom',
+ *     plugins: ['Zoom'],
+ *     condition: document.querySelectorAll('.image').length,
+ *     callback: () => {
+ *       new PlarsonJS.Zoom(document.querySelector('.image'));
+ *     }
+ *   });
+ *
+ * В HTML:
+ *   <img class="image" src="https://via.placeholder.com/200x200" data-full-image="https://via.placeholder.com/2000x2000">
+ */
+
 import './Zoom.scss';
 
 /**

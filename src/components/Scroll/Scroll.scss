@@ -8,6 +8,8 @@
 .scroll {
   position: relative;
 
+  border: 0.1rem solid #000;
+
   overflow: hidden;
 
   .scroll-vertical, .scroll-horizontal {

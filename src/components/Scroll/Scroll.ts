@@ -1,3 +1,32 @@
+/**
+ * Плагин скрола
+ *
+ * Скрол представляет из себя область, в которую помещается исходный элемент и, если он не влезает в данную область, то появляется скрол
+ * бар, и возможность скролить эту область колесиком мыши.
+ *
+ * Автор: Ерохин Максим, plarson.ru
+ * Дата: 30.09.2018
+ *
+ *
+ * Пример использования
+ * В JS:
+ *   PlarsonJS.add({
+ *     pluginName: 'ScrollPage',
+ *     plugins: ['Scroll'],
+ *     condition: document.querySelectorAll('.for-scroll').length,
+ *     callback: () => {
+ *       new PlarsonJS.Scroll(document.querySelector('.for-scroll'), {
+ *         height: 200,
+ *       });
+ *     }
+ *   });
+ *
+ * В HTML:
+ *   <div class="for-scroll">
+ *     МНОГО ТЕКСТА
+ *   </div>
+ */
+
 import './Scroll.scss';
 
 /**

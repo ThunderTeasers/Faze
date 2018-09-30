@@ -92,7 +92,7 @@ class Scroll {
    * Навешивание событий
    */
   bind(): void {
-    this.node.addEventListener('wheel', (event) => {
+    this.wrapperNode.addEventListener('wheel', (event) => {
       event.preventDefault();
 
       // Определяем направление

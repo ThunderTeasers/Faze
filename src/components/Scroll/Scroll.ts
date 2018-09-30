@@ -67,6 +67,9 @@ class Scroll {
   // Размер вертикального скрола в процентах относительно области скрола
   scrollVerticalHeightInPercents: number;
 
+  // Флаг обозначающий имеет ли область вертикальный скролл
+  isVertical: boolean;
+
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
       throw new Error('Не задан объект скрола');
@@ -85,6 +88,7 @@ class Scroll {
     // Инициализация переменных
     this.wrapperNode = document.createElement('div');
     this.scrollVerticalNode = document.createElement('div');
+    this.isVertical = false;
 
     this.initialize();
     this.bind();
@@ -97,52 +101,56 @@ class Scroll {
     // Получаем полную высоту элемента
     this.calculateHeight();
 
-    // Подготовка элемента
-    this.node.style.position = 'absolute';
-    this.node.style.top = '0';
-    this.node.style.left = '0';
-    this.node.style.transition = this.config.transition;
+    if (this.isVertical) {
+      // Подготовка элемента
+      this.node.style.position = 'absolute';
+      this.node.style.top = '0';
+      this.node.style.left = '0';
+      this.node.style.transition = this.config.transition;
 
-    // Создаем обертку
-    this.wrapperNode.className = 'scroll';
-    this.wrapperNode.style.height = `${this.config.height}px`;
-    if (this.node.parentNode) {
-      this.node.parentNode.insertBefore(this.wrapperNode, this.node);
+      // Создаем обертку
+      this.wrapperNode.className = 'scroll';
+      this.wrapperNode.style.height = `${this.config.height}px`;
+      if (this.node.parentNode) {
+        this.node.parentNode.insertBefore(this.wrapperNode, this.node);
+      }
+      this.wrapperNode.appendChild(this.node);
+
+      // Создаем вертикальный скролл
+      this.scrollVerticalNode.className = 'scroll-vertical';
+      this.scrollVerticalNode.style.transition = this.config.transition;
+      this.wrapperNode.appendChild(this.scrollVerticalNode);
     }
-    this.wrapperNode.appendChild(this.node);
-
-    // Создаем вертикальный скролл
-    this.scrollVerticalNode.className = 'scroll-vertical';
-    this.scrollVerticalNode.style.transition = this.config.transition;
-    this.wrapperNode.appendChild(this.scrollVerticalNode);
   }
 
   /**
    * Навешивание событий
    */
   bind(): void {
-    this.wrapperNode.addEventListener('wheel', (event) => {
-      event.preventDefault();
+    if (this.isVertical) {
+      this.wrapperNode.addEventListener('wheel', (event) => {
+        event.preventDefault();
 
-      // Определяем направление
-      const delta = event.deltaY > 0 ? 100 : -100;
+        // Определяем направление
+        const delta = event.deltaY > 0 ? 100 : -100;
 
-      // Изменяем текущую позицию
-      let positionY = parseInt(this.node.style.top || '0', 10) - delta;
+        // Изменяем текущую позицию
+        let positionY = parseInt(this.node.style.top || '0', 10) - delta;
 
-      // Проверяем чтобы позиция не уехала за рамки
-      if (positionY >= 0) {
-        positionY = 0;
-      } else if (positionY <= -this.height + this.config.height) {
-        positionY = -this.height + this.config.height;
-      }
+        // Проверяем чтобы позиция не уехала за рамки
+        if (positionY >= 0) {
+          positionY = 0;
+        } else if (positionY <= -this.height + this.config.height) {
+          positionY = -this.height + this.config.height;
+        }
 
-      // Задаем позицию элементу который скролим
-      this.node.style.top = `${positionY}px`;
+        // Задаем позицию элементу который скролим
+        this.node.style.top = `${positionY}px`;
 
-      // Задаем позицию вертикальному скрол бару
-      this.scrollVerticalNode.style.top = `${Math.abs(this.scrollVerticalHeightInPercents / 100 * positionY)}px`;
-    });
+        // Задаем позицию вертикальному скрол бару
+        this.scrollVerticalNode.style.top = `${Math.abs(this.scrollVerticalHeightInPercents / 100 * positionY)}px`;
+      });
+    }
   }
 
   /**
@@ -153,9 +161,13 @@ class Scroll {
       this.height = this.node.getBoundingClientRect().height;
     }
 
-    if (this.scrollVerticalNode) {
-      this.scrollVerticalHeightInPercents = <any>(this.config.height / this.height).toFixed(3) * 100;
-      this.scrollVerticalNode.style.height = `${this.scrollVerticalHeightInPercents}%`;
+    if (this.height > this.config.height) {
+      this.isVertical = true;
+
+      if (this.scrollVerticalNode) {
+        this.scrollVerticalHeightInPercents = <any>(this.config.height / this.height).toFixed(3) * 100;
+        this.scrollVerticalNode.style.height = `${this.scrollVerticalHeightInPercents}%`;
+      }
     }
   }
 }

@@ -1,5 +1,50 @@
+/**
+ * Плагин формы
+ *
+ * Модуль формы представляет из себя легкую обертку над стандартными формами с предоставлением функционала отправления POST запроса к
+ * серверу и возможностью задать пользовательские функции колбеки для работы с ответом от сервера.
+ *
+ * Автор: Ерохин Максим, plarson.ru
+ * Дата: 01.10.2018
+ *
+ *
+ * Пример использования
+ * В JS:
+ *   PlarsonJS.add({
+ *     pluginName: 'OrderForm',
+ *     plugins: ['Form'],
+ *     condition: document.querySelectorAll('.form-order').length,
+ *     callback: () => {
+ *       new PlarsonJS.Form(document.querySelector('.form-order'), {
+ *         callbacks: {
+ *           success: (data) => {
+ *             console.log(data.response);
+ *           }
+ *         }
+ *       });
+ *     }
+ *   });
+ *
+ * В HTML:
+ *   <form class="form-order">
+ *     <input type="text" name="name" placeholder="ФИО">
+ *     <input type="email" name="email" placeholder="email">
+ *     <button type="submit">
+ *       Отправить
+ *     </button>
+ *   </form>
+ */
+
 import './Form.scss';
 
+/**
+ * Структура возвращаемого объекта в пользовательских функциях
+ *
+ * Содержит:
+ *   form     - DOM элемент формы
+ *   button   - DOM элемент кнопки submit
+ *   response - ответ от сервера после передачи запроса, так же может содержать ошибку, в случае, если сервер не ответил
+ */
 interface CallbackData {
   form: HTMLFormElement;
   button: HTMLElement | null;
@@ -18,6 +63,11 @@ interface CallbackData {
  *     button   - CSS селектор кнопки отправки
  */
 interface Config {
+  url?: string;
+  texts: {
+    buttonLoading: string;
+    buttonCompleted: string;
+  };
   callbacks: {
     created?: (data: CallbackData) => void;
     success?: (data: CallbackData) => void;
@@ -48,6 +98,11 @@ class Form {
 
     // Конфиг по умолчанию
     const defaultConfig: Config = {
+      url: undefined,
+      texts: {
+        buttonLoading: 'Обработка...',
+        buttonCompleted: 'Готово!',
+      },
       callbacks: {
         created: undefined,
         success: undefined,
@@ -95,7 +150,8 @@ class Form {
       // Блокировка кнопки от повторного нажатия
       this.lockButton();
 
-      const url = this.node.getAttribute('action') || window.location.href;
+      // Получение URL куда отправляем запрос
+      const url = this.config.url || this.node.getAttribute('action') || window.location.href;
 
       // Отправка данных на сервер
       fetch(url, {
@@ -153,7 +209,7 @@ class Form {
       this.button.setAttribute('disabled', 'disabled');
       this.button.setAttribute('data-initial-text', this.button.textContent || '');
       this.button.classList.add('disabled');
-      this.button.textContent = this.button.getAttribute('data-loading-text') || 'Обработка...';
+      this.button.textContent = this.button.getAttribute('data-loading-text') || this.config.texts.buttonLoading;
     }
   }
 
@@ -164,7 +220,7 @@ class Form {
     if (this.button) {
       this.button.removeAttribute('disabled');
       this.button.classList.remove('disabled');
-      this.button.textContent = this.button.getAttribute('data-initial-text') || 'Готово!';
+      this.button.textContent = this.button.getAttribute('data-initial-text') || this.config.texts.buttonCompleted;
     }
   }
 }

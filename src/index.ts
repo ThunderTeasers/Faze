@@ -81,7 +81,7 @@ PlarsonJS.add({
 // Тесты
 PlarsonJS.add({
   pluginName: 'TooltipTest',
-  plugins: ['Scroll', 'Zoom', 'Carousel', 'Select', 'Dropdown', 'Tab', 'Modal', 'Tooltip'],
+  plugins: ['Form', 'Scroll', 'Zoom', 'Carousel', 'Select', 'Dropdown', 'Tab', 'Modal', 'Tooltip'],
   condition: document.querySelectorAll('#button').length > 0,
   callback: () => {
     new PlarsonJS.Tooltip(document.querySelector('#button'), {
@@ -127,6 +127,14 @@ PlarsonJS.add({
 
     new PlarsonJS.Scroll(document.querySelector('.for-scroll'), {
       height: 100,
+    });
+
+    new PlarsonJS.Form(document.querySelector('.form-order'), {
+      callbacks: {
+        error: (data: any) => {
+          console.log(data);
+        },
+      },
     });
   },
 });

@@ -9,6 +9,7 @@ import Zoom from './components/Zoom/Zoom';
 import Scroll from './components/Scroll/Scroll';
 import Form from './components/Form/Form';
 import Page from './components/Page/Page';
+import Filter from './components/Filter/Filter';
 
 // @ts-ignore
 window.PlarsonJS = PlarsonJS;
@@ -83,6 +84,13 @@ PlarsonJS.add({
   pluginName: 'Page',
   callback: () => {
     PlarsonJS.Page = Page;
+  },
+});
+
+PlarsonJS.add({
+  pluginName: 'Page',
+  callback: () => {
+    PlarsonJS.Filter = Filter;
   },
 });
 

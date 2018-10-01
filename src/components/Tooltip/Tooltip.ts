@@ -139,9 +139,17 @@ class Tooltip {
     const offsetHorizontal = callerRect.width / 2 + tooltipRect.width / 2 + this.config.margin;
     const offsetVertical = callerRect.height / 2 + tooltipRect.height / 2 + this.config.margin;
 
+    const documentElement = document.documentElement;
+    let left = 0;
+    let top = 0;
+    if (documentElement) {
+      left = (window.pageXOffset || documentElement.scrollLeft) - (documentElement.clientLeft || 0);
+      top = (window.pageYOffset || documentElement.scrollTop) - (documentElement.clientTop || 0);
+    }
+
     // Рассчет центров
-    let centerX = callerRect.left + callerRect.width / 2 - tooltipRect.width / 2;
-    let centerY = callerRect.top + callerRect.height / 2 - tooltipRect.height / 2;
+    let centerX = callerRect.left + callerRect.width / 2 - tooltipRect.width / 2 + left;
+    let centerY = callerRect.top + callerRect.height / 2 - tooltipRect.height / 2 + top;
 
     // Применение отступа в зависимости от стороны
     switch (this.config.side) {

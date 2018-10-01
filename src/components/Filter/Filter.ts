@@ -16,6 +16,9 @@ interface Config {
     items: string;
     total: string;
   };
+  texts: {
+    buttonLoading: string;
+  };
   callbacks: {
     created?: () => void;
     filtered?: () => void;
@@ -31,6 +34,9 @@ class Filter {
 
   // Конфиг с настройками
   readonly config: Config;
+
+  // DOM элемент кнопки сабмита формы фильтра
+  readonly buttonSubmitNode: HTMLElement | null;
 
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
@@ -49,6 +55,9 @@ class Filter {
         items: '.js-filter .js-items',
         total: '.total',
       },
+      texts: {
+        buttonLoading: 'Обработка...',
+      },
       callbacks: {
         created: undefined,
         filtered: undefined,
@@ -57,6 +66,9 @@ class Filter {
 
     this.config = Object.assign(defaultConfig, config);
     this.node = node;
+
+    // Инициализация переменных
+    this.buttonSubmitNode = this.node.querySelector(`${this.config.selectors.form} [type="submit"]`);
 
     this.initialize();
     this.bind();
@@ -74,6 +86,29 @@ class Filter {
    */
   bind(): void {
 
+  }
+
+  /**
+   * Блокирует кнопку от нажатия, так же запоминает оригинальный тест
+   */
+  lockButton() {
+    if (this.buttonSubmitNode) {
+      this.buttonSubmitNode.setAttribute('disabled', 'disabled');
+      this.buttonSubmitNode.setAttribute('data-initial-text', this.buttonSubmitNode.textContent || '');
+      this.buttonSubmitNode.classList.add('disabled');
+      this.buttonSubmitNode.textContent = this.config.texts.buttonLoading;
+    }
+  }
+
+  /**
+   * Разблокирует кнопку, ставя ей обратно текст который был на ней изначально, до блокировки
+   */
+  unlockButton() {
+    if (this.buttonSubmitNode) {
+      this.buttonSubmitNode.removeAttribute('disabled');
+      this.buttonSubmitNode.classList.remove('disabled');
+      this.buttonSubmitNode.textContent = this.buttonSubmitNode.getAttribute('data-initial-text') || 'Готово!';
+    }
   }
 }
 

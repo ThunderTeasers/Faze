@@ -38,6 +38,9 @@ class Filter {
   // DOM элемент кнопки сабмита формы фильтра
   readonly buttonSubmitNode: HTMLElement | null;
 
+  // Параметры фильтра, должны совпадать с параметрами в поисковой строке
+  params: URLSearchParams;
+
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
       throw new Error('Не задан объект дропдауна');
@@ -86,6 +89,13 @@ class Filter {
    */
   bind(): void {
 
+  }
+
+  /**
+   * Обновление внутненних параметров поиска, для того чтобы они совпадали с теми, что содержатся в поисковой строке
+   */
+  updateSearchParams() {
+    this.params = new URLSearchParams(window.location.search);
   }
 
   /**

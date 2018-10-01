@@ -88,7 +88,7 @@ PlarsonJS.add({
 });
 
 PlarsonJS.add({
-  pluginName: 'Page',
+  pluginName: 'Filter',
   callback: () => {
     PlarsonJS.Filter = Filter;
   },

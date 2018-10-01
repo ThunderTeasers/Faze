@@ -144,7 +144,6 @@ class Page {
     this.offset = this.config.offset;
 
     this.createButton();
-    this.bind();
 
     // Выполнение кастомной функции
     if (typeof this.config.callbacks.created === 'function') {

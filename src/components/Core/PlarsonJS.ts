@@ -70,6 +70,7 @@ class PlarsonJS {
   static Gallery: any;
   static Scroll: any;
   static Page: any;
+  static Form: any;
   static Filter: any;
   static Dropdown: any;
   static Select: any;

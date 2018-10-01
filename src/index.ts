@@ -7,6 +7,7 @@ import Select from './components/Select/Select';
 import Carousel from './components/Carousel/Carousel';
 import Zoom from './components/Zoom/Zoom';
 import Scroll from './components/Scroll/Scroll';
+import Form from './components/Form/Form';
 
 // @ts-ignore
 window.PlarsonJS = PlarsonJS;
@@ -70,10 +71,17 @@ PlarsonJS.add({
   },
 });
 
+PlarsonJS.add({
+  pluginName: 'Form',
+  callback: () => {
+    PlarsonJS.Form = Form;
+  },
+});
+
 // Тесты
 PlarsonJS.add({
   pluginName: 'TooltipTest',
-  plugins: ['Zoom', 'Carousel', 'Select', 'Dropdown', 'Tab', 'Modal', 'Tooltip'],
+  plugins: ['Scroll', 'Zoom', 'Carousel', 'Select', 'Dropdown', 'Tab', 'Modal', 'Tooltip'],
   condition: document.querySelectorAll('#button').length > 0,
   callback: () => {
     new PlarsonJS.Tooltip(document.querySelector('#button'), {
@@ -115,6 +123,10 @@ PlarsonJS.add({
 
     new PlarsonJS.Zoom(document.querySelector('.image'), {
       side: 'bottom',
+    });
+
+    new PlarsonJS.Scroll(document.querySelector('.for-scroll'), {
+      height: 100,
     });
   },
 });

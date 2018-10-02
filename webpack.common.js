@@ -1,8 +1,8 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   entry: './src/index.ts',
@@ -17,21 +17,15 @@ module.exports = {
       template: './src/index.html',
     }),
     new webpack.HotModuleReplacementPlugin(),
-    // new BundleAnalyzerPlugin(),
+    new MiniCssExtractPlugin({
+      filename: 'bundle.css',
+    }),
   ],
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
   module: {
     rules: [
-      {
-        test: /\.scss$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          'sass-loader',
-        ],
-      },
       {
         test: /\.tsx?$/,
         use: 'ts-loader',

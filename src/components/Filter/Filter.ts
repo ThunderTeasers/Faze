@@ -1,6 +1,24 @@
 import './Filter.scss';
 
 /**
+ * Структура возвращаемого объекта в пользовательских функциях
+ *
+ * Содержит:
+ *   filterNode - DOM элемент всего фильтра
+ *   formNode   - DOM элемент формы фильтра
+ *   itemsHolderNode - DOM элемент родителя содержащего элементы которые фильтруются
+ *   params     - текущие параметры фильтра
+ *   total      - общее количество отфильтрованных элементов
+ */
+interface CallbackData {
+  filterNode: HTMLElement;
+  formNode: HTMLFormElement | null;
+  itemsHolderNode: HTMLElement | null;
+  params: URLSearchParams;
+  total: number;
+}
+
+/**
  * Структура конфига
  *
  * Содержит:
@@ -33,8 +51,8 @@ interface Config {
     buttonLoading: string;
   };
   callbacks: {
-    created?: () => void;
-    filtered?: () => void;
+    created?: (data: CallbackData) => void;
+    filtered?: (data: CallbackData) => void;
   };
 }
 

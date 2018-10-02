@@ -9,6 +9,8 @@ import './Filter.scss';
  *   itemsHolderNode - DOM элемент родителя содержащего элементы которые фильтруются
  *   params     - текущие параметры фильтра
  *   total      - общее количество отфильтрованных элементов
+ *   response   - ответ от сервера в тексте
+ *   responseHTML - ответ от сервера в формате HTML документа
  */
 interface CallbackData {
   filterNode: HTMLElement;
@@ -16,6 +18,8 @@ interface CallbackData {
   itemsHolderNode: HTMLElement | null;
   params: URLSearchParams;
   total: number;
+  response?: string;
+  responseHTML?: Document;
 }
 
 /**
@@ -155,7 +159,86 @@ class Filter {
    * Навешивание событий
    */
   bind(): void {
+    if (this.formNode) {
+      this.formNode.addEventListener('submit', (event) => {
+        event.preventDefault();
 
+        // Блокировка кнопки для предотвращения повторного нажатия во время отправки запроса
+        this.lockButton();
+
+        // Составление запроса для фильтрации
+        const formData = new FormData(<HTMLFormElement>this.formNode);
+        const formDataURLString = new URLSearchParams(<any>formData);
+
+        // URL для вставки в строку поиска в браузере(HTML5 history)
+        const urlForHistory = `?${formDataURLString.toString()}`;
+        formDataURLString.append('mime', 'txt');
+        if (this.config.modules.get) {
+          formDataURLString.append('show', this.config.modules.get.toString());
+        }
+
+        // URL для запроса к серверу
+        const urlForRequest = `?${formDataURLString.toString()}`;
+
+        // Отправка запрос на сервер
+        fetch(urlForRequest)
+          .then(response => response.text())
+          .then((response) => {
+            // Парсинг ответа от сервера
+            const responseHTML = (new DOMParser()).parseFromString(response, 'text/html');
+
+            const responseNode = responseHTML.querySelector(`.${this.node.className}`);
+            if (responseNode) {
+              if (this.itemsHolderNode) {
+                // Проверка, если отфильтрованных элементов больше 0, тогда происходит их вывод
+                // иначе сообщение об отсутствии элементов по данному запросу
+                const itemsHolderNode = responseNode.querySelector(this.config.selectors.itemsHolder);
+                if (itemsHolderNode) {
+                  this.itemsHolderNode.innerHTML = itemsHolderNode.innerHTML;
+                } else {
+                  this.itemsHolderNode.innerHTML = '<p class="error">К сожалению, ничего не найдено...</p>';
+                }
+              }
+
+              // Обновление количества элементов
+              const total = responseNode.getAttribute('data-total') || '0';
+              if (this.config.showTotal && this.totalNode) {
+                this.totalNode.textContent = total;
+              }
+              this.node.setAttribute('data-total', total);
+            }
+
+            // Обновление строки в браузере
+            window.history.pushState({}, '', urlForHistory);
+
+            // Обновляем хранимые параметры
+            this.updateSearchParams();
+
+            // Выполняем пользовательскую функцию
+            if (typeof this.config.callbacks.filtered === 'function') {
+              try {
+                this.config.callbacks.filtered({
+                  response,
+                  responseHTML,
+                  filterNode: this.node,
+                  formNode: this.formNode,
+                  itemsHolderNode: this.itemsHolderNode,
+                  params: this.params,
+                  total: parseInt(this.node.getAttribute('data-total') || '0', 10),
+                });
+              } catch (e) {
+                console.error(e);
+              }
+            }
+
+            // Разблокировка кнопки
+            this.unlockButton();
+
+            // Скрол наверх
+            window.scrollTo(0, 0);
+          });
+      });
+    }
   }
 
   /**

@@ -75,6 +75,9 @@ class Filter {
   // DOM элемент родителя элементов фильтрации
   readonly itemsHolderNode: HTMLElement | null;
 
+  // DOM элемент содержащий текст об общем количестве отфильтрованных элементов
+  readonly totalNode: HTMLElement | null;
+
   // Параметры фильтра, должны совпадать с параметрами в поисковой строке
   params: URLSearchParams;
 
@@ -112,6 +115,10 @@ class Filter {
     this.formNode = document.querySelector(this.config.selectors.form);
     this.itemsHolderNode = document.querySelector(this.config.selectors.itemsHolder);
 
+    if (this.config.showTotal && this.formNode) {
+      this.totalNode = this.formNode.querySelector(this.config.selectors.total);
+    }
+
     this.initialize();
     this.bind();
   }
@@ -120,6 +127,14 @@ class Filter {
    * Инициализация
    */
   initialize(): void {
+    // Обновляем хранимые параметры
+    this.updateSearchParams();
+
+    // Простановка общего числа элементов
+    if (this.config.showTotal && this.totalNode) {
+      this.totalNode.textContent = this.node.getAttribute('data-total');
+    }
+
     // Выполняем пользовательскую фукнции
     if (typeof this.config.callbacks.created === 'function') {
       try {

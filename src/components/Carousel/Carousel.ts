@@ -329,22 +329,24 @@ class Carousel {
    * Создание дополнительных элементов карусели, таких как: пагинация, стрелки, счетчик
    */
   createControls() {
-    this.controlsNode.className = 'faze-carousel-controls';
-    this.node.appendChild(this.controlsNode);
+    if (this.config.arrows || this.config.pages || this.config.counter) {
+      this.controlsNode.className = 'faze-carousel-controls';
+      this.node.appendChild(this.controlsNode);
 
-    // Создание пагинации, если это указанов конфиге
-    if (this.config.pages) {
-      this.createPagination();
-    }
+      // Создание пагинации, если это указанов конфиге
+      if (this.config.pages) {
+        this.createPagination();
+      }
 
-    // Создание стрелок переключения, если это указано в конфиге
-    if (this.config.arrows) {
-      this.createArrows();
-    }
+      // Создание стрелок переключения, если это указано в конфиге
+      if (this.config.arrows) {
+        this.createArrows();
+      }
 
-    // Создание счетчика, если это указано в конфиге
-    if (this.config.counter) {
-      this.createSlidesCounter();
+      // Создание счетчика, если это указано в конфиге
+      if (this.config.counter) {
+        this.createSlidesCounter();
+      }
     }
   }
 

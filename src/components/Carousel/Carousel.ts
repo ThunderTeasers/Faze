@@ -91,7 +91,7 @@ interface CallbackData {
   slidesNodes: HTMLElement[];
   totalSlides: number;
   index: number;
-  currentSlideNode: HTMLElement | null;
+  currentSlideNode?: HTMLElement | null;
 }
 
 /**
@@ -254,6 +254,21 @@ class Carousel {
 
     // Создание дополнительных элементов карусели
     this.createControls();
+
+    // Выполнение пользовательской функции
+    if (typeof this.config.callbacks.created === 'function') {
+      try {
+        this.config.callbacks.created({
+          holderNode: this.itemsHolderNode,
+          carouselNode: this.node,
+          slidesNodes: this.slidesNodes,
+          totalSlides: this.totalSlides,
+          index: this.index,
+        });
+      } catch (error) {
+        console.error('Ошибка исполнения пользовательского метода "created":', error);
+      }
+    }
   }
 
   /**
@@ -536,7 +551,7 @@ class Carousel {
     // Инменяем индикаторы
     this.changeControls();
 
-    // Выполнение кастомной функции
+    // Выполнение пользовательской функции
     if (typeof this.config.callbacks.changed === 'function') {
       try {
         this.config.callbacks.changed({

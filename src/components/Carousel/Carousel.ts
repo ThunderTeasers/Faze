@@ -89,6 +89,10 @@ interface CallbackData {
   holderNode: HTMLElement;
   carouselNode: HTMLElement;
   slidesNodes: HTMLElement[];
+  controlsNode?: HTMLElement;
+  pagesNode?: HTMLElement;
+  arrowsNode?: HTMLElement;
+  counterNode?: HTMLElement;
   totalSlides: number;
   index: number;
   currentSlideNode?: HTMLElement | null;
@@ -111,7 +115,7 @@ class Carousel {
   readonly itemsHolderNode: HTMLElement;
 
   // DOM элемент содержащий пагинацию по слайдам
-  readonly pagesNode: HTMLElement | null;
+  readonly pagesNode: HTMLElement;
 
   // DOM элементы пагинации
   pagesNodes: NodeListOf<HTMLElement>;
@@ -264,6 +268,10 @@ class Carousel {
           slidesNodes: this.slidesNodes,
           totalSlides: this.totalSlides,
           index: this.index,
+          controlsNode: this.controlsNode,
+          counterNode: this.counterNode,
+          arrowsNode: this.arrowsNode,
+          pagesNode: this.pagesNode,
         });
       } catch (error) {
         console.error('Ошибка исполнения пользовательского метода "created":', error);
@@ -563,6 +571,10 @@ class Carousel {
           totalSlides: this.totalSlides,
           index: this.index,
           currentSlideNode: currentSlide,
+          controlsNode: this.controlsNode,
+          counterNode: this.counterNode,
+          arrowsNode: this.arrowsNode,
+          pagesNode: this.pagesNode,
         });
       } catch (error) {
         console.error('Ошибка исполнения пользовательского метода "changed":', error);

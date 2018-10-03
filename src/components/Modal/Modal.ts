@@ -269,7 +269,7 @@ class Modal {
    */
   buildButtons() {
     const buttonsNode = document.createElement('div');
-    buttonsNode.className = 'buttons';
+    buttonsNode.className = 'faze-buttons';
 
     if (this.config.buttons && this.config.buttons.length > 0) {
       for (const buttonData of this.config.buttons) {

@@ -6,7 +6,7 @@ const webpack = require('webpack');
 
 module.exports = {
   output: {
-    filename: 'plarson.js',
+    filename: 'faze.js',
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/',
   },
@@ -17,7 +17,7 @@ module.exports = {
     }),
     new webpack.HotModuleReplacementPlugin(),
     new MiniCssExtractPlugin({
-      filename: 'bundle.css',
+      filename: 'faze.css',
     }),
   ],
   resolve: {

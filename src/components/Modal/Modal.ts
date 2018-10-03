@@ -98,12 +98,12 @@ interface Config {
  *   wrapper      - элемент содержащий всё что связанно с модальным окном
  */
 interface ModalParts {
-  closeButton: HTMLElement;
-  header: HTMLElement;
-  body: HTMLElement;
-  footer: HTMLElement;
-  full: HTMLElement;
-  wrapper: HTMLElement;
+  closeButtonNode: HTMLElement;
+  headerNode: HTMLElement;
+  bodyNode: HTMLElement;
+  footerNode: HTMLElement;
+  fullNode: HTMLElement;
+  wrapperNode: HTMLElement;
 }
 
 /**
@@ -147,12 +147,12 @@ class Modal {
    */
   reset() {
     this.modalParts = {
-      closeButton: document.createElement('div'),
-      header: document.createElement('header'),
-      body: document.createElement('main'),
-      footer: document.createElement('footer'),
-      full: document.createElement('div'),
-      wrapper: document.createElement('div'),
+      closeButtonNode: document.createElement('div'),
+      headerNode: document.createElement('header'),
+      bodyNode: document.createElement('main'),
+      footerNode: document.createElement('footer'),
+      fullNode: document.createElement('div'),
+      wrapperNode: document.createElement('div'),
     };
   }
 
@@ -207,10 +207,10 @@ class Modal {
     this.buildFooter();
     this.buildFull();
 
-    this.modalParts.wrapper.className = 'faze-modal-wrapper';
-    this.modalParts.wrapper.appendChild(this.modalParts.full);
+    this.modalParts.wrapperNode.className = 'faze-modal-wrapper';
+    this.modalParts.wrapperNode.appendChild(this.modalParts.fullNode);
 
-    document.body.appendChild(this.modalParts.wrapper);
+    document.body.appendChild(this.modalParts.wrapperNode);
   }
 
   /**
@@ -224,26 +224,26 @@ class Modal {
     const titleNode = document.createElement('span');
     titleNode.textContent = this.config.title || '';
 
-    this.modalParts.header = document.createElement('header');
-    this.modalParts.header.appendChild(titleNode);
-    this.modalParts.header.appendChild(this.modalParts.closeButton);
+    this.modalParts.headerNode = document.createElement('header');
+    this.modalParts.headerNode.appendChild(titleNode);
+    this.modalParts.headerNode.appendChild(this.modalParts.closeButtonNode);
   }
 
   /**
    * Создание кнопки закрытия и бинд на её нажатие
    */
   buildAndBindCloseButton(): void {
-    this.modalParts.closeButton.className = 'faze-close';
+    this.modalParts.closeButtonNode.className = 'faze-close';
 
-    this.modalParts.closeButton.addEventListener('click', (event) => {
+    this.modalParts.closeButtonNode.addEventListener('click', (event) => {
       event.preventDefault();
 
       document.body.classList.remove('faze-modal-opened');
 
       // Сначала навешивается класс, а потом через указанное время удаляем окно со страницы, это нужно для того чтобы анимация(если они
       // есть) успела проиграться и завершиться
-      this.modalParts.full.classList.add('faze-closing');
-      setTimeout(() => this.modalParts.wrapper.remove(), this.config.delayToClose);
+      this.modalParts.fullNode.classList.add('faze-closing');
+      setTimeout(() => this.modalParts.wrapperNode.remove(), this.config.delayToClose);
     });
   }
 
@@ -253,7 +253,7 @@ class Modal {
    * @param content - контент для вставки в тело окна
    */
   buildBody(content?: string) {
-    this.modalParts.body.innerHTML = content || '';
+    this.modalParts.bodyNode.innerHTML = content || '';
   }
 
   /**
@@ -289,7 +289,7 @@ class Modal {
         buttonsNode.appendChild(buttonNode);
       }
 
-      this.modalParts.footer.appendChild(buttonsNode);
+      this.modalParts.footerNode.appendChild(buttonsNode);
     }
   }
 
@@ -297,11 +297,11 @@ class Modal {
    * Компановка частей модального окна в один элемент
    */
   buildFull(): void {
-    this.modalParts.full.className = 'faze-modal';
+    this.modalParts.fullNode.className = 'faze-modal';
 
-    this.modalParts.full.appendChild(this.modalParts.header);
-    this.modalParts.full.appendChild(this.modalParts.body);
-    this.modalParts.full.appendChild(this.modalParts.footer);
+    this.modalParts.fullNode.appendChild(this.modalParts.headerNode);
+    this.modalParts.fullNode.appendChild(this.modalParts.bodyNode);
+    this.modalParts.fullNode.appendChild(this.modalParts.footerNode);
   }
 
   /**

@@ -10,12 +10,12 @@
  *
  * Пример использования
  * В JS:
- *   PlarsonJS.add({
+ *   Faze.add({
  *     pluginName: 'ScrollPage',
  *     plugins: ['Scroll'],
  *     condition: document.querySelectorAll('.for-scroll').length,
  *     callback: () => {
- *       new PlarsonJS.Scroll(document.querySelector('.for-scroll'), {
+ *       new Faze.Scroll(document.querySelector('.for-scroll'), {
  *         height: 200,
  *       });
  *     }
@@ -109,7 +109,7 @@ class Scroll {
       this.node.style.transition = this.config.transition;
 
       // Создаем обертку
-      this.wrapperNode.className = 'scroll';
+      this.wrapperNode.className = 'faze-scroll';
       this.wrapperNode.style.height = `${this.config.height}px`;
       if (this.node.parentNode) {
         this.node.parentNode.insertBefore(this.wrapperNode, this.node);
@@ -117,7 +117,7 @@ class Scroll {
       this.wrapperNode.appendChild(this.node);
 
       // Создаем вертикальный скролл
-      this.scrollVerticalNode.className = 'scroll-vertical';
+      this.scrollVerticalNode.className = 'faze-scroll-vertical';
       this.scrollVerticalNode.style.transition = this.config.transition;
       this.wrapperNode.appendChild(this.scrollVerticalNode);
     }

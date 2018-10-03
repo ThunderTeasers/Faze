@@ -5,10 +5,11 @@
  * Дата: 23.09.2018
  */
 
-$width: 0.5rem;
-$height: 0.5rem;
+.faze-tooltip {
+  // Переменные для плагина
+  $width: 0.5rem;
+  $height: 0.5rem;
 
-.tooltip {
   position: absolute;
 
   padding: 1rem;
@@ -28,7 +29,7 @@ $height: 0.5rem;
     position: absolute;
   }
 
-  &.tooltip-top, &.tooltip-bottom {
+  &.faze-tooltip-top, &.faze-tooltip-bottom {
     &:before {
       left: 50%;
 
@@ -36,7 +37,7 @@ $height: 0.5rem;
     }
   }
 
-  &.tooltip-left, &.tooltip-right {
+  &.faze-tooltip-left, &.faze-tooltip-right {
     &:before {
       top: 50%;
 
@@ -44,7 +45,7 @@ $height: 0.5rem;
     }
   }
 
-  &.tooltip-top {
+  &.faze-tooltip-top {
     &:before {
       bottom: -$height;
 
@@ -54,7 +55,7 @@ $height: 0.5rem;
     }
   }
 
-  &.tooltip-bottom {
+  &.faze-tooltip-bottom {
     &:before {
       top: -$height;
 
@@ -64,7 +65,7 @@ $height: 0.5rem;
     }
   }
 
-  &.tooltip-left {
+  &.faze-tooltip-left {
     &:before {
       right: -$width;
 
@@ -74,7 +75,7 @@ $height: 0.5rem;
     }
   }
 
-  &.tooltip-right {
+  &.faze-tooltip-right {
     &:before {
       left: -$width;
 

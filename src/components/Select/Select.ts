@@ -9,19 +9,23 @@
  *
  * Пример использования
  * В JS:
- *   PlarsonJS.add({
+ *   Faze.add({
  *     pluginName: 'FilterSelects',
  *     plugins: ['Select'],
- *     condition: document.querySelectorAll('.select').length,
+ *     condition: document.querySelectorAll('.faze-select').length,
  *     callback: () => {
- *       new PlarsonJS.Select(document.querySelector('.select'));
+ *       new Faze.Select(document.querySelector('.faze-select'));
  *     }
  *   });
  *
  * В HTML:
- *   <div class="dropdown">
- *     <div class="title">Дропдаун</div>
- *     <div class="body">Тело дропдауна</div>
+ *   <div class="faze-select">
+ *     <div class="faze-title">Селект</div>
+ *      <div class="faze-body">
+ *        <div class="faze-option">Выбор 1</div>
+ *        <div class="faze-option">Выбор 2</div>
+ *        <div class="faze-option">Выбор 3</div>
+ *      </div>
  *   </div>
  */
 
@@ -107,8 +111,8 @@ class Select {
    */
   initialize(): void {
     // Поиск основных элементов и проверка на то что они найдены
-    this.title = this.node.querySelector('.title');
-    this.body = this.node.querySelector('.body');
+    this.title = this.node.querySelector('.faze-title');
+    this.body = this.node.querySelector('.faze-body');
 
     if (!this.title || !this.body) {
       throw new Error('Для селекта не найдены шапка и тело');
@@ -121,7 +125,7 @@ class Select {
     this.resetTitle();
 
     // Берем все опции в селекте
-    this.options = this.body.querySelectorAll('.option');
+    this.options = this.body.querySelectorAll('.faze-option');
 
     // Вызываем пользовательский метод
     if (typeof this.config.callbacks.created === 'function') {
@@ -152,8 +156,8 @@ class Select {
     this.title.addEventListener('click', (event) => {
       event.preventDefault();
 
-      if (!this.node.classList.contains('disabled')) {
-        this.node.classList.toggle('active');
+      if (!this.node.classList.contains('faze-disabled')) {
+        this.node.classList.toggle('faze-active');
       }
     });
 
@@ -169,7 +173,7 @@ class Select {
 
         // Меняем заголовок
         this.title.textContent = option.getAttribute('data-caption') || option.textContent;
-        this.value = option.getAttribute('data-value') || option.textContent;
+        this.value = option.getAttribute('data-faze-value') || option.textContent;
 
         // Вызываем пользовательский метод
         if (typeof this.config.callbacks.changed === 'function') {
@@ -185,7 +189,7 @@ class Select {
         }
 
         // Закрываем селект
-        this.node.classList.remove('active');
+        this.node.classList.remove('faze-active');
 
         // Скрываем выбранную опцию
         this.hideOption(this.value);
@@ -197,7 +201,7 @@ class Select {
       const path = event.path || (event.composedPath && event.composedPath());
       if (path) {
         if (!path.find((element: any) => element === this.node)) {
-          this.node.classList.remove('active');
+          this.node.classList.remove('faze-active');
         }
       }
     });
@@ -226,7 +230,7 @@ class Select {
    */
   hideOption(value: string | null) {
     this.options.forEach((option) => {
-      const optionValue = option.getAttribute('data-value') || option.textContent;
+      const optionValue = option.getAttribute('data-faze-value') || option.textContent;
 
       if (optionValue === value) {
         option.style.display = 'none';

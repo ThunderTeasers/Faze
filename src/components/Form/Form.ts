@@ -10,19 +10,19 @@
  *
  * Пример использования
  * В JS:
- *   PlarsonJS.add({
+ *   Faze.add({
  *     pluginName: 'OrderForm',
  *     plugins: ['Form'],
  *     condition: document.querySelectorAll('.form-order').length,
  *     callback: () => {
- *       new PlarsonJS.Form(document.querySelector('.form-order'), {
+ *       new Faze.Form(document.querySelector('.form-order'), {
  *         callbacks: {
  *           success: (data) => {
  *             console.log(data.response);
- *           }
- *         }
+ *           },
+ *         },
  *       });
- *     }
+ *     },
  *   });
  *
  * В HTML:
@@ -131,6 +131,10 @@ class Form {
    * Инициализация
    */
   initialize(): void {
+    // Присваиваем особый класс для стилей
+    this.node.classList.add('faze-form');
+
+    // Выполняем пользовательскую фукнции
     try {
       if (typeof this.config.callbacks.created === 'function') {
         this.config.callbacks.created({
@@ -211,9 +215,9 @@ class Form {
   lockButton() {
     if (this.button) {
       this.button.setAttribute('disabled', 'disabled');
-      this.button.setAttribute('data-initial-text', this.button.textContent || '');
-      this.button.classList.add('disabled');
-      this.button.textContent = this.button.getAttribute('data-loading-text') || this.config.texts.buttonLoading;
+      this.button.setAttribute('data-faze-initial-text', this.button.textContent || '');
+      this.button.classList.add('faze-disabled');
+      this.button.textContent = this.button.getAttribute('data-faze-loading-text') || this.config.texts.buttonLoading;
     }
   }
 
@@ -223,8 +227,8 @@ class Form {
   unlockButton() {
     if (this.button) {
       this.button.removeAttribute('disabled');
-      this.button.classList.remove('disabled');
-      this.button.textContent = this.button.getAttribute('data-initial-text') || this.config.texts.buttonCompleted;
+      this.button.classList.remove('faze-disabled');
+      this.button.textContent = this.button.getAttribute('data-faze-initial-text') || this.config.texts.buttonCompleted;
     }
   }
 }

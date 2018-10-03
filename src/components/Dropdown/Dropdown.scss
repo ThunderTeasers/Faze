@@ -5,10 +5,10 @@
  * Дата: 26.09.2018
  */
 
-.dropdown {
+.faze-dropdown {
   position: relative;
 
-  & > .title {
+  & > .faze-title {
     display: inline-flex;
 
     padding: 0.5rem 1rem;
@@ -29,7 +29,7 @@
     }
   }
 
-  & > .body {
+  & > .faze-body {
     position: absolute;
 
     display: none;
@@ -42,8 +42,8 @@
     z-index: 3;
   }
 
-  &.active {
-    & > .body {
+  &.faze-active {
+    & > .faze-body {
       display: block;
     }
   }

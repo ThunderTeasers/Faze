@@ -10,12 +10,12 @@
  *
  * Пример использования
  * В JS:
- *   PlarsonJS.add({
+ *   Faze.add({
  *     pluginName: 'NewsList',
  *     plugins: ['Page'],
  *     condition: document.querySelectorAll('.news .items').length,
  *     callback: () => {
- *       new PlarsonJS.Page(document.querySelector('.news .items'), {
+ *       new Faze.Page(document.querySelector('.news .items'), {
  *         offset: 10,
  *         quantity: 10,
  *         tableName: 'list',
@@ -171,7 +171,7 @@ class Page {
     if (this.config.modules.get) {
       searchParams.append('show', this.config.modules.get.toString());
     } else {
-      console.error('Не задан модуль "show"!');
+      console.error('Не задан ID модуля для "show"!');
     }
     searchParams.append('mime', 'txt');
 
@@ -184,7 +184,7 @@ class Page {
 
       // Блокировка кнопки от повторного нажатия
       this.buttonLoadModeNode.setAttribute('disabled', 'disabled');
-      this.buttonLoadModeNode.classList.add('disabled');
+      this.buttonLoadModeNode.classList.add('faze-disabled');
 
       // Получение новых элементов
       fetch(`${window.location.pathname}?${searchParams.toString()}`)
@@ -203,7 +203,7 @@ class Page {
 
           // Разблокировка кнопки
           this.buttonLoadModeNode.removeAttribute('disabled');
-          this.buttonLoadModeNode.classList.remove('disabled');
+          this.buttonLoadModeNode.classList.remove('faze-disabled');
 
           // Выполнение кастомной функции
           if (typeof this.config.callbacks.loaded === 'function') {
@@ -213,10 +213,13 @@ class Page {
                 button: this.buttonLoadModeNode,
                 items: this.node.querySelectorAll(this.config.selectors.items),
               });
-            } catch (e) {
-              console.error(e);
+            } catch (error) {
+              console.error('Ошибка исполнения пользовательского метода "loaded"', error);
             }
           }
+        })
+        .catch((error) => {
+          console.error('Ошибка получения новых элементов для бесконечной подгрузки', error);
         });
     });
   }

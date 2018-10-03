@@ -5,14 +5,14 @@
  * Дата: 29.09.2018
  */
 
-.scroll {
+.faze-scroll {
   position: relative;
 
   border: 0.1rem solid #000;
 
   overflow: hidden;
 
-  .scroll-vertical, .scroll-horizontal {
+  .faze-scroll-vertical, .faze-scroll-horizontal {
     position: absolute;
     top: 0;
     right: 0;

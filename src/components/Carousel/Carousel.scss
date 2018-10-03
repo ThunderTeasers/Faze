@@ -5,18 +5,18 @@
  * Дата: 27.09.2018
  */
 
-.carousel {
+.faze-carousel {
   position: relative;
 
-  .carousel-holder {
+  .faze-carousel-holder {
     position: relative;
 
     display: flex;
   }
 
   // Анимация появления-исчезновения
-  &.animation-fade {
-    .item {
+  &.faze-animation-fade {
+    .faze-item {
       display: flex;
 
       position: absolute;
@@ -32,7 +32,7 @@
 
       z-index: 1;
 
-      &.active {
+      &.faze-active {
         position: relative;
 
         opacity: 1;
@@ -40,20 +40,20 @@
         z-index: 2;
       }
 
-      &:not(.active) {
+      &:not(.faze-active) {
         opacity: 0;
       }
     }
   }
 
   // Анимация слайда
-  &.animation-slide {
+  &.faze-animation-slide {
     position: relative;
 
     overflow: hidden;
 
-    &.direction-horizontal {
-      & > .carousel-holder {
+    &.faze-direction-horizontal {
+      & > .faze-carousel-holder {
         left: 0;
 
         width: 5000%;
@@ -66,8 +66,8 @@
       }
     }
 
-    &.direction-vertical {
-      & > .carousel-holder {
+    &.faze-direction-vertical {
+      & > .faze-carousel-holder {
         top: 0;
 
         height: 5000%;
@@ -78,9 +78,9 @@
   }
 
   // Элементы управления
-  & > .carousel-controls {
+  & > .faze-carousel-controls {
     // Пагинация
-    .carousel-pages {
+    .faze-carousel-pages {
       display: flex;
       flex-direction: row;
       align-items: center;
@@ -98,18 +98,18 @@
 
       z-index: 4;
 
-      & > .page {
+      & > .faze-page {
         width: 1.2rem;
         height: 1.2rem;
 
         background-color: #fff;
         border-radius: 50%;
 
-        & + .page {
+        & + .faze-page {
           margin-left: 0.5rem;
         }
 
-        &.active {
+        &.faze-active {
           background-color: #000;
         }
 
@@ -120,7 +120,7 @@
     }
 
     // Стрелки переключения
-    & > .carousel-arrows {
+    & > .faze-carousel-arrows {
       position: absolute;
       top: 0;
       left: 0;
@@ -130,7 +130,7 @@
 
       z-index: 3;
 
-      & > .carousel-arrow {
+      & > .faze-carousel-arrow {
         position: absolute;
         top: 0;
 
@@ -151,7 +151,7 @@
           border-top: 0.3rem solid #000;
         }
 
-        &.carousel-arrow-prev {
+        &.faze-carousel-arrow-prev {
           left: 0;
 
           &:after {
@@ -161,7 +161,7 @@
           }
         }
 
-        &.carousel-arrow-next {
+        &.faze-carousel-arrow-next {
           right: 0;
 
           &:after {
@@ -182,7 +182,7 @@
     }
 
     // Счетчик
-    .carousel-counter {
+    .faze-carousel-counter {
       position: absolute;
       right: 0.5rem;
       bottom: 0.5rem;

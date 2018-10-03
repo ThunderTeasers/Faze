@@ -57,7 +57,7 @@ interface InnerPluginsData {
  * Класс для управления модулями, а именно содержит хэш таблицу всех загруженных ранее модулей,
  * для их удобного подключения в другие модули без повторной загрузки
  */
-class PlarsonJS {
+class Faze {
   // Переменная, содержащая в себе всю информацию о плагинах, а так же их тела для дальнейшего исполнения
   static plugins: PluginsData = {};
 
@@ -81,7 +81,7 @@ class PlarsonJS {
    * то есть если 'document.querySelectorAll(selector).length > 0'.
    *
    * Пример создания плагина:
-   *   PlarsonJS.add({
+   *   Faze.add({
    *     pluginName: 'foo',
    *     plugins: ['Page', 'Carousel'],
    *     selector: '.some-class',
@@ -103,16 +103,16 @@ class PlarsonJS {
 
     // Проверка на ошибки
     if (!config) {
-      throw new Error('Config does not set');
+      throw new Error('Не задана конфигурация плагина!');
     }
 
     if (!('pluginName' in config) || config.pluginName === undefined) {
-      throw new Error('Plugin name does not set');
+      throw new Error('Не задано имя плагина!');
     }
 
     // Сначала просто записываем модуль в таблицу, если его еще нет в хэше, но не загружаем его
-    if (!(config.pluginName in PlarsonJS.plugins)) {
-      PlarsonJS.plugins[config.pluginName] = {
+    if (!(config.pluginName in Faze.plugins)) {
+      Faze.plugins[config.pluginName] = {
         config,
         body: undefined,
       };
@@ -122,23 +122,23 @@ class PlarsonJS {
     if (config.plugins && config.plugins.length > 0) {
       for (const pluginName of config.plugins) {
         // Проверка на существование такого модуля, если его не существует, загружаем следующий
-        if (!PlarsonJS.plugins[pluginName]) {
-          console.error(`Plugin with name: '${pluginName}' does not found, config:`, config);
+        if (!Faze.plugins[pluginName]) {
+          console.error(`Плагин: '${pluginName}' не найден, его конфиг:`, config);
           continue;
         }
 
         // Загружаем нужный модуль, если он еще не был загружен
-        if (PlarsonJS.plugins[pluginName].body === undefined) {
+        if (Faze.plugins[pluginName].body === undefined) {
           try {
-            PlarsonJS.plugins[pluginName].body = PlarsonJS.plugins[pluginName].config.callback;
-            PlarsonJS.plugins[pluginName].body = PlarsonJS.plugins[pluginName].body();
+            Faze.plugins[pluginName].body = Faze.plugins[pluginName].config.callback;
+            Faze.plugins[pluginName].body = Faze.plugins[pluginName].body();
           } catch (e) {
-            console.error(`Plugin ${pluginName} has an error in their callback function:`, e);
+            console.error(`Ошибка в плагине '${pluginName}':`, e);
           }
         }
 
         // Добавляем нужный модуль в массив для передачи в метод
-        currentPlugins[pluginName] = PlarsonJS.plugins[pluginName].body;
+        currentPlugins[pluginName] = Faze.plugins[pluginName].body;
       }
     }
 
@@ -160,8 +160,8 @@ class PlarsonJS {
    * @param name - ключ по которому удаляем
    */
   static remove(name: string) {
-    delete PlarsonJS.plugins[name];
+    delete Faze.plugins[name];
   }
 }
 
-export default PlarsonJS;
+export default Faze;

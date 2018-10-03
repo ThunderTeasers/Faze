@@ -10,19 +10,19 @@
  *
  * Пример использования
  * В JS:
- *   PlarsonJS.add({
+ *   Faze.add({
  *     pluginName: 'FilterDropdowns',
  *     plugins: ['Dropdown'],
- *     condition: document.querySelectorAll('.dropdown').length,
+ *     condition: document.querySelectorAll('.faze-dropdown').length,
  *     callback: () => {
- *       new PlarsonJS.Dropdown(document.querySelector('.dropdown'));
+ *       new Faze.Dropdown(document.querySelector('.faze-dropdown'));
  *     }
  *   });
  *
  * В HTML:
- *   <div class="dropdown">
- *     <div class="title">Дропдаун</div>
- *     <div class="body">Тело дропдауна</div>
+ *   <div class="faze-dropdown">
+ *     <div class="faze-title">Дропдаун</div>
+ *     <div class="faze-body">Тело дропдауна</div>
  *   </div>
  */
 
@@ -99,8 +99,8 @@ class Dropdown {
    */
   initialize(): void {
     // Поиск основных элементов и проверка на то что они найдены
-    this.title = this.node.querySelector('.title');
-    this.body = this.node.querySelector('.body');
+    this.title = this.node.querySelector('.faze-title');
+    this.body = this.node.querySelector('.faze-body');
 
     if (!this.title || !this.body) {
       throw new Error('Для дропдауна не найдены шапка и тело');
@@ -137,9 +137,9 @@ class Dropdown {
     this.title.addEventListener('click', (event) => {
       event.preventDefault();
 
-      this.node.classList.toggle('active');
+      this.node.classList.toggle('faze-active');
 
-      if (this.node.classList.contains('active')) {
+      if (this.node.classList.contains('faze-active')) {
         // Вызываем пользовательский метод
         if (typeof this.config.callbacks.opened === 'function') {
           try {
@@ -159,7 +159,7 @@ class Dropdown {
       const path = event.path || (event.composedPath && event.composedPath());
       if (path) {
         if (!path.find((element: any) => element === this.node)) {
-          this.node.classList.remove('active');
+          this.node.classList.remove('faze-active');
         }
       }
     });

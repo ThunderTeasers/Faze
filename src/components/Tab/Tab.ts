@@ -10,24 +10,24 @@
  *
  * Пример использования
  * В JS:
- *   PlarsonJS.add({
+ *   Faze.add({
  *     pluginName: 'ProductsTabs',
  *     plugins: ['Tab'],
- *     condition: document.querySelectorAll('.tabs').length,
+ *     condition: document.querySelectorAll('.faze-tabs').length,
  *     callback: () => {
- *       new PlarsonJS.Tab(document.querySelector('.tabs'));
+ *       new Faze.Tab(document.querySelector('.faze-tabs'));
  *     }
  *   });
  *
  * В HTML:
- *   <div class="tabs">
- *     <div class="tabs-headers">
- *       <div class="tab-header" data-tab-body="1">Таб 1</div>
- *       <div class="tab-header" data-tab-body="2">Таб 2</div>
+ *   <div class="faze-tabs">
+ *     <div class="faze-tabs-headers">
+ *       <div class="faze-tab-header" data-faze-tab-body="1">Таб 1</div>
+ *       <div class="faze-tab-header" data-faze-tab-body="2">Таб 2</div>
  *     </div>
- *     <div class="tabs-bodies">
- *       <div class="tab-body" data-tab-body="1">Тело 1</div>
- *       <div class="tab-body" data-tab-body="2">Тело 2</div>
+ *     <div class="faze-tabs-bodies">
+ *       <div class="faze-tab-body" data-faze-tab-body="1">Тело 1</div>
+ *       <div class="faze-tab-body" data-faze-tab-body="2">Тело 2</div>
  *     </div>
  *   </div>
  */
@@ -73,8 +73,8 @@ class Tab {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       selectors: {
-        headers: '.tabs-headers .tab-header',
-        bodies: '.tabs-bodies .tab-body',
+        headers: '.faze-tabs-headers .faze-tab-header',
+        bodies: '.faze-tabs-bodies .faze-tab-body',
       },
     };
 
@@ -93,7 +93,7 @@ class Tab {
     this.bodies = this.node.querySelectorAll(this.config.selectors.bodies);
 
     // Активация первой вкладки по умолчанию
-    this.activateTab(this.headers[0].getAttribute('data-tab-body'));
+    this.activateTab(this.headers[0].getAttribute('data-faze-tab-body'));
   }
 
   /**
@@ -104,7 +104,7 @@ class Tab {
       header.addEventListener('click', (event) => {
         event.preventDefault();
 
-        this.activateTab(header.getAttribute('data-tab-body'));
+        this.activateTab(header.getAttribute('data-faze-tab-body'));
       });
     });
   }
@@ -116,15 +116,15 @@ class Tab {
    */
   activateTab(key: string | null): void {
     this.headers.forEach((head) => {
-      if (head.getAttribute('data-tab-body') === key) {
-        head.classList.add('active');
+      if (head.getAttribute('data-faze-tab-body') === key) {
+        head.classList.add('faze-active');
       } else {
-        head.classList.remove('active');
+        head.classList.remove('faze-active');
       }
     });
 
     this.bodies.forEach((body) => {
-      if (body.getAttribute('data-tab-body') === key) {
+      if (body.getAttribute('data-faze-tab-body') === key) {
         body.style.display = 'block';
       } else {
         body.style.display = 'none';

@@ -98,9 +98,9 @@ class Filter {
         get: undefined,
       },
       selectors: {
-        form: '.js-filter .js-form',
-        itemsHolder: '.js-filter .js-items',
-        total: '.total',
+        form: '.faze-filter .faze-form',
+        itemsHolder: '.faze-filter .faze-items',
+        total: '.faze-total',
       },
       texts: {
         buttonLoading: 'Обработка...',
@@ -136,7 +136,7 @@ class Filter {
 
     // Простановка общего числа элементов
     if (this.config.showTotal && this.totalNode) {
-      this.totalNode.textContent = this.node.getAttribute('data-total');
+      this.totalNode.textContent = this.node.getAttribute('data-faze-total');
     }
 
     // Выполняем пользовательскую фукнции
@@ -147,7 +147,7 @@ class Filter {
           formNode: this.formNode,
           itemsHolderNode: this.itemsHolderNode,
           params: this.params,
-          total: parseInt(this.node.getAttribute('data-total') || '0', 10),
+          total: parseInt(this.node.getAttribute('data-faze-total') || '0', 10),
         });
       } catch (error) {
         console.error('Ошибка исполнения пользовательской функции "created"', error);
@@ -201,11 +201,11 @@ class Filter {
               }
 
               // Обновление количества элементов
-              const total = responseNode.getAttribute('data-total') || '0';
+              const total = responseNode.getAttribute('data-faze-total') || '0';
               if (this.config.showTotal && this.totalNode) {
                 this.totalNode.textContent = total;
               }
-              this.node.setAttribute('data-total', total);
+              this.node.setAttribute('data-faze-total', total);
             }
 
             // Обновление строки в браузере
@@ -224,7 +224,7 @@ class Filter {
                   formNode: this.formNode,
                   itemsHolderNode: this.itemsHolderNode,
                   params: this.params,
-                  total: parseInt(this.node.getAttribute('data-total') || '0', 10),
+                  total: parseInt(this.node.getAttribute('data-faze-total') || '0', 10),
                 });
               } catch (e) {
                 console.error(e);
@@ -254,8 +254,8 @@ class Filter {
   lockButton() {
     if (this.buttonSubmitNode) {
       this.buttonSubmitNode.setAttribute('disabled', 'disabled');
-      this.buttonSubmitNode.setAttribute('data-initial-text', this.buttonSubmitNode.textContent || '');
-      this.buttonSubmitNode.classList.add('disabled');
+      this.buttonSubmitNode.setAttribute('data-faze-initial-text', this.buttonSubmitNode.textContent || '');
+      this.buttonSubmitNode.classList.add('faze-disabled');
       this.buttonSubmitNode.textContent = this.config.texts.buttonLoading;
     }
   }
@@ -266,8 +266,8 @@ class Filter {
   unlockButton() {
     if (this.buttonSubmitNode) {
       this.buttonSubmitNode.removeAttribute('disabled');
-      this.buttonSubmitNode.classList.remove('disabled');
-      this.buttonSubmitNode.textContent = this.buttonSubmitNode.getAttribute('data-initial-text') || 'Готово!';
+      this.buttonSubmitNode.classList.remove('faze-disabled');
+      this.buttonSubmitNode.textContent = this.buttonSubmitNode.getAttribute('data-faze-initial-text') || 'Готово!';
     }
   }
 }

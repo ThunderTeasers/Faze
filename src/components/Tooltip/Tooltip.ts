@@ -9,19 +9,19 @@
  *
  * Пример использования
  * В JS:
- *   PlarsonJS.add({
+ *   Faze.add({
  *     pluginName: 'ProductTooltips',
  *     plugins: ['Tooltip'],
  *     condition: document.querySelectorAll('.informer').length,
  *     callback: () => {
  *       for (const informer of document.querySelectorAll('.informer')) {
- *         new PlarsonJS.Tooltip(informer);
+ *         new Faze.Tooltip(informer);
  *       }
  *     }
  *   });
  *
  * В HTML:
- *   <div class="informer" data-tooltip-text="Я подсказка!">Наведите для подсказки</div>
+ *   <div class="informer" data-faze-tooltip-text="Я подсказка!">Наведите для подсказки</div>
  */
 
 import './Tooltip.scss';
@@ -91,9 +91,9 @@ class Tooltip {
    * Инициализация
    */
   initialize(): void {
-    this.tooltip.className = `tooltip tooltip-${this.config.side}`;
+    this.tooltip.className = `faze-tooltip faze-tooltip-${this.config.side}`;
     this.tooltip.style.visibility = 'hidden';
-    this.tooltip.textContent = this.config.text || this.node.getAttribute('data-tooltip-text') || '';
+    this.tooltip.textContent = this.config.text || this.node.getAttribute('data-faze-tooltip-text') || '';
   }
 
   /**

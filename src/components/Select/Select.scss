@@ -1,7 +1,7 @@
-.select {
+.faze-select {
   position: relative;
 
-  & > .title {
+  & > .faze-title {
     display: inline-flex;
 
     padding: 0.5rem 1rem;
@@ -15,14 +15,14 @@
     -ms-user-select: none;
     user-select: none;
 
-    z-index: 2;
+    z-index: 3;
 
     &:hover {
       cursor: pointer;
     }
   }
 
-  & > .body {
+  & > .faze-body {
     position: absolute;
 
     display: none;
@@ -32,17 +32,17 @@
     background-color: #fff;
     border: 0.1rem solid #000;
 
-    z-index: 3;
+    z-index: 4;
 
-    & > .option {
+    & > .faze-option {
       &:hover {
         cursor: pointer;
       }
     }
   }
 
-  &.active {
-    & > .body {
+  &.faze-active {
+    & > .faze-body {
       display: block;
     }
   }

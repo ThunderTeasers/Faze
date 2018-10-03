@@ -9,17 +9,17 @@
  *
  * Пример использования
  * В JS:
- *   PlarsonJS.add({
+ *   Faze.add({
  *     pluginName: 'ProductsZoom',
  *     plugins: ['Zoom'],
  *     condition: document.querySelectorAll('.image').length,
  *     callback: () => {
- *       new PlarsonJS.Zoom(document.querySelector('.image'));
+ *       new Faze.Zoom(document.querySelector('.image'));
  *     }
  *   });
  *
  * В HTML:
- *   <img class="image" src="https://via.placeholder.com/200x200" data-full-image="https://via.placeholder.com/2000x2000">
+ *   <img class="image" src="https://via.placeholder.com/200x200" data-faze-full-image="https://via.placeholder.com/2000x2000">
  */
 
 import './Zoom.scss';
@@ -124,23 +124,23 @@ class Zoom {
    */
   initialize(): void {
     // Создаем обертку
-    this.wrapperNode.className = 'zoom';
+    this.wrapperNode.className = 'faze-zoom';
 
     // Перемещаем исходный элемент в обертку для дальнейшей работы
     if (!this.node.parentNode) {
       throw new Error('У DOM элемента зума нет родителя');
     }
     this.node.parentNode.insertBefore(this.wrapperNode, this.node);
-    this.node.classList.add('zoom-initial-image');
+    this.node.classList.add('faze-zoom-initial-image');
     this.wrapperNode.appendChild(this.node);
 
     // Создаем указатель который находится в центре мышки и показывает область которую
     // увеличиваем в данный момент времени
-    this.pointerNode.className = 'zoom-pointer';
+    this.pointerNode.className = 'faze-zoom-pointer';
     this.wrapperNode.appendChild(this.pointerNode);
 
     // Создаем большую картинку и обертку для неё
-    this.bigImageWrapperNode.className = 'zoom-image-wrapper';
+    this.bigImageWrapperNode.className = 'faze-zoom-image-wrapper';
     this.bigImageWrapperNode.style.width = `${this.config.width}px`;
     this.bigImageWrapperNode.style.height = `${this.config.height}px`;
 
@@ -165,8 +165,8 @@ class Zoom {
         break;
     }
 
-    this.bigImageNode.className = 'zoom-big-image';
-    const bigImageSource = this.node.getAttribute('data-full-image');
+    this.bigImageNode.className = 'faze-zoom-big-image';
+    const bigImageSource = this.node.getAttribute('data-faze-full-image');
     if (bigImageSource) {
       this.bigImageNode.setAttribute('src', bigImageSource);
     }

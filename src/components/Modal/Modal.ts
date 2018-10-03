@@ -10,12 +10,12 @@
  *
  * Пример использования
  * В JS:
- *   PlarsonJS.add({
+ *   Faze.add({
  *     pluginName: 'ManagerModal',
  *     plugins: ['Modal'],
  *     condition: document.querySelectorAll('.modal-caller').length,
  *     callback: () => {
- *       new PlarsonJS.Tooltip(document.querySelector('.modal-caller'), {
+ *       new Faze.Tooltip(document.querySelector('.modal-caller'), {
  *         title: 'Заголовок модального окна',
  *         url: '/form.html',
  *         class: 'modal-manager',
@@ -163,7 +163,7 @@ class Modal {
     this.node.addEventListener('click', (event) => {
       event.preventDefault();
 
-      document.body.classList.add('modal-opened');
+      document.body.classList.add('faze-modal-opened');
 
       // Получение контента
       this.getContent()
@@ -207,7 +207,7 @@ class Modal {
     this.buildFooter();
     this.buildFull();
 
-    this.modalParts.wrapper.className = 'modal-wrapper';
+    this.modalParts.wrapper.className = 'faze-modal-wrapper';
     this.modalParts.wrapper.appendChild(this.modalParts.full);
 
     document.body.appendChild(this.modalParts.wrapper);
@@ -233,16 +233,16 @@ class Modal {
    * Создание кнопки закрытия и бинд на её нажатие
    */
   buildAndBindCloseButton(): void {
-    this.modalParts.closeButton.className = 'close';
+    this.modalParts.closeButton.className = 'faze-close';
 
     this.modalParts.closeButton.addEventListener('click', (event) => {
       event.preventDefault();
 
-      document.body.classList.remove('modal-opened');
+      document.body.classList.remove('faze-modal-opened');
 
       // Сначала навешивается класс, а потом через указанное время удаляем окно со страницы, это нужно для того чтобы анимация(если они
       // есть) успела проиграться и завершиться
-      this.modalParts.full.classList.add('closing');
+      this.modalParts.full.classList.add('faze-closing');
       setTimeout(() => this.modalParts.wrapper.remove(), this.config.delayToClose);
     });
   }
@@ -297,7 +297,7 @@ class Modal {
    * Компановка частей модального окна в один элемент
    */
   buildFull(): void {
-    this.modalParts.full.className = 'modal';
+    this.modalParts.full.className = 'faze-modal';
 
     this.modalParts.full.appendChild(this.modalParts.header);
     this.modalParts.full.appendChild(this.modalParts.body);

@@ -1,4 +1,4 @@
-import PlarsonJS from './components/Core/PlarsonJS';
+import Faze from './components/Core/Faze';
 import Tooltip from './components/Tooltip/Tooltip';
 import Modal from './components/Modal/Modal';
 import Tab from './components/Tab/Tab';
@@ -12,99 +12,100 @@ import Page from './components/Page/Page';
 import Filter from './components/Filter/Filter';
 
 // @ts-ignore
-window.PlarsonJS = PlarsonJS;
+window.Faze = Faze;
 
 /**
  * Регистрация заводских плагинов
  */
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Tooltip',
   callback: () => {
-    PlarsonJS.Tooltip = Tooltip;
+    Faze.Tooltip = Tooltip;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Modal',
   callback: () => {
-    PlarsonJS.Modal = Modal;
+    Faze.Modal = Modal;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Tab',
   callback: () => {
-    PlarsonJS.Tab = Tab;
+    Faze.Tab = Tab;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Dropdown',
   callback: () => {
-    PlarsonJS.Dropdown = Dropdown;
+    Faze.Dropdown = Dropdown;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Select',
   callback: () => {
-    PlarsonJS.Select = Select;
+    Faze.Select = Select;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Carousel',
   callback: () => {
-    PlarsonJS.Carousel = Carousel;
+    Faze.Carousel = Carousel;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Zoom',
   callback: () => {
-    PlarsonJS.Zoom = Zoom;
+    Faze.Zoom = Zoom;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Scroll',
   callback: () => {
-    PlarsonJS.Scroll = Scroll;
+    Faze.Scroll = Scroll;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Form',
   callback: () => {
-    PlarsonJS.Form = Form;
+    Faze.Form = Form;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Page',
   callback: () => {
-    PlarsonJS.Page = Page;
+    Faze.Page = Page;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Filter',
   callback: () => {
-    PlarsonJS.Filter = Filter;
+    Faze.Filter = Filter;
   },
 });
 
 // Тесты
-PlarsonJS.add({
+Faze.add({
   pluginName: 'TooltipTest',
   plugins: ['Page', 'Form', 'Scroll', 'Zoom', 'Carousel', 'Select', 'Dropdown', 'Tab', 'Modal', 'Tooltip'],
   condition: document.querySelectorAll('#button').length > 0,
   callback: () => {
-    new PlarsonJS.Tooltip(document.querySelector('#button'), {
+    new Faze.Tooltip(document.querySelector('#button'), {
       text: '123',
       side: 'right',
     });
-    new PlarsonJS.Modal(document.querySelector('#button'), {
+
+    new Faze.Modal(document.querySelector('#button'), {
       title: 'Тестирование модального окна',
       url: 'https://jsonplaceholder.typicode.com/todos/1',
       buttons: [
@@ -117,10 +118,11 @@ PlarsonJS.add({
         },
       ],
     });
-    new PlarsonJS.Tab(document.querySelector('.tabs'));
-    new PlarsonJS.Dropdown(document.querySelector('.dropdown'));
-    new PlarsonJS.Select(document.querySelector('.select'));
-    new PlarsonJS.Carousel(document.querySelector('.carousel-test'), {
+
+    new Faze.Tab(document.querySelector('.faze-tabs'));
+    new Faze.Dropdown(document.querySelector('.faze-dropdown'));
+    new Faze.Select(document.querySelector('.faze-select'));
+    new Faze.Carousel(document.querySelector('.carousel-test'), {
       autoplay: false,
       pages: true,
       arrows: true,
@@ -131,20 +133,24 @@ PlarsonJS.add({
         direction: 'horizontal',
       },
     });
-    new PlarsonJS.Zoom(document.querySelector('.image'), {
+
+    new Faze.Zoom(document.querySelector('.image'), {
       side: 'right',
     });
-    new PlarsonJS.Scroll(document.querySelector('.for-scroll'), {
+
+    new Faze.Scroll(document.querySelector('.for-scroll'), {
       height: 100,
     });
-    new PlarsonJS.Form(document.querySelector('.form-order'), {
+
+    new Faze.Form(document.querySelector('.form-order'), {
       callbacks: {
         error: (data: any) => {
           console.log(data);
         },
       },
     });
-    new PlarsonJS.Page(document.querySelector('.news .items'), {
+
+    new Faze.Page(document.querySelector('.news .items'), {
       offset: 10,
       quantity: 10,
       tableName: 'list',

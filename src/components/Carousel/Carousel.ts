@@ -16,12 +16,12 @@
  *
  * Пример использования
  * В JS:
- *   PlarsonJS.add({
+ *   Faze.add({
  *     pluginName: 'ProductCarousel',
  *     plugins: ['Carousel'],
  *     condition: document.querySelectorAll('.carousel-product').length,
  *     callback: () => {
- *       new PlarsonJS.Carousel(document.querySelector('.carousel-product'), {
+ *       new Faze.Carousel(document.querySelector('.carousel-product'), {
  *         autoplay: true,
  *         pages: true,
  *         counter: true,
@@ -227,12 +227,12 @@ class Carousel {
     this.index = 0;
 
     // Инициализируем держатель для элементов карусели и перемещаем их в него
-    this.itemsHolderNode.className = 'carousel-holder';
+    this.itemsHolderNode.className = 'faze-carousel-holder';
     this.slidesNodes.forEach((slide: HTMLElement, i: number) => {
       // Необходимо для соединения между "пагинацией" и самими слайдами
-      slide.setAttribute('data-index', i.toString());
+      slide.setAttribute('data-faze-index', i.toString());
 
-      slide.classList.add('item');
+      slide.classList.add('faze-item');
 
       // Задаем время анимации слайда
       slide.style.transitionDuration = this.transitionDuration;
@@ -243,13 +243,13 @@ class Carousel {
     this.node.appendChild(this.itemsHolderNode);
 
     // Присвоение DOM объекту карусели необходимых классов и стилей для работы самой карусели
-    this.node.classList.add('carousel');
-    this.node.classList.add(`animation-${this.config.animation.type}`, `direction-${this.config.animation.direction}`);
+    this.node.classList.add('faze-carousel');
+    this.node.classList.add(`faze-animation-${this.config.animation.type}`, `faze-direction-${this.config.animation.direction}`);
     this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
 
     // Активания первого слайда по умолчанию, нужно только для анимации "fade"
     if (this.config.animation.type === 'fade') {
-      this.slidesNodes[0].classList.add('active');
+      this.slidesNodes[0].classList.add('faze-active');
     }
 
     // Создание дополнительных элементов карусели
@@ -282,7 +282,7 @@ class Carousel {
       page.addEventListener('click', (event) => {
         event.preventDefault();
 
-        const index = page.getAttribute('data-index');
+        const index = page.getAttribute('data-faze-index');
         if (index) {
           this.index = parseInt(index, 10);
           this.changeSlide(null);
@@ -314,7 +314,7 @@ class Carousel {
    * Создание дополнительных элементов карусели, таких как: пагинация, стрелки, счетчик
    */
   createControls() {
-    this.controlsNode.className = 'carousel-controls';
+    this.controlsNode.className = 'faze-carousel-controls';
     this.node.appendChild(this.controlsNode);
 
     // Создание пагинации, если это указанов конфиге
@@ -341,26 +341,26 @@ class Carousel {
       throw new Error('Родительский элемент пагинации не найден');
     }
 
-    this.pagesNode.className = 'carousel-pages';
+    this.pagesNode.className = 'faze-carousel-pages';
     this.node.appendChild(this.pagesNode);
 
     let pagesHTML = '';
     for (let i = 0; i < this.totalSlides; i += 1) {
-      pagesHTML += `<div class="page" data-index="${i}"></div>`;
+      pagesHTML += `<div class="faze-page" data-faze-index="${i}"></div>`;
     }
     this.pagesNode.innerHTML = pagesHTML;
-    this.pagesNodes = this.pagesNode.querySelectorAll('.page');
+    this.pagesNodes = this.pagesNode.querySelectorAll('.faze-page');
     this.controlsNode.appendChild(this.pagesNode);
 
     // Активируем первую по умолчанию
-    this.pagesNodes[0].classList.add('active');
+    this.pagesNodes[0].classList.add('faze-active');
   }
 
   /**
    * Создание счетчика слайдов
    */
   createSlidesCounter(): void {
-    this.counterNode.className = 'carousel-counter';
+    this.counterNode.className = 'faze-carousel-counter';
     this.changeCounter();
 
     // Если у карусели есть стрелки, то вставляем между них
@@ -375,20 +375,20 @@ class Carousel {
    * Изменение назписи счетчика в соответствии с текущим индексом
    */
   changeCounter() {
-    this.counterNode.innerHTML = `<span class="carousel-counter-current">${this.index + 1}</span> / <span class="carousel-counter-total">${this.totalSlides}</span>`;
+    this.counterNode.innerHTML = `<span class="faze-carousel-counter-current">${this.index + 1}</span> / <span class="faze-carousel-counter-total">${this.totalSlides}</span>`;
   }
 
   /**
    * Создание стрелок переключения слайдов вперед/назад(либо вверх вниз в вертикальном виде)
    */
   createArrows(): void {
-    this.arrowsNode.className = 'carousel-arrows';
+    this.arrowsNode.className = 'faze-carousel-arrows';
     this.controlsNode.appendChild(this.arrowsNode);
 
-    this.arrowsNodes.left.className = 'carousel-arrow carousel-arrow-prev';
+    this.arrowsNodes.left.className = 'faze-carousel-arrow faze-carousel-arrow-prev';
     this.arrowsNode.appendChild(this.arrowsNodes.left);
 
-    this.arrowsNodes.right.className = 'carousel-arrow carousel-arrow-next';
+    this.arrowsNodes.right.className = 'faze-carousel-arrow faze-carousel-arrow-next';
     this.arrowsNode.appendChild(this.arrowsNodes.right);
   }
 
@@ -451,12 +451,12 @@ class Carousel {
         // Вся анимация происходит за счет CSS.
         this.slidesNodes.forEach((slide, index) => {
           if (this.index === index) {
-            slide.classList.add('active');
+            slide.classList.add('faze-active');
 
             // Задаем текущий слайд для передачи в кастомную функцию
             currentSlide = slide;
           } else {
-            slide.classList.remove('active');
+            slide.classList.remove('faze-active');
           }
         });
         break;
@@ -574,9 +574,9 @@ class Carousel {
   changePagination() {
     this.pagesNodes.forEach((indicator, i) => {
       if (this.index === i) {
-        indicator.classList.add('active');
+        indicator.classList.add('faze-active');
       } else {
-        indicator.classList.remove('active');
+        indicator.classList.remove('faze-active');
       }
     });
   }

@@ -5,18 +5,18 @@
  * Дата: 29.09.2018
  */
 
-.zoom {
+.faze-zoom {
   position: relative;
 
   // Изначальное изображение
-  .zoom-initial-image, .zoom-pointer {
+  .faze-zoom-initial-image, .faze-zoom-pointer {
     &:hover {
       cursor: crosshair;
     }
   }
 
   // Указатель, показывающий область увеличения
-  .zoom-pointer {
+  .faze-zoom-pointer {
     position: absolute;
 
     display: none;
@@ -25,7 +25,7 @@
   }
 
   // Обертка для показа области увеличения
-  .zoom-image-wrapper {
+  .faze-zoom-image-wrapper {
     position: absolute;
 
     display: none;
@@ -35,7 +35,7 @@
     z-index: 5;
 
     // Большое изображение
-    .zoom-big-image {
+    .faze-zoom-big-image {
       position: absolute;
       top: 0;
       left: 0;

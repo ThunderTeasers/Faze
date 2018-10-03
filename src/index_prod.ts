@@ -1,4 +1,4 @@
-import PlarsonJS from './components/Core/PlarsonJS';
+import Faze from './components/Core/Faze';
 import Tooltip from './components/Tooltip/Tooltip';
 import Modal from './components/Modal/Modal';
 import Tab from './components/Tab/Tab';
@@ -12,84 +12,84 @@ import Page from './components/Page/Page';
 import Filter from './components/Filter/Filter';
 
 // @ts-ignore
-window.PlarsonJS = PlarsonJS;
+window.Faze = Faze;
 
 /**
  * Регистрация заводских плагинов
  */
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Tooltip',
   callback: () => {
-    PlarsonJS.Tooltip = Tooltip;
+    Faze.Tooltip = Tooltip;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Modal',
   callback: () => {
-    PlarsonJS.Modal = Modal;
+    Faze.Modal = Modal;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Tab',
   callback: () => {
-    PlarsonJS.Tab = Tab;
+    Faze.Tab = Tab;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Dropdown',
   callback: () => {
-    PlarsonJS.Dropdown = Dropdown;
+    Faze.Dropdown = Dropdown;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Select',
   callback: () => {
-    PlarsonJS.Select = Select;
+    Faze.Select = Select;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Carousel',
   callback: () => {
-    PlarsonJS.Carousel = Carousel;
+    Faze.Carousel = Carousel;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Zoom',
   callback: () => {
-    PlarsonJS.Zoom = Zoom;
+    Faze.Zoom = Zoom;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Scroll',
   callback: () => {
-    PlarsonJS.Scroll = Scroll;
+    Faze.Scroll = Scroll;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Form',
   callback: () => {
-    PlarsonJS.Form = Form;
+    Faze.Form = Form;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Page',
   callback: () => {
-    PlarsonJS.Page = Page;
+    Faze.Page = Page;
   },
 });
 
-PlarsonJS.add({
+Faze.add({
   pluginName: 'Filter',
   callback: () => {
-    PlarsonJS.Filter = Filter;
+    Faze.Filter = Filter;
   },
 });

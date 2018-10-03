@@ -297,7 +297,7 @@ class Modal {
    * Компановка частей модального окна в один элемент
    */
   buildFull(): void {
-    this.modalParts.fullNode.className = 'faze-modal';
+    this.modalParts.fullNode.className = `faze-modal ${this.config.class}`;
 
     this.modalParts.fullNode.appendChild(this.modalParts.headerNode);
     this.modalParts.fullNode.appendChild(this.modalParts.bodyNode);

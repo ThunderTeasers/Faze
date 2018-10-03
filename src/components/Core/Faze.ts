@@ -68,6 +68,7 @@ class Faze {
   static Carousel: any;
   static Zoom: any;
   static Gallery: any;
+  static Helpers: any;
   static Scroll: any;
   static Page: any;
   static Form: any;

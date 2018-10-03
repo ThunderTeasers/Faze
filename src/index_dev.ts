@@ -1,4 +1,5 @@
 import Faze from './components/Core/Faze';
+import Helpers from './components/Helpers/Helpers';
 import Tooltip from './components/Tooltip/Tooltip';
 import Modal from './components/Modal/Modal';
 import Tab from './components/Tab/Tab';
@@ -17,6 +18,13 @@ window.Faze = Faze;
 /**
  * Регистрация заводских плагинов
  */
+Faze.add({
+  pluginName: 'Helpers',
+  callback: () => {
+    Faze.Helpers = Helpers;
+  },
+});
+
 Faze.add({
   pluginName: 'Tooltip',
   callback: () => {

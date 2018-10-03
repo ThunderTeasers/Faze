@@ -168,6 +168,8 @@ class Modal {
       // Получение контента
       this.getContent()
         .then((responseText) => {
+          this.build(responseText);
+
           // Исполняем пользовательский метод при успешном получении данных
           if (typeof this.config.callbacks.success === 'function') {
             try {
@@ -176,8 +178,6 @@ class Modal {
               console.error('Ошибка исполнения пользовательского метода "success":', e);
             }
           }
-
-          this.build(responseText);
         })
         .catch((error) => {
           console.error(`Ошибка при получении данных с сервера по адресу ${this.config.url}`, error);

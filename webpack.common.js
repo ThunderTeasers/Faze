@@ -5,7 +5,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack');
 
 module.exports = {
-  entry: './src/index.ts',
   output: {
     filename: 'plarson.js',
     path: path.resolve(__dirname, 'dist'),

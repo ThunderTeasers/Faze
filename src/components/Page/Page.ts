@@ -82,7 +82,8 @@ interface Config {
     loaded?: (data: CallbackData) => void;
   };
   texts: {
-    button: string;
+    buttonIdle: string;
+    buttonLoading: string;
   };
 }
 
@@ -123,7 +124,8 @@ class Page {
         loaded: undefined,
       },
       texts: {
-        button: 'Показать ещё',
+        buttonIdle: 'Показать ещё',
+        buttonLoading: 'Загрузка...',
       },
     };
 
@@ -141,6 +143,10 @@ class Page {
    * Инициализация
    */
   initialize(): void {
+    // Присвоение класса для обертки плагина
+    this.node.classList.add('.faze-page');
+
+    // Присвоение текущего сдвига, для корректного счета при последующей загрузке
     this.offset = this.config.offset;
 
     this.createButton();
@@ -183,8 +189,7 @@ class Page {
       searchParams.set(tableString, this.offset.toString());
 
       // Блокировка кнопки от повторного нажатия
-      this.buttonLoadModeNode.setAttribute('disabled', 'disabled');
-      this.buttonLoadModeNode.classList.add('faze-disabled');
+      this.lockButton();
 
       // Получение новых элементов
       fetch(`${window.location.pathname}?${searchParams.toString()}`)
@@ -202,8 +207,7 @@ class Page {
           this.offset += this.config.quantity;
 
           // Разблокировка кнопки
-          this.buttonLoadModeNode.removeAttribute('disabled');
-          this.buttonLoadModeNode.classList.remove('faze-disabled');
+          this.unlockButton();
 
           // Выполнение кастомной функции
           if (typeof this.config.callbacks.loaded === 'function') {
@@ -228,11 +232,29 @@ class Page {
    * Создание кнопки и её вставка в родительский элемент содержащий все элементы, при нажатии на неё будет совершена подгрузка
    */
   createButton() {
-    this.buttonLoadModeNode.textContent = this.config.texts.button;
+    this.buttonLoadModeNode.textContent = this.config.texts.buttonIdle;
     this.buttonLoadModeNode.type = 'button';
     this.buttonLoadModeNode.className = 'btn btn-load_more';
 
     this.node.after(this.buttonLoadModeNode);
+  }
+
+  /**
+   * Блокировка кнопки, от повторного нажатия до того как текущий контент был загружен
+   */
+  lockButton() {
+    this.buttonLoadModeNode.setAttribute('disabled', 'disabled');
+    this.buttonLoadModeNode.classList.add('faze-disabled');
+    this.buttonLoadModeNode.textContent = this.config.texts.buttonLoading;
+  }
+
+  /**
+   * Возвращение кнопки в нормальное состояние
+   */
+  unlockButton() {
+    this.buttonLoadModeNode.removeAttribute('disabled');
+    this.buttonLoadModeNode.classList.remove('faze-disabled');
+    this.buttonLoadModeNode.textContent = this.config.texts.buttonIdle;
   }
 }
 

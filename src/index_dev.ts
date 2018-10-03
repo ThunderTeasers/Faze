@@ -134,11 +134,16 @@ Faze.add({
       autoplay: false,
       pages: true,
       arrows: true,
-      counter: true,
+      counter: false,
       animation: {
         type: 'fade',
         time: 1000,
         direction: 'horizontal',
+      },
+      callbacks: {
+        created: (data: any) => {
+          console.log(data);
+        },
       },
     });
 

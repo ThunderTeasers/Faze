@@ -133,6 +133,11 @@ Faze.add({
 
     new Faze.Select(document.querySelector('.faze-select'), {
       default: false,
+      callbacks: {
+        created: (data: any) => {
+          console.log(data);
+        },
+      },
     });
 
     new Faze.Carousel(document.querySelector('.carousel-test'), {

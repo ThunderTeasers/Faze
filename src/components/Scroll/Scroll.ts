@@ -101,34 +101,32 @@ class Scroll {
     // Получаем полную высоту элемента
     this.calculateHeight();
 
-    if (this.isVertical) {
-      // Подготовка элемента
-      this.node.style.position = 'absolute';
-      this.node.style.top = '0';
-      this.node.style.left = '0';
-      this.node.style.transition = this.config.transition;
+    // Подготовка элемента
+    this.node.style.position = 'absolute';
+    this.node.style.top = '0';
+    this.node.style.left = '0';
+    this.node.style.transition = this.config.transition;
 
-      // Создаем обертку
-      this.wrapperNode.className = 'faze-scroll';
-      this.wrapperNode.style.height = `${this.config.height}px`;
-      if (this.node.parentNode) {
-        this.node.parentNode.insertBefore(this.wrapperNode, this.node);
-      }
-      this.wrapperNode.appendChild(this.node);
-
-      // Создаем вертикальный скролл
-      this.scrollVerticalNode.className = 'faze-scroll-vertical';
-      this.scrollVerticalNode.style.transition = this.config.transition;
-      this.wrapperNode.appendChild(this.scrollVerticalNode);
+    // Создаем обертку
+    this.wrapperNode.className = 'faze-scroll';
+    this.wrapperNode.style.height = `${this.config.height}px`;
+    if (this.node.parentNode) {
+      this.node.parentNode.insertBefore(this.wrapperNode, this.node);
     }
+    this.wrapperNode.appendChild(this.node);
+
+    // Создаем вертикальный скролл
+    this.scrollVerticalNode.className = 'faze-scroll-vertical';
+    this.scrollVerticalNode.style.transition = this.config.transition;
+    this.wrapperNode.appendChild(this.scrollVerticalNode);
   }
 
   /**
    * Навешивание событий
    */
   bind(): void {
-    if (this.isVertical) {
-      this.wrapperNode.addEventListener('wheel', (event) => {
+    this.wrapperNode.addEventListener('wheel', (event) => {
+      if (this.isVertical) {
         event.preventDefault();
 
         // Определяем направление
@@ -149,8 +147,8 @@ class Scroll {
 
         // Задаем позицию вертикальному скрол бару
         this.scrollVerticalNode.style.top = `${Math.abs(this.scrollVerticalHeightInPercents / 100 * positionY)}px`;
-      });
-    }
+      }
+    });
   }
 
   /**

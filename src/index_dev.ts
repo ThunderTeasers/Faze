@@ -128,8 +128,13 @@ Faze.add({
     });
 
     new Faze.Tab(document.querySelector('.faze-tabs'));
+
     new Faze.Dropdown(document.querySelector('.faze-dropdown'));
-    new Faze.Select(document.querySelector('.faze-select'));
+
+    new Faze.Select(document.querySelector('.faze-select'), {
+      default: false,
+    });
+
     new Faze.Carousel(document.querySelector('.carousel-test'), {
       autoplay: false,
       pages: true,

@@ -84,6 +84,9 @@ class Select {
   // Выбранное значение
   value: string | null;
 
+  // DOM элемент изначального значения в селекте(то которое в заголовке)
+  readonly initialOptionNode: HTMLDivElement;
+
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
       throw new Error('Не задан объект селекта');
@@ -102,6 +105,11 @@ class Select {
     this.config = Object.assign(defaultConfig, config);
     this.node = node;
 
+    // Инициализация переменных
+    if (this.config.default) {
+      this.initialOptionNode = document.createElement('div');
+    }
+
     this.initialize();
     this.bind();
   }
@@ -118,14 +126,36 @@ class Select {
       throw new Error('Для селекта не найдены шапка и тело');
     }
 
+    // Если имеется первичное значение селекта
+    if (this.config.default) {
+      // Вставляем изначальный(тот что был в заголовке) вариант первым
+      this.initialOptionNode.className = 'faze-option';
+      this.initialOptionNode.setAttribute('data-faze-value', 'FAZE_INITIAL_TITLE');
+      this.initialOptionNode.textContent = this.title.textContent;
+      this.initialOptionNode.style.display = 'none';
+      this.body.insertBefore(this.initialOptionNode, this.body.firstChild);
+
+      // Берем все опции в селекте
+      this.options = this.body.querySelectorAll('.faze-option');
+    } else {
+      // Если нет, то делаем выбираем первую опцию по умолчанию
+      const firstOption = this.body.querySelector('.faze-option:first-child');
+      if (firstOption) {
+        this.title.textContent = firstOption.getAttribute('data-faze-caption') || firstOption.textContent;
+        this.value = firstOption.getAttribute('data-faze-value') || firstOption.textContent;
+
+        // Берем все опции в селекте
+        this.options = this.body.querySelectorAll('.faze-option');
+
+        this.hideOption(this.value);
+      }
+    }
+
     // Присвоение сдвига для тела
     this.body.style.top = `${this.title.offsetHeight + this.config.positionTopOffset}px`;
 
     // Пересоздаем заголовок чтобы удалить с него все бинды
     this.resetTitle();
-
-    // Берем все опции в селекте
-    this.options = this.body.querySelectorAll('.faze-option');
 
     // Вызываем пользовательский метод
     if (typeof this.config.callbacks.created === 'function') {
@@ -133,7 +163,7 @@ class Select {
         this.config.callbacks.created({
           title: this.title,
           body: this.body,
-          value: null,
+          value: this.value,
         });
       } catch (error) {
         console.error('Ошибка исполнения пользовательского метода "created":', error);

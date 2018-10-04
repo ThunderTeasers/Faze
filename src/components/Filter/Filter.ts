@@ -98,9 +98,9 @@ class Filter {
         get: undefined,
       },
       selectors: {
-        form: '.faze-filter .faze-form',
-        itemsHolder: '.faze-filter .faze-items',
-        total: '.faze-total',
+        form: '.faze-filter-form',
+        itemsHolder: '.faze-filter-items',
+        total: '.faze-filter-total',
       },
       texts: {
         buttonLoading: 'Обработка...',
@@ -187,7 +187,7 @@ class Filter {
             // Парсинг ответа от сервера
             const responseHTML = (new DOMParser()).parseFromString(response, 'text/html');
 
-            const responseNode = responseHTML.querySelector(`.${this.node.className}`);
+            const responseNode = responseHTML.querySelector(`.${this.node.className.replace(' ', '.')}`);
             if (responseNode) {
               if (this.itemsHolderNode) {
                 // Проверка, если отфильтрованных элементов больше 0, тогда происходит их вывод

@@ -95,7 +95,7 @@ interface CallbackData {
   counterNode?: HTMLElement;
   totalSlides: number;
   index: number;
-  currentSlideNode?: HTMLElement | null;
+  currentSlideNode: HTMLElement | null;
 }
 
 /**
@@ -272,6 +272,7 @@ class Carousel {
           counterNode: this.counterNode,
           arrowsNode: this.arrowsNode,
           pagesNode: this.pagesNode,
+          currentSlideNode: this.slidesNodes[this.index],
         });
       } catch (error) {
         console.error('Ошибка исполнения пользовательского метода "created":', error);

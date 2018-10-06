@@ -238,9 +238,6 @@ class Filter {
 
             // Разблокировка кнопки
             this.unlockButton();
-
-            // Скрол наверх
-            window.scrollTo(0, 0);
           });
       });
     }

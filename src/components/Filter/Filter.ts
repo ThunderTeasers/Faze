@@ -114,6 +114,11 @@ class Filter {
     this.config = Object.assign(defaultConfig, config);
     this.node = node;
 
+    // Проверка на ошибки
+    if (!this.config.tableName) {
+      throw new Error('Не задан префикс таблицы для фильтрации');
+    }
+
     // Инициализация переменных
     this.buttonSubmitNode = this.node.querySelector(`${this.config.selectors.form} [type="submit"]`);
     this.formNode = document.querySelector(this.config.selectors.form);

@@ -105,7 +105,7 @@ class Page {
 
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
-      throw new Error('Не задан объект зума');
+      throw new Error('Не задан объект бесконечной загрузки');
     }
 
     // Конфиг по умолчанию

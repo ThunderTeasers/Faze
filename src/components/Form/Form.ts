@@ -46,8 +46,8 @@ import './Form.scss';
  *   response - ответ от сервера после передачи запроса, так же может содержать ошибку, в случае, если сервер не ответил
  */
 interface CallbackData {
-  form: HTMLFormElement;
-  button: HTMLElement | null;
+  formNode: HTMLFormElement;
+  buttonNode: HTMLElement | null;
   response?: any;
 }
 
@@ -138,8 +138,8 @@ class Form {
     try {
       if (typeof this.config.callbacks.created === 'function') {
         this.config.callbacks.created({
-          form: this.node,
-          button: this.button,
+          formNode: this.node,
+          buttonNode: this.button,
           response: undefined,
         });
       }
@@ -174,8 +174,8 @@ class Form {
             try {
               this.config.callbacks.success({
                 response,
-                form: this.node,
-                button: this.button,
+                formNode: this.node,
+                buttonNode: this.button,
               });
             } catch (error) {
               console.log('Ошибка исполнения пользовательской функции "success":', error);
@@ -191,8 +191,8 @@ class Form {
           if (typeof this.config.callbacks.error === 'function') {
             try {
               this.config.callbacks.error({
-                form: this.node,
-                button: this.button,
+                formNode: this.node,
+                buttonNode: this.button,
                 response: error,
               });
             } catch (error) {

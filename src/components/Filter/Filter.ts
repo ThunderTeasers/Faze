@@ -141,7 +141,7 @@ class Filter {
 
     // Простановка общего числа элементов
     if (this.config.showTotal && this.totalNode) {
-      this.totalNode.textContent = this.node.getAttribute('data-faze-total');
+      this.totalNode.textContent = this.node.getAttribute('data-faze-filter-total');
     }
 
     // Выполняем пользовательскую фукнции
@@ -152,7 +152,7 @@ class Filter {
           formNode: this.formNode,
           itemsHolderNode: this.itemsHolderNode,
           params: this.params,
-          total: parseInt(this.node.getAttribute('data-faze-total') || '0', 10),
+          total: parseInt(this.node.getAttribute('data-faze-filter-total') || '0', 10),
         });
       } catch (error) {
         console.error('Ошибка исполнения пользовательской функции "created"', error);
@@ -206,11 +206,11 @@ class Filter {
               }
 
               // Обновление количества элементов
-              const total = responseNode.getAttribute('data-faze-total') || '0';
+              const total = responseNode.getAttribute('data-faze-filter-total') || '0';
               if (this.config.showTotal && this.totalNode) {
                 this.totalNode.textContent = total;
               }
-              this.node.setAttribute('data-faze-total', total);
+              this.node.setAttribute('data-faze-filter-total', total);
             }
 
             // Обновление строки в браузере
@@ -229,7 +229,7 @@ class Filter {
                   formNode: this.formNode,
                   itemsHolderNode: this.itemsHolderNode,
                   params: this.params,
-                  total: parseInt(this.node.getAttribute('data-faze-total') || '0', 10),
+                  total: parseInt(this.node.getAttribute('data-faze-filter-total') || '0', 10),
                 });
               } catch (e) {
                 console.error(e);

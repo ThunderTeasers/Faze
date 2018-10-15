@@ -64,6 +64,7 @@
 
     overflow: hidden;
 
+    // Горизонтальная прокрутка
     &.faze-direction-horizontal {
       & > .faze-carousel-holder {
         left: 0;
@@ -78,8 +79,11 @@
       }
     }
 
+    // Вертикальная прокрутка
     &.faze-direction-vertical {
       & > .faze-carousel-holder {
+        flex-direction: column;
+
         top: 0;
 
         height: 5000%;

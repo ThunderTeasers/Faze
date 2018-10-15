@@ -146,9 +146,9 @@ Faze.add({
       arrows: true,
       counter: false,
       animation: {
-        type: 'fade',
+        type: 'slide',
         time: 1000,
-        direction: 'horizontal',
+        direction: 'vertical',
       },
       callbacks: {
         created: (data: any) => {

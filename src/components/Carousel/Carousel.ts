@@ -81,6 +81,11 @@ interface Config {
  *   holderNode   - DOM элемент содержащий слайды
  *   carouselNode - DOM элемент в котором находится всё, что относится карусели
  *   slidesNodes  - DOM элементы слайдов
+ *   controlsNode - DOM элемент родителя всех управляющих элементов карусели
+ *   pagesNode    - DOM элемент пагинации слайдов
+ *   arrowsNode   - DOM элемент родителя стрелок
+ *   arrowsNodes  - DOM элементы стрелок, не путать с arrowsNode
+ *   counterNode  - DOM элемент счетчика слайдов
  *   totalSlides  - общее число слайдов
  *   index        - индекс активного слайда
  *   currentSlideNode - DOM элемент активного слайда
@@ -92,6 +97,10 @@ interface CallbackData {
   controlsNode?: HTMLElement;
   pagesNode?: HTMLElement;
   arrowsNode?: HTMLElement;
+  arrowsNodes?: {
+    left: HTMLElement;
+    right: HTMLElement;
+  };
   counterNode?: HTMLElement;
   totalSlides: number;
   index: number;
@@ -270,6 +279,7 @@ class Carousel {
           controlsNode: this.controlsNode,
           counterNode: this.counterNode,
           arrowsNode: this.arrowsNode,
+          arrowsNodes: this.arrowsNodes,
           pagesNode: this.pagesNode,
           currentSlideNode: this.slidesNodes[this.index],
         });
@@ -577,6 +587,7 @@ class Carousel {
           controlsNode: this.controlsNode,
           counterNode: this.counterNode,
           arrowsNode: this.arrowsNode,
+          arrowsNodes: this.arrowsNodes,
           pagesNode: this.pagesNode,
         });
       } catch (error) {

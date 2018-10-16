@@ -217,10 +217,9 @@ class Carousel {
     this.initialize();
     this.bind();
 
-    // Получение параметров слайда, ВАЖНО делать после инициализации, т.к. на слайды могут быть повешаны CSS модификаторы изменяющие его
-    // размеры
-    this.slideWidth = this.slidesNodes[0].offsetWidth;
-    this.slideHeight = this.slidesNodes[0].offsetHeight;
+    // Получение параметров слайда, ВАЖНО делать после инициализации, т.к. на слайды могут быть повешаны CSS модификаторы
+    // изменяющие его размеры
+    this.calculateSlideSize();
   }
 
   /**
@@ -467,6 +466,9 @@ class Carousel {
     // Сброс предыдущей анимации
     this.resetInterval();
 
+    // Получение актуальной информации о размере слайде
+    this.calculateSlideSize();
+
     let currentSlide = null;
     switch (this.config.animation.type) {
       // Анимация 'fade', заключается в исчезновении предыдущего и появлении следующего слайда
@@ -609,6 +611,14 @@ class Carousel {
         indicator.classList.remove('faze-active');
       }
     });
+  }
+
+  /**
+   * Получение размеров слайда
+   */
+  calculateSlideSize() {
+    this.slideWidth = this.slidesNodes[0].offsetWidth;
+    this.slideHeight = this.slidesNodes[0].offsetHeight;
   }
 }
 

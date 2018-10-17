@@ -11,6 +11,7 @@ import Scroll from './components/Scroll/Scroll';
 import Form from './components/Form/Form';
 import Page from './components/Page/Page';
 import Filter from './components/Filter/Filter';
+import Spoiler from './components/Spoiler/Spoiler';
 
 // @ts-ignore
 window.Faze = Faze;
@@ -99,5 +100,12 @@ Faze.add({
   pluginName: 'Filter',
   callback: () => {
     Faze.Filter = Filter;
+  },
+});
+
+Faze.add({
+  pluginName: 'Spoiler',
+  callback: () => {
+    Faze.Spoiler = Spoiler;
   },
 });

@@ -11,6 +11,7 @@ import Scroll from './components/Scroll/Scroll';
 import Form from './components/Form/Form';
 import Page from './components/Page/Page';
 import Filter from './components/Filter/Filter';
+import Spoiler from './components/Spoiler/Spoiler';
 
 // @ts-ignore
 window.Faze = Faze;
@@ -96,6 +97,13 @@ Faze.add({
 });
 
 Faze.add({
+  pluginName: 'Spoiler',
+  callback: () => {
+    Faze.Spoiler = Spoiler;
+  },
+});
+
+Faze.add({
   pluginName: 'Filter',
   callback: () => {
     Faze.Filter = Filter;
@@ -105,7 +113,7 @@ Faze.add({
 // Тесты
 Faze.add({
   pluginName: 'TooltipTest',
-  plugins: ['Page', 'Form', 'Scroll', 'Zoom', 'Carousel', 'Select', 'Dropdown', 'Tab', 'Modal', 'Tooltip'],
+  plugins: ['Page', 'Form', 'Spoiler', 'Scroll', 'Zoom', 'Carousel', 'Select', 'Dropdown', 'Tab', 'Modal', 'Tooltip'],
   condition: document.querySelectorAll('#button').length > 0,
   callback: () => {
     new Faze.Tooltip(document.querySelector('#button'), {
@@ -160,6 +168,8 @@ Faze.add({
     new Faze.Zoom(document.querySelector('.image'), {
       side: 'right',
     });
+
+    new Faze.Spoiler(document.querySelector('.spoiler-test'));
 
     new Faze.Scroll(document.querySelector('.for-scroll'), {
       height: 100,

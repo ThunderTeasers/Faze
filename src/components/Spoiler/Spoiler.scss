@@ -1,0 +1,29 @@
+/**
+ * Стили для плагина спойлера
+ *
+ * Автор: Ерохин Максим, plarson.ru
+ * Дата: 17.10.2018
+ */
+
+.faze-spoiler {
+  .faze-title {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .faze-body {
+    display: none;
+  }
+
+  &.faze-active {
+    .faze-body {
+      display: block;
+    }
+  }
+}

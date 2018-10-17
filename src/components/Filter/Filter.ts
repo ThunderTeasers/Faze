@@ -87,7 +87,7 @@ class Filter {
 
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
-      throw new Error('Не задан объект дропдауна');
+      throw new Error('Не задан объект фильтра');
     }
 
     // Конфиг по умолчанию

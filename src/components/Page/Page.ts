@@ -103,6 +103,12 @@ class Page {
   // Текущий сдвиг для получения запроса с сервера, работает так же как и в OFFSET в SQL
   offset: number;
 
+  // Параметры строки поиска
+  params: URLSearchParams;
+
+  // Общее количество элементов
+  total: number;
+
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
       throw new Error('Не задан объект бесконечной загрузки');
@@ -146,10 +152,20 @@ class Page {
     // Присвоение класса для обертки плагина
     this.node.classList.add('.faze-page');
 
-    // Присвоение текущего сдвига, для корректного счета при последующей загрузке
-    this.offset = this.config.offset;
+    // Получение общего числа элементов
+    this.updateTotal();
 
+    // Присвоение текущего сдвига, для корректного счета при последующей загрузке
+    this.resetOffset();
+
+    // Создание кнопки
     this.createButton();
+
+    // Проверка кнопки на необходимость скрытия
+    this.checkButton();
+
+    // Инициализация параметров
+    this.params = new URLSearchParams(window.location.search);
 
     // Выполнение кастомной функции
     if (typeof this.config.callbacks.created === 'function') {
@@ -172,27 +188,26 @@ class Page {
     const tableString = `first${this.config.tableName}`;
 
     // Сборка строки параметров
-    const searchParams = new URLSearchParams(window.location.search);
-    searchParams.append(tableString, this.offset.toString());
+    this.params.append(tableString, this.offset.toString());
     if (this.config.modules.get) {
-      searchParams.append('show', this.config.modules.get.toString());
+      this.params.append('show', this.config.modules.get.toString());
     } else {
       console.error('Не задан ID модуля для "show"!');
     }
-    searchParams.append('mime', 'txt');
+    this.params.append('mime', 'txt');
 
     // Бинд клика на кнопку, при котором происходит подгрузка новых элементов
     this.buttonLoadModeNode.addEventListener('click', (event) => {
       event.preventDefault();
 
       // Обновление сдвига в строке параметров
-      searchParams.set(tableString, this.offset.toString());
+      this.params.set(tableString, this.offset.toString());
 
       // Блокировка кнопки от повторного нажатия
       this.lockButton();
 
       // Получение новых элементов
-      fetch(`${window.location.pathname}?${searchParams.toString()}`)
+      fetch(`${window.location.pathname}?${this.params.toString()}`)
         .then(response => response.text())
         .then((response) => {
           // Парсинг ответа
@@ -208,6 +223,9 @@ class Page {
 
           // Разблокировка кнопки
           this.unlockButton();
+
+          // Проверка кнопки на необходимость скрытия
+          this.checkButton();
 
           // Выполнение кастомной функции
           if (typeof this.config.callbacks.loaded === 'function') {
@@ -255,6 +273,42 @@ class Page {
     this.buttonLoadModeNode.removeAttribute('disabled');
     this.buttonLoadModeNode.classList.remove('faze-disabled');
     this.buttonLoadModeNode.textContent = this.config.texts.buttonIdle;
+  }
+
+  /**
+   * Обновление значения общего количества элементов
+   *
+   * @param total - опциональное значение, если не задано, берется значение из атрибута "data-page-total"
+   */
+  updateTotal(total?: number) {
+    this.total = total || parseInt(this.node.getAttribute('data-faze-page-total') || '9999', 10) || 9999;
+  }
+
+  /**
+   * Сброс количества загруженных элементов
+   */
+  resetOffset() {
+    this.offset = this.config.offset;
+  }
+
+  /**
+   * Проверка, если загружены все элементы, то скрываем кнопку
+   */
+  checkButton() {
+    if (this.offset >= this.total) {
+      this.buttonLoadModeNode.style.display = 'none';
+    } else {
+      this.buttonLoadModeNode.style.display = 'block';
+    }
+  }
+
+  /**
+   * Изменение параметров загрузки новых элементов, может порадобиться например при фильтрации и последующей бесконечной прокрутке
+   *
+   * @param params - параметры поисковой строки
+   */
+  setParams(params: URLSearchParams) {
+    this.params = params;
   }
 }
 

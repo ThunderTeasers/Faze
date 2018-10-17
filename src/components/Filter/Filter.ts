@@ -144,6 +144,9 @@ class Filter {
       this.totalNode.textContent = this.node.getAttribute('data-faze-filter-total');
     }
 
+    // Восстанавливаем заданые значения
+    this.restoreFilteredInputs();
+
     // Выполняем пользовательскую фукнции
     if (typeof this.config.callbacks.created === 'function') {
       try {
@@ -239,6 +242,31 @@ class Filter {
             // Разблокировка кнопки
             this.unlockButton();
           });
+      });
+    }
+  }
+
+  /**
+   * Восстановление значений выбранных инпутов после перезагрузки страницы
+   */
+  restoreFilteredInputs() {
+    // Для чекбоксов
+    this.restoreFilteredCheckboxes();
+  }
+
+  /**
+   * Восстановление значений выбранных чекбоксов после перезагрузки страницы
+   */
+  restoreFilteredCheckboxes() {
+    if (this.formNode) {
+      this.formNode.querySelectorAll('input[type="checkbox"]').forEach((checkboxNode: any) => {
+        const checkboxName = checkboxNode.name;
+        const checkboxValue = checkboxNode.value;
+
+        const values = this.params.getAll(checkboxName);
+        if (values.includes(checkboxValue)) {
+          checkboxNode.checked = true;
+        }
       });
     }
   }

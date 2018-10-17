@@ -111,7 +111,7 @@ interface CallbackData {
  * Класс карусели
  */
 class Carousel {
-  // DOM элемент при наведении на который появляется тултип
+  // DOM элемент карусели
   readonly node: HTMLElement;
 
   // Конфиг с настройками

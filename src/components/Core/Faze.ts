@@ -70,6 +70,7 @@ class Faze {
   static Gallery: any;
   static Helpers: any;
   static Scroll: any;
+  static Spoiler: any;
   static Page: any;
   static Form: any;
   static Filter: any;

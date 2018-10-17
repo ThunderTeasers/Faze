@@ -46,7 +46,7 @@ interface Config {
  * Класс скролл
  */
 class Scroll {
-  // DOM элемент при наведении на который появляется тултип
+  // DOM элемент скрола
   readonly node: HTMLElement;
 
   // Конфиг с настройками

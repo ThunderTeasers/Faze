@@ -42,7 +42,7 @@ interface Config {
  * Класс зума
  */
 class Zoom {
-  // DOM элемент при наведении на который появляется тултип
+  // DOM элемент зума
   readonly node: HTMLElement;
 
   // Конфиг с настройками

@@ -86,7 +86,7 @@ interface Config {
  * Класс форм
  */
 class Form {
-  // DOM элемент при наведении на который появляется тултип
+  // DOM элемент формы
   readonly node: HTMLFormElement;
 
   // Конфиг с настройками

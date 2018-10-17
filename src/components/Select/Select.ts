@@ -66,7 +66,7 @@ interface CallbackData {
  * Класс дропдауна
  */
 class Select {
-  // DOM элемент при наведении на который появляется тултип
+  // DOM элемент селекта
   readonly node: HTMLElement;
 
   // Конфиг с настройками

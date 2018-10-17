@@ -53,7 +53,7 @@ interface Config {
  * Класс табов
  */
 class Tab {
-  // DOM элемент при наведении на который появляется тултип
+  // DOM элемент табов
   readonly node: HTMLElement;
 
   // Конфиг с настройками

@@ -64,7 +64,7 @@ interface Config {
  * Класс фильтра
  */
 class Filter {
-  // DOM элемент при наведении на который появляется тултип
+  // DOM элемент фильтра
   readonly node: HTMLElement;
 
   // Конфиг с настройками

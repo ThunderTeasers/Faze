@@ -281,7 +281,11 @@ class Page {
    * @param total - опциональное значение, если не задано, берется значение из атрибута "data-page-total"
    */
   updateTotal(total?: number) {
-    this.total = total || parseInt(this.node.getAttribute('data-faze-page-total') || '9999', 10) || 9999;
+    if (total === undefined || total === null) {
+      this.total = parseInt(this.node.getAttribute('data-faze-page-total') || '9999', 10) || 9999;
+    } else {
+      this.total = total;
+    }
   }
 
   /**

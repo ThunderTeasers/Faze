@@ -12,6 +12,7 @@ import Form from './components/Form/Form';
 import Page from './components/Page/Page';
 import Filter from './components/Filter/Filter';
 import Spoiler from './components/Spoiler/Spoiler';
+import Gallery from './components/Gallery/Gallery';
 
 // @ts-ignore
 window.Faze = Faze;
@@ -107,5 +108,12 @@ Faze.add({
   pluginName: 'Spoiler',
   callback: () => {
     Faze.Spoiler = Spoiler;
+  },
+});
+
+Faze.add({
+  pluginName: 'Gallery',
+  callback: () => {
+    Faze.Gallery = Gallery;
   },
 });

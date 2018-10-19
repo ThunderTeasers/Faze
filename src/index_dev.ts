@@ -12,6 +12,7 @@ import Form from './components/Form/Form';
 import Page from './components/Page/Page';
 import Filter from './components/Filter/Filter';
 import Spoiler from './components/Spoiler/Spoiler';
+import Gallery from './components/Gallery/Gallery';
 
 // @ts-ignore
 window.Faze = Faze;
@@ -110,10 +111,17 @@ Faze.add({
   },
 });
 
+Faze.add({
+  pluginName: 'Gallery',
+  callback: () => {
+    Faze.Gallery = Gallery;
+  },
+});
+
 // Тесты
 Faze.add({
   pluginName: 'TooltipTest',
-  plugins: ['Page', 'Form', 'Spoiler', 'Scroll', 'Zoom', 'Carousel', 'Select', 'Dropdown', 'Tab', 'Modal', 'Tooltip'],
+  plugins: ['Page', 'Gallery', 'Form', 'Spoiler', 'Scroll', 'Zoom', 'Carousel', 'Select', 'Dropdown', 'Tab', 'Modal', 'Tooltip'],
   condition: document.querySelectorAll('#button').length > 0,
   callback: () => {
     new Faze.Tooltip(document.querySelector('#button'), {
@@ -190,6 +198,10 @@ Faze.add({
       modules: {
         get: 111222,
       },
+    });
+
+    new Faze.Gallery(document.querySelectorAll('.image-product'), {
+      thumbnailsPosition: '123',
     });
   },
 });

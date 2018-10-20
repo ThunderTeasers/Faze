@@ -1,0 +1,149 @@
+/**
+ * Стили для плагина галереи
+ *
+ * Автор: Ерохин Максим, plarson.ru
+ * Дата: 20.10.2018
+ */
+
+.faze-gallery-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background-color: rgba(0, 0, 0, 0.5);
+
+  z-index: 5;
+
+  // Стрелки
+  & > .faze-gallery-arrow {
+    position: relative;
+
+    width: 10rem;
+    height: 100%;
+
+    &:after {
+      content: '';
+
+      display: block;
+      width: 2.5rem;
+      height: 2.5rem;
+
+      position: absolute;
+      top: 50%;
+      left: 50%;
+
+      border-top: 0.3rem solid #000;
+    }
+
+    &.faze-gallery-arrow-prev {
+      left: 0;
+
+      &:after {
+        border-left: 0.3rem solid #000;
+
+        transform: translate(-50%, -50%) rotateZ(-45deg);
+      }
+    }
+
+    &.faze-gallery-arrow-next {
+      right: 0;
+
+      &:after {
+        border-right: 0.3rem solid #000;
+
+        transform: translate(-50%, -50%) rotateZ(45deg);
+      }
+    }
+
+    & > .faze-gallery-wrapper-image {
+      & > faze-gallery-image {
+        display: flex;
+
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+    }
+
+    &:hover {
+      cursor: pointer;
+
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  // Кнопка закрытия
+  & > .faze-gallery-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    display: flex;
+    width: 10rem;
+    height: 10rem;
+
+    z-index: 6;
+
+    &:before, &:after {
+      content: '';
+
+      position: absolute;
+      top: 50%;
+      left: 50%;
+
+      display: block;
+      width: 4rem;
+      height: 0.3rem;
+
+      background-color: #000;
+    }
+
+    &:before {
+      transform: translate(-50%, -50%) rotateZ(45deg);
+    }
+
+    &:after {
+      transform: translate(-50%, -50%) rotateZ(-45deg);
+    }
+
+    &:hover {
+      cursor: pointer;
+
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  // Изображение
+  & > .faze-gallery-wrapper-image {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    width: calc(100% - 20rem);
+
+    & > .faze-gallery-image {
+      width: auto;
+      max-width: 100%;
+      height: auto;
+      max-height: 100vh;
+    }
+  }
+}
+
+.faze-gallery-caller {
+  &:hover {
+    cursor: pointer;
+  }
+}

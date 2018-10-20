@@ -18,6 +18,30 @@ class Gallery {
   // Конфиг с настройками
   readonly config: Config;
 
+  // DOM элемент содержащий все элементы галереи
+  readonly wrapperNode: HTMLDivElement;
+
+  // DOM элементы стрелок переключения
+  readonly arrowsNodes: {
+    prev: HTMLDivElement,
+    next: HTMLDivElement,
+  };
+
+  // DOM элемент крестика для закрытия галереи
+  readonly closeButtonNode: HTMLDivElement;
+
+  // DOM элемент враммера картинки
+  readonly imageWrapperNode: HTMLDivElement;
+
+  // DOM элемент картинки
+  readonly imageNode: HTMLImageElement;
+
+  // Общее количество картинок в галерее
+  readonly totalImages: number;
+
+  // Индекс текущей картинки в галереи
+  index: number;
+
   constructor(nodes: HTMLElement[] | null, config: Partial<Config>) {
     if (!nodes) {
       throw new Error('Не заданы объекты галереи');
@@ -34,6 +58,17 @@ class Gallery {
     // Проверка конфига
     this.checkConfig();
 
+    // Инициализирование переменных
+    this.wrapperNode = document.createElement('div');
+    this.arrowsNodes = {
+      prev: document.createElement('div'),
+      next: document.createElement('div'),
+    };
+    this.closeButtonNode = document.createElement('div');
+    this.imageWrapperNode = document.createElement('div');
+    this.imageNode = document.createElement('img');
+    this.totalImages = this.nodes.length;
+
     // Вызов стандартных методов плагина
     this.initialize();
     this.bind();
@@ -43,8 +78,9 @@ class Gallery {
    * Инициализация
    */
   initialize() {
+    // Проставляем класс всем элементам галереи
     this.nodes.forEach((node) => {
-      node.classList.add('faze-gallery-item');
+      node.classList.add('faze-gallery-caller');
     });
   }
 
@@ -52,12 +88,95 @@ class Gallery {
    * Навешивание событий
    */
   bind() {
-    this.nodes.forEach((node) => {
+    this.nodes.forEach((node, i) => {
       node.addEventListener('click', (event) => {
         event.preventDefault();
 
-        console.log(1);
+        // Присвоение корректного индекса
+        this.index = i;
+
+        // Построение галереи
+        this.build();
+
+        // Навешивание событий на созданные выше элементы
+        this.bindArrows();
+        this.bindCloseButton();
       });
+    });
+  }
+
+  /**
+   * Создание галереи
+   */
+  build() {
+    // Присваиваем необходимые классы
+    this.wrapperNode.className = 'faze-gallery-wrapper';
+
+    this.arrowsNodes.prev.className = 'faze-gallery-arrow faze-gallery-arrow-prev';
+    this.arrowsNodes.next.className = 'faze-gallery-arrow faze-gallery-arrow-next';
+
+    this.closeButtonNode.className = 'faze-gallery-close';
+
+    this.imageWrapperNode.className = 'faze-gallery-wrapper-image';
+    this.imageNode.className = 'faze-gallery-image';
+
+    // Сборка элементов друг с другом
+    this.wrapperNode.appendChild(this.arrowsNodes.prev);
+
+    const source = this.nodes[this.index].getAttribute('data-faze-gallery-image');
+    if (source) {
+      this.imageNode.src = source;
+    }
+    this.imageWrapperNode.appendChild(this.imageNode);
+    this.wrapperNode.appendChild(this.imageWrapperNode);
+
+    this.wrapperNode.appendChild(this.closeButtonNode);
+
+    this.wrapperNode.appendChild(this.arrowsNodes.next);
+
+    document.body.appendChild(this.wrapperNode);
+  }
+
+  bindArrows() {
+    // Кнопка перелистывания назад
+    this.arrowsNodes.prev.addEventListener('click', (event) => {
+      event.preventDefault();
+
+      this.index -= 1;
+      if (this.index < 0) {
+        this.index = this.totalImages - 1;
+      }
+
+      const source = this.nodes[this.index].getAttribute('data-faze-gallery-image');
+      if (source) {
+        this.imageNode.src = source;
+      }
+    });
+
+    // Кнопка перелистывания вперед
+    this.arrowsNodes.next.addEventListener('click', (event) => {
+      event.preventDefault();
+
+      this.index += 1;
+      if (this.index >= this.totalImages) {
+        this.index = 0;
+      }
+
+      const source = this.nodes[this.index].getAttribute('data-faze-gallery-image');
+      if (source) {
+        this.imageNode.src = source;
+      }
+    });
+  }
+
+  /**
+   * Навешивание события на кнопку закрытия
+   */
+  bindCloseButton() {
+    this.closeButtonNode.addEventListener('click', (event) => {
+      event.preventDefault();
+
+      this.wrapperNode.remove();
     });
   }
 

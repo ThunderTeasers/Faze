@@ -9,7 +9,8 @@
       "esnext"
     ],
     "module": "es6",
-    "target": "esnext",
+    "target": "es5",
+    "downlevelIteration": true,
     "sourceMap": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
@@ -21,6 +22,6 @@
     "node_modules"
   ],
   "include": [
-    "./src/**/*"
+    "./src/**/*.ts"
   ]
 }

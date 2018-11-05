@@ -1,8 +1,4 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const webpack = require('webpack');
 
 module.exports = {
   output: {
@@ -10,24 +6,19 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/',
   },
-  plugins: [
-    new CleanWebpackPlugin(['dist']),
-    new HtmlWebpackPlugin({
-      template: './src/index.html',
-    }),
-    new webpack.HotModuleReplacementPlugin(),
-    new MiniCssExtractPlugin({
-      filename: 'faze.min.css',
-    }),
-  ],
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.ts'],
   },
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
+        test: /\.ts$/,
+        use: ['babel-loader', 'ts-loader'],
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.(js)$/,
+        loaders: ['babel'],
         exclude: /node_modules/,
       },
       {

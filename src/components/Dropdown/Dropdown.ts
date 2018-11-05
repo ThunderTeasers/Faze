@@ -33,12 +33,14 @@ import './Dropdown.scss';
  *
  * Содержит:
  *   positionTopOffset  - сдвиг тела от верхнего края заголовка, например для отображения там стрелочки
+ *   strictPosition     - считать ли сдвиг не только снизу заголовка, но еще и со сдвигом страницы
  *   callbacks
  *     created  - пользовательский метод, исполняющийся при успешном создании дропдауна
  *     opened   - пользовательский метод, исполняющийся при открытии дропдауна
  */
 interface Config {
   positionTopOffset: number;
+  strictPosition: boolean;
   callbacks: {
     created?: (data: CallbackData) => void;
     opened?: (data: CallbackData) => void;
@@ -81,6 +83,7 @@ class Dropdown {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       positionTopOffset: 0,
+      strictPosition: false,
       callbacks: {
         created: undefined,
         opened: undefined,
@@ -107,7 +110,17 @@ class Dropdown {
     }
 
     // Присвоение сдвига для тела
-    this.body.style.top = `${this.title.offsetHeight + this.config.positionTopOffset}px`;
+    let topOffset = this.title.offsetHeight + this.config.positionTopOffset;
+    if (this.config.strictPosition) {
+      const callerRect = this.node.getBoundingClientRect();
+      const documentElement = document.documentElement;
+
+      if (documentElement) {
+        topOffset += (window.pageYOffset || documentElement.scrollTop) + callerRect.top;
+      }
+    }
+
+    this.body.style.top = `${topOffset}px`;
 
     // Пересоздаем заголовок чтобы удалить с него все бинды
     this.resetTitle();

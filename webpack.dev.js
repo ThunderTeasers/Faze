@@ -1,5 +1,10 @@
 const merge = require('webpack-merge');
 const common = require('./webpack.common.js');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const webpack = require('webpack');
+
 
 module.exports = merge(common, {
   entry: './src/index_dev.ts',
@@ -9,6 +14,16 @@ module.exports = merge(common, {
     contentBase: 'dist/',
     hot: true,
   },
+  plugins: [
+    new CleanWebpackPlugin(['dist']),
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+    }),
+    new webpack.HotModuleReplacementPlugin(),
+    new MiniCssExtractPlugin({
+      filename: 'faze.min.css',
+    }),
+  ],
   module: {
     rules: [
       {

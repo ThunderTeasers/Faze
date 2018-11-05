@@ -145,7 +145,9 @@ Faze.add({
 
     new Faze.Tab(document.querySelector('.faze-tabs'));
 
-    new Faze.Dropdown(document.querySelector('.faze-dropdown'));
+    new Faze.Dropdown(document.querySelector('.faze-dropdown'), {
+      strictPosition: true,
+    });
 
     new Faze.Select(document.querySelector('.faze-select'), {
       default: false,
@@ -201,7 +203,7 @@ Faze.add({
     });
 
     new Faze.Gallery(document.querySelectorAll('.image-product'), {
-      thumbnailsPosition: '123',
+
     });
   },
 });

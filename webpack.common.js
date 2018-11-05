@@ -7,26 +7,14 @@ module.exports = {
     publicPath: '/',
   },
   resolve: {
-    extensions: ['.ts'],
+    extensions: ['.ts', '.js', '.scss', '.css'],
   },
   module: {
     rules: [
       {
         test: /\.ts$/,
-        use: ['babel-loader', 'ts-loader'],
+        use: 'ts-loader',
         exclude: /node_modules/,
-      },
-      {
-        test: /\.(js)$/,
-        loaders: ['babel'],
-        exclude: /node_modules/,
-      },
-      {
-        test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader',
-        ],
       },
       {
         test: /\.(png|svg|jpg|gif)$/,

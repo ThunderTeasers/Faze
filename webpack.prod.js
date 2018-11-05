@@ -23,12 +23,6 @@ module.exports = merge(common, {
       new OptimizeCSSAssetsPlugin({}),
     ],
   },
-  plugins: [
-    new CleanWebpackPlugin(['dist']),
-    new MiniCssExtractPlugin({
-      filename: 'faze.min.css',
-    }),
-  ],
   module: {
     rules: [
       {
@@ -41,4 +35,10 @@ module.exports = merge(common, {
       },
     ],
   },
+  plugins: [
+    new CleanWebpackPlugin(['dist']),
+    new MiniCssExtractPlugin({
+      filename: 'faze.min.css',
+    }),
+  ],
 });

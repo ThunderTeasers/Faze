@@ -223,6 +223,12 @@ class Select {
         this.title.textContent = option.getAttribute('data-caption') || option.textContent;
         this.value = option.getAttribute('data-faze-value') || option.textContent;
 
+        // Закрываем селект
+        this.node.classList.remove('faze-active');
+
+        // Скрываем выбранную опцию
+        this.hideOption(this.value);
+
         // Вызываем пользовательскую функцию
         if (typeof this.config.callbacks.changed === 'function') {
           try {
@@ -235,12 +241,6 @@ class Select {
             console.error('Ошибка исполнения пользовательского метода "changed":', error);
           }
         }
-
-        // Закрываем селект
-        this.node.classList.remove('faze-active');
-
-        // Скрываем выбранную опцию
-        this.hideOption(this.value);
       });
     });
 

@@ -155,6 +155,9 @@ Faze.add({
         created: (data: any) => {
           console.log(data);
         },
+        opened: (data: any) => {
+          console.log('opened', data);
+        },
       },
     });
 

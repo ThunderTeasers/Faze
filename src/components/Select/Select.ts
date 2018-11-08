@@ -37,8 +37,9 @@ import './Select.scss';
  * Содержит:
  *   positionTopOffset  - сдвиг тела от верхнего края заголовка, например для отображения там стрелочки
  *   callbacks
- *     created  - пользовательский метод, исполняющийся при успешном создании дропдауна
- *     opened   - пользовательский метод, исполняющийся при открытии дропдауна
+ *     created - пользовательская футкция, исполняющаяся при успешном создании селекта
+ *     changed - пользовательская футкция, исполняющаяся при изменении значения селекта, а именно, после клика по новому значению в его теле
+ *     opened  - пользовательская футкция, исполняющаяся при открытии селекта
  */
 interface Config {
   default: boolean;
@@ -46,6 +47,7 @@ interface Config {
   callbacks: {
     created?: (data: CallbackData) => void,
     changed?: (data: CallbackData) => void,
+    opened?: (data: CallbackData) => void,
   };
 }
 
@@ -53,8 +55,8 @@ interface Config {
  * Структура возвращаемого объекта в пользовательском методе
  *
  * Содержит:
- *   title  - заголовок дропдауна
- *   body   - тело дропдауна
+ *   title  - заголовок селекта
+ *   body   - тело селекта
  */
 interface CallbackData {
   title: HTMLElement | null;
@@ -99,6 +101,7 @@ class Select {
       callbacks: {
         created: undefined,
         changed: undefined,
+        opened: undefined,
       },
     };
 
@@ -157,7 +160,7 @@ class Select {
     // Пересоздаем заголовок чтобы удалить с него все бинды
     this.resetTitle();
 
-    // Вызываем пользовательский метод
+    // Вызываем пользовательскую функцию
     if (typeof this.config.callbacks.created === 'function') {
       try {
         this.config.callbacks.created({
@@ -189,6 +192,21 @@ class Select {
       if (!this.node.classList.contains('faze-disabled')) {
         this.node.classList.toggle('faze-active');
       }
+
+      // Вызываем пользовательскую функцию при открытии селекта
+      if (this.node.classList.contains('faze-active')) {
+        if (typeof this.config.callbacks.opened === 'function') {
+          try {
+            this.config.callbacks.opened({
+              title: this.title,
+              body: this.body,
+              value: this.value,
+            });
+          } catch (error) {
+            console.error('Ошибка исполнения пользовательского метода "opened":', error);
+          }
+        }
+      }
     });
 
     // Навешиваем события на нажатие по опциям, при нажатии нужно сделать её активной,
@@ -205,7 +223,7 @@ class Select {
         this.title.textContent = option.getAttribute('data-caption') || option.textContent;
         this.value = option.getAttribute('data-faze-value') || option.textContent;
 
-        // Вызываем пользовательский метод
+        // Вызываем пользовательскую функцию
         if (typeof this.config.callbacks.changed === 'function') {
           try {
             this.config.callbacks.changed({
@@ -213,8 +231,8 @@ class Select {
               body: this.body,
               value: this.value,
             });
-          } catch (e) {
-            console.error(e);
+          } catch (error) {
+            console.error('Ошибка исполнения пользовательского метода "changed":', error);
           }
         }
 

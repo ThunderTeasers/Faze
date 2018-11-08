@@ -89,6 +89,7 @@ class Tab {
    * Инициализация
    */
   initialize(): void {
+    this.node.classList.add('faze-tabs');
     this.headers = this.node.querySelectorAll(this.config.selectors.headers);
     this.bodies = this.node.querySelectorAll(this.config.selectors.bodies);
 

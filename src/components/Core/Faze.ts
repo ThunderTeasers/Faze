@@ -76,6 +76,7 @@ class Faze {
   static Filter: any;
   static Dropdown: any;
   static Select: any;
+  static REST: any;
 
   /**
    * Метод добавления нового плагина по предоставленному конфигу.

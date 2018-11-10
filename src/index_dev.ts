@@ -208,5 +208,9 @@ Faze.add({
     new Faze.Gallery(document.querySelectorAll('.image-product'), {
 
     });
+
+    Faze.addEventForChild('click', '.test-on', () => {
+      console.log(1);
+    });
   },
 });

@@ -157,6 +157,26 @@ class Faze {
   }
 
   /**
+   * Отслеживание событий для элементов которые только могут появиться в DOM дереве, аналог jQuery.on(...)
+   *
+   * @param eventName     - имя события
+   * @param childSelector - CSS селектор элемента на который вешаем событие
+   * @param callback      - пользовательская функция которая будет исполнена после срабатывания события
+   */
+  static addEventListener(eventName: string, childSelector: string, callback: (event: Event, child: HTMLElement) => void) {
+    window.addEventListener(eventName, (event) => {
+      const clickedElement = <any>event.target;
+      if (clickedElement) {
+        const matchingChild = clickedElement.closest(childSelector);
+
+        if (matchingChild) {
+          callback(event, matchingChild);
+        }
+      }
+    });
+  }
+
+  /**
    * Удаление плагина
    *
    * @param name - ключ по которому удаляем

@@ -300,9 +300,9 @@ class Page {
    */
   checkButton() {
     if (this.offset >= this.total) {
-      this.buttonLoadModeNode.style.display = 'none';
+      this.buttonLoadModeNode.classList.add('faze-hide');
     } else {
-      this.buttonLoadModeNode.style.display = 'block';
+      this.buttonLoadModeNode.classList.remove('faze-hide');
     }
   }
 

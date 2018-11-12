@@ -178,7 +178,7 @@ class Form {
                 buttonNode: this.button,
               });
             } catch (error) {
-              console.log('Ошибка исполнения пользовательской функции "success":', error);
+              console.error('Ошибка исполнения пользовательской функции "success":', error);
             }
           }
 

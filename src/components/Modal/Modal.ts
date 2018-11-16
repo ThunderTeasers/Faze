@@ -68,6 +68,7 @@ interface Buttons {
  *   title        - заголовок окна
  *   url          - адрес с которого будет взят контент для вставки в тело
  *   class        - CSS класс модального окна для кастомизации
+ *   event        - событие при вызове которого на переданный элемент(node) должно вызываться модальное окно
  *   delayToClose - время в миллисекундах от нажатия кнопки закрытия до удаления модального окна со страницы, нужно для анимации
  *   callbacks
  *     success    - пользовательский метод, исполняющийся при успешном выполнении запроса на получение данных по url указанного выше
@@ -78,6 +79,7 @@ interface Config {
   title?: string;
   url: string;
   class?: string;
+  event: string;
   delayToClose?: number;
   callbacks: {
     success?: (parts: ModalParts) => void,
@@ -128,6 +130,7 @@ class Modal {
       title: '',
       url: '',
       class: '',
+      event: 'click',
       delayToClose: 0,
       callbacks: {
         success: undefined,
@@ -160,7 +163,7 @@ class Modal {
    * Навешивание событий
    */
   bind(): void {
-    this.node.addEventListener('click', (event) => {
+    this.node.addEventListener(this.config.event, (event) => {
       event.preventDefault();
 
       document.body.classList.add('faze-modal-opened');

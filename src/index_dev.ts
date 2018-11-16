@@ -209,7 +209,7 @@ Faze.add({
 
     });
 
-    Faze.addEventListener('click', '.test-on', () => {
+    Faze.on('click', '.test-on', () => {
       console.log(1);
     });
   },

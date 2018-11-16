@@ -75,9 +75,7 @@ class Spoiler {
    */
   bind() {
     if (this.titleNode) {
-      this.titleNode.addEventListener('click', (event) => {
-        event.preventDefault();
-
+      this.titleNode.addEventListener('click', () => {
         this.node.classList.toggle('faze-active');
       });
     }

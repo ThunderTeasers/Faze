@@ -166,7 +166,7 @@ class Faze {
    * @param childSelector - CSS селектор элемента на который вешаем событие
    * @param callback      - пользовательская функция которая будет исполнена после срабатывания события
    */
-  static addEventListener(eventName: string, childSelector: string, callback: (event: Event, child: HTMLElement) => void) {
+  static on(eventName: string, childSelector: string, callback: (event: Event, child: HTMLElement) => void) {
     window.addEventListener(eventName, (event) => {
       const clickedElement = <any>event.target;
       if (clickedElement) {

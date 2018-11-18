@@ -69,6 +69,8 @@ interface Buttons {
  *   url          - адрес с которого будет взят контент для вставки в тело
  *   class        - CSS класс модального окна для кастомизации
  *   event        - событие при вызове которого на переданный элемент(node) должно вызываться модальное окно
+ *   evented      - отображать модальное окно по событию или сразу
+ *   draggable    - флаг указывающий можно ли передвигать форму
  *   delayToClose - время в миллисекундах от нажатия кнопки закрытия до удаления модального окна со страницы, нужно для анимации
  *   callbacks
  *     success    - пользовательский метод, исполняющийся при успешном выполнении запроса на получение данных по url указанного выше
@@ -80,6 +82,8 @@ interface Config {
   url: string;
   class?: string;
   event: string;
+  evented: boolean;
+  draggable: boolean;
   delayToClose?: number;
   callbacks: {
     success?: (parts: ModalParts) => void,
@@ -131,6 +135,8 @@ class Modal {
       url: '',
       class: '',
       event: 'click',
+      evented: true,
+      draggable: false,
       delayToClose: 0,
       callbacks: {
         success: undefined,
@@ -163,38 +169,49 @@ class Modal {
    * Навешивание событий
    */
   bind(): void {
-    this.node.addEventListener(this.config.event, (event) => {
-      event.preventDefault();
+    if (this.config.evented) {
+      this.node.addEventListener(this.config.event, (event) => {
+        event.preventDefault();
 
-      document.body.classList.add('faze-modal-opened');
+        this.create();
+      });
+    } else {
+      this.create();
+    }
+  }
 
-      // Получение контента
-      this.getContent()
-        .then((responseText) => {
-          this.build(responseText);
+  /**
+   * Создание формы
+   */
+  create() {
+    document.body.classList.add('faze-modal-opened');
 
-          // Исполняем пользовательский метод при успешном получении данных
-          if (typeof this.config.callbacks.success === 'function') {
-            try {
-              this.config.callbacks.success(this.modalParts);
-            }catch (e) {
-              console.error('Ошибка исполнения пользовательского метода "success":', e);
-            }
+    // Получение контента
+    this.getContent()
+      .then((responseText) => {
+        this.build(responseText);
+
+        // Исполняем пользовательский метод при успешном получении данных
+        if (typeof this.config.callbacks.success === 'function') {
+          try {
+            this.config.callbacks.success(this.modalParts);
+          } catch (e) {
+            console.error('Ошибка исполнения пользовательского метода "success":', e);
           }
-        })
-        .catch((error) => {
-          console.error(`Ошибка при получении данных с сервера по адресу ${this.config.url}`, error);
+        }
+      })
+      .catch((error) => {
+        console.error(`Ошибка при получении данных с сервера по адресу ${this.config.url}`, error);
 
-          // Исполняем пользовательский метод при ошибки получения данных
-          if (typeof this.config.callbacks.error === 'function') {
-            try {
-              this.config.callbacks.error(this.modalParts);
-            }catch (e) {
-              console.error('Ошибка исполнения пользовательского метода "error":', e);
-            }
+        // Исполняем пользовательский метод при ошибки получения данных
+        if (typeof this.config.callbacks.error === 'function') {
+          try {
+            this.config.callbacks.error(this.modalParts);
+          } catch (e) {
+            console.error('Ошибка исполнения пользовательского метода "error":', e);
           }
-        });
-    });
+        }
+      });
   }
 
   /**
@@ -243,8 +260,8 @@ class Modal {
 
       document.body.classList.remove('faze-modal-opened');
 
-      // Сначала навешивается класс, а потом через указанное время удаляем окно со страницы, это нужно для того чтобы анимация(если они
-      // есть) успела проиграться и завершиться
+      // Сначала навешивается класс, а потом через указанное время удаляем окно со страницы, это нужно для того чтобы анимация
+      // (если она есть) успела проиграться и завершиться
       this.modalParts.fullNode.classList.add('faze-closing');
       setTimeout(() => this.modalParts.wrapperNode.remove(), this.config.delayToClose);
     });
@@ -284,7 +301,7 @@ class Modal {
         if (typeof buttonData.callback === 'function') {
           try {
             buttonNode.addEventListener('click', () => buttonData.callback(this.modalParts));
-          }catch (e) {
+          } catch (e) {
             console.error(e);
           }
         }

@@ -165,6 +165,18 @@ class Carousel {
   // Ширина слайда, нужна для анимации "slide" по вертикали
   slideHeight: number;
 
+  // Начало касания пальца
+  readonly touchStart: {
+    x: number;
+    y: number;
+  };
+
+  // Конец касания пальца
+  readonly touchEnd: {
+    x: number;
+    y: number;
+  };
+
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
       throw new Error('Не задан объект карусели');
@@ -197,6 +209,17 @@ class Carousel {
     this.totalSlides = this.slidesNodes.length;
     this.itemsHolderNode = document.createElement('div');
     this.controlsNode = document.createElement('div');
+
+    // Жестов
+    this.touchStart = {
+      x: 0,
+      y: 0,
+    };
+
+    this.touchEnd = {
+      x: 0,
+      y: 0,
+    };
 
     // Для пагинации
     if (this.config.pages) {
@@ -305,6 +328,9 @@ class Carousel {
     if (this.config.arrows) {
       this.bindArrows();
     }
+
+    // Навешиваем события жестов
+    this.bindGestures();
   }
 
   /**
@@ -340,6 +366,23 @@ class Carousel {
       event.preventDefault();
 
       this.next();
+    });
+  }
+
+  /**
+   * Навешивание событий для отслеживания жестов
+   */
+  bindGestures() {
+    this.itemsHolderNode.addEventListener('touchstart', (event) => {
+      this.touchStart.x = event.changedTouches[0].screenX;
+      this.touchStart.y = event.changedTouches[0].screenY;
+    });
+
+    this.itemsHolderNode.addEventListener('touchend', (event) => {
+      this.touchEnd.x = event.changedTouches[0].screenX;
+      this.touchEnd.y = event.changedTouches[0].screenY;
+
+      this.handleGestures();
     });
   }
 
@@ -558,7 +601,7 @@ class Carousel {
                 this.itemsHolderNode.style.top = '0';
               }
               this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
-            }, 1);
+            }, 10);
 
             // И после выполнения анимации, ставится флаг, что карусель свободна
             setTimeout(() => {
@@ -630,6 +673,19 @@ class Carousel {
   calculateSlideSize() {
     this.slideWidth = this.slidesNodes[0].offsetWidth;
     this.slideHeight = this.slidesNodes[0].offsetHeight;
+  }
+
+  /**
+   * Отслеживание жестов и выполнение действий при них
+   */
+  handleGestures() {
+    const tolerance = 20;
+
+    if (this.touchEnd.x <= this.touchStart.x + tolerance) {
+      this.next();
+    } else if (this.touchEnd.x >= this.touchStart.x - tolerance) {
+      this.prev();
+    }
   }
 }
 

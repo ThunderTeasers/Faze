@@ -378,7 +378,7 @@ class Carousel {
       this.touchStart.y = event.changedTouches[0].screenY;
     });
 
-    this.itemsHolderNode.addEventListener('touchend', (event) => {
+    this.itemsHolderNode.addEventListener('touchmove', (event) => {
       this.touchEnd.x = event.changedTouches[0].screenX;
       this.touchEnd.y = event.changedTouches[0].screenY;
 
@@ -578,6 +578,9 @@ class Carousel {
               // Так же крайний левый слайд перемещается в конец
               this.itemsHolderNode.appendChild(this.slidesNodes[0]);
 
+              // Присваиваем текущий слайд
+              currentSlide = this.slidesNodes[this.index];
+
               // Выставление флага, что карусель в простое и готова к новой анимации
               this.isIdle = true;
             }, this.config.animation.time);
@@ -605,6 +608,9 @@ class Carousel {
 
             // И после выполнения анимации, ставится флаг, что карусель свободна
             setTimeout(() => {
+              currentSlide = this.slidesNodes[this.index];
+
+              // Выставление флага, что карусель в простое и готова к новой анимации
               this.isIdle = true;
             }, this.config.animation.time);
           }
@@ -679,11 +685,9 @@ class Carousel {
    * Отслеживание жестов и выполнение действий при них
    */
   handleGestures() {
-    const tolerance = 20;
-
-    if (this.touchEnd.x <= this.touchStart.x + tolerance) {
+    if (this.touchEnd.x <= this.touchStart.x) {
       this.next();
-    } else if (this.touchEnd.x >= this.touchStart.x - tolerance) {
+    } else if (this.touchEnd.x >= this.touchStart.x) {
       this.prev();
     }
   }

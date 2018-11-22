@@ -226,6 +226,13 @@ class Faze {
   static remove(name: string) {
     delete Faze.plugins[name];
   }
+
+  /**
+   * Инициализация плагинов по data атрибутам
+   */
+  static hotInitialize() {
+    Faze.Modal.hotInitialize();
+  }
 }
 
 export default Faze;

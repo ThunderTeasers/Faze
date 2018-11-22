@@ -37,6 +37,7 @@
  */
 
 import './Modal.scss';
+import Faze from '../Core/Faze';
 
 /**
  * Структура кнопки в подвале
@@ -330,6 +331,19 @@ class Modal {
   async getContent(): Promise<string> {
     const response = await fetch(this.config.url);
     return await response.text();
+  }
+
+  /**
+   * Инициализация формы по data атрибутам
+   */
+  static hotInitialize(): void {
+    Faze.on('click', '[data-faze="modal"]', (event, callerNode) => {
+      new Faze.Modal(callerNode, {
+        evented: false,
+        url: callerNode.dataset.fazeModalUrl || '',
+        class: callerNode.dataset.fazeModalClass || '',
+      });
+    });
   }
 }
 

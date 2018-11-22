@@ -339,6 +339,7 @@ class Modal {
   static hotInitialize(): void {
     Faze.on('click', '[data-faze="modal"]', (event, callerNode) => {
       new Faze.Modal(callerNode, {
+        title: callerNode.dataset.fazeModalTitle || '',
         evented: false,
         url: callerNode.dataset.fazeModalUrl || '',
         class: callerNode.dataset.fazeModalClass || '',

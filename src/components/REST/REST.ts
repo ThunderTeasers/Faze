@@ -1,10 +1,30 @@
+interface FetchOptions {
+  method: string;
+  body?: any;
+}
+
 class REST {
   static ajaxRequest(method: string, url: string, data: any, callbackSuccess: (response: any) => void) {
     let formData: FormData = new FormData();
     let dataType: string = '';
     let testedMethod: string = '';
 
-    // Определим тип переменной
+    // Проверка method на корректность
+    if (method.toLowerCase() === 'post') {
+      dataType = 'json';
+      testedMethod = 'POST';
+    } else {
+      dataType = 'html';
+      testedMethod = 'GET';
+    }
+
+    // Параметры запроса, вынесены в отдельную переменую, чтобы иметь возможность задать "body", если это POST запрос и не делать этого
+    // если GET. Т.к. при передаче даже пустоты(пустой строки, null, undefined) fetch выдает ошибку что GET запрос не может иметь body.
+    const fetchOptions: FetchOptions = {
+      method: testedMethod,
+    };
+
+    // Определим тип переменной и в соответствии с ней заполняем FormData
     if (data instanceof FormData) {
       formData = data;
     } else if (data instanceof HTMLFormElement) {
@@ -19,32 +39,25 @@ class REST {
       throw new Error('Параметр "data" функции ajaxRequest не является объектом');
     }
 
-    // Проверка method на корректность
+    // Заполняем данные, если это POST запрос
     if (method.toLowerCase() === 'post') {
-      dataType = 'json';
-      testedMethod = 'POST';
-    } else {
-      dataType = 'html';
-      testedMethod = 'GET';
+      fetchOptions.body = formData;
     }
 
-    fetch(`${url}?${(new URLSearchParams(<any>formData)).toString()}`, {
-      method: testedMethod,
-      body: formData,
-    })
+    fetch(`${url}?${(new URLSearchParams(<any>formData)).toString()}`, fetchOptions)
       .then((response) => {
         // В зависимости от типа запроса нужно по разному получить ответ от сервера
         return dataType === 'json' ? response.json() : response.text();
       })
       .then((response) => {
-        if (data['response-text'] && typeof data['response-text'] === 'string') {
-          document.querySelectorAll(data['response-text']).forEach((el) => {
+        if (data['response_text'] && typeof data['response_text'] === 'string') {
+          document.querySelectorAll(data['response_text']).forEach((el) => {
             el.innerHTML = response;
           });
         }
 
-        if (data['response-json'] && typeof data['response-json'] === 'string') {
-          document.querySelectorAll(data['response-json']).forEach((el) => {
+        if (data['response_json'] && typeof data['response_json'] === 'string') {
+          document.querySelectorAll(data['response_json']).forEach((el) => {
             el.innerHTML = response.message;
           });
         }
@@ -116,7 +129,7 @@ class REST {
 
       // Если есть контейнер <span data-notification=""></span>
       formNode.querySelectorAll('[data-faze-rest-notification]').forEach((el) => {
-        if (el.getAttribute('data-faze-rest-notification') === 'response-json') {
+        if (el.getAttribute('data-faze-rest-notification') === 'response_json') {
           el.innerHTML = response.message;
 
           if (response.status === 'success') {

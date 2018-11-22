@@ -104,12 +104,12 @@ Faze.add({
           method: 'GET',
           module: 293394,
           items: 293394,
-          'response-text': '.cart-list-items',
+          response_text: '.cart-list-items',
         },
         {
           method: 'GET',
           module: 293345,
-          'response-text': '.cart-state-container',
+          response_text: '.cart-state-container',
         },
       ]);
     });

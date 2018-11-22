@@ -25,7 +25,6 @@
 
   .faze-modal {
     width: 40rem;
-    max-height: 80vh;
 
     padding: 1rem;
 
@@ -76,7 +75,12 @@
     }
 
     & > main {
+      max-width: 80vh;
+      max-height: 80vh;
+
       margin-top: 1rem;
+
+      overflow: auto;
     }
 
     & > footer {

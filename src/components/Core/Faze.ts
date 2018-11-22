@@ -13,6 +13,24 @@
 import './Faze.scss';
 
 /**
+ * Импорты всех плагинов
+ */
+import Modal from '../Modal/Modal';
+import Helpers from '../Helpers/Helpers';
+import Tooltip from '../Tooltip/Tooltip';
+import Tab from '../Tab/Tab';
+import Dropdown from '../Dropdown/Dropdown';
+import Select from '../Select/Select';
+import Carousel from '../Carousel/Carousel';
+import Zoom from '../Zoom/Zoom';
+import Scroll from '../Scroll/Scroll';
+import Form from '../Form/Form';
+import Page from '../Page/Page';
+import Filter from '../Filter/Filter';
+import Spoiler from '../Spoiler/Spoiler';
+import Gallery from '../Gallery/Gallery';
+
+/**
  * Структура конфигурации плагина при его инициализации
  *
  * Содержит:
@@ -64,21 +82,20 @@ class Faze {
   static plugins: PluginsData = {};
 
   // Резервирование статических переменных под заводские плагины
-  static Tooltip: any;
-  static Modal: any;
-  static Tab: any;
-  static Carousel: any;
-  static Zoom: any;
-  static Gallery: any;
-  static Helpers: any;
-  static Scroll: any;
-  static Spoiler: any;
-  static Page: any;
-  static Form: any;
-  static Filter: any;
-  static Dropdown: any;
-  static Select: any;
-  static REST: any;
+  static Tooltip: any = Tooltip;
+  static Modal: any = Modal;
+  static Tab: any = Tab;
+  static Carousel: any = Carousel;
+  static Zoom: any = Zoom;
+  static Gallery: any = Gallery;
+  static Helpers: any = Helpers;
+  static Scroll: any = Scroll;
+  static Spoiler: any = Spoiler;
+  static Page: any = Page;
+  static Form: any = Form;
+  static Filter: any = Filter;
+  static Dropdown: any = Dropdown;
+  static Select: any = Select;
 
   /**
    * Метод добавления нового плагина по предоставленному конфигу.
@@ -106,6 +123,24 @@ class Faze {
   static add(config: Partial<PluginConfig>): void {
     const currentPlugins: InnerPluginsData = {};
 
+    // Зарезервированные имена
+    const predefinedNames = [
+      'Zoom',
+      'Tooltip',
+      'Carousel',
+      'Page',
+      'Gallery',
+      'Form',
+      'Spoiler',
+      'Select',
+      'Scroll',
+      'Tab',
+      'Dropdown',
+      'Helpers',
+      'Modal',
+      'Filter',
+    ];
+
     // Проверка на ошибки
     if (!config) {
       throw new Error('Не задана конфигурация плагина!');
@@ -126,6 +161,10 @@ class Faze {
     // Если есть подключаемые модули
     if (config.plugins && config.plugins.length > 0) {
       for (const pluginName of config.plugins) {
+        if (predefinedNames.includes(pluginName)) {
+          continue;
+        }
+
         // Проверка на существование такого модуля, если его не существует, загружаем следующий
         if (!Faze.plugins[pluginName]) {
           console.error(`Плагин: '${pluginName}' не найден, его конфиг:`, config);

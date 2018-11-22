@@ -1,9 +1,5 @@
-interface Window {
-  [key: string]: any;
-}
-
 class REST {
-  static request(method: string, url: string, data: any, callbackSuccess: (response: any) => void) {
+  static ajaxRequest(method: string, url: string, data: any, callbackSuccess: (response: any) => void) {
     let formData: FormData = new FormData();
     let dataType: string = '';
     let testedMethod: string = '';
@@ -13,10 +9,10 @@ class REST {
       formData = data;
     } else if (data instanceof HTMLFormElement) {
       formData = new FormData(data);
-    } else if (data instanceof Object) {
+    } else if (data) {
       formData = new FormData();
 
-      for (const key of data.keys()) {
+      for (const key of Object.keys(data)) {
         formData.append(key, data[key]);
       }
     } else {
@@ -115,7 +111,7 @@ class REST {
 
     let callbackSuccess = (response: any) => {
       if (formNode.hasAttribute('data-faze-rest')) {
-        REST.chain(formNode.getAttribute('data-faze-rest') || null);
+        REST.ajaxChain(formNode.getAttribute('data-faze-rest') || null);
       }
 
       // Если есть контейнер <span data-notification=""></span>
@@ -137,8 +133,8 @@ class REST {
     // Если пользовательская функция была написана и передана в атрибут, то заменяем стандартный колбек на неё
     const callback = formNode.getAttribute('data-faze-rest-update');
     if (callback) {
-      if (typeof window[callback] === 'function') {
-        callbackSuccess = window[callback];
+      if (typeof (window as any)[callback] === 'function') {
+        callbackSuccess = (window as any)[callback];
       }
     }
 
@@ -146,7 +142,7 @@ class REST {
     formData.append('from', window.location.href);
 
     // Выполняем запрос на сервер
-    REST.request('POST', url, formData, callbackSuccess);
+    REST.ajaxRequest('POST', url, formData, callbackSuccess);
   }
 
   static getElementValue(element: any): string {
@@ -165,7 +161,7 @@ class REST {
     return '';
   }
 
-  static ajaxDataAttr(object: any) {
+  static dataAttr(object: any) {
     let chain: any[] = [];
     let json: any = null;
     let element: any = null;
@@ -225,7 +221,7 @@ class REST {
           if (element && element.name) newValue = REST.getElementValue(element);
           if (element && element.name) chain[0][element.name] = newValue;
 
-          REST.chain(chain);
+          REST.ajaxChain(chain);
         }, chain[0]['delay']);
       } else {
         // Запускаем цепочку AJAX запросов без задержки
@@ -233,12 +229,12 @@ class REST {
           chain[0][element.name] = currentValue;
         }
 
-        REST.chain(chain);
+        REST.ajaxChain(chain);
       }
     }
   }
 
-  static chain(chainRawData: any) {
+  static ajaxChain(chainRawData: any) {
     let chainData: any = null;
 
     // Определяем тип цепочки и парсим её в соответствии с ним
@@ -263,19 +259,19 @@ class REST {
 
     if (typeof data === 'function') {
       data();
-      REST.chain(chainData);
-    } else if ((typeof data === 'string') && (data in window && window[data]) && (typeof window[data] === 'function')) {
-      window[data]();
+      REST.ajaxChain(chainData);
+    } else if ((typeof data === 'string') && (data in window && (window as any)[data]) && (typeof (window as any)[data] === 'function')) {
+      (window as any)[data]();
     } else if (data instanceof Object) {
       if ('function' in data) {
         const functionName = data['function'];
 
         // Проверим существование функции
-        if (functionName in window && typeof window[functionName] === 'function') {
-          window[functionName]();
+        if (functionName in window && typeof (window as any)[functionName] === 'function') {
+          (window as any)[functionName]();
         }
 
-        REST.chain(chainData);
+        REST.ajaxChain(chainData);
       } else if ('method' in data) {
         const method = data['method'];
         let url = window.location.pathname;
@@ -304,8 +300,8 @@ class REST {
         delete data['module'];
         delete data['page'];
 
-        REST.request(method, url, data, () => {
-          REST.chain(chainData);
+        REST.ajaxRequest(method, url, data, () => {
+          REST.ajaxChain(chainData);
         });
       } else {
         throw new Error('Не указан обязательный параметр "method" в ajaxChain');
@@ -313,3 +309,5 @@ class REST {
     }
   }
 }
+
+export default REST;

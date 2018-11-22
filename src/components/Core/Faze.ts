@@ -29,6 +29,7 @@ import Page from '../Page/Page';
 import Filter from '../Filter/Filter';
 import Spoiler from '../Spoiler/Spoiler';
 import Gallery from '../Gallery/Gallery';
+import REST from '../REST/REST';
 
 /**
  * Структура конфигурации плагина при его инициализации
@@ -96,6 +97,7 @@ class Faze {
   static Filter: any = Filter;
   static Dropdown: any = Dropdown;
   static Select: any = Select;
+  static REST: any = REST;
 
   /**
    * Метод добавления нового плагина по предоставленному конфигу.
@@ -139,6 +141,7 @@ class Faze {
       'Helpers',
       'Modal',
       'Filter',
+      'REST',
     ];
 
     // Проверка на ошибки

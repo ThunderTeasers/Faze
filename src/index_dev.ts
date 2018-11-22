@@ -99,7 +99,19 @@ Faze.add({
     });
 
     Faze.on('click', '.test-on', () => {
-      console.log(1);
+      Faze.REST.ajaxChain([
+        {
+          method: 'GET',
+          module: 293394,
+          items: 293394,
+          'response-text': '.cart-list-items',
+        },
+        {
+          method: 'GET',
+          module: 293345,
+          'response-text': '.cart-state-container',
+        },
+      ]);
     });
   },
 });

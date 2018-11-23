@@ -24,6 +24,8 @@
   z-index: 5;
 
   .faze-modal {
+    position: relative;
+
     width: 40rem;
 
     padding: 1rem;
@@ -93,6 +95,52 @@
 
       & > header {
         cursor: move;
+      }
+    }
+
+    // Если окно можно ресайзить
+    &.faze-modal-resizable {
+      // Позиционирование границ
+      .faze-modal-resize-border {
+        position: absolute;
+
+        &.faze-modal-resize-border-top, &.faze-modal-resize-border-bottom {
+          width: 100%;
+          height: 0.5rem;
+
+          left: 0;
+          
+          &:hover {
+            cursor: s-resize;
+          }
+        }
+
+        &.faze-modal-resize-border-right, &.faze-modal-resize-border-left {
+          width: 0.5rem;
+          height: 100%;
+
+          top: 0;
+
+          &:hover {
+            cursor: e-resize;
+          }
+        }
+
+        &.faze-modal-resize-border-top {
+          top: 0;
+        }
+
+        &.faze-modal-resize-border-bottom {
+          bottom: 0;
+        }
+
+        &.faze-modal-resize-border-right {
+          right: 0;
+        }
+
+        &.faze-modal-resize-border-left {
+          left: 0;
+        }
       }
     }
   }

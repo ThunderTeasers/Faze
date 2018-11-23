@@ -72,6 +72,7 @@ interface Buttons {
  *   event        - событие при вызове которого на переданный элемент(node) должно вызываться модальное окно
  *   evented      - отображать модальное окно по событию или сразу
  *   draggable    - флаг указывающий можно ли передвигать форму
+ *   resizable    - флаг указывающий можно ли ресайзить форму
  *   delayToClose - время в миллисекундах от нажатия кнопки закрытия до удаления модального окна со страницы, нужно для анимации
  *   callbacks
  *     success    - пользовательский метод, исполняющийся при успешном выполнении запроса на получение данных по url указанного выше
@@ -85,6 +86,7 @@ interface Config {
   event: string;
   evented: boolean;
   draggable: boolean;
+  resizable: boolean;
   delayToClose?: number;
   callbacks: {
     success?: (parts: ModalParts) => void,
@@ -138,6 +140,7 @@ class Modal {
       event: 'click',
       evented: true,
       draggable: false,
+      resizable: false,
       delayToClose: 0,
       callbacks: {
         success: undefined,
@@ -288,7 +291,7 @@ class Modal {
   }
 
   /**
-   * Метод создания кнопок из конфига
+   * Создания кнопок из конфига
    */
   buildButtons() {
     const buttonsNode = document.createElement('div');
@@ -320,18 +323,47 @@ class Modal {
    * Компановка частей модального окна в один элемент
    */
   buildFull(): void {
-    let modalClasses = `faze-modal ${this.config.class}`;
+    this.modalParts.fullNode.className = `faze-modal ${this.config.class}`;
 
-    // Если окно можно перетаскивать проставляем ей класс
+    // Если окно можно перетаскивать проставляем дополнительный класс
     if (this.config.draggable) {
-      modalClasses += ' faze-modal-draggable';
+      this.modalParts.fullNode.classList.add('faze-modal-draggable');
     }
 
-    this.modalParts.fullNode.className = modalClasses;
+    // Если окно можно ресайзить проставляем дополнительный класс
+    if (this.config.resizable) {
+      this.modalParts.fullNode.classList.add('faze-modal-resizable');
+    }
 
     this.modalParts.fullNode.appendChild(this.modalParts.headerNode);
     this.modalParts.fullNode.appendChild(this.modalParts.bodyNode);
     this.modalParts.fullNode.appendChild(this.modalParts.footerNode);
+
+    // Если поставлен флаг на ресайз создаем границы для навешивания событий
+    if (this.config.draggable) {
+      this.buildBordersForResize();
+    }
+  }
+
+  /**
+   * Построение невидимых элементов по границам для возможности вешать на них события для ресайза окна
+   */
+  buildBordersForResize() {
+    const topResizeBorderNode = document.createElement('div');
+    topResizeBorderNode.className = 'faze-modal-resize-border faze-modal-resize-border-top';
+    this.modalParts.fullNode.appendChild(topResizeBorderNode);
+
+    const rightResizeBorderNode = document.createElement('div');
+    rightResizeBorderNode.className = 'faze-modal-resize-border faze-modal-resize-border-right';
+    this.modalParts.fullNode.appendChild(rightResizeBorderNode);
+
+    const bottomResizeBorderNode = document.createElement('div');
+    bottomResizeBorderNode.className = 'faze-modal-resize-border faze-modal-resize-border-bottom';
+    this.modalParts.fullNode.appendChild(bottomResizeBorderNode);
+
+    const leftResizeBorderNode = document.createElement('div');
+    leftResizeBorderNode.className = 'faze-modal-resize-border faze-modal-resize-border-left';
+    this.modalParts.fullNode.appendChild(leftResizeBorderNode);
   }
 
   /**
@@ -416,6 +448,7 @@ class Modal {
         title: callerNode.dataset.fazeModalTitle || '',
         evented: false,
         draggable: callerNode.dataset.fazeModalDraggable === 'true',
+        resizable: callerNode.dataset.fazeModalResizable === 'true',
         url: callerNode.dataset.fazeModalUrl || '',
         class: callerNode.dataset.fazeModalClass || '',
       });

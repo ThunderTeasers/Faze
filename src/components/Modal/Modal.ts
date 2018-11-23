@@ -342,6 +342,9 @@ class Modal {
     return await response.text();
   }
 
+  /**
+   * Навешивание событий и управление перетаскиванием модального окна
+   */
   bindDrag() {
     // Начальная позиция мыши
     const startMousePosition = {

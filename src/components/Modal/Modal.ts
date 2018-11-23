@@ -192,6 +192,8 @@ class Modal {
       .then((responseText) => {
         this.build(responseText);
 
+        this.bindDrag();
+
         // Исполняем пользовательский метод при успешном получении данных
         if (typeof this.config.callbacks.success === 'function') {
           try {
@@ -318,7 +320,14 @@ class Modal {
    * Компановка частей модального окна в один элемент
    */
   buildFull(): void {
-    this.modalParts.fullNode.className = `faze-modal ${this.config.class}`;
+    let modalClasses = `faze-modal ${this.config.class}`;
+
+    // Если окно можно перетаскивать проставляем ей класс
+    if (this.config.draggable) {
+      modalClasses += ' faze-modal-draggable';
+    }
+
+    this.modalParts.fullNode.className = modalClasses;
 
     this.modalParts.fullNode.appendChild(this.modalParts.headerNode);
     this.modalParts.fullNode.appendChild(this.modalParts.bodyNode);
@@ -333,6 +342,68 @@ class Modal {
     return await response.text();
   }
 
+  bindDrag() {
+    // Начальная позиция мыши
+    const startMousePosition = {
+      x: 0,
+      y: 0,
+    };
+
+    // КОнечная позиция мыши
+    const endMousePosition = {
+      x: 0,
+      y: 0,
+    };
+
+    /**
+     * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
+     *
+     * @param event - событие мыши
+     */
+    const dragMouseDown = (event: MouseEvent) => {
+      event.preventDefault();
+
+      // Получение позиции курсора при нажатии на элемент
+      startMousePosition.x = event.clientX;
+      startMousePosition.y = event.clientY;
+
+      document.addEventListener('mouseup', endDragElement);
+      document.addEventListener('mousemove', elementDrag);
+    };
+
+    /**
+     * Функция перетаскивания модального окна.
+     * Тут идет расчет координат и они присваиваются окну через стили "top" и "left", окно в таком случае естественно должно иметь
+     * позиционирование "absolute"
+     *
+     * @param event - событие мыши
+     */
+    const elementDrag = (event: MouseEvent) => {
+      event.preventDefault();
+
+      // Рассчет новой позиции курсора
+      endMousePosition.x = startMousePosition.x - event.clientX;
+      endMousePosition.y = startMousePosition.y - event.clientY;
+      startMousePosition.x = event.clientX;
+      startMousePosition.y = event.clientY;
+
+      // Рассчет новой позиции окна
+      this.modalParts.fullNode.style.left = `${(this.modalParts.fullNode.offsetLeft - endMousePosition.x)}px`;
+      this.modalParts.fullNode.style.top = `${(this.modalParts.fullNode.offsetTop - endMousePosition.y)}px`;
+    };
+
+    /**
+     * Завершение перетаскивания(момент отпускания кнопки мыши), удаляем все слушатели, т.к. они создаются при каждом новом перетаскивании
+     */
+    const endDragElement = () => {
+      document.removeEventListener('mouseup', endDragElement);
+      document.removeEventListener('mousemove', elementDrag);
+    };
+
+    // Навешиваем событие перетаскивания окна по нажатию на его заголовок
+    this.modalParts.headerNode.addEventListener('mousedown', dragMouseDown);
+  }
+
   /**
    * Инициализация формы по data атрибутам
    */
@@ -341,6 +412,7 @@ class Modal {
       new Faze.Modal(callerNode, {
         title: callerNode.dataset.fazeModalTitle || '',
         evented: false,
+        draggable: callerNode.dataset.fazeModalDraggable === 'true',
         url: callerNode.dataset.fazeModalUrl || '',
         class: callerNode.dataset.fazeModalClass || '',
       });

@@ -86,5 +86,14 @@
     & > footer {
       margin-top: 1rem;
     }
+
+    // Если окно можно передвигать
+    &.faze-modal-draggable {
+      position: absolute;
+
+      & > header {
+        cursor: move;
+      }
+    }
   }
 }

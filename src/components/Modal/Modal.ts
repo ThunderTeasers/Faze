@@ -58,8 +58,10 @@ interface Button {
  */
 interface Buttons {
   [index: number]: Button;
-  length: number;
+
   [Symbol.iterator](): IterableIterator<Button>;
+
+  length: number;
 }
 
 /**
@@ -113,6 +115,12 @@ interface ModalParts {
   footerNode: HTMLElement;
   fullNode: HTMLElement;
   wrapperNode: HTMLElement;
+  resizeBorders: {
+    top: HTMLDivElement;
+    right: HTMLDivElement;
+    bottom: HTMLDivElement;
+    left: HTMLDivElement;
+  };
 }
 
 /**
@@ -166,6 +174,12 @@ class Modal {
       footerNode: document.createElement('footer'),
       fullNode: document.createElement('div'),
       wrapperNode: document.createElement('div'),
+      resizeBorders: {
+        top: document.createElement('div'),
+        right: document.createElement('div'),
+        bottom: document.createElement('div'),
+        left: document.createElement('div'),
+      },
     };
   }
 
@@ -195,7 +209,13 @@ class Modal {
       .then((responseText) => {
         this.build(responseText);
 
-        this.bindDrag();
+        if (this.config.draggable) {
+          this.bindDrag();
+        }
+
+        if (this.config.resizable) {
+          this.bindResize();
+        }
 
         // Исполняем пользовательский метод при успешном получении данных
         if (typeof this.config.callbacks.success === 'function') {
@@ -349,21 +369,17 @@ class Modal {
    * Построение невидимых элементов по границам для возможности вешать на них события для ресайза окна
    */
   buildBordersForResize() {
-    const topResizeBorderNode = document.createElement('div');
-    topResizeBorderNode.className = 'faze-modal-resize-border faze-modal-resize-border-top';
-    this.modalParts.fullNode.appendChild(topResizeBorderNode);
+    this.modalParts.resizeBorders.top.className = 'faze-modal-resize-border faze-modal-resize-border-top';
+    this.modalParts.fullNode.appendChild(this.modalParts.resizeBorders.top);
 
-    const rightResizeBorderNode = document.createElement('div');
-    rightResizeBorderNode.className = 'faze-modal-resize-border faze-modal-resize-border-right';
-    this.modalParts.fullNode.appendChild(rightResizeBorderNode);
+    this.modalParts.resizeBorders.right.className = 'faze-modal-resize-border faze-modal-resize-border-right';
+    this.modalParts.fullNode.appendChild(this.modalParts.resizeBorders.right);
 
-    const bottomResizeBorderNode = document.createElement('div');
-    bottomResizeBorderNode.className = 'faze-modal-resize-border faze-modal-resize-border-bottom';
-    this.modalParts.fullNode.appendChild(bottomResizeBorderNode);
+    this.modalParts.resizeBorders.bottom.className = 'faze-modal-resize-border faze-modal-resize-border-bottom';
+    this.modalParts.fullNode.appendChild(this.modalParts.resizeBorders.bottom);
 
-    const leftResizeBorderNode = document.createElement('div');
-    leftResizeBorderNode.className = 'faze-modal-resize-border faze-modal-resize-border-left';
-    this.modalParts.fullNode.appendChild(leftResizeBorderNode);
+    this.modalParts.resizeBorders.left.className = 'faze-modal-resize-border faze-modal-resize-border-left';
+    this.modalParts.fullNode.appendChild(this.modalParts.resizeBorders.left);
   }
 
   /**
@@ -372,6 +388,124 @@ class Modal {
   async getContent(): Promise<string> {
     const response = await fetch(this.config.url);
     return await response.text();
+  }
+
+  /**
+   * Навешивание событий и управление ресайзом окна
+   */
+  bindResize() {
+    // Текущие границы модального окна(на момент нажатия)
+    const currentRect = {
+      top: this.modalParts.fullNode.getBoundingClientRect().top,
+      right: this.modalParts.fullNode.getBoundingClientRect().right,
+      bottom: this.modalParts.fullNode.getBoundingClientRect().bottom,
+      left: this.modalParts.fullNode.getBoundingClientRect().left,
+    };
+
+    /**
+     * Обновление текущей позиции модального окна
+     */
+    const updateCurrentRect = () => {
+      currentRect.top = this.modalParts.fullNode.getBoundingClientRect().top;
+      currentRect.right = this.modalParts.fullNode.getBoundingClientRect().right;
+      currentRect.bottom = this.modalParts.fullNode.getBoundingClientRect().bottom;
+      currentRect.left = this.modalParts.fullNode.getBoundingClientRect().left;
+    };
+
+    /**
+     * Расчет изменения размера модального окна при растягивании вверх
+     *
+     * @param event - событие мыши
+     */
+    const resizeTopBorder = (event: MouseEvent) => {
+      const offset = currentRect.bottom - event.clientY;
+
+      this.modalParts.fullNode.style.top = `${event.clientY}px`;
+      this.modalParts.fullNode.style.height = `${offset}px`;
+    };
+
+    /**
+     * Расчет изменения размера модального окна при растягивании вниз
+     *
+     * @param event - событие мыши
+     */
+    const resizeBottomBorder = (event: MouseEvent) => {
+      const offset = event.clientY - currentRect.top;
+
+      this.modalParts.fullNode.style.top = `${currentRect.top}px`;
+      this.modalParts.fullNode.style.height = `${offset}px`;
+    };
+
+    /**
+     * Расчет изменения размера модального окна при растягивании направо
+     *
+     * @param event - событие мыши
+     */
+    const resizeRightBorder = (event: MouseEvent) => {
+      const offset = event.clientX - currentRect.left;
+
+      this.modalParts.fullNode.style.left = `${currentRect.left}px`;
+      this.modalParts.fullNode.style.width = `${offset}px`;
+    };
+
+    /**
+     * Расчет изменения размера модального окна при растягивании налево
+     *
+     * @param event - событие мыши
+     */
+    const resizeLeftBorder = (event: MouseEvent) => {
+      const offset = currentRect.right - event.clientX;
+
+      this.modalParts.fullNode.style.left = `${event.clientX}px`;
+      this.modalParts.fullNode.style.width = `${offset}px`;
+    };
+
+    /**
+     * Остановка ресайза, происходит при отпускании ЛКМ, необходимо удалить все обработчики связанные с этим
+     */
+    const stopResize = () => {
+      // Обновляем границы модального окна
+      updateCurrentRect();
+
+      document.removeEventListener('mousemove', resizeTopBorder);
+      document.removeEventListener('mousemove', resizeBottomBorder);
+      document.removeEventListener('mousemove', resizeRightBorder);
+      document.removeEventListener('mousemove', resizeLeftBorder);
+      document.removeEventListener('mouseup', stopResize);
+    };
+
+    /**
+     * Инициализация резайза, происходит при нажатии на ЛКМ по границе модального окна
+     *
+     * @param borderCallback - функция для работы в момент движения мыши
+     */
+    const initResize = (borderCallback: (event: MouseEvent) => void) => {
+      // Обновляем границы модального окна
+      updateCurrentRect();
+
+      document.addEventListener('mousemove', borderCallback);
+      document.addEventListener('mouseup', stopResize);
+    };
+
+    // Верхняя граница
+    this.modalParts.resizeBorders.top.addEventListener('mousedown', () => {
+      initResize(resizeTopBorder);
+    });
+
+    // Нижняя граница
+    this.modalParts.resizeBorders.bottom.addEventListener('mousedown', () => {
+      initResize(resizeBottomBorder);
+    });
+
+    // Правая граница
+    this.modalParts.resizeBorders.right.addEventListener('mousedown', () => {
+      initResize(resizeRightBorder);
+    });
+
+    // Левая граница
+    this.modalParts.resizeBorders.left.addEventListener('mousedown', () => {
+      initResize(resizeLeftBorder);
+    });
   }
 
   /**

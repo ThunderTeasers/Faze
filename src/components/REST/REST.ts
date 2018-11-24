@@ -4,17 +4,17 @@ interface FetchOptions {
 }
 
 class REST {
-  static ajaxRequest(method: string, url: string, data: any, callbackSuccess: (response: any) => void) {
+  static ajaxRequest(method: string, type: string | null, url: string, data: any, callbackSuccess: ((response: any) => void) | null) {
     let formData: FormData = new FormData();
     let dataType: string = '';
     let testedMethod: string = '';
 
     // Проверка method на корректность
     if (method.toLowerCase() === 'post') {
-      dataType = 'json';
+      dataType = type ? type : 'json';
       testedMethod = 'POST';
     } else {
-      dataType = 'html';
+      dataType = type ? type : 'html';
       testedMethod = 'GET';
     }
 
@@ -46,8 +46,16 @@ class REST {
 
     fetch(`${url}?${(new URLSearchParams(<any>formData)).toString()}`, fetchOptions)
       .then((response) => {
+        let data = null;
+
         // В зависимости от типа запроса нужно по разному получить ответ от сервера
-        return dataType === 'json' ? response.json() : response.text();
+        try {
+          data = dataType === 'json' ? response.json() : response.text();
+        } catch (error) {
+          console.error(error);
+        }
+
+        return data;
       })
       .then((response) => {
         if (data['response_text'] && typeof data['response_text'] === 'string') {
@@ -73,10 +81,19 @@ class REST {
       })
       .catch((error) => {
         console.error('Ошибка при взаимодействии с сервером: ', error);
+
+        // Выполнение пользовательской функции
+        if (typeof callbackSuccess === 'function') {
+          try {
+            callbackSuccess(null);
+          } catch (error) {
+            console.error('Ошибка исполнения пользовательского метода: ', error);
+          }
+        }
       });
   }
 
-  static formSubmit(formNode: HTMLFormElement) {
+  static ajaxFormSubmit(formNode: HTMLFormElement) {
     if (!(formNode instanceof HTMLFormElement)) {
       throw new Error('Параметр метода formSubmit не является формой');
     }
@@ -155,7 +172,7 @@ class REST {
     formData.append('from', window.location.href);
 
     // Выполняем запрос на сервер
-    REST.ajaxRequest('POST', url, formData, callbackSuccess);
+    REST.ajaxRequest('POST', null, url, formData, callbackSuccess);
   }
 
   static getElementValue(element: any): string {
@@ -257,50 +274,64 @@ class REST {
       try {
         chainData = JSON.parse(chainRawData || '');
       } catch (error) {
-        console.error(`Ошибка парсинга JSON в функции ajaxChain ("${chainRawData}"):`, error);
+        console.error(`Ошибка парсинга JSON в функции ajaxChain ("${chainRawData}"), текст ошибки:`, error);
       }
     } else {
       return;
     }
 
     // Если длина цепочки для выполнения равна нулю, то выходим из метода
-    if (chainData.length === 0) {
+    if (chainData && chainData.length === 0) {
       return;
     }
 
+    // Берем данные первого элемента и удаляем его из массива
     const data = chainData.shift();
 
+    // Тип ответа от сервера
+    const dataType = data.type || null;
+
+    // Если это функция, то выполняем её, иначе - это объект, разбираем его и в любом случае снова рекурсивно запускаем ajaxChain
     if (typeof data === 'function') {
-      data();
+      try {
+        data();
+      } catch (error) {
+        console.error('Ошибка исполнения пользовательской функции переданной в массиве в ajaxChain, текст ошибки:', error);
+      }
       REST.ajaxChain(chainData);
-    } else if ((typeof data === 'string') && (data in window && (window as any)[data]) && (typeof (window as any)[data] === 'function')) {
-      (window as any)[data]();
-    } else if (data instanceof Object) {
+    } else {
+      // Если в объекте присутствует поле "function", то есть имя некой функции, пытаемся найти её и выполнить
       if ('function' in data) {
         const functionName = data['function'];
 
         // Проверим существование функции
         if (functionName in window && typeof (window as any)[functionName] === 'function') {
-          (window as any)[functionName]();
+          try {
+            (window as any)[functionName]();
+          } catch (error) {
+            console.error(`Ошибка в пользовательской функции в параметре "function" с именем ${functionName}, текст ошибки:`, error);
+          }
         }
 
         REST.ajaxChain(chainData);
-      } else if ('method' in data) {
+      }
+      // Если в объекте присутствует поле "method" значит это объект с настройками для отправки через ajaxRequest
+      else if ('method' in data) {
         const method = data['method'];
         let url = window.location.pathname;
 
+        // Разбор параметров "page" и "module" относительно присутствия которых им присваиваются соответствующие значения
         if (data['page'] && data['module']) {
           url = /^\//.test(data['page']) ? data['page'] : `/${data['page']}.txt`;
           data['show'] = data['module'];
         } else if (data['module']) {
           url = window.location.pathname;
           data['show'] = data['module'];
-
         } else if (data['page']) {
           url = /^\//.test(data['page']) ? data['page'] : `/${data['page']}.txt`;
         }
 
-        // Если метод POST или post
+        // Если это POST метод
         if (method.toLocaleString() === 'post') {
           data['update'] = data['module'];
           data['from'] = window.location.href;
@@ -309,15 +340,17 @@ class REST {
           data['mime'] = 'txt';
         }
 
+        // Удаляем данные которые не хотим передавать на сервер
         delete data['method'];
         delete data['module'];
         delete data['page'];
 
-        REST.ajaxRequest(method, url, data, () => {
+        // Отправляем запрос, после выполнения которого снова вызываем ajaxChain
+        REST.ajaxRequest(method, dataType, url, data, () => {
           REST.ajaxChain(chainData);
         });
       } else {
-        throw new Error('Не указан обязательный параметр "method" в ajaxChain');
+        throw new Error('Не указан обязательный параметр "method" или "function" в ajaxChain');
       }
     }
   }

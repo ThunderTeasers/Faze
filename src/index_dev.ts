@@ -104,6 +104,7 @@ Faze.add({
           method: 'GET',
           module: 293394,
           items: 293394,
+          type: 'json',
           response_text: '.cart-list-items',
         },
         {

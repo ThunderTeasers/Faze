@@ -94,25 +94,26 @@ Faze.add({
       },
     });
 
-    new Faze.Gallery(document.querySelectorAll('.image-product'), {
-
-    });
+    new Faze.Gallery(document.querySelectorAll('.image-product'), {});
 
     Faze.on('click', '.test-on', () => {
       Faze.REST.ajaxChain([
         {
           method: 'GET',
-          module: 293394,
-          items: 293394,
-          type: 'json',
-          response_text: '.cart-list-items',
-        },
-        {
-          method: 'GET',
-          module: 293345,
-          response_text: '.cart-state-container',
+          module: '287707',
+          response_html: '.faze-dropdown',
+          callback: (response: any) => {
+            console.log(response);
+          },
         },
       ]);
     });
+
+    const dataAttrButton = document.querySelector('[data-faze-restapi]');
+    if (dataAttrButton) {
+      dataAttrButton.addEventListener('click', () => {
+        Faze.REST.ajaxDataAttr(dataAttrButton);
+      });
+    }
   },
 });

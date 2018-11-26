@@ -58,6 +58,16 @@ class REST {
         return data;
       })
       .then((response) => {
+        if (data['response_html'] && typeof data['response_html'] === 'string') {
+
+          // Парсинг ответа
+          const responseHTML = (new DOMParser()).parseFromString(response, 'text/html');
+
+          document.querySelectorAll(data['response_html']).forEach((el) => {
+            el.innerHTML = responseHTML.querySelector(data['response_html']).innerHTML;
+          });
+        }
+
         if (data['response_text'] && typeof data['response_text'] === 'string') {
           document.querySelectorAll(data['response_text']).forEach((el) => {
             el.innerHTML = response;
@@ -117,7 +127,7 @@ class REST {
         }
 
         if (element.hasAttribute('data-faze-rest-json-name')) {
-          const jsonName = element.getAttribute('data-faze-rest-json-name');
+          const jsonName = element.getAttribute('data-faze-restapi-json-name');
 
           if (jsonObject[jsonName] === undefined) {
             jsonObject[jsonName] = {};
@@ -140,8 +150,8 @@ class REST {
     const url = formNode.getAttribute('action') || window.location.href;
 
     let callbackSuccess = (response: any) => {
-      if (formNode.hasAttribute('data-faze-rest')) {
-        REST.ajaxChain(formNode.getAttribute('data-faze-rest') || null);
+      if (formNode.hasAttribute('data-faze-restapi')) {
+        REST.ajaxChain(formNode.getAttribute('data-faze-restapi') || null);
       }
 
       // Если есть контейнер <span data-notification=""></span>
@@ -161,7 +171,7 @@ class REST {
     };
 
     // Если пользовательская функция была написана и передана в атрибут, то заменяем стандартный колбек на неё
-    const callback = formNode.getAttribute('data-faze-rest-update');
+    const callback = formNode.getAttribute('data-faze-restapi-update');
     if (callback) {
       if (typeof (window as any)[callback] === 'function') {
         callbackSuccess = (window as any)[callback];
@@ -191,44 +201,44 @@ class REST {
     return '';
   }
 
-  static dataAttr(object: any) {
+  static ajaxDataAttr(object: any | any[]) {
     let chain: any[] = [];
     let json: any = null;
     let element: any = null;
     const timeoutID: any[] = [];
 
     if (object instanceof Element) {
-      // ajaxDataAttr( document.querySelector('[data-restapi]') );
+      // Пример вызова: ajaxDataAttr( document.querySelector('[data-restapi]') );
       element = object;
-    } else if (object instanceof Array) {
-      // ajaxDataAttr([{ ... }]);
+
+      if (!element.hasAttribute('data-faze-restapi')) {
+        throw new Error('Нет дата-атрибута data-faze-restapi!');
+      }
+
+      json = element.getAttribute('data-faze-restapi') || '';
+    } else if (object.constructor === Array) {
+      // Пример вызова: ajaxDataAttr([{ ... }]);
       chain = object;
       json = JSON.stringify(chain);
     } else {
       throw new Error('Параметр функции ajaxDataAttr не является ни HTML элементом, ни массивом!');
     }
 
-    if (element) {
-      if (!element.hasAttribute('data-faze-restapi')) {
-        throw new Error('Нет дата-атрибута data-faze-restapi!');
-      }
-
-      json = element.getAttribute('data-faze-restapi') || '';
-    }
-
-    // проверяем корректность JSON
+    // Проверяем корректность JSON
     try {
       json = JSON.parse(json);
     } catch (error) {
       throw new Error(`Ошибка парсинга JSON конфига ("${json}"), дословно: ${error}`);
     }
 
-    if (json instanceof Array) {
+    // Проверяем, что JSON это массив, а не объект
+    if (json.constructor === Array) {
       chain = json;
     } else {
       throw new Error('JSON не является массивом!');
     }
 
+    // Если в массиве есть элементы
     if (chain.length) {
       // Добавим значение из инпута
       let currentValue = null;
@@ -254,7 +264,7 @@ class REST {
           REST.ajaxChain(chain);
         }, chain[0]['delay']);
       } else {
-        // Запускаем цепочку AJAX запросов без задержки
+        // Запускаем цепочку AJAX запросов
         if (element && element.name) {
           chain[0][element.name] = currentValue;
         }
@@ -264,6 +274,11 @@ class REST {
     }
   }
 
+  /**
+   * Подготавливает запрос и выполняет цепочку вложенных AJAX запросов, работает рекурсивно, пока не останется элементов в массиве запросов
+   *
+   * @param chainRawData - данные предыдущей итерации ajaxChain
+   */
   static ajaxChain(chainRawData: any) {
     let chainData: any = null;
 
@@ -346,7 +361,15 @@ class REST {
         delete data['page'];
 
         // Отправляем запрос, после выполнения которого снова вызываем ajaxChain
-        REST.ajaxRequest(method, dataType, url, data, () => {
+        REST.ajaxRequest(method, dataType, url, data, (response: any) => {
+          if (typeof data['callback'] === 'function') {
+            try {
+              data['callback'](response);
+            } catch (error) {
+              console.error('Ошибка исполнения пользовательской функции переданной в ajaxChain, текст ошибки:', error);
+            }
+          }
+
           REST.ajaxChain(chainData);
         });
       } else {

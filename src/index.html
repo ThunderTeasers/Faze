@@ -27,6 +27,11 @@
             padding-top: 1rem;
         }
     </style>
+    <script>
+      function test(){
+        console.log('test');
+      }
+    </script>
 </head>
 <body>
     <a data-faze="modal" data-faze-modal-title="Заголовок" data-faze-modal-resizable="true" data-faze-modal-draggable="true" data-faze-modal-class="modal-test" data-faze-modal-url="https://doubletreemoscow.ru/list-4.html?show=226922&array=226922&mime=json">Модальное окно</a>
@@ -68,6 +73,44 @@
             Я тело спойлера
         </div>
     </div>
+
+    <form data-faze-restapi-form data-faze-restapi-json-name>
+        <input type="hidden" name="order_action" value="send">
+        <input type="hidden" name="mime" value="json">
+        <input type="hidden" name="show" value="294934">
+
+        <input data-faze-restapi-json-name="basket_txt_json" name="Name1" id="name" type="text" placeholder="Name" value="Name1">
+        <input data-faze-restapi-json-name="basket_txt_json" name="Email1" id="email" type="text" placeholder="Email" value="Name2">
+
+        <input data-faze-restapi-json-name="basket_txt_json2" name="Name2" id="name2" type="text" placeholder="Name" value="Name2">
+        <input data-faze-restapi-json-name="basket_txt_json2" name="Email2" id="email2" type="text" placeholder="Email" value="Email2">
+
+        <label>
+            Мужчина
+            <input data-faze-restapi-json-name="basket_txt_json" name="Sex" type="radio" value="Male" checked>
+        </label>
+
+        <label>
+            Женщина
+            <input data-faze-restapi-json-name="basket_txt_json" name="Sex" type="radio" value="Female">
+        </label>
+
+
+        <label>
+            Тест1
+            <input data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest" type="checkbox" value="Test1" checked>
+        </label>
+
+        <label>
+            Тест2
+            <input data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest" type="checkbox" value="Test2">
+        </label>
+
+        <p><input type="submit" value="Отправить"></p>
+
+
+        <div data-faze-restapi-notification="response-text"></div>
+    </form>
 
     <div class="carousel-test">
         <img src="https://via.placeholder.com/350x480" alt="">

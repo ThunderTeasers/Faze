@@ -97,22 +97,29 @@ Faze.add({
     new Faze.Gallery(document.querySelectorAll('.image-product'), {});
 
     Faze.on('click', '.test-on', () => {
-      Faze.REST.ajaxChain([
+      Faze.REST.chain([
         {
-          method: 'GET',
+          method: 'POST',
           module: '287707',
           response_html: '.faze-dropdown',
           callback: (response: any) => {
             console.log(response);
           },
         },
+        'test',
       ]);
+    });
+
+    Faze.on('submit', 'form[data-faze-restapi-form]', (event, node: any) => {
+      event.preventDefault();
+
+      Faze.REST.formSubmit(node);
     });
 
     const dataAttrButton = document.querySelector('[data-faze-restapi]');
     if (dataAttrButton) {
       dataAttrButton.addEventListener('click', () => {
-        Faze.REST.ajaxDataAttr(dataAttrButton);
+        Faze.REST.dataAttr(dataAttrButton);
       });
     }
   },

@@ -160,7 +160,7 @@ class REST {
 
     // Футкция, которая исполнится при получении ответа от сервера
     const callbackSuccess = (response: any) => {
-      if (formNode.fazeRestapiForm) {
+      if (formNode.hasAttribute('data-faze-restapi-form')) {
         REST.chain(formNode.dataset.fazeRestapiForm || null);
       }
 
@@ -281,7 +281,7 @@ class REST {
     // Определяем тип цепочки и парсим её в соответствии с ним
     if (chainRawData instanceof Array) {
       chainData = chainRawData;
-    } else if (typeof chainData === 'string') {
+    } else if (typeof chainRawData === 'string') {
       try {
         chainData = JSON.parse(chainRawData || '');
       } catch (error) {

@@ -113,7 +113,9 @@ Faze.add({
     Faze.on('submit', 'form[data-faze-restapi-form]', (event, node: any) => {
       event.preventDefault();
 
-      Faze.REST.formSubmit(node);
+      Faze.REST.formSubmit(node, () => {
+        console.log(123123123);
+      });
     });
 
     const dataAttrButton = document.querySelector('[data-faze-restapi]');

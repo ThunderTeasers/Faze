@@ -1,3 +1,10 @@
+/**
+ * Структура параметров запроса на сервер
+ *
+ * Содержит:
+ *   method   - метод передаваемый в запросе
+ *   body     - тело запроса
+ */
 interface FetchOptions {
   method: string;
   body?: any;
@@ -116,8 +123,9 @@ class REST {
    *        json - в помеченное поле будет вставлен параметр "json.message" из ответа сервера.
    *
    * @param formNode - DOM элемент формы из которой оправляем
+   * @param callback - пользовательская функция, исполняющаяся ПОСЛЕ всех действий
    */
-  static formSubmit(formNode: HTMLFormElement) {
+  static formSubmit(formNode: HTMLFormElement, callback?: () => void) {
     if (!(formNode instanceof HTMLFormElement)) {
       throw new Error('Параметр метода formSubmit не является формой');
     }
@@ -161,7 +169,7 @@ class REST {
     // Футкция, которая исполнится при получении ответа от сервера
     const callbackSuccess = (response: any) => {
       if (formNode.hasAttribute('data-faze-restapi-form')) {
-        REST.chain(formNode.dataset.fazeRestapiForm || null);
+        REST.chain(formNode.dataset.fazeRestapiForm || null, callback);
       }
 
       // Если есть контейнер(ы) <span data-faze-restapi-notification="text/json"></span>
@@ -273,9 +281,10 @@ class REST {
   /**
    * Подготавливает запрос и выполняет цепочку вложенных AJAX запросов, работает рекурсивно, пока не останется элементов в массиве запросов
    *
-   * @param chainRawData - данные предыдущей итерации ajaxChain
+   * @param chainRawData  - данные предыдущей итерации ajaxChain
+   * @param finalCallback - пользовательская функция, исполняющаяся после всей цепочки
    */
-  static chain(chainRawData: any) {
+  static chain(chainRawData: any, finalCallback?: () => void) {
     let chainData: any;
 
     // Определяем тип цепочки и парсим её в соответствии с ним
@@ -293,6 +302,14 @@ class REST {
 
     // Если длина цепочки для выполнения равна нулю, то выходим из метода
     if (chainData && chainData.length === 0) {
+      if (typeof finalCallback === 'function') {
+        try {
+          finalCallback();
+        } catch (error) {
+          console.error('Ошибка исполнения пользовательской функции в formSubmit, текст ошибки:', error);
+        }
+      }
+
       return;
     }
 
@@ -309,7 +326,7 @@ class REST {
       } catch (error) {
         console.error('Ошибка исполнения пользовательской функции переданной через "function" в ajaxChain, текст ошибки:', error);
       }
-      REST.chain(chainData);
+      REST.chain(chainData, finalCallback);
     }
     // Если это функция записанная строкой, то есть только имя, то тоже выполним её
     else if (typeof data === 'string' && data in window && (window as any)[data] && (window as any)[data] instanceof Function) {
@@ -332,7 +349,7 @@ class REST {
           }
         }
 
-        REST.chain(chainData);
+        REST.chain(chainData, finalCallback);
       }
       // Если в объекте присутствует поле "method" значит это объект с настройками для отправки через ajaxRequest
       else if ('method' in data) {
@@ -378,7 +395,7 @@ class REST {
             }
           }
 
-          REST.chain(chainData);
+          REST.chain(chainData, finalCallback);
         });
       } else {
         throw new Error('Не указан обязательный параметр "method" или "function" в ajaxChain');

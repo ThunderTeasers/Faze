@@ -181,8 +181,10 @@ class Filter {
         // URL для вставки в строку поиска в браузере(HTML5 history)
         const urlForHistory = `?${formDataURLString.toString()}`;
         formDataURLString.append('mime', 'txt');
-        if (this.config.modules.get) {
-          formDataURLString.append('show', this.config.modules.get.toString());
+
+        const module = this.config.modules.get || this.node.dataset.fazeFilterModuleGet;
+        if (module) {
+          formDataURLString.append('show', module.toString());
         }
 
         // URL для запроса к серверу

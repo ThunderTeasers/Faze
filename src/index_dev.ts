@@ -124,5 +124,16 @@ Faze.add({
         Faze.REST.dataAttr(dataAttrButton);
       });
     }
+
+    let testObject = {};
+
+    testObject = Faze.Helpers.objectFromString(testObject, 'offer.news', 'title', 'Hello!');
+    testObject = Faze.Helpers.objectFromString(testObject, 'offer.news', 'date', 'today');
+    testObject = Faze.Helpers.objectFromString(testObject, 'test', 'author', 'me');
+    testObject = Faze.Helpers.objectFromString(testObject, '', 'day', 'good');
+    testObject = Faze.Helpers.objectFromString(testObject, 'offer.manager.contacts', 'name', 'max');
+    testObject = Faze.Helpers.objectFromString(testObject, 'house.address', 'name', 'max');
+
+    console.log(testObject);
   },
 });

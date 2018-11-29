@@ -5,6 +5,8 @@
  *   method   - метод передаваемый в запросе
  *   body     - тело запроса
  */
+import Faze from '../Core/Faze';
+
 interface FetchOptions {
   method: string;
   body?: any;
@@ -66,7 +68,6 @@ class REST {
       })
       .then((response) => {
         if (data['response_html'] && typeof data['response_html'] === 'string') {
-
           // Парсинг ответа
           const responseHTML = (new DOMParser()).parseFromString(response, 'text/html');
 
@@ -137,20 +138,40 @@ class REST {
     const jsonFields = formNode.querySelectorAll('[data-faze-restapi-json-name]');
 
     // Получение уникальных названий полей для сборки JSON объектов
-    const jsonNames = [...new Set(Array.from(jsonFields).map((item: any) => item.dataset.fazeRestapiJsonName))];
+    const jsonNames = [...new Set(Array.from(jsonFields).map((item: any) => {
+      const inputDataName = item.dataset.fazeRestapiJsonName;
+
+      return inputDataName.substring(0, inputDataName.indexOf('.'));
+    }))];
 
     // Проходимся по уникальным именам объектов JSON которые надо собрать
     for (const jsonName of jsonNames) {
-      const jsonObject: any = {};
+      let jsonObject: any = {};
 
-      // Проходимся по всем инпутам которые относятся к данному объекту
-      formNode.querySelectorAll(`[data-faze-restapi-json-name="${jsonName}"]`).forEach((itemNode: any) => {
+      // Проходимся по всем инпутам название в атрибуте которых начинается с имени ключа объекта в который мы собираем их
+      const inputsNodes = Array.from(formNode.querySelectorAll('[data-faze-restapi-json-name]')).filter((inputNode: any) => {
+        const attrJsonName = inputNode.dataset.fazeRestapiJsonName;
+
+        // Проверяем, если название содержит точку, то значит нужно проверять вместе с ней, если нет - то нет, это очень важно
+        return attrJsonName.includes('.') ? attrJsonName.startsWith(`${jsonName}.`) : attrJsonName.startsWith(`${jsonName}`);
+      });
+
+      inputsNodes.forEach((itemNode: any) => {
         // Проверка на то, является ли инпут чекбоксом или радио кнопкой
         const isCheckboxOrRadio = ['radio', 'checkbox'].includes(itemNode.type);
 
         // Если это не чекбокс или не радио кнопка ЛИБО если чекбокс или радио кнопка НО с флагом "checked", то есть выбранный
         if (!isCheckboxOrRadio || (isCheckboxOrRadio && itemNode.checked)) {
-          jsonObject[itemNode.name] = itemNode.value;
+          // Мы должны вырезать из строки всё что идет до первой точки, т.к. это ключ для отправки в formData, если точки нет, это
+          // значит, что это ключ первого уровня, а для этого необходимо передать пустую строку
+          let jsonNameForObject = itemNode.dataset.fazeRestapiJsonName;
+          if (jsonNameForObject.includes('.')) {
+            jsonNameForObject = jsonNameForObject.substring(jsonNameForObject.indexOf('.') + 1);
+          } else {
+            jsonNameForObject = '';
+          }
+
+          jsonObject = Faze.Helpers.objectFromString(jsonObject, jsonNameForObject, itemNode.name, itemNode.value);
         }
 
         // Удаляем найденные поля из formdata
@@ -159,8 +180,13 @@ class REST {
         }
       });
 
+      // Важно взять только то, что стоит до точки
+      const jsonRealName = jsonName.split('.')[0];
+
+      console.log(jsonObject);
+
       // Добавляем получившийся JSON объект в итоговые данные для отправки
-      formData.append(jsonName, JSON.stringify(jsonObject));
+      formData.append(jsonRealName, JSON.stringify(jsonObject));
     }
 
     // Вычисляем URL для отправки запроса
@@ -205,7 +231,7 @@ class REST {
     return '';
   }
 
-  static dataAttr(object: any | any[]) {
+  static dataAttr(object: any | any[], finalCallback?: () => void) {
     let chain: any[] = [];
     let json: any = null;
     let element: any = null;
@@ -215,13 +241,13 @@ class REST {
       // Пример вызова: ajaxDataAttr( document.querySelector('[data-restapi]') );
       element = object;
 
-      if (!element.hasAttribute('data-faze-restapi')) {
+      if (!element.hasAttribute('data-faze-restapi-attr')) {
         throw new Error('Нет дата-атрибута data-faze-restapi!');
       }
 
-      json = element.getAttribute('data-faze-restapi') || '';
+      json = element.getAttribute('data-faze-restapi-attr') || '';
     } else if (object.constructor === Array) {
-      // Пример вызова: ajaxDataAttr([{ ... }]);
+      // Пример вызова: dataAttr([{ ... }]);
       chain = object;
       json = JSON.stringify(chain);
     } else {
@@ -265,7 +291,7 @@ class REST {
           if (element && element.name) newValue = REST.getElementValue(element);
           if (element && element.name) chain[0][element.name] = newValue;
 
-          REST.chain(chain);
+          REST.chain(chain, finalCallback);
         }, chain[0]['delay']);
       } else {
         // Запускаем цепочку AJAX запросов
@@ -273,7 +299,7 @@ class REST {
           chain[0][element.name] = currentValue;
         }
 
-        REST.chain(chain);
+        REST.chain(chain, finalCallback);
       }
     }
   }

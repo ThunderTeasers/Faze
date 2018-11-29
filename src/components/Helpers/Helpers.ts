@@ -110,6 +110,94 @@ class Helpers {
 
     return '';
   }
+
+  /**
+   * Определение объект ли переданный параметр, суть в том, что массив тоже объект в JS и эта проверка исключает это
+   *
+   * @param item - переменная которую надо проверить
+   */
+  static isObject(item: any) {
+    return (item && typeof item === 'object' && !Array.isArray(item));
+  }
+
+  /**
+   * Метод для глубого слияния объектов
+   *
+   * @param target  - объект в который сливаем
+   * @param sources - сливаемый объект
+   */
+  static mergeDeep(target: any, ...sources: any[]): any {
+    if (!sources.length) return target;
+    const source = sources.shift();
+
+    if (Helpers.isObject(target) && Helpers.isObject(source)) {
+      for (const key in source) {
+        if (Helpers.isObject(source[key])) {
+          if (!target[key]) Object.assign(target, {[key]: {}});
+          Helpers.mergeDeep(target[key], source[key]);
+        } else {
+          Object.assign(target, {[key]: source[key]});
+        }
+      }
+    }
+
+    return Helpers.mergeDeep(target, ...sources);
+  }
+
+  /**
+   * Создание объекта из строки
+   *
+   * Пример работы:
+   *   Исходная строка: manager.address.house, ключ: name, значение: Nice House
+   *   Результат:
+   *     {
+   *       manager: {
+   *         address: {
+   *           house: {
+   *             name: "Nice House"
+   *           }
+   *         }
+   *       }
+   *     }
+   *
+   * Так же происходит слияние сгенерированного объекта с переданным в первом параметре, при передаче пустого объекта будет просто
+   * сгенерирован новый объект из строки и ключа/значения.
+   *
+   * @param jsonObject - объект в который в итоге будет слит другой объект в результате парсинга строки
+   * @param stringData - строка для парсинга, должна либо содержать одно слово, либо слова разделенными точками для показа вложенности
+   * @param key        - ключ для вставки в итоговый объект
+   * @param value      - значение для вставки в итоговый объект по так же переданному ключу
+   */
+  static objectFromString(jsonObject: any = {}, stringData: string, key: string, value: string): object {
+    // Разбиваем строку на токены, при этом фильтруя на пустоту токена, т.к. если мы пытаемся разделить пустую строку, "split" вернет
+    // массив у которого 1 пустой элемент, а это некорректно в данном случае.
+    const objectTokens: string[] = stringData.split('.').filter(token => token.length !== 0);
+
+    // Конечный результат генерации объекта из строки
+    const result = {};
+
+    // Промежуточный объект, для создания вложенных объектов, если это понадобится
+    let ref: any = result;
+
+    // Если есть токены для генерации объекта
+    if (objectTokens.length > 0) {
+      // Проходимся по токенам
+      for (let i = 0; i < objectTokens.length; i += 1) {
+        // Создаем новый объект и переприсваиваем его к промежуточному объекту для создания дальнейшей цепочки
+        ref[objectTokens[i]] = {};
+        ref = ref[objectTokens[i]];
+      }
+
+      // В итоге присваиваем ключ/значение к конечному объекту в цепочке
+      ref[key] = value;
+    } else {
+      // Если нет, то просто на самом верхнем кровне присваиваем к объекту ключ/значение
+      jsonObject[key] = value;
+    }
+
+    // Возвращаем объект собранный из переданного и только что сгенерированного
+    return Helpers.mergeDeep(jsonObject, result);
+  }
 }
 
 export default Helpers;

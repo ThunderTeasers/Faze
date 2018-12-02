@@ -568,7 +568,7 @@ class Carousel {
             // После того как CSS анимация выполнилась,
             // стили сбрасываются в первоначальное состояние
             setTimeout(() => {
-              this.itemsHolderNode.style.transitionDuration = null;
+              this.itemsHolderNode.style.transitionDuration = '';
               if (this.config.animation.direction === 'horizontal') {
                 this.itemsHolderNode.style.left = '0';
               } else if (this.config.animation.direction === 'vertical') {
@@ -594,7 +594,7 @@ class Carousel {
             } else if (this.config.animation.direction === 'vertical') {
               this.itemsHolderNode.style.top = `-${this.slideHeight}px`;
             }
-            this.itemsHolderNode.style.transitionDuration = null;
+            this.itemsHolderNode.style.transitionDuration = '';
 
             // Хак для включения транзишина
             setTimeout(() => {

@@ -60,6 +60,11 @@ class Zoom {
   // DOM элемент большой картинки
   readonly bigImageNode: HTMLImageElement;
 
+  readonly bigImageSize: {
+    width: number;
+    height: number;
+  };
+
   // Флаг показывающий активен ли зум в настоящее время
   isEnabled: boolean;
 
@@ -114,9 +119,14 @@ class Zoom {
     this.bigImageWrapperNode = document.createElement('div');
     this.bigImageNode = document.createElement('img');
     this.isEnabled = true;
+    this.bigImageSize = {
+      width: 0,
+      height: 0,
+    };
 
     this.initialize();
     this.bind();
+    this.calculate();
   }
 
   /**
@@ -168,11 +178,19 @@ class Zoom {
     this.bigImageNode.className = 'faze-zoom-big-image';
     const bigImageSource = this.node.getAttribute('data-faze-full-image');
     if (bigImageSource) {
-      this.bigImageNode.setAttribute('src', bigImageSource);
-    }
-    this.bigImageWrapperNode.appendChild(this.bigImageNode);
+      const bigImage = new Image();
+      bigImage.src = bigImageSource;
+      bigImage.onload = () => {
+        this.bigImageNode.setAttribute('src', bigImageSource);
+        this.bigImageWrapperNode.appendChild(this.bigImageNode);
+        this.wrapperNode.appendChild(this.bigImageWrapperNode);
 
-    this.wrapperNode.appendChild(this.bigImageWrapperNode);
+        this.bigImageSize.width = bigImage.width;
+        this.bigImageSize.height = bigImage.height;
+
+        this.calculate();
+      };
+    }
   }
 
   /**
@@ -247,8 +265,8 @@ class Zoom {
    */
   calculate() {
     // Данные о размере большого изображения
-    const bigImageWidth = this.bigImageNode.getBoundingClientRect().width;
-    const bigImageHeight = this.bigImageNode.getBoundingClientRect().height;
+    const bigImageWidth = this.bigImageSize.width;
+    const bigImageHeight = this.bigImageSize.height;
 
     if ((bigImageWidth <= this.config.width && bigImageWidth !== 0) || (bigImageHeight <= this.config.height && bigImageHeight !== 0)) {
       this.isEnabled = false;
@@ -298,9 +316,20 @@ class Zoom {
    */
   setImage(source: string | null) {
     if (source) {
-      this.isEnabled = true;
-      this.bigImageNode.setAttribute('src', source);
-      this.calculate();
+      const bigImage = new Image();
+      bigImage.src = source;
+      bigImage.onload = () => {
+        this.isEnabled = true;
+
+        this.bigImageNode.setAttribute('src', source);
+        this.bigImageWrapperNode.appendChild(this.bigImageNode);
+        this.wrapperNode.appendChild(this.bigImageWrapperNode);
+
+        this.bigImageSize.width = bigImage.width;
+        this.bigImageSize.height = bigImage.height;
+
+        this.calculate();
+      };
     }
   }
 }

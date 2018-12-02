@@ -1,3 +1,6 @@
+import Faze from '../Core/Faze';
+import Helpers from '../Helpers/Helpers';
+
 /**
  * Структура параметров запроса на сервер
  *
@@ -5,8 +8,6 @@
  *   method   - метод передаваемый в запросе
  *   body     - тело запроса
  */
-import Faze from '../Core/Faze';
-
 interface FetchOptions {
   method: string;
   body?: any;
@@ -115,7 +116,7 @@ class REST {
    * Метод помощник для работы с формами через AJAX
    * Делает следующее:
    *   1. Собирает и отправляет все данные инпутов в форме через AJAX запрос;
-   *   2. Если у полей есть специальный data атрибут "data-faze-restapi-json-name" собирает на основе этих полей JSON объекты, которые;
+   *   2. Если у полей есть специальный data атрибут "data-faze-restapi-json-name" собирает на основе этих полей JSON объекты, которые
    *      будут в итоге отправлены на сервер с указанным именем. ВАЖНО - из formData помеченные поля удаляются;
    *   3. Выполняет указанные в data атрибуте "data-faze-restapi-form" команды указанные как для метода "dataAttr";
    *   4. Выдает ответ при наличии DOM Элемента с data атрибутом "data-faze-restapi-notification", который в свою очередь может быть
@@ -141,7 +142,7 @@ class REST {
     const jsonNames = [...new Set(Array.from(jsonFields).map((item: any) => {
       const inputDataName = item.dataset.fazeRestapiJsonName;
 
-      return inputDataName.substring(0, inputDataName.indexOf('.'));
+      return inputDataName.includes('.') ? inputDataName.substring(0, inputDataName.indexOf('.')) : inputDataName;
     }))];
 
     // Проходимся по уникальным именам объектов JSON которые надо собрать
@@ -171,7 +172,10 @@ class REST {
             jsonNameForObject = '';
           }
 
-          jsonObject = Faze.Helpers.objectFromString(jsonObject, jsonNameForObject, itemNode.name, itemNode.value);
+          const key = itemNode.dataset.fazeRestapiJsonKey || itemNode.name;
+          const value = itemNode.dataset.fazeRestapiJsonValue || itemNode.value;
+
+          jsonObject = Faze.Helpers.objectFromString(jsonObject, jsonNameForObject, key, value);
         }
 
         // Удаляем найденные поля из formdata
@@ -183,7 +187,19 @@ class REST {
       // Важно взять только то, что стоит до точки
       const jsonRealName = jsonName.split('.')[0];
 
-      console.log(jsonObject);
+      // Если есть data атрибут с объектом с которым нужно слить сгенерируемый из строк объект, то выполняем слияние
+      if (formNode.hasAttribute('data-faze-restapi-json-merge')) {
+        let objectToMerge = null;
+        const jsonData = formNode.dataset.fazeRestapiJsonMerge || '';
+
+        try {
+          objectToMerge = JSON.parse(jsonData);
+        } catch (error) {
+          console.error(`Ошибка парсинга JSON объекта для слияния("data-faze-restapi-json-merge"), JSON: ${jsonData}, текст ошибки: `, error);
+        }
+
+        jsonObject = Helpers.mergeDeep(objectToMerge, jsonObject);
+      }
 
       // Добавляем получившийся JSON объект в итоговые данные для отправки
       formData.append(jsonRealName, JSON.stringify(jsonObject));
@@ -191,6 +207,15 @@ class REST {
 
     // Вычисляем URL для отправки запроса
     const url = formNode.getAttribute('action') || window.location.href;
+
+    // Определение, какой тип ответа запрашивать
+    let typeForResponse = 'text';
+    const notificationNode: any = formNode.querySelector('[data-faze-restapi-notification]');
+    if (notificationNode) {
+      if (notificationNode.dataset.fazeRestapiNotification === 'response_json') {
+        typeForResponse = 'json';
+      }
+    }
 
     // Футкция, которая исполнится при получении ответа от сервера
     const callbackSuccess = (response: any) => {
@@ -200,7 +225,7 @@ class REST {
 
       // Если есть контейнер(ы) <span data-faze-restapi-notification="text/json"></span>
       formNode.querySelectorAll('[data-faze-restapi-notification]').forEach((itemNode: any) => {
-        if (itemNode.dataset.fazeRestapiNotification === 'json') {
+        if (itemNode.dataset.fazeRestapiNotification === 'response_json') {
           itemNode.innerHTML = response.message;
         } else {
           itemNode.innerHTML = response;
@@ -212,7 +237,7 @@ class REST {
     formData.append('from', window.location.href);
 
     // Выполняем запрос на сервер
-    REST.request('POST', null, url, formData, callbackSuccess);
+    REST.request('POST', typeForResponse, url, formData, callbackSuccess);
   }
 
   static getElementValue(element: any): string {

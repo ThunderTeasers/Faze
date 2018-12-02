@@ -36,9 +36,10 @@
 <body>
     <a data-faze="modal" data-faze-modal-title="Заголовок" data-faze-modal-resizable="true" data-faze-modal-draggable="true" data-faze-modal-class="modal-test" data-faze-modal-url="https://doubletreemoscow.ru/list-4.html?show=226922&array=226922&mime=json">Модальное окно</a>
 
-    <button data-faze-restapi='[{"method":"get", "module":"285330", "response-text":"main .section"},
+    <button data-faze-restapi-attr='[{"method":"get", "module":"285330", "response-text":"main .section"},
 	{ "method": "GET",  "module": "286910", "response-html": "#cart-state-1"},
-	{ "method": "GET",  "module": "286904", "response-html": "#cart-state-2"}]'>ajaxDataAttr</button>
+	{ "method": "GET",  "module": "286904", "response-html": "#cart-state-2"},
+	{"function":"test"}]'>ajaxDataAttr</button>
 
     <div class="faze-tabs">
         <div class="faze-tabs-headers">
@@ -74,42 +75,61 @@
         </div>
     </div>
 
+    <form data-faze-restapi-form action="http://alfa-suvenir.plarson.ru/">
+        <input type="hidden" name="show" value="295499">
+        <input type="hidden" name="mime" value="json">
+        <input type="hidden" name="order_action" value="send">
+        <input type="hidden" name="url" value="http://alfa-suvenir.plarson.ru/">
+
+        <div class="wrapper-inputs">
+            <input type="text" name="Name" placeholder="Ваше имя">
+            <input type="text" name="Email" placeholder="Ваша почта">
+            <textarea name="Text" placeholder="Текст сообщения"></textarea>
+            <button type="submit" class="btn btn-primary">
+                Задать вопрос
+            </button>
+        </div>
+        <div data-faze-restapi-notification="response_text"></div>
+    </form>
+
     <form data-faze-restapi-form='[
           {
             "method": "GET",
             "module": "##MY_CARTSTATE##",
             "response_text": ".cart-state-container"
-          }]'>
+          }]'
+
+    data-faze-restapi-json-merge='{"settings":{"settings_header":"on","settings_manager_name":"on","settings_manager_email":"on","settings_manager_site":"on","settings_manager_address":"on","settings_logo":"on","settings_text":"on","settings_products":"on","settings_article":"on","settings_name":"on","settings_chars":"on","settings_print":"on","settings_price_without_print":"on","settings_price_print":"on"},"manager":{"manager_chr_name":"Публиченко Павел Андреевич","manager_chr_email":"wowgrack@gmail.com","manager_chr_phone":"518-88-22","manager_chr_site":"groove.ru","email":"wowgrack@gmail.com"}}'>
         <input type="hidden" name="order_action" value="send">
         <input type="hidden" name="mime" value="json">
         <input type="hidden" name="show" value="294934">
 
-        <input data-faze-restapi-json-name="basket_txt_json2.offer.news" name="Name1" id="name" type="text" placeholder="Name" value="Name1">
-        <input data-faze-restapi-json-name="basket_txt_json2.offer.news" name="Email1" id="email" type="text" placeholder="Email" value="Name2">
+        <input data-faze-restapi-json-name="basket_txt_json2.manager" name="Name1" id="name" type="text" placeholder="Name" value="Name1">
+        <input data-faze-restapi-json-name="basket_txt_json2.manager" name="Email1" id="email" type="text" placeholder="Email" value="Name2">
 
-        <input data-faze-restapi-json-name="basket_txt_json2.offer.manager.name" name="Name2" id="name2" type="text" placeholder="Name" value="Name2Val">
-        <input data-faze-restapi-json-name="basket_txt_json2.offer.manager.name" name="Email2" id="email2" type="text" placeholder="Email" value="Email2Val">
+        <!--<input data-faze-restapi-json-name="basket_txt_json2.offer.manager.name" name="Name2" id="name2" type="text" placeholder="Name" value="Name2Val">-->
+        <!--<input data-faze-restapi-json-name="basket_txt_json2.offer.manager.name" name="Email2" id="email2" type="text" placeholder="Email" value="Email2Val">-->
 
-        <label>
-            Мужчина
-            <input data-faze-restapi-json-name="basket_txt_json" name="Sex" type="radio" value="Male" checked>
-        </label>
+        <!--<label>-->
+            <!--Мужчина-->
+            <!--<input data-faze-restapi-json-name="basket_txt_json" name="Sex" type="radio" value="Male" checked>-->
+        <!--</label>-->
 
-        <label>
-            Женщина
-            <input data-faze-restapi-json-name="basket_txt_json" name="Sex" type="radio" value="Female">
-        </label>
+        <!--<label>-->
+            <!--Женщина-->
+            <!--<input data-faze-restapi-json-name="basket_txt_json" name="Sex" type="radio" value="Female">-->
+        <!--</label>-->
 
 
-        <label>
-            Тест1
-            <input data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest" type="checkbox" value="Test1" checked>
-        </label>
+        <!--<label>-->
+            <!--Тест1-->
+            <!--<input data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest" type="checkbox" value="Test1" checked>-->
+        <!--</label>-->
 
-        <label>
-            Тест2
-            <input data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest" type="checkbox" value="Test2">
-        </label>
+        <!--<label>-->
+            <!--Тест2-->
+            <!--<input data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest" type="checkbox" value="Test2">-->
+        <!--</label>-->
 
         <p><input type="submit" value="Отправить"></p>
 

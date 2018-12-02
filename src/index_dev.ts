@@ -67,9 +67,10 @@ Faze.add({
       },
     });
 
-    new Faze.Zoom(document.querySelector('.image'), {
+    const zoom = new Faze.Zoom(document.querySelector('.image'), {
       side: 'right',
     });
+    console.log(zoom);
 
     new Faze.Spoiler(document.querySelector('.spoiler-test'));
 

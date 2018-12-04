@@ -95,7 +95,7 @@ Faze.add({
       },
     });
 
-    new Faze.Gallery(document.querySelectorAll('.image-product'), {});
+    // new Faze.Gallery(document.querySelectorAll('.image-product'), {});
 
     Faze.on('click', '.test-on', () => {
       Faze.REST.chain([

@@ -245,7 +245,12 @@ class Gallery {
    * Инициализация галереи по data атрибутам
    */
   static hotInitialize(): void {
-    Faze.on('click', '[data-faze="gallery"]', (event, callerNode) => {
+    // Задаем всем элементам без группы стандартную
+    document.querySelectorAll('[data-faze="gallery"]:not([data-faze-gallery-group])').forEach((callerNode) => {
+      callerNode.setAttribute('data-faze-gallery-group', 'default');
+    });
+
+    Faze.on('click', '[data-faze="gallery"]:not([data-faze-gallery-passive])', (event, callerNode) => {
       const group: string | null = callerNode.getAttribute('data-faze-gallery-group');
       const callerNodes = document.querySelectorAll(`[data-faze-gallery-group=${group}]`);
 

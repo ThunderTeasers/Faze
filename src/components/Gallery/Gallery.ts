@@ -6,9 +6,11 @@ import './Gallery.scss';
  * Содержит:
  *   thumbnails - позиция превьюшек фотографий относительно экрана("left", "right", "top", "bottom"), так же может быть пусто,
  *                тогда они показываться не будут
+ *   event      - событие по которому происходит инициализация галереи
  */
 interface Config {
   thumbnailsPosition?: string;
+  event: string;
 }
 
 class Gallery {
@@ -19,22 +21,22 @@ class Gallery {
   readonly config: Config;
 
   // DOM элемент содержащий все элементы галереи
-  readonly wrapperNode: HTMLDivElement;
+  wrapperNode: HTMLDivElement;
 
   // DOM элементы стрелок переключения
-  readonly arrowsNodes: {
+  arrowsNodes: {
     prev: HTMLDivElement,
     next: HTMLDivElement,
   };
 
   // DOM элемент крестика для закрытия галереи
-  readonly closeButtonNode: HTMLDivElement;
+  closeButtonNode: HTMLDivElement;
 
   // DOM элемент враммера картинки
-  readonly imageWrapperNode: HTMLDivElement;
+  imageWrapperNode: HTMLDivElement;
 
   // DOM элемент картинки
-  readonly imageNode: HTMLImageElement;
+  imageNode: HTMLImageElement;
 
   // Общее количество картинок в галерее
   readonly totalImages: number;
@@ -50,6 +52,7 @@ class Gallery {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       thumbnailsPosition: undefined,
+      event: 'click',
     };
 
     this.config = Object.assign(defaultConfig, config);
@@ -59,14 +62,6 @@ class Gallery {
     this.checkConfig();
 
     // Инициализирование переменных
-    this.wrapperNode = document.createElement('div');
-    this.arrowsNodes = {
-      prev: document.createElement('div'),
-      next: document.createElement('div'),
-    };
-    this.closeButtonNode = document.createElement('div');
-    this.imageWrapperNode = document.createElement('div');
-    this.imageNode = document.createElement('img');
     this.totalImages = this.nodes.length;
 
     // Вызов стандартных методов плагина
@@ -89,19 +84,22 @@ class Gallery {
    */
   bind() {
     this.nodes.forEach((node, i) => {
-      node.addEventListener('click', (event) => {
-        event.preventDefault();
+      // Вызываем галерею только на элементах у которых нет data атрибута "data-faze-gallery-passive"
+      if (!node.hasAttribute('data-faze-gallery-passive')) {
+        node.addEventListener(this.config.event, (event) => {
+          event.preventDefault();
 
-        // Присвоение корректного индекса
-        this.index = i;
+          // Присвоение корректного индекса
+          this.index = i;
 
-        // Построение галереи
-        this.build();
+          // Построение галереи
+          this.build();
 
-        // Навешивание событий на созданные выше элементы
-        this.bindArrows();
-        this.bindCloseButton();
-      });
+          // Навешивание событий на созданные выше элементы
+          this.bindArrows();
+          this.bindCloseButton();
+        });
+      }
     });
   }
 
@@ -109,6 +107,16 @@ class Gallery {
    * Создание галереи
    */
   build() {
+    // Создание элементов
+    this.wrapperNode = document.createElement('div');
+    this.arrowsNodes = {
+      prev: document.createElement('div'),
+      next: document.createElement('div'),
+    };
+    this.closeButtonNode = document.createElement('div');
+    this.imageWrapperNode = document.createElement('div');
+    this.imageNode = document.createElement('img');
+
     // Присваиваем необходимые классы
     this.wrapperNode.className = 'faze-gallery-wrapper';
 

@@ -1,4 +1,5 @@
 import './Gallery.scss';
+import Faze from '../Core/Faze';
 
 /**
  * Структура конфига галереи
@@ -6,13 +7,17 @@ import './Gallery.scss';
  * Содержит:
  *   thumbnails - позиция превьюшек фотографий относительно экрана("left", "right", "top", "bottom"), так же может быть пусто,
  *                тогда они показываться не будут
- *   event      - событие по которому происходит инициализация галереи
+ *   index      - индекс картики в группе при нажатии на которую была инициализированна галерея
  *   group      - группа галереи, если на странице несколько галерей, то они связаны через это поле
+ *   event      - событие по которому происходит инициализация галереи
+ *   evented    - инициализировать по событию или сразу
  */
 interface Config {
   thumbnailsPosition?: string;
   group: string;
+  index?: number;
   event: string;
+  evented: boolean;
 }
 
 class Gallery {
@@ -58,7 +63,9 @@ class Gallery {
     const defaultConfig: Config = {
       thumbnailsPosition: undefined,
       event: 'click',
+      index: undefined,
       group: 'default',
+      evented: true,
     };
 
     this.config = Object.assign(defaultConfig, config);
@@ -95,29 +102,48 @@ class Gallery {
    * Навешивание событий
    */
   bind() {
-    this.callerNodes.forEach((node, i) => {
-      // Вызываем галерею только на элементах у которых нет data атрибута "data-faze-gallery-passive"
-      if (!node.hasAttribute('data-faze-gallery-passive')) {
-        node.addEventListener(this.config.event, () => {
-          // Фильтруем только элементы у которых такая же группа, как и у элемента по которому инициализируем галерею
-          this.activeNodes = Array.from(this.callerNodes)
-            .filter(callerNode => callerNode.getAttribute('data-faze-gallery-group') === node.getAttribute('data-faze-gallery-group'));
+    if (this.config.evented) {
+      this.callerNodes.forEach((node) => {
+        // Вызываем галерею только на элементах у которых нет data атрибута "data-faze-gallery-passive"
+        if (!node.hasAttribute('data-faze-gallery-passive')) {
+          node.addEventListener(this.config.event, () => {
+            // Фильтруем только элементы у которых такая же группа, как и у элемента по которому инициализируем галерею
+            this.activeNodes = Array.from(this.callerNodes)
+              .filter(callerNode => callerNode.getAttribute('data-faze-gallery-group') === node.getAttribute('data-faze-gallery-group'));
 
-          // Обновляем общее количество элементов
-          this.totalImages = this.activeNodes.length;
+            // Обновляем общее количество элементов
+            this.totalImages = this.activeNodes.length;
 
-          // Присвоение корректного индекса
-          this.index = this.activeNodes.indexOf(node);
+            // Присвоение корректного индекса
+            this.index = this.activeNodes.indexOf(node);
 
-          // Построение галереи
-          this.build();
+            // Построение галереи
+            this.build();
 
-          // Навешивание событий на созданные выше элементы
-          this.bindArrows();
-          this.bindCloseButton();
-        });
-      }
-    });
+            // Навешивание событий на созданные выше элементы
+            this.bindArrows();
+            this.bindCloseButton();
+          });
+        }
+      });
+    } else {
+      // Фильтруем только элементы у которых такая же группа, как и у элемента по которому инициализируем галерею
+      this.activeNodes = Array.from(this.callerNodes)
+        .filter(callerNode => callerNode.getAttribute('data-faze-gallery-group') === this.config.group);
+
+      // Обновляем общее количество элементов
+      this.totalImages = this.activeNodes.length;
+
+      // Присвоение корректного индекса
+      this.index = this.config.index || 0;
+
+      // Построение галереи
+      this.build();
+
+      // Навешивание событий на созданные выше элементы
+      this.bindArrows();
+      this.bindCloseButton();
+    }
   }
 
   /**
@@ -147,8 +173,6 @@ class Gallery {
 
     // Сборка элементов друг с другом
     this.wrapperNode.appendChild(this.arrowsNodes.prev);
-
-    console.log(this.index);
 
     const source = this.activeNodes[this.index].getAttribute('data-faze-gallery-image');
     if (source) {
@@ -215,6 +239,22 @@ class Gallery {
     if (this.config.thumbnailsPosition && !['left', 'right', 'top', 'bottom'].includes(this.config.thumbnailsPosition)) {
       throw new Error('Значение "thumbnailsPosition" некорректно, возможные значения: "left", "right", "top", "bottom".');
     }
+  }
+
+  /**
+   * Инициализация галереи по data атрибутам
+   */
+  static hotInitialize(): void {
+    Faze.on('click', '[data-faze="gallery"]', (event, callerNode) => {
+      const group: string | null = callerNode.getAttribute('data-faze-gallery-group');
+      const callerNodes = document.querySelectorAll(`[data-faze-gallery-group=${group}]`);
+
+      new Faze.Gallery(callerNodes, {
+        group,
+        evented: false,
+        index: Array.from(callerNodes).indexOf(callerNode),
+      });
+    });
   }
 }
 

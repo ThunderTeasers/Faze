@@ -7,15 +7,20 @@ import './Gallery.scss';
  *   thumbnails - позиция превьюшек фотографий относительно экрана("left", "right", "top", "bottom"), так же может быть пусто,
  *                тогда они показываться не будут
  *   event      - событие по которому происходит инициализация галереи
+ *   group      - группа галереи, если на странице несколько галерей, то они связаны через это поле
  */
 interface Config {
   thumbnailsPosition?: string;
+  group: string;
   event: string;
 }
 
 class Gallery {
   // DOM элементы фотографий из которых надо составить галерею
-  readonly nodes: HTMLElement[];
+  readonly callerNodes: HTMLElement[];
+
+  // DOM элементы которые относятся к текущей активной группе
+  activeNodes: HTMLElement[];
 
   // Конфиг с настройками
   readonly config: Config;
@@ -39,7 +44,7 @@ class Gallery {
   imageNode: HTMLImageElement;
 
   // Общее количество картинок в галерее
-  readonly totalImages: number;
+  totalImages: number;
 
   // Индекс текущей картинки в галереи
   index: number;
@@ -53,16 +58,18 @@ class Gallery {
     const defaultConfig: Config = {
       thumbnailsPosition: undefined,
       event: 'click',
+      group: 'default',
     };
 
     this.config = Object.assign(defaultConfig, config);
-    this.nodes = nodes;
+    this.callerNodes = nodes;
 
     // Проверка конфига
     this.checkConfig();
 
     // Инициализирование переменных
-    this.totalImages = this.nodes.length;
+    this.totalImages = this.callerNodes.length;
+    this.activeNodes = [];
 
     // Вызов стандартных методов плагина
     this.initialize();
@@ -74,8 +81,13 @@ class Gallery {
    */
   initialize() {
     // Проставляем класс всем элементам галереи
-    this.nodes.forEach((node) => {
+    this.callerNodes.forEach((node) => {
       node.classList.add('faze-gallery-caller');
+
+      // Присваиваем стандартную группу, если она не указана
+      if (!node.hasAttribute('data-faze-gallery-group')) {
+        node.setAttribute('data-faze-gallery-group', this.config.group);
+      }
     });
   }
 
@@ -83,14 +95,19 @@ class Gallery {
    * Навешивание событий
    */
   bind() {
-    this.nodes.forEach((node, i) => {
+    this.callerNodes.forEach((node, i) => {
       // Вызываем галерею только на элементах у которых нет data атрибута "data-faze-gallery-passive"
       if (!node.hasAttribute('data-faze-gallery-passive')) {
-        node.addEventListener(this.config.event, (event) => {
-          event.preventDefault();
+        node.addEventListener(this.config.event, () => {
+          // Фильтруем только элементы у которых такая же группа, как и у элемента по которому инициализируем галерею
+          this.activeNodes = Array.from(this.callerNodes)
+            .filter(callerNode => callerNode.getAttribute('data-faze-gallery-group') === node.getAttribute('data-faze-gallery-group'));
+
+          // Обновляем общее количество элементов
+          this.totalImages = this.activeNodes.length;
 
           // Присвоение корректного индекса
-          this.index = i;
+          this.index = this.activeNodes.indexOf(node);
 
           // Построение галереи
           this.build();
@@ -131,7 +148,9 @@ class Gallery {
     // Сборка элементов друг с другом
     this.wrapperNode.appendChild(this.arrowsNodes.prev);
 
-    const source = this.nodes[this.index].getAttribute('data-faze-gallery-image');
+    console.log(this.index);
+
+    const source = this.activeNodes[this.index].getAttribute('data-faze-gallery-image');
     if (source) {
       this.imageNode.src = source;
     }
@@ -155,7 +174,7 @@ class Gallery {
         this.index = this.totalImages - 1;
       }
 
-      const source = this.nodes[this.index].getAttribute('data-faze-gallery-image');
+      const source = this.activeNodes[this.index].getAttribute('data-faze-gallery-image');
       if (source) {
         this.imageNode.src = source;
       }
@@ -170,7 +189,7 @@ class Gallery {
         this.index = 0;
       }
 
-      const source = this.nodes[this.index].getAttribute('data-faze-gallery-image');
+      const source = this.activeNodes[this.index].getAttribute('data-faze-gallery-image');
       if (source) {
         this.imageNode.src = source;
       }

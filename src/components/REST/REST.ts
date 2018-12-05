@@ -347,12 +347,10 @@ class REST {
       } catch (error) {
         console.error(`Ошибка парсинга JSON в функции ajaxChain ("${chainRawData}"), текст ошибки:`, error);
       }
-    } else {
-      return;
     }
 
-    // Если длина цепочки для выполнения равна нулю, то выходим из метода
-    if (chainData && chainData.length === 0) {
+    // Если длина цепочки для выполнения равна нулю или "chainData" не определено, то выполняем финальную пользовательскую функцию и выходим
+    if (!chainData || (chainData && chainData.length === 0)) {
       if (typeof finalCallback === 'function') {
         try {
           finalCallback();

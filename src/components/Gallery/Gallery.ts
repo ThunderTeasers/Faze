@@ -186,6 +186,7 @@ class Gallery {
     this.wrapperNode.appendChild(this.arrowsNodes.next);
 
     document.body.appendChild(this.wrapperNode);
+    document.body.classList.add('faze-gallery');
   }
 
   bindArrows() {
@@ -228,6 +229,7 @@ class Gallery {
       event.preventDefault();
 
       this.wrapperNode.remove();
+      document.body.classList.remove('faze-gallery');
     });
   }
 

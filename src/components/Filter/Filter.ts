@@ -252,8 +252,8 @@ class Filter {
    * Восстановление значений выбранных инпутов после перезагрузки страницы
    */
   restoreFilteredInputs() {
-    // Для чекбоксов
     this.restoreFilteredCheckboxes();
+    this.restoreFilteredRadioButtons();
   }
 
   /**
@@ -268,6 +268,23 @@ class Filter {
         const values = this.params.getAll(checkboxName);
         if (values.includes(checkboxValue)) {
           checkboxNode.checked = true;
+        }
+      });
+    }
+  }
+
+  /**
+   * Восстановление значений выбранных радио кнопок после перезагрузки страницы
+   */
+  restoreFilteredRadioButtons() {
+    if (this.formNode) {
+      this.formNode.querySelectorAll('input[type="radio"]').forEach((radioNode: any) => {
+        const checkboxName = radioNode.name;
+        const checkboxValue = radioNode.value;
+
+        const values = this.params.getAll(checkboxName);
+        if (values.includes(checkboxValue)) {
+          radioNode.checked = true;
         }
       });
     }
@@ -300,6 +317,15 @@ class Filter {
       this.buttonSubmitNode.removeAttribute('disabled');
       this.buttonSubmitNode.classList.remove('faze-disabled');
       this.buttonSubmitNode.textContent = this.buttonSubmitNode.getAttribute('data-faze-initial-text') || 'Готово!';
+    }
+  }
+
+  /**
+   * Обновление фильтра(эмуляция события сабмит)
+   */
+  updateFilter() {
+    if (this.formNode) {
+      this.formNode.dispatchEvent(new Event('submit'));
     }
   }
 }

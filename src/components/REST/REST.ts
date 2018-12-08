@@ -127,7 +127,7 @@ class REST {
    * @param formNode - DOM элемент формы из которой оправляем
    * @param callback - пользовательская функция, исполняющаяся ПОСЛЕ всех действий
    */
-  static formSubmit(formNode: HTMLFormElement, callback?: () => void) {
+  static formSubmit(formNode: HTMLFormElement, callback?: (response?: any) => void) {
     if (!(formNode instanceof HTMLFormElement)) {
       throw new Error('Параметр метода formSubmit не является формой');
     }
@@ -220,7 +220,7 @@ class REST {
     // Футкция, которая исполнится при получении ответа от сервера
     const callbackSuccess = (response: any) => {
       if (formNode.hasAttribute('data-faze-restapi-form')) {
-        REST.chain(formNode.dataset.fazeRestapiForm || null, callback);
+        REST.chain(formNode.dataset.fazeRestapiForm || null, callback, response);
       }
 
       // Если есть контейнер(ы) <span data-faze-restapi-notification="text/json"></span>
@@ -334,8 +334,9 @@ class REST {
    *
    * @param chainRawData  - данные предыдущей итерации ajaxChain
    * @param finalCallback - пользовательская функция, исполняющаяся после всей цепочки
+   * @param response      - ответ от сервера для финальной пользовательской функции
    */
-  static chain(chainRawData: any, finalCallback?: () => void) {
+  static chain(chainRawData: any, finalCallback?: (response?: any) => void, response?: any) {
     let chainData: any;
 
     // Определяем тип цепочки и парсим её в соответствии с ним
@@ -353,7 +354,7 @@ class REST {
     if (!chainData || (chainData && chainData.length === 0)) {
       if (typeof finalCallback === 'function') {
         try {
-          finalCallback();
+          finalCallback(response);
         } catch (error) {
           console.error('Ошибка исполнения пользовательской функции в formSubmit, текст ошибки:', error);
         }

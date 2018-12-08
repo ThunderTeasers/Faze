@@ -236,6 +236,7 @@ class Faze {
   static hotInitialize() {
     Faze.Modal.hotInitialize();
     Faze.Gallery.hotInitialize();
+    Faze.Page.hotInitialize();
   }
 }
 

@@ -150,7 +150,7 @@ class Page {
    */
   initialize(): void {
     // Присвоение класса для обертки плагина
-    this.node.classList.add('.faze-page');
+    this.node.classList.add('faze-page');
 
     // Получение общего числа элементов
     this.updateTotal();
@@ -175,8 +175,8 @@ class Page {
           button: this.buttonLoadModeNode,
           items: this.node.querySelectorAll(this.config.selectors.items),
         });
-      } catch (e) {
-        console.error(e);
+      } catch (error) {
+        console.error('Ошибка исполнения пользовательской функции "created": ', error);
       }
     }
   }
@@ -313,6 +313,26 @@ class Page {
    */
   setParams(params: URLSearchParams) {
     this.params = params;
+  }
+
+  /**
+   * Инициализация бесконечной загрузки по data атрибутам
+   */
+  static hotInitialize(): void {
+    const pageInitializators = document.querySelectorAll('[data-faze="page"]');
+    pageInitializators.forEach((pageInitializator: any) => {
+      new Page(pageInitializator, {
+        offset: parseInt(pageInitializator.getAttribute('data-faze-page-offset') || '10', 10),
+        quantity: parseInt(pageInitializator.getAttribute('data-faze-page-quantity') || '10', 10),
+        tableName: pageInitializator.getAttribute('data-faze-page-table_name'),
+        modules: {
+          get: pageInitializator.getAttribute('data-faze-page-modules-get'),
+        },
+        selectors: {
+          items: pageInitializator.getAttribute('data-faze-page-selectors-items') || '.item',
+        },
+      });
+    });
   }
 }
 

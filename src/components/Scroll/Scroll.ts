@@ -126,7 +126,7 @@ class Scroll {
    */
   bind(): void {
     this.bindMouseWheel();
-    this.bindMouseDrag();
+    this.bindMouseDragVertical();
   }
 
   /**
@@ -162,7 +162,7 @@ class Scroll {
   /**
    * Навешивание события прокрутки области видимости с помощью скролбара
    */
-  bindMouseDrag() {
+  bindMouseDragVertical() {
     // Начальная позиция мыши
     let startMousePosition = 0;
 
@@ -180,7 +180,9 @@ class Scroll {
       // Получение позиции курсора при нажатии на элемент
       startMousePosition = event.clientY;
 
+      // Выключаем плавную прокрутку при движении мышкой
       this.scrollBarVerticalNode.style.transition = '';
+      this.node.style.transition = '';
 
       document.addEventListener('mouseup', endDragElement);
       document.addEventListener('mousemove', elementDrag);
@@ -209,13 +211,18 @@ class Scroll {
 
       // Рассчет новой позиции скролбара
       this.scrollBarVerticalNode.style.top = `${position}px`;
+
+      // Задаем позицию вертикальному скрол бару
+      this.node.style.top = `${-parseInt(this.scrollBarVerticalNode.style.top, 10) / this.scrollVerticalHeightInPercents * 100}px`;
     };
 
     /**
      * Завершение перетаскивания(момент отпускания кнопки мыши), удаляем все слушатели, т.к. они создаются при каждом новом перетаскивании
      */
     const endDragElement = () => {
+      // Включаем плавную прокрутку обратно после того как закончили двигать скрол бар мышкой
       this.scrollBarVerticalNode.style.transition = this.config.transition;
+      this.node.style.transition = this.config.transition;
 
       document.removeEventListener('mouseup', endDragElement);
       document.removeEventListener('mousemove', elementDrag);

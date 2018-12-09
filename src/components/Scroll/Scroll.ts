@@ -56,7 +56,7 @@ class Scroll {
   readonly wrapperNode: HTMLDivElement;
 
   // DOM элемент вертикального скрол бара
-  readonly scrollVerticalNode: HTMLDivElement;
+  readonly scrollBarVerticalNode: HTMLDivElement;
 
   // Общая ширина области скрола
   width: number;
@@ -87,7 +87,7 @@ class Scroll {
 
     // Инициализация переменных
     this.wrapperNode = document.createElement('div');
-    this.scrollVerticalNode = document.createElement('div');
+    this.scrollBarVerticalNode = document.createElement('div');
     this.isVertical = false;
 
     this.initialize();
@@ -116,15 +116,23 @@ class Scroll {
     this.wrapperNode.appendChild(this.node);
 
     // Создаем вертикальный скролл
-    this.scrollVerticalNode.className = 'faze-scroll-vertical';
-    this.scrollVerticalNode.style.transition = this.config.transition;
-    this.wrapperNode.appendChild(this.scrollVerticalNode);
+    this.scrollBarVerticalNode.className = 'faze-scroll-vertical';
+    this.scrollBarVerticalNode.style.transition = this.config.transition;
+    this.wrapperNode.appendChild(this.scrollBarVerticalNode);
   }
 
   /**
    * Навешивание событий
    */
   bind(): void {
+    this.bindMouseWheel();
+    this.bindMouseDrag();
+  }
+
+  /**
+   * Навешивание события прокрутки области видимости с помощью колесика мышы
+   */
+  bindMouseWheel() {
     this.wrapperNode.addEventListener('wheel', (event) => {
       if (this.isVertical) {
         event.preventDefault();
@@ -146,9 +154,75 @@ class Scroll {
         this.node.style.top = `${positionY}px`;
 
         // Задаем позицию вертикальному скрол бару
-        this.scrollVerticalNode.style.top = `${Math.abs(this.scrollVerticalHeightInPercents / 100 * positionY)}px`;
+        this.scrollBarVerticalNode.style.top = `${Math.abs(this.scrollVerticalHeightInPercents / 100 * positionY)}px`;
       }
     });
+  }
+
+  /**
+   * Навешивание события прокрутки области видимости с помощью скролбара
+   */
+  bindMouseDrag() {
+    // Начальная позиция мыши
+    let startMousePosition = 0;
+
+    // КОнечная позиция мыши
+    let endMousePosition = 0;
+
+    /**
+     * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
+     *
+     * @param event - событие мыши
+     */
+    const dragMouseDown = (event: MouseEvent) => {
+      event.preventDefault();
+
+      // Получение позиции курсора при нажатии на элемент
+      startMousePosition = event.clientY;
+
+      this.scrollBarVerticalNode.style.transition = '';
+
+      document.addEventListener('mouseup', endDragElement);
+      document.addEventListener('mousemove', elementDrag);
+    };
+
+    /**
+     * Функция перетаскивания модального окна.
+     * Тут идет расчет координат и они присваиваются окну через стили "top" и "left", окно в таком случае естественно должно иметь
+     * позиционирование "absolute"
+     *
+     * @param event - событие мыши
+     */
+    const elementDrag = (event: MouseEvent) => {
+      event.preventDefault();
+
+      // Рассчет новой позиции курсора
+      endMousePosition = startMousePosition - event.clientY;
+      startMousePosition = event.clientY;
+
+      let position = this.scrollBarVerticalNode.offsetTop - endMousePosition;
+      if (position <= 0) {
+        position = 0;
+      } else if (position >= this.config.height - this.scrollBarVerticalNode.offsetHeight) {
+        position = this.config.height - this.scrollBarVerticalNode.offsetHeight;
+      }
+
+      // Рассчет новой позиции скролбара
+      this.scrollBarVerticalNode.style.top = `${position}px`;
+    };
+
+    /**
+     * Завершение перетаскивания(момент отпускания кнопки мыши), удаляем все слушатели, т.к. они создаются при каждом новом перетаскивании
+     */
+    const endDragElement = () => {
+      this.scrollBarVerticalNode.style.transition = this.config.transition;
+
+      document.removeEventListener('mouseup', endDragElement);
+      document.removeEventListener('mousemove', elementDrag);
+    };
+
+    // Навешиваем событие перетаскивания окна по нажатию на его заголовок
+    this.scrollBarVerticalNode.addEventListener('mousedown', dragMouseDown);
   }
 
   /**
@@ -162,9 +236,9 @@ class Scroll {
     if (this.height > this.config.height) {
       this.isVertical = true;
 
-      if (this.scrollVerticalNode) {
+      if (this.scrollBarVerticalNode) {
         this.scrollVerticalHeightInPercents = <any>(this.config.height / this.height).toFixed(3) * 100;
-        this.scrollVerticalNode.style.height = `${this.scrollVerticalHeightInPercents}%`;
+        this.scrollBarVerticalNode.style.height = `${this.scrollVerticalHeightInPercents}%`;
       }
     }
   }

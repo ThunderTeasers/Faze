@@ -30,10 +30,19 @@
         .faze-scroll .faze-scroll-vertical {
             width: 2rem !important;
         }
-    </style>
+    </style><img src="https://via.placeholder.com/350x153" data-faze="gallery" data-faze-gallery-image="https://via.placeholder.com/350x153" alt="" >
     <script>
       function test(){
         console.log('test');
+      }
+
+      function addPhoto() {
+        const photoNode = document.createElement('img');
+        photoNode.src = 'https://via.placeholder.com/350x153';
+        photoNode.setAttribute('data-faze', 'gallery');
+        photoNode.setAttribute('data-faze-gallery-image', 'https://via.placeholder.com/200x200');
+
+        document.querySelector('.gallery').appendChild(photoNode);
       }
     </script>
 </head>
@@ -179,7 +188,8 @@
         </div>
     </div>
 
-    <div>
+    <button onclick="addPhoto()" type="button">Add</button>
+    <div class="gallery">
         <img src="https://via.placeholder.com/350x151" data-faze="gallery" data-faze-gallery-image="https://via.placeholder.com/350x151" data-faze-gallery-passive alt="">
         <img src="https://via.placeholder.com/350x152" data-faze="gallery" data-faze-gallery-image="https://via.placeholder.com/350x152" alt="" >
         <img src="https://via.placeholder.com/350x153" data-faze="gallery" data-faze-gallery-image="https://via.placeholder.com/350x153" alt="" >

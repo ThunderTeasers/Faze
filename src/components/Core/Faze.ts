@@ -30,6 +30,7 @@ import Filter from '../Filter/Filter';
 import Spoiler from '../Spoiler/Spoiler';
 import Gallery from '../Gallery/Gallery';
 import REST from '../REST/REST';
+import Observer from './Observer';
 
 /**
  * Структура конфигурации плагина при его инициализации
@@ -97,6 +98,7 @@ class Faze {
   static Filter: any = Filter;
   static Dropdown: any = Dropdown;
   static Select: any = Select;
+  static Observer: any = new Observer();
   static REST: any = REST;
 
   /**

@@ -142,6 +142,7 @@ class Gallery {
 
       // Навешивание событий на созданные выше элементы
       this.bindArrows();
+      this.bindKeyboardButtons();
       this.bindCloseButton();
     }
   }
@@ -189,36 +190,49 @@ class Gallery {
     document.body.classList.add('faze-gallery');
   }
 
+  /**
+   * Навешивание событий на стрелки переключения фотографий
+   */
   bindArrows() {
     // Кнопка перелистывания назад
     this.arrowsNodes.prev.addEventListener('click', (event) => {
       event.preventDefault();
 
-      this.index -= 1;
-      if (this.index < 0) {
-        this.index = this.totalImages - 1;
-      }
-
-      const source = this.activeNodes[this.index].getAttribute('data-faze-gallery-image');
-      if (source) {
-        this.imageNode.src = source;
-      }
+      this.prev();
     });
 
     // Кнопка перелистывания вперед
     this.arrowsNodes.next.addEventListener('click', (event) => {
       event.preventDefault();
 
-      this.index += 1;
-      if (this.index >= this.totalImages) {
-        this.index = 0;
-      }
-
-      const source = this.activeNodes[this.index].getAttribute('data-faze-gallery-image');
-      if (source) {
-        this.imageNode.src = source;
-      }
+      this.next();
     });
+  }
+
+  /**
+   * Навешивание событий переключения фотографий при нажатии на соответствующие клавишы
+   */
+  bindKeyboardButtons() {
+    const callbackFn = (event: KeyboardEvent) => {
+      switch (event.code) {
+        case 'ArrowRight':
+        case 'ArrowUp':
+          this.next();
+          break;
+        case 'ArrowLeft':
+        case 'ArrowDown':
+          this.prev();
+          break;
+        case 'Escape':
+          this.close();
+          break;
+        default:
+          break;
+      }
+    };
+
+    document.removeEventListener('keyup', callbackFn);
+    document.addEventListener('keyup', callbackFn);
   }
 
   /**
@@ -228,9 +242,46 @@ class Gallery {
     this.closeButtonNode.addEventListener('click', (event) => {
       event.preventDefault();
 
-      this.wrapperNode.remove();
-      document.body.classList.remove('faze-gallery');
+      this.close();
     });
+  }
+
+  /**
+   * Закрытие галереи
+   */
+  close() {
+    this.wrapperNode.remove();
+    document.body.classList.remove('faze-gallery');
+  }
+
+  /**
+   * Переключение галареи на одну фотографию вперед
+   */
+  next() {
+    this.index += 1;
+    if (this.index >= this.totalImages) {
+      this.index = 0;
+    }
+
+    const source = this.activeNodes[this.index].getAttribute('data-faze-gallery-image');
+    if (source) {
+      this.imageNode.src = source;
+    }
+  }
+
+  /**
+   * Переключение галареи на одну фотографию назад
+   */
+  prev() {
+    this.index -= 1;
+    if (this.index < 0) {
+      this.index = this.totalImages - 1;
+    }
+
+    const source = this.activeNodes[this.index].getAttribute('data-faze-gallery-image');
+    if (source) {
+      this.imageNode.src = source;
+    }
   }
 
   /**

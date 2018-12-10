@@ -133,10 +133,17 @@ class Helpers {
     if (Helpers.isObject(target) && Helpers.isObject(source)) {
       for (const key in source) {
         if (Helpers.isObject(source[key])) {
-          if (!target[key]) Object.assign(target, {[key]: {}});
+          if (!target[key]) {
+            Object.assign(target, {[key]: {}});
+          }
+
           Helpers.mergeDeep(target[key], source[key]);
         } else {
-          Object.assign(target, {[key]: source[key]});
+          if (Array.isArray(target[key])) {
+            target[key].push(...source[key]);
+          } else {
+            Object.assign(target, {[key]: source[key]});
+          }
         }
       }
     }
@@ -184,15 +191,34 @@ class Helpers {
       // Проходимся по токенам
       for (let i = 0; i < objectTokens.length; i += 1) {
         // Создаем новый объект и переприсваиваем его к промежуточному объекту для создания дальнейшей цепочки
-        ref[objectTokens[i]] = {};
-        ref = ref[objectTokens[i]];
+        if (objectTokens[i].endsWith('[]')) {
+          const key = objectTokens[i].replace('[]', '');
+
+          ref[key] = [];
+          ref = ref[key];
+        } else {
+          ref[objectTokens[i]] = {};
+          ref = ref[objectTokens[i]];
+        }
       }
 
-      // В итоге присваиваем ключ/значение к конечному объекту в цепочке
-      ref[key] = value;
+      if (Array.isArray(ref)) {
+        ref.push(value);
+      } else {
+        ref[key] = value;
+      }
     } else {
-      // Если нет, то просто на самом верхнем кровне присваиваем к объекту ключ/значение
-      jsonObject[key] = value;
+      // Если встретили ключ первый раз, то просто добавляем его
+      if (!(key in jsonObject)) {
+        jsonObject[key] = value;
+      } else {
+        // Если нет, то проверяем, если значение это уже массив, то просто добавляем новое, если нет, то создаем массив
+        if (Array.isArray(jsonObject[key])) {
+          jsonObject[key] = [...jsonObject[key], value];
+        } else {
+          jsonObject[key] = [jsonObject[key], value];
+        }
+      }
     }
 
     // Возвращаем объект собранный из переданного и только что сгенерированного

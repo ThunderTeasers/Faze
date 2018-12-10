@@ -139,8 +139,21 @@ class Helpers {
 
           Helpers.mergeDeep(target[key], source[key]);
         } else {
-          if (Array.isArray(target[key])) {
-            target[key].push(...source[key]);
+          // Если это массив или содержит служебный ключ "__id", то необходимо произвести объединение
+          if (Array.isArray(target[key]) || source[key][0].__id !== undefined) {
+            // Если значение не задано, создаем пустой массив и пушим в него первый элемент
+            if (!target[key]) {
+              target[key] = [];
+              target[key].push(...source[key]);
+            }
+
+            // Если содержит служебный ключ "__id", то необходимо объединяем уже существующие данные элемента массива с новыми
+            if (source[key][0].__id !== undefined) {
+              target[key][source[key][0].__id] = {...target[key][source[key][0].__id], ...source[key][0]};
+            } else {
+              // Если не содержит, то это просто элемент массива, значит пушим его
+              target[key].push(...source[key]);
+            }
           } else {
             Object.assign(target, {[key]: source[key]});
           }
@@ -191,19 +204,37 @@ class Helpers {
       // Проходимся по токенам
       for (let i = 0; i < objectTokens.length; i += 1) {
         // Создаем новый объект и переприсваиваем его к промежуточному объекту для создания дальнейшей цепочки
-        if (objectTokens[i].endsWith('[]')) {
-          const key = objectTokens[i].replace('[]', '');
-
-          ref[key] = [];
-          ref = ref[key];
-        } else {
-          ref[objectTokens[i]] = {};
-          ref = ref[objectTokens[i]];
-        }
+        ref[objectTokens[i]] = {};
+        ref = ref[objectTokens[i]];
       }
 
-      if (Array.isArray(ref)) {
-        ref.push(value);
+      // Если название содержит квадратные скопки, значит нужно собрать массив
+      if (key.includes('[') && key.includes(']')) {
+        const regex = /\[(.+?)?\]/g;
+        const match = regex.exec(key);
+        let index = 0;
+
+        // Берем число между квадратных скобок, если оно есть
+        if (match) {
+          index = parseInt(match[0].replace('[', '').replace(']', ''), 10);
+        }
+
+        // Очищаем ключ от скобок
+        const clearArrayKey = key.replace(regex, '');
+
+        // Если ключ содержит точку, то это массив объектов, а это значит, что у него есть индекс прописанный между скобками
+        if (key.includes('.')) {
+          const objectArrayName = key.split('.')[1];
+
+          // Определяем элемент массива, так же важно добавить "__id", это служебное поле, для будущего слияния ключей-значений в один
+          // объект элемента массива
+          ref[clearArrayKey.split('.')[0]] = [{
+            __id: index,
+            [objectArrayName]: value,
+          }];
+        } else {
+          ref[clearArrayKey] = [value];
+        }
       } else {
         ref[key] = value;
       }

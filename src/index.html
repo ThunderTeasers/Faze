@@ -134,17 +134,20 @@
 
         <label>
             Тест1
-            <input data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest" type="checkbox" value="Test1" checked>
+            <input data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[0].id" type="checkbox" value="1" checked>
+            <input data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[0].name" type="checkbox" value="Test1" checked>
         </label>
 
         <label>
             Тест2
-            <input data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest" type="checkbox" value="Test2" checked>
+            <input data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[1].id" type="checkbox" value="2" checked>
+            <input data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[1].name" type="checkbox" value="Test2" checked>
         </label>
 
         <label>
             Тест3
-            <input data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest" type="checkbox" value="Test3" checked>
+            <input data-faze-restapi-json-name="basket_txt_json.photos" name="ids[]" type="checkbox" value="3123123" checked>
+            <input data-faze-restapi-json-name="basket_txt_json.photos" name="ids[]" type="checkbox" value="3423433" checked>
         </label>
 
         <!--<input data-faze-restapi-json-name="basket_txt_json.promotions[]." name="CheckboxTest" type="hidden" value="1">-->
@@ -152,7 +155,7 @@
         <p><input type="submit" value="Отправить"></p>
 
 
-        <div data-faze-restapi-notification="response-text"></div>
+        <!--<div data-faze-restapi-notification="response-text"></div>-->
     </form>
 
     <div class="carousel-test">

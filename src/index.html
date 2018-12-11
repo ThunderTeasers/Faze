@@ -118,36 +118,46 @@
         <input data-faze-restapi-json-name="basket_txt_json.manager" name="Name1" id="name" type="text" placeholder="Name" value="Name1">
         <input data-faze-restapi-json-name="basket_txt_json.manager" name="Email1" id="email" type="text" placeholder="Email" value="Name2">
 
-        <!--<input data-faze-restapi-json-name="basket_txt_json2.offer.manager.name" name="Name2" id="name2" type="text" placeholder="Name" value="Name2Val">-->
-        <!--<input data-faze-restapi-json-name="basket_txt_json2.offer.manager.name" name="Email2" id="email2" type="text" placeholder="Email" value="Email2Val">-->
+        <input data-faze-restapi-json-name="basket_txt_json2.offer.manager.name" name="Name2" id="name2" type="text" placeholder="Name" value="Name2Val">
+        <input data-faze-restapi-json-name="basket_txt_json2.offer.manager.name" name="Email2" id="email2" type="text" placeholder="Email" value="Email2Val">
 
-        <!--<label>-->
-            <!--Мужчина-->
-            <!--<input data-faze-restapi-json-name="basket_txt_json" name="Sex" type="radio" value="Male" checked>-->
-        <!--</label>-->
-
-        <!--<label>-->
-            <!--Женщина-->
-            <!--<input data-faze-restapi-json-name="basket_txt_json" name="Sex" type="radio" value="Female">-->
-        <!--</label>-->
-
+        <input data-faze-restapi-json-name="basket_txt_json" name="Phone" id="phone" type="text" placeholder="123" value="798123123434">
 
         <label>
-            Тест1
-            <input data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[0].id" type="checkbox" value="1" checked>
-            <input data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[0].name" type="checkbox" value="Test1" checked>
+            Мужчина
+            <input data-faze-restapi-json-name="basket_txt_json" name="Sex" type="radio" value="Male" checked>
         </label>
 
         <label>
-            Тест2
-            <input data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[1].id" type="checkbox" value="2" checked>
-            <input data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[1].name" type="checkbox" value="Test2" checked>
+            Женщина
+            <input data-faze-restapi-json-name="basket_txt_json" name="Sex" type="radio" value="Female">
+        </label>
+
+
+        <label>
+            <input data-faze-restapi-json-array-group="1" data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[].id" type="checkbox" value="1" checked>
+            <input data-faze-restapi-json-array-group="1" data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[].name" type="checkbox" value="Test1" checked>
+        </label>
+
+        <label>
+            <input data-faze-restapi-json-array-group="2123" data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[].id" type="checkbox" value="2" checked>
+            <input data-faze-restapi-json-array-group="2123" data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[].name" type="checkbox" value="Test2" checked>
+        </label>
+
+        <label>
+            <input data-faze-restapi-json-array-group="1" data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest[].id" type="checkbox" value="23" checked>
+            <input data-faze-restapi-json-array-group="1" data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest[].name" type="checkbox" value="Пока" checked>
+        </label>
+
+        <label>
+            <input data-faze-restapi-json-array-group="dsf" data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest[].id" type="checkbox" value="24" checked>
+            <input data-faze-restapi-json-array-group="dsf" data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest[].name" type="checkbox" value="Привет" checked>
         </label>
 
         <label>
             Тест3
-            <input data-faze-restapi-json-name="basket_txt_json.photos" name="ids[]" type="checkbox" value="3123123" checked>
-            <input data-faze-restapi-json-name="basket_txt_json.photos" name="ids[]" type="checkbox" value="3423433" checked>
+            <input data-faze-restapi-json-name="basket_txt_json" name="ids[]" type="checkbox" value="3123123" checked>
+            <input data-faze-restapi-json-name="basket_txt_json" name="ids[]" type="checkbox" value="3423433" checked>
         </label>
 
         <!--<input data-faze-restapi-json-name="basket_txt_json.promotions[]." name="CheckboxTest" type="hidden" value="1">-->

@@ -174,8 +174,9 @@ class REST {
 
           const key = itemNode.dataset.fazeRestapiJsonKey || itemNode.name;
           const value = itemNode.dataset.fazeRestapiJsonValue || itemNode.value;
+          const arrayGroup = itemNode.dataset.fazeRestapiJsonArrayGroup || 'default';
 
-          jsonObject = Faze.Helpers.objectFromString(jsonObject, jsonNameForObject, key, value);
+          jsonObject = Faze.Helpers.objectFromString(jsonObject, jsonNameForObject, key, value, arrayGroup);
         }
 
         // Удаляем найденные поля из formdata
@@ -200,6 +201,8 @@ class REST {
 
         jsonObject = Helpers.mergeDeep(objectToMerge, jsonObject);
       }
+
+      console.log(jsonObject);
 
       // Добавляем получившийся JSON объект в итоговые данные для отправки
       formData.append(jsonRealName, JSON.stringify(jsonObject));

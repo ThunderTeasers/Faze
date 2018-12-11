@@ -140,16 +140,28 @@ class Helpers {
           Helpers.mergeDeep(target[key], source[key]);
         } else {
           // Если это массив или содержит служебный ключ "__id", то необходимо произвести объединение
-          if (Array.isArray(target[key]) || source[key][0].__id !== undefined) {
+          if (Array.isArray(target[key]) || source[key][0].__group !== undefined) {
             // Если значение не задано, создаем пустой массив и пушим в него первый элемент
             if (!target[key]) {
               target[key] = [];
               target[key].push(...source[key]);
             }
 
-            // Если содержит служебный ключ "__id", то необходимо объединяем уже существующие данные элемента массива с новыми
-            if (source[key][0].__id !== undefined) {
-              target[key][source[key][0].__id] = {...target[key][source[key][0].__id], ...source[key][0]};
+            // Если содержит служебный ключ "__group"
+            if (source[key][0].__group !== undefined) {
+              // Ищем элемент у которого уже есть такая группа
+              const foundElement = target[key].find((targetObject: any) => targetObject.__group === source[key][0].__group);
+
+              // Определяем индекс найденного элемента
+              const foundIndex = target[key].indexOf(foundElement);
+
+              // Если элемент в массиве не нашли, то необходимо добавить новый элемент в массив
+              if (foundIndex === -1) {
+                target[key].push(...source[key][0]);
+              } else {
+                // Если нашли, то объединяем объекты этого элемента с новым
+                target[key][foundIndex] = {...foundElement, ...source[key][0]};
+              }
             } else {
               // Если не содержит, то это просто элемент массива, значит пушим его
               target[key].push(...source[key]);
@@ -187,8 +199,9 @@ class Helpers {
    * @param stringData - строка для парсинга, должна либо содержать одно слово, либо слова разделенными точками для показа вложенности
    * @param key        - ключ для вставки в итоговый объект
    * @param value      - значение для вставки в итоговый объект по так же переданному ключу
+   * @param arrayGroup - группа для слияния нескольких пар ключ-значение в один объект при сборке массива объектов
    */
-  static objectFromString(jsonObject: any = {}, stringData: string, key: string, value: string): object {
+  static objectFromString(jsonObject: any = {}, stringData: string, key: string, value: string, arrayGroup = 'default'): object {
     // Разбиваем строку на токены, при этом фильтруя на пустоту токена, т.к. если мы пытаемся разделить пустую строку, "split" вернет
     // массив у которого 1 пустой элемент, а это некорректно в данном случае.
     const objectTokens: string[] = stringData.split('.').filter(token => token.length !== 0);
@@ -207,49 +220,28 @@ class Helpers {
         ref[objectTokens[i]] = {};
         ref = ref[objectTokens[i]];
       }
+    }
 
-      // Если название содержит квадратные скопки, значит нужно собрать массив
-      if (key.includes('[') && key.includes(']')) {
-        const regex = /\[(.+?)?\]/g;
-        const match = regex.exec(key);
-        let index = 0;
+    // Если название содержит квадратные скопки, значит нужно собрать массив
+    if (key.includes('[]')) {
+      // Очищаем ключ от скобок
+      const clearArrayKey = key.replace('[]', '');
 
-        // Берем число между квадратных скобок, если оно есть
-        if (match) {
-          index = parseInt(match[0].replace('[', '').replace(']', ''), 10);
-        }
+      // Если ключ содержит точку, то это массив объектов, которые соединяет поле "__group"
+      if (key.includes('.')) {
+        const objectArrayName = key.split('.')[1];
 
-        // Очищаем ключ от скобок
-        const clearArrayKey = key.replace(regex, '');
-
-        // Если ключ содержит точку, то это массив объектов, а это значит, что у него есть индекс прописанный между скобками
-        if (key.includes('.')) {
-          const objectArrayName = key.split('.')[1];
-
-          // Определяем элемент массива, так же важно добавить "__id", это служебное поле, для будущего слияния ключей-значений в один
-          // объект элемента массива
-          ref[clearArrayKey.split('.')[0]] = [{
-            __id: index,
-            [objectArrayName]: value,
-          }];
-        } else {
-          ref[clearArrayKey] = [value];
-        }
+        // Определяем элемент массива, так же важно добавить "__group", это служебное поле,
+        // для будущего слияния ключей-значений в один объект элемента массива
+        ref[clearArrayKey.split('.')[0]] = [{
+          __group: arrayGroup,
+          [objectArrayName]: value,
+        }];
       } else {
-        ref[key] = value;
+        ref[clearArrayKey] = [value];
       }
     } else {
-      // Если встретили ключ первый раз, то просто добавляем его
-      if (!(key in jsonObject)) {
-        jsonObject[key] = value;
-      } else {
-        // Если нет, то проверяем, если значение это уже массив, то просто добавляем новое, если нет, то создаем массив
-        if (Array.isArray(jsonObject[key])) {
-          jsonObject[key] = [...jsonObject[key], value];
-        } else {
-          jsonObject[key] = [jsonObject[key], value];
-        }
-      }
+      ref[key] = value;
     }
 
     // Возвращаем объект собранный из переданного и только что сгенерированного

@@ -202,8 +202,6 @@ class REST {
         jsonObject = Helpers.mergeDeep(objectToMerge, jsonObject);
       }
 
-      console.log(jsonObject);
-
       // Добавляем получившийся JSON объект в итоговые данные для отправки
       formData.append(jsonRealName, JSON.stringify(jsonObject));
     }

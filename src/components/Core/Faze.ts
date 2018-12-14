@@ -239,6 +239,8 @@ class Faze {
     Faze.Modal.hotInitialize();
     Faze.Gallery.hotInitialize();
     Faze.Page.hotInitialize();
+    Faze.Tab.hotInitialize();
+    Faze.Spoiler.hotInitialize();
   }
 }
 

@@ -121,12 +121,34 @@ class Helpers {
   }
 
   /**
+   * Удаление массивов из объекта
+   *
+   * @param target - объект в котором удаляем
+   */
+  static removeArrays(target: any) {
+    for (const key in target) {
+      if (!target.hasOwnProperty(key)) {
+        continue;
+      }
+
+      if (Array.isArray(target[key])) {
+        target[key] = [];
+      } else if (Helpers.isObject(target[key])) {
+        Helpers.removeArrays(target[key]);
+      }
+    }
+
+    return target;
+  }
+
+  /**
    * Метод для глубого слияния объектов
    *
-   * @param target  - объект в который сливаем
-   * @param sources - сливаемый объект
+   * @param arraysReplace
+   * @param target      - объект в который сливаем
+   * @param sources     - сливаемый объект
    */
-  static mergeDeep(target: any, ...sources: any[]): any {
+  static mergeDeep(arraysReplace: boolean = false, target: any, ...sources: any[]): any {
     if (!sources.length) return target;
     const source = sources.shift();
 
@@ -137,10 +159,10 @@ class Helpers {
             Object.assign(target, {[key]: {}});
           }
 
-          Helpers.mergeDeep(target[key], source[key]);
+          Helpers.mergeDeep(arraysReplace, target[key], source[key]);
         } else {
           // Если это массив или содержит служебный ключ "__id", то необходимо произвести объединение
-          if (Array.isArray(target[key]) || source[key][0].__group !== undefined) {
+          if (Array.isArray(target[key]) || (source[key][0] && source[key][0].__group !== undefined)) {
             // Если значение не задано, создаем пустой массив и пушим в него первый элемент
             if (!target[key]) {
               target[key] = [];
@@ -164,7 +186,11 @@ class Helpers {
               }
             } else {
               // Если не содержит, то это просто элемент массива, значит пушим его
-              target[key].push(...source[key]);
+              if (arraysReplace) {
+                target[key] = source[key];
+              } else {
+                target[key].push(...source[key]);
+              }
             }
           } else {
             Object.assign(target, {[key]: source[key]});
@@ -173,7 +199,7 @@ class Helpers {
       }
     }
 
-    return Helpers.mergeDeep(target, ...sources);
+    return Helpers.mergeDeep(arraysReplace, target, ...sources);
   }
 
   /**
@@ -245,7 +271,7 @@ class Helpers {
     }
 
     // Возвращаем объект собранный из переданного и только что сгенерированного
-    return Helpers.mergeDeep(jsonObject, result);
+    return Helpers.mergeDeep(false, jsonObject, result);
   }
 }
 

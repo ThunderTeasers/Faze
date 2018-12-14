@@ -199,7 +199,7 @@ class REST {
           console.error(`Ошибка парсинга JSON объекта для слияния("data-faze-restapi-json-merge"), JSON: ${jsonData}, текст ошибки: `, error);
         }
 
-        jsonObject = Helpers.mergeDeep(objectToMerge, jsonObject);
+        jsonObject = Helpers.mergeDeep(true, objectToMerge, jsonObject);
       }
 
       // Добавляем получившийся JSON объект в итоговые данные для отправки

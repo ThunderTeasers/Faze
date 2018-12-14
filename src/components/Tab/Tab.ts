@@ -33,6 +33,7 @@
  */
 
 import './Tab.scss';
+import Faze from '../Core/Faze';
 
 /**
  * Структура конфига табов
@@ -130,6 +131,15 @@ class Tab {
       } else {
         body.style.display = 'none';
       }
+    });
+  }
+
+  /**
+   * Инициализация табов по data атрибутам
+   */
+  static hotInitialize(): void {
+    document.querySelectorAll('[data-faze="tab"]').forEach((tabsNode) => {
+      new Faze.Tab(tabsNode);
     });
   }
 }

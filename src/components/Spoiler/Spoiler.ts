@@ -28,6 +28,7 @@
  */
 
 import './Spoiler.scss';
+import Faze from '../Core/Faze';
 
 /**
  * Класс дропдауна
@@ -79,6 +80,15 @@ class Spoiler {
         this.node.classList.toggle('faze-active');
       });
     }
+  }
+
+  /**
+   * Инициализация спойлеров по data атрибутам
+   */
+  static hotInitialize(): void {
+    document.querySelectorAll('[data-faze="spoiler"]').forEach((spoilerNode) => {
+      new Faze.Spoiler(spoilerNode);
+    });
   }
 }
 

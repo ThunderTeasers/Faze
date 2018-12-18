@@ -241,6 +241,7 @@ class Faze {
     Faze.Page.hotInitialize();
     Faze.Tab.hotInitialize();
     Faze.Spoiler.hotInitialize();
+    Faze.Carousel.hotInitialize();
   }
 }
 

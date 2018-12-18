@@ -39,6 +39,7 @@
  */
 
 import './Carousel.scss';
+import Faze from '../Core/Faze';
 
 /**
  * Структура конфига карусели
@@ -690,6 +691,26 @@ class Carousel {
     } else if (this.touchEnd.x >= this.touchStart.x) {
       this.prev();
     }
+  }
+
+  /**
+   * Инициализация карусели по data атрибутам
+   */
+  static hotInitialize(): void {
+    document.querySelectorAll('[data-faze="carousel"]').forEach((carouselNode) => {
+      new Faze.Carousel(carouselNode, {
+        autoplay: (carouselNode.getAttribute('data-faze-carousel-autoplay') || 'false') === 'true',
+        counter: (carouselNode.getAttribute('data-faze-carousel-counter') || 'false') === 'true',
+        pages: (carouselNode.getAttribute('data-faze-carousel-pages') || 'false') === 'true',
+        arrows: (carouselNode.getAttribute('data-faze-carousel-arrows') || 'true') === 'true',
+        duration: carouselNode.getAttribute('data-faze-carousel-duration') || 3000,
+        animation: {
+          type: carouselNode.getAttribute('data-faze-carousel-animation-type') || 'fade',
+          time: carouselNode.getAttribute('data-faze-carousel-animation-time') || 1000,
+          direction: carouselNode.getAttribute('data-faze-carousel-animation-direction') || 'horizontal',
+        },
+      });
+    });
   }
 }
 

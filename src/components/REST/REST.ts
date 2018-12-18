@@ -18,6 +18,7 @@ class REST {
     let formData: FormData = new FormData();
     let dataType: string = '';
     let testedMethod: string = '';
+    let currentURL = url;
 
     // Проверка method на корректность
     if (method.toLowerCase() === 'post') {
@@ -54,7 +55,12 @@ class REST {
       fetchOptions.body = formData;
     }
 
-    fetch(`${url}?${(new URLSearchParams(<any>formData)).toString()}`, fetchOptions)
+    // Если это GET запрос, подставляем параметры
+    if (method.toLowerCase() === 'get') {
+      currentURL += `?${(new URLSearchParams(<any>formData)).toString()}`;
+    }
+
+    fetch(`${currentURL}`, fetchOptions)
       .then((response) => {
         let data = null;
 

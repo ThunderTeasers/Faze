@@ -50,6 +50,7 @@ import Faze from '../Core/Faze';
  *   pages      - отображать ли пагинацию слайдов
  *   arrows     - отображать ли стрелки переключения
  *   duration   - время смены слайдов, в мс.
+ *   useSlideFullSize - учитывать ли при измерении размера слайда его margin
  *   animation
  *     type     - тип анимации, может быть: 'slide', 'fade'
  *     time     - длительность анимации в миллисекундах
@@ -64,6 +65,7 @@ interface Config {
   pages: boolean;
   arrows: boolean;
   duration: number;
+  useSlideFullSize: boolean;
   animation: {
     type: string;
     time: number;
@@ -190,6 +192,7 @@ class Carousel {
       pages: false,
       arrows: true,
       duration: 3000,
+      useSlideFullSize: false,
       animation: {
         type: 'fade',
         time: 1000,
@@ -678,8 +681,26 @@ class Carousel {
    * Получение размеров слайда
    */
   calculateSlideSize() {
-    this.slideWidth = this.slidesNodes[0].offsetWidth;
-    this.slideHeight = this.slidesNodes[0].offsetHeight;
+    const slideNode = this.slidesNodes[0];
+
+    if (this.config.useSlideFullSize) {
+      const style = window.getComputedStyle(slideNode);
+
+      this.slideWidth = slideNode.offsetWidth +
+        parseFloat(style.marginLeft || '0') +
+        parseFloat(style.marginRight || '0') +
+        parseFloat(style.paddingLeft || '0') +
+        parseFloat(style.paddingRight || '0');
+
+      this.slideHeight = slideNode.offsetHeight +
+        parseFloat(style.marginTop || '0') +
+        parseFloat(style.marginBottom || '0') +
+        parseFloat(style.paddingTop || '0') +
+        parseFloat(style.paddingBottom || '0');
+    } else {
+      this.slideWidth = slideNode.offsetWidth;
+      this.slideHeight = slideNode.offsetHeight;
+    }
   }
 
   /**
@@ -704,6 +725,7 @@ class Carousel {
         pages: (carouselNode.getAttribute('data-faze-carousel-pages') || 'false') === 'true',
         arrows: (carouselNode.getAttribute('data-faze-carousel-arrows') || 'true') === 'true',
         duration: carouselNode.getAttribute('data-faze-carousel-duration') || 3000,
+        useSlideFullSize: (carouselNode.getAttribute('data-faze-carousel-use-slide-full-size') || 'false') === 'true',
         animation: {
           type: carouselNode.getAttribute('data-faze-carousel-animation-type') || 'fade',
           time: carouselNode.getAttribute('data-faze-carousel-animation-time') || 1000,

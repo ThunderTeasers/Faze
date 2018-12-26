@@ -37,6 +37,30 @@ class Helpers {
   }
 
   /**
+   * Разделение трех знаком у числа пробелами, необходимо для форматирования цен в цдобочитаемом для человека виде.
+   * Если передали целое число, то есть которое не содержит точку, то просто разделяем по 3, если же передали число с плавающей точкой,
+   * то форматируем у неё только левую часть, то есть ту которая до точки, после этого склеиваем обе части и возвращаем их.
+   *
+   * @param numberToFormat - число или строка содержащая число которое будет форматироваться
+   * @return строка разделенная пробелами каждые 3 символа
+   */
+  static numberWithSpaces(numberToFormat: number | string): string {
+    const numberString = numberToFormat.toString();
+    let result = '';
+
+    if (numberString.includes('.')) {
+      const parts = numberString.split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+      result = parts.join('.');
+    } else {
+      result = numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+
+    return result;
+  }
+
+  /**
    * Создание маски мобильного телефона российского формата
    *
    * @param input - DOM элемент ввода телефона

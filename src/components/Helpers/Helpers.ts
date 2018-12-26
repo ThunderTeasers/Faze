@@ -154,46 +154,48 @@ class Helpers {
 
     if (Helpers.isObject(target) && Helpers.isObject(source)) {
       for (const key in source) {
-        if (Helpers.isObject(source[key])) {
-          if (!target[key]) {
-            Object.assign(target, {[key]: {}});
-          }
-
-          Helpers.mergeDeep(arraysReplace, target[key], source[key]);
-        } else {
-          // Если это массив или содержит служебный ключ "__id", то необходимо произвести объединение
-          if (Array.isArray(target[key]) || (source[key][0] && source[key][0].__group !== undefined)) {
-            // Если значение не задано, создаем пустой массив и пушим в него первый элемент
+        if (source.hasOwnProperty(key)) {
+          if (Helpers.isObject(source[key])) {
             if (!target[key]) {
-              target[key] = [];
-              target[key].push(...source[key]);
+              Object.assign(target, {[key]: {}});
             }
 
-            // Если содержит служебный ключ "__group"
-            if (source[key][0].__group !== undefined) {
-              // Ищем элемент у которого уже есть такая группа
-              const foundElement = target[key].find((targetObject: any) => targetObject.__group === source[key][0].__group);
-
-              // Определяем индекс найденного элемента
-              const foundIndex = target[key].indexOf(foundElement);
-
-              // Если элемент в массиве не нашли, то необходимо добавить новый элемент в массив
-              if (foundIndex === -1) {
-                target[key].push(...source[key][0]);
-              } else {
-                // Если нашли, то объединяем объекты этого элемента с новым
-                target[key][foundIndex] = {...foundElement, ...source[key][0]};
-              }
-            } else {
-              // Если не содержит, то это просто элемент массива, значит пушим его
-              if (arraysReplace) {
-                target[key] = source[key];
-              } else {
+            Helpers.mergeDeep(arraysReplace, target[key], source[key]);
+          } else {
+            // Если это массив или содержит служебный ключ "__id", то необходимо произвести объединение
+            if (Array.isArray(target[key]) || (source[key] && source[key][0] && source[key][0].__group !== undefined)) {
+              // Если значение не задано, создаем пустой массив и пушим в него первый элемент
+              if (!target[key]) {
+                target[key] = [];
                 target[key].push(...source[key]);
               }
+
+              // Если содержит служебный ключ "__group"
+              if (source[key][0].__group !== undefined) {
+                // Ищем элемент у которого уже есть такая группа
+                const foundElement = target[key].find((targetObject: any) => targetObject.__group === source[key][0].__group);
+
+                // Определяем индекс найденного элемента
+                const foundIndex = target[key].indexOf(foundElement);
+
+                // Если элемент в массиве не нашли, то необходимо добавить новый элемент в массив
+                if (foundIndex === -1) {
+                  target[key].push(...source[key][0]);
+                } else {
+                  // Если нашли, то объединяем объекты этого элемента с новым
+                  target[key][foundIndex] = {...foundElement, ...source[key][0]};
+                }
+              } else {
+                // Если не содержит, то это просто элемент массива, значит пушим его
+                if (arraysReplace) {
+                  target[key] = source[key];
+                } else {
+                  target[key].push(...source[key]);
+                }
+              }
+            } else {
+              Object.assign(target, {[key]: source[key]});
             }
-          } else {
-            Object.assign(target, {[key]: source[key]});
           }
         }
       }

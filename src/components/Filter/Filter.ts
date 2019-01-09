@@ -125,7 +125,7 @@ class Filter {
     this.itemsHolderNode = document.querySelector(this.config.selectors.itemsHolder);
 
     if (this.config.showTotal && this.formNode) {
-      this.totalNode = this.formNode.querySelector(this.config.selectors.total);
+      this.totalNode = this.node.querySelector(this.config.selectors.total);
     }
 
     this.initialize();

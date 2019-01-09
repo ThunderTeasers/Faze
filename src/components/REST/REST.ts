@@ -41,8 +41,6 @@ class REST {
     } else if (data instanceof HTMLFormElement) {
       formData = new FormData(data);
     } else if (data) {
-      formData = new FormData();
-
       for (const key of Object.keys(data)) {
         formData.append(key, data[key]);
       }

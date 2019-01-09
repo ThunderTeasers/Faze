@@ -5,23 +5,7 @@
  *
  * Автор: Ерохин Максим, plarson.ru
  * Дата: 23.09.2018
- *
- *
- * Пример использования
- * В JS:
- *   Faze.add({
- *     pluginName: 'ProductTooltips',
- *     plugins: ['Tooltip'],
- *     condition: document.querySelectorAll('.informer').length,
- *     callback: () => {
- *       for (const informer of document.querySelectorAll('.informer')) {
- *         new Faze.Tooltip(informer);
- *       }
- *     }
- *   });
- *
- * В HTML:
- *   <div class="informer" data-faze-tooltip-text="Я подсказка!">Наведите для подсказки</div>
+ * Документация: https://github.com/ThunderTeasers/Faze/wiki/%D0%9C%D0%BE%D0%B4%D1%83%D0%BB%D1%8C-Tooltip
  */
 
 import './Tooltip.scss';
@@ -31,15 +15,15 @@ import Faze from '../Core/Faze';
  * Структура конфига тултипа
  *
  * Содержит:
- *   side   - сторона с которой должен появляться тултип
- *   text   - текст тултипа
+ *   text   - текст подсказки
+ *   side   - сторона с которой должена появляться подсказка
  *   margin - отступ от выбранной стороны(side) в пикселях
  *   callbacks
- *     opened  - пользовательский метод, срабатывающий при вызове тултипа
+ *     opened  - пользовательская функция, срабатывающая при показе тултипа
  */
 interface Config {
-  side: string;
   text: string;
+  side: string;
   margin: number;
   callbacks: {
     opened?: () => void;
@@ -66,8 +50,8 @@ class Tooltip {
 
     // Конфиг по умолчанию
     const defaultConfig: Config = {
-      side: 'bottom',
       text: '',
+      side: 'bottom',
       margin: 10,
       callbacks: {
         opened: undefined,
@@ -81,6 +65,7 @@ class Tooltip {
       throw new Error('Параметр "side" задан верно! Корректные значения: "top", "right", "bottom", "left".');
     }
 
+    // Инициализация переменных
     this.node = node;
     this.tooltip = document.createElement('div');
 

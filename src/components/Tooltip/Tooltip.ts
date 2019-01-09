@@ -25,6 +25,7 @@
  */
 
 import './Tooltip.scss';
+import Faze from '../Core/Faze';
 
 /**
  * Структура конфига тултипа
@@ -171,6 +172,18 @@ class Tooltip {
     // Применение данных на тултип
     this.tooltip.style.top = `${centerY}px`;
     this.tooltip.style.left = `${centerX}px`;
+  }
+
+  /**
+   * Инициализация спойлеров по data атрибутам
+   */
+  static hotInitialize(): void {
+    document.querySelectorAll('[data-faze="tooltip"]').forEach((tooltipNode) => {
+      new Faze.Tooltip(tooltipNode, {
+        text: tooltipNode.getAttribute('data-faze-tooltip-text') || '',
+        side: tooltipNode.getAttribute('data-faze-tooltip-side') || 'bottom',
+      });
+    });
   }
 }
 

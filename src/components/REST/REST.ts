@@ -196,7 +196,7 @@ class REST {
         let value = itemNode.getAttribute('data-faze-restapi-json-value') || itemNode.value;
 
         // Если это не активный чекбокс, то присваиваем ему значение из data атрибута
-        // Гарантированность того что оно задано обеспечивает условие сверху
+        // Гарантированность того, что оно задано, обеспечивает условие сверху
         if (isCheckbox && !itemNode.checked) {
           value = itemNode.getAttribute('data-faze-restapi-disabled-value');
         }

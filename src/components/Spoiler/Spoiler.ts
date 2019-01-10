@@ -5,26 +5,7 @@
  *
  * Автор: Ерохин Максим, plarson.ru
  * Дата: 17.10.2018
- *
- *
- * Пример использования
- * В JS:
- *   Faze.add({
- *     pluginName: 'FilterSpoiler',
- *     plugins: ['Spoiler'],
- *     condition: document.querySelectorAll('.spoiler-test').length,
- *     callback: () => {
- *       new Faze.Spoiler(document.querySelector('.spoiler-test'));
- *     }
- *   });
- *
- * В HTML:
- *   <div class="spoiler-test">
- *     <div class="title">Заголовок</div>
- *     <div class="body">
- *       Я тело спойлера
- *     </div>
- *   </div>
+ * Документация: https://github.com/ThunderTeasers/Faze/wiki/%D0%9C%D0%BE%D0%B4%D1%83%D0%BB%D1%8C-Spoiler
  */
 
 import './Spoiler.scss';
@@ -48,9 +29,9 @@ class Spoiler {
       throw new Error('Не задан объект спойлера');
     }
 
+    // Инициализация переменных
     this.node = node;
 
-    // Инициализация переменных
     this.titleNode = node.querySelector('.title');
     this.bodyNode = node.querySelector('.body');
 

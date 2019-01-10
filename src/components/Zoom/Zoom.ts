@@ -5,31 +5,17 @@
  *
  * Автор: Ерохин Максим, plarson.ru
  * Дата: 29.09.2018
- *
- *
- * Пример использования
- * В JS:
- *   Faze.add({
- *     pluginName: 'ProductsZoom',
- *     plugins: ['Zoom'],
- *     condition: document.querySelectorAll('.image').length,
- *     callback: () => {
- *       new Faze.Zoom(document.querySelector('.image'));
- *     }
- *   });
- *
- * В HTML:
- *   <img class="image" src="https://via.placeholder.com/200x200" data-faze-full-image="https://via.placeholder.com/2000x2000">
+ * Документация: https://github.com/ThunderTeasers/Faze/wiki/%D0%9C%D0%BE%D0%B4%D1%83%D0%BB%D1%8C-Zoom
  */
 
 import './Zoom.scss';
-import Faze from "../Core/Faze";
+import Faze from '../Core/Faze';
 
 /**
  * Структура конфига
  *
  * Содержит:
- *   image  - путь к картинке оригинального масштаба
+ *   image  - путь к картинке оригинального размера
  *   side   - сторона с которой должно появится окно с увеличенной картиной, может быть: 'left', 'right', 'top', 'bottom'
  *   width  - ширина окна с увеличенной картинкой в пикселях
  *   height - высота окна с увеличенной картинкой в пикселях

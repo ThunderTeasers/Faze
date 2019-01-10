@@ -210,7 +210,7 @@ class Faze {
    * @param childSelector - CSS селектор элемента на который вешаем событие
    * @param callback      - пользовательская функция которая будет исполнена после срабатывания события
    */
-  static on(eventName: string, childSelector: string, callback: (event: Event, child: HTMLElement) => void) {
+  static on(eventName: string, childSelector: string, callback: (event: Event, child: HTMLElement) => void): void {
     window.addEventListener(eventName, (event) => {
       const clickedElement = <any>event.target;
       if (clickedElement) {
@@ -228,14 +228,14 @@ class Faze {
    *
    * @param name - ключ по которому удаляем
    */
-  static remove(name: string) {
+  static remove(name: string): void {
     delete Faze.plugins[name];
   }
 
   /**
    * Инициализация плагинов по data атрибутам
    */
-  static hotInitialize() {
+  static hotInitialize(): void {
     Faze.Modal.hotInitialize();
     Faze.Gallery.hotInitialize();
     Faze.Page.hotInitialize();

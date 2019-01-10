@@ -243,6 +243,7 @@ class Faze {
     Faze.Spoiler.hotInitialize();
     Faze.Carousel.hotInitialize();
     Faze.Tooltip.hotInitialize();
+    Faze.Zoom.hotInitialize();
   }
 }
 

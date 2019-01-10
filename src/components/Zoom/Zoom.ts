@@ -341,10 +341,12 @@ class Zoom {
    * Инициализация модуля по data атрибутам
    */
   static hotInitialize(): void {
-    document.querySelectorAll('[data-faze="tooltip"]').forEach((tooltipNode) => {
-      new Faze.Tooltip(tooltipNode, {
-        text: tooltipNode.getAttribute('data-faze-tooltip-text') || '',
-        side: tooltipNode.getAttribute('data-faze-tooltip-side') || 'bottom',
+    document.querySelectorAll('[data-faze="zoom"]').forEach((zoomNode) => {
+      new Faze.Zoom(zoomNode, {
+        image: zoomNode.getAttribute('data-faze-zoom-image'),
+        side: zoomNode.getAttribute('data-faze-zoom-side') || 'right',
+        width: parseInt(zoomNode.getAttribute('data-faze-zoom-width') || '300', 10),
+        height: parseInt(zoomNode.getAttribute('data-faze-zoom-height') || '300', 10),
       });
     });
   }

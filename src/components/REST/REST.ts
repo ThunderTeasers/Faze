@@ -161,27 +161,49 @@ class REST {
         return attrJsonName.includes('.') ? attrJsonName.startsWith(`${jsonName}.`) : attrJsonName.startsWith(`${jsonName}`);
       });
 
+      // Проходимся по всем инпутам и собираем итоговый объект
       inputsNodes.forEach((itemNode: any) => {
-        // Проверка на то, является ли инпут чекбоксом или радио кнопкой
-        const isCheckboxOrRadio = ['radio', 'checkbox'].includes(itemNode.type);
+        // Проверка, является ли инпут чекбоксом
+        const isCheckbox = itemNode.type === 'checkbox';
 
-        // Если это не чекбокс или не радио кнопка ЛИБО если чекбокс или радио кнопка НО с флагом "checked", то есть выбранный
-        if (!isCheckboxOrRadio || (isCheckboxOrRadio && itemNode.checked)) {
-          // Мы должны вырезать из строки всё что идет до первой точки, т.к. это ключ для отправки в formData, если точки нет, это
-          // значит, что это ключ первого уровня, а для этого необходимо передать пустую строку
-          let jsonNameForObject = itemNode.dataset.fazeRestapiJsonName;
-          if (jsonNameForObject.includes('.')) {
-            jsonNameForObject = jsonNameForObject.substring(jsonNameForObject.indexOf('.') + 1);
-          } else {
-            jsonNameForObject = '';
-          }
+        // Проверка, является ли инпут радио кнопкой
+        const isRadioButton = itemNode.type === 'radio';
 
-          const key = itemNode.dataset.fazeRestapiJsonKey || itemNode.name;
-          const value = itemNode.dataset.fazeRestapiJsonValue || itemNode.value;
-          const arrayGroup = itemNode.dataset.fazeRestapiJsonArrayGroup || 'default';
+        // Пропускаем не нужные инпуты
+        if (
+          // Кнопки
+          ['button', 'submit'].includes(itemNode.type) ||
 
-          jsonObject = Faze.Helpers.objectFromString(jsonObject, jsonNameForObject, key, value, arrayGroup);
+          // Радио кнопки которые не в активном положении
+          (isRadioButton && !itemNode.checked) ||
+
+          // Чекбоксы в неактивном положении у которых нет data атрибута с значением неактивного положения, либо атрибут пустой
+          (isCheckbox && !itemNode.checked && !itemNode.getAttribute('data-faze-restapi-disabled-value'))
+        ) {
+          return;
         }
+
+        // Мы должны вырезать из строки всё что идет до первой точки, т.к. это ключ для отправки в formData, если точки нет, это
+        // значит, что это ключ первого уровня, а для этого необходимо передать пустую строку
+        let jsonNameForObject = itemNode.dataset.fazeRestapiJsonName;
+        if (jsonNameForObject.includes('.')) {
+          jsonNameForObject = jsonNameForObject.substring(jsonNameForObject.indexOf('.') + 1);
+        } else {
+          jsonNameForObject = '';
+        }
+
+        const key = itemNode.getAttribute('data-faze-restapi-json-key') || itemNode.name;
+        let value = itemNode.getAttribute('data-faze-restapi-json-value') || itemNode.value;
+
+        // Если это не активный чекбокс, то присваиваем ему значение из data атрибута
+        // Гарантированность того что оно задано обеспечивает условие сверху
+        if (isCheckbox && !itemNode.checked) {
+          value = itemNode.getAttribute('data-faze-restapi-disabled-value');
+        }
+
+        const arrayGroup = itemNode.dataset.fazeRestapiJsonArrayGroup || 'default';
+
+        jsonObject = Faze.Helpers.objectFromString(jsonObject, jsonNameForObject, key, value, arrayGroup);
 
         // Удаляем найденные поля из formdata
         if (formData.delete) {

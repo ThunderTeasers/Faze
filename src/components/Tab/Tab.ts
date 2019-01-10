@@ -6,30 +6,7 @@
  *
  * Автор: Ерохин Максим, plarson.ru
  * Дата: 26.09.2018
- *
- *
- * Пример использования
- * В JS:
- *   Faze.add({
- *     pluginName: 'ProductsTabs',
- *     plugins: ['Tab'],
- *     condition: document.querySelectorAll('.faze-tabs').length,
- *     callback: () => {
- *       new Faze.Tab(document.querySelector('.faze-tabs'));
- *     }
- *   });
- *
- * В HTML:
- *   <div class="faze-tabs">
- *     <div class="faze-tabs-headers">
- *       <div class="faze-tab-header" data-faze-tab-body="1">Таб 1</div>
- *       <div class="faze-tab-header" data-faze-tab-body="2">Таб 2</div>
- *     </div>
- *     <div class="faze-tabs-bodies">
- *       <div class="faze-tab-body" data-faze-tab-body="1">Тело 1</div>
- *       <div class="faze-tab-body" data-faze-tab-body="2">Тело 2</div>
- *     </div>
- *   </div>
+ * Документация: https://github.com/ThunderTeasers/Faze/wiki/Модуль-Tab
  */
 
 import './Tab.scss';
@@ -60,11 +37,11 @@ class Tab {
   // Конфиг с настройками
   readonly config: Config;
 
-  // Заголовки табов
-  headers: NodeListOf<HTMLElement>;
+  // DOM элементы заголовков табов
+  headersNodes: NodeListOf<HTMLElement>;
 
-  // Тела табов
-  bodies: NodeListOf<HTMLElement>;
+  // DOM элементы тел табов
+  bodiesNodes: NodeListOf<HTMLElement>;
 
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
@@ -91,18 +68,18 @@ class Tab {
    */
   initialize(): void {
     this.node.classList.add('faze-tabs');
-    this.headers = this.node.querySelectorAll(this.config.selectors.headers);
-    this.bodies = this.node.querySelectorAll(this.config.selectors.bodies);
+    this.headersNodes = this.node.querySelectorAll(this.config.selectors.headers);
+    this.bodiesNodes = this.node.querySelectorAll(this.config.selectors.bodies);
 
     // Активация первой вкладки по умолчанию
-    this.activateTab(this.headers[0].getAttribute('data-faze-tab-body'));
+    this.activateTab(this.headersNodes[0].getAttribute('data-faze-tab-body'));
   }
 
   /**
    * Навешивание событий
    */
   bind(): void {
-    this.headers.forEach((header) => {
+    this.headersNodes.forEach((header) => {
       header.addEventListener('click', (event) => {
         event.preventDefault();
 
@@ -117,20 +94,12 @@ class Tab {
    * @param key - ключ в data атрибутах по которому ищем шапку и тело
    */
   activateTab(key: string | null): void {
-    this.headers.forEach((head) => {
-      if (head.getAttribute('data-faze-tab-body') === key) {
-        head.classList.add('faze-active');
-      } else {
-        head.classList.remove('faze-active');
-      }
+    this.headersNodes.forEach((headerNode) => {
+      headerNode.classList.toggle('faze-active', headerNode.getAttribute('data-faze-tab-body') === key);
     });
 
-    this.bodies.forEach((body) => {
-      if (body.getAttribute('data-faze-tab-body') === key) {
-        body.style.display = 'block';
-      } else {
-        body.style.display = 'none';
-      }
+    this.bodiesNodes.forEach((bodyNode) => {
+      bodyNode.style.display = bodyNode.getAttribute('data-faze-tab-body') === key ? 'block' : 'none';
     });
   }
 

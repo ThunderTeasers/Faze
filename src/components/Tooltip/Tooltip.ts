@@ -160,7 +160,7 @@ class Tooltip {
   }
 
   /**
-   * Инициализация спойлеров по data атрибутам
+   * Инициализация модуля по data атрибутам
    */
   static hotInitialize(): void {
     document.querySelectorAll('[data-faze="tooltip"]').forEach((tooltipNode) => {

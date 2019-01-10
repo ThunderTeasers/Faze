@@ -23,16 +23,19 @@
  */
 
 import './Zoom.scss';
+import Faze from "../Core/Faze";
 
 /**
  * Структура конфига
  *
  * Содержит:
+ *   image  - путь к картинке оригинального масштаба
  *   side   - сторона с которой должно появится окно с увеличенной картиной, может быть: 'left', 'right', 'top', 'bottom'
  *   width  - ширина окна с увеличенной картинкой в пикселях
  *   height - высота окна с увеличенной картинкой в пикселях
  */
 interface Config {
+  image?: string;
   side: string;
   width: number;
   height: number;
@@ -105,6 +108,7 @@ class Zoom {
 
     // Конфиг по умолчанию
     const defaultConfig: Config = {
+      image: undefined,
       side: 'right',
       width: 300,
       height: 300,
@@ -176,7 +180,7 @@ class Zoom {
     }
 
     this.bigImageNode.className = 'faze-zoom-big-image';
-    const bigImageSource = this.node.getAttribute('data-faze-full-image');
+    const bigImageSource = this.config.image || this.node.getAttribute('data-faze-full-image');
     if (bigImageSource) {
       const bigImage = new Image();
       bigImage.src = bigImageSource;
@@ -331,6 +335,18 @@ class Zoom {
         this.calculate();
       };
     }
+  }
+
+  /**
+   * Инициализация модуля по data атрибутам
+   */
+  static hotInitialize(): void {
+    document.querySelectorAll('[data-faze="tooltip"]').forEach((tooltipNode) => {
+      new Faze.Tooltip(tooltipNode, {
+        text: tooltipNode.getAttribute('data-faze-tooltip-text') || '',
+        side: tooltipNode.getAttribute('data-faze-tooltip-side') || 'bottom',
+      });
+    });
   }
 }
 

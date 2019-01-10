@@ -715,7 +715,7 @@ class Carousel {
   }
 
   /**
-   * Инициализация карусели по data атрибутам
+   * Инициализация модуля по data атрибутам
    */
   static hotInitialize(): void {
     document.querySelectorAll('[data-faze="carousel"]').forEach((carouselNode) => {

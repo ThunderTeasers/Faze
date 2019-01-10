@@ -574,7 +574,7 @@ class Modal {
   }
 
   /**
-   * Инициализация формы по data атрибутам
+   * Инициализация модуля по data атрибутам
    */
   static hotInitialize(): void {
     Faze.on('click', '[data-faze="modal"]', (event, callerNode) => {

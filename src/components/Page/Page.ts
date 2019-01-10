@@ -316,7 +316,7 @@ class Page {
   }
 
   /**
-   * Инициализация бесконечной загрузки по data атрибутам
+   * Инициализация модуля по data атрибутам
    */
   static hotInitialize(): void {
     const pageInitializators = document.querySelectorAll('[data-faze="page"]');

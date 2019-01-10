@@ -135,7 +135,7 @@ class Tab {
   }
 
   /**
-   * Инициализация табов по data атрибутам
+   * Инициализация модуля по data атрибутам
    */
   static hotInitialize(): void {
     document.querySelectorAll('[data-faze="tab"]').forEach((tabsNode) => {

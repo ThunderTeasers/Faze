@@ -104,10 +104,11 @@ class Helpers {
    *
    * @param message         - текст или HTML код сообщения
    * @param cssClass        - CSS класс сообщения
+   * @param isNested        - нужно ли выстраивать сообщение один за другим или удалять предыдущее
    * @param time            - как долго оно должно отображаться, в миллисекундах
    * @param backgroundColor - цвет самой плашки сообщения
    */
-  static showNotification(message: string, cssClass: string = '', time: number = 3000, backgroundColor: string = '#14D100'): void {
+  static showNotification(message: string, cssClass: string = '', isNested: boolean = true, time: number = 3000, backgroundColor: string = '#14D100'): void {
     // DOM элемент обертки для информационнах сообщений, она нужна для того, чтобы сообщения шли друг под другом, если их несколько
     let notificationWrapperNode: HTMLDivElement | null = document.querySelector('.faze-notification-wrapper');
 
@@ -126,6 +127,11 @@ class Helpers {
     notificationNode.className = `faze-notification ${cssClass}`;
     notificationNode.innerHTML = message;
     notificationNode.style.backgroundColor = backgroundColor;
+
+    // Если поставлен флаг на удаление предыдущих сообщений, то делаем это
+    if (!isNested) {
+      notificationWrapperNode.innerHTML = '';
+    }
 
     // Добавляем его на страницу
     notificationWrapperNode.appendChild(notificationNode);

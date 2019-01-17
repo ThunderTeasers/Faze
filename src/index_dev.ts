@@ -126,6 +126,15 @@ Faze.add({
       });
     }
 
+    const notificationButtonNode = document.querySelector('.js-notification');
+    if (notificationButtonNode) {
+      notificationButtonNode.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        Faze.Helpers.showNotification('Тест');
+      });
+    }
+
     // let testObject = {};
     //
     // testObject = Faze.Helpers.objectFromString(testObject, 'offer.news', 'title', 'Hello!');

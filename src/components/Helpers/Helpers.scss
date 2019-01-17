@@ -1,0 +1,43 @@
+/**
+ * Стили для методов помощников
+ *
+ * Автор: Ерохин Максим, plarson.ru
+ * Дата: 17.01.2019
+ */
+
+@keyframes faze-notification-appear {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+// Обертка для информационнах сообщений, нужна для того, чтобы они шли друг под другом
+.faze-notification-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  display: block;
+  width: 100%;
+
+  z-index: 5;
+
+  // Информационное сообщение
+  .faze-notification {
+    display: block;
+    width: 100%;
+
+    padding: 1rem;
+
+    color: #fff;
+    font-size: 1.6rem;
+    text-align: center;
+
+    animation-name: faze-notification-appear;
+    animation-duration: 1s;
+  }
+}

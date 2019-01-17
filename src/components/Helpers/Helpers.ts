@@ -1,3 +1,5 @@
+import './Helpers.scss';
+
 class Helpers {
   /**
    * Асинхронная загрузка дополнительного JS
@@ -95,6 +97,48 @@ class Helpers {
       // Присваиваем собранный номер
       input.value = value;
     });
+  }
+
+  /**
+   * Показ информационного сообщения сверху экрана
+   *
+   * @param message         - текст или HTML код сообщения
+   * @param cssClass        - CSS класс сообщения
+   * @param time            - как долго оно должно отображаться, в миллисекундах
+   * @param backgroundColor - цвет самой плашки сообщения
+   */
+  static showNotification(message: string, cssClass: string = '', time: number = 3000, backgroundColor: string = '#14D100'): void {
+    // DOM элемент обертки для информационнах сообщений, она нужна для того, чтобы сообщения шли друг под другом, если их несколько
+    let notificationWrapperNode: HTMLDivElement | null = document.querySelector('.faze-notification-wrapper');
+
+    // Проверяем, существует ли DOM элемент обертки для информационных сообщений
+    if (!notificationWrapperNode) {
+      // Если он не существует, то значит это первое сообщение в пуле, а значит создаём его
+      notificationWrapperNode = document.createElement('div');
+      notificationWrapperNode.className = 'faze-notification-wrapper';
+
+      // Добавляем его на страницу
+      document.body.appendChild(notificationWrapperNode);
+    }
+
+    // Создаем DOM элемент сообщения
+    const notificationNode: HTMLDivElement = document.createElement('div');
+    notificationNode.className = `faze-notification ${cssClass}`;
+    notificationNode.innerHTML = message;
+    notificationNode.style.backgroundColor = backgroundColor;
+
+    // Добавляем его на страницу
+    notificationWrapperNode.appendChild(notificationNode);
+
+    // После истечения времени удаляем DOM элемент и декриментируем общее количество сообщений на странице
+    setTimeout(() => {
+      notificationNode.remove();
+
+      // Проверка на содержание в обертке информационных сообщений, если их нет, то удаляем саму обертку
+      if (notificationWrapperNode && notificationWrapperNode.querySelectorAll('.faze-notification').length === 0) {
+        notificationWrapperNode.remove();
+      }
+    }, time);
   }
 
   /**

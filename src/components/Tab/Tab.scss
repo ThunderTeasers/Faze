@@ -37,9 +37,9 @@
   // Тела табов
   .faze-tabs-bodies {
     .faze-tab-body {
-      padding: 1rem;
-
       display: none;
+
+      padding-top: 1rem;
 
       &:first-child {
         display: block;

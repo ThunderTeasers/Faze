@@ -1,5 +1,21 @@
 import './Helpers.scss';
 
+/**
+ * Структура настроек информационного сообщения
+ *
+ * Содержит:
+ *   class           - CSS класс сообщения
+ *   isNested        - нужно ли выстраивать сообщение один за другим или удалять предыдущее
+ *   time            - как долго оно должно отображаться, в миллисекундах
+ *   backgroundColor - цвет самой плашки сообщения
+ */
+interface NotificationOptions {
+  class: string;
+  isNested: boolean;
+  backgroundColor: string;
+  time: number;
+}
+
 class Helpers {
   /**
    * Асинхронная загрузка дополнительного JS
@@ -102,13 +118,10 @@ class Helpers {
   /**
    * Показ информационного сообщения сверху экрана
    *
-   * @param message         - текст или HTML код сообщения
-   * @param cssClass        - CSS класс сообщения
-   * @param isNested        - нужно ли выстраивать сообщение один за другим или удалять предыдущее
-   * @param time            - как долго оно должно отображаться, в миллисекундах
-   * @param backgroundColor - цвет самой плашки сообщения
+   * @param message - текст или HTML код сообщения
+   * @param options - настройки
    */
-  static showNotification(message: string, cssClass: string = '', isNested: boolean = true, time: number = 3000, backgroundColor: string = '#14D100'): void {
+  static showNotification(message: string, options: NotificationOptions = {class: '', isNested: true, time: 3000, backgroundColor: '#00b938'}): void {
     // DOM элемент обертки для информационнах сообщений, она нужна для того, чтобы сообщения шли друг под другом, если их несколько
     let notificationWrapperNode: HTMLDivElement | null = document.querySelector('.faze-notification-wrapper');
 
@@ -124,12 +137,12 @@ class Helpers {
 
     // Создаем DOM элемент сообщения
     const notificationNode: HTMLDivElement = document.createElement('div');
-    notificationNode.className = `faze-notification ${cssClass}`;
+    notificationNode.className = `faze-notification ${options.class}`;
     notificationNode.innerHTML = message;
-    notificationNode.style.backgroundColor = backgroundColor;
+    notificationNode.style.backgroundColor = options.backgroundColor;
 
     // Если поставлен флаг на удаление предыдущих сообщений, то делаем это
-    if (!isNested) {
+    if (!options.isNested) {
       notificationWrapperNode.innerHTML = '';
     }
 
@@ -144,7 +157,7 @@ class Helpers {
       if (notificationWrapperNode && notificationWrapperNode.querySelectorAll('.faze-notification').length === 0) {
         notificationWrapperNode.remove();
       }
-    }, time);
+    }, options.time);
   }
 
   /**

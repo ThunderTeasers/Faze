@@ -10,7 +10,7 @@ import './Helpers.scss';
  *   backgroundColor - цвет самой плашки сообщения
  */
 interface NotificationOptions {
-  class: string;
+  className: string;
   isNested: boolean;
   backgroundColor: string;
   time: number;
@@ -121,7 +121,9 @@ class Helpers {
    * @param message - текст или HTML код сообщения
    * @param options - настройки
    */
-  static showNotification(message: string, options: NotificationOptions = {class: '', isNested: true, time: 3000, backgroundColor: '#00b938'}): void {
+  static showNotification(message: string, options: NotificationOptions): void {
+    const {className = '', isNested = true, time = 3000, backgroundColor = '#00b938'} = options;
+
     // DOM элемент обертки для информационнах сообщений, она нужна для того, чтобы сообщения шли друг под другом, если их несколько
     let notificationWrapperNode: HTMLDivElement | null = document.querySelector('.faze-notification-wrapper');
 
@@ -137,12 +139,12 @@ class Helpers {
 
     // Создаем DOM элемент сообщения
     const notificationNode: HTMLDivElement = document.createElement('div');
-    notificationNode.className = `faze-notification ${options.class}`;
+    notificationNode.className = `faze-notification ${className}`;
     notificationNode.innerHTML = message;
-    notificationNode.style.backgroundColor = options.backgroundColor;
+    notificationNode.style.backgroundColor = backgroundColor;
 
     // Если поставлен флаг на удаление предыдущих сообщений, то делаем это
-    if (!options.isNested) {
+    if (!isNested) {
       notificationWrapperNode.innerHTML = '';
     }
 
@@ -157,7 +159,7 @@ class Helpers {
       if (notificationWrapperNode && notificationWrapperNode.querySelectorAll('.faze-notification').length === 0) {
         notificationWrapperNode.remove();
       }
-    }, options.time);
+    }, time);
   }
 
   /**

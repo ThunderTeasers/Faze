@@ -131,7 +131,9 @@ Faze.add({
       notificationButtonNode.addEventListener('click', (event) => {
         event.preventDefault();
 
-        Faze.Helpers.showNotification('Тест');
+        Faze.Helpers.showNotification('Тест', {
+          isNested: false,
+        });
       });
     }
 

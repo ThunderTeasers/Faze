@@ -42,14 +42,16 @@ import './Page.scss';
  * Структура возвращаемого объекта в пользовательском методе
  *
  * Содержит:
- *  node    - DOM элемент родителя
- *  button  - DOM элемент кнопки подгрузки
- *  items   - зашруженные элементы
+ *  node        - DOM элемент родителя
+ *  button      - DOM элемент кнопки подгрузки
+ *  items       - все DOM элементы объектов
+ *  loadedItems - новые DOM элементы объектов
  */
 interface CallbackData {
   node: HTMLElement;
   button: HTMLButtonElement;
   items: NodeListOf<HTMLElement>;
+  loadedItems?: NodeListOf<HTMLElement>;
 }
 
 /**
@@ -174,6 +176,7 @@ class Page {
           node: this.node,
           button: this.buttonLoadModeNode,
           items: this.node.querySelectorAll(this.config.selectors.items),
+          loadedItems: undefined,
         });
       } catch (error) {
         console.error('Ошибка исполнения пользовательской функции "created": ', error);
@@ -213,8 +216,11 @@ class Page {
           // Парсинг ответа
           const responseHTML = (new DOMParser()).parseFromString(response, 'text/html');
 
+          // DOM элементы загруженных объектов
+          const loadedItemNodes = responseHTML.querySelectorAll(this.config.selectors.items);
+
           // Фставка новых элементов
-          responseHTML.querySelectorAll(this.config.selectors.items).forEach((item) => {
+          loadedItemNodes.forEach((item) => {
             this.node.append(item);
           });
 
@@ -234,6 +240,7 @@ class Page {
                 node: this.node,
                 button: this.buttonLoadModeNode,
                 items: this.node.querySelectorAll(this.config.selectors.items),
+                loadedItems: <any>loadedItemNodes,
               });
             } catch (error) {
               console.error('Ошибка исполнения пользовательского метода "loaded"', error);

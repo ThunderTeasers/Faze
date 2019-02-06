@@ -70,6 +70,7 @@ interface Buttons {
  * Содержит:
  *   title        - заголовок окна
  *   url          - адрес с которого будет взят контент для вставки в тело
+ *   html         - HTML код для вставки в тела модельного окна, используется вместо указания "url"
  *   class        - CSS класс модального окна для кастомизации
  *   event        - событие при вызове которого на переданный элемент(node) должно вызываться модальное окно
  *   evented      - отображать модальное окно по событию или сразу
@@ -83,7 +84,8 @@ interface Buttons {
  */
 interface Config {
   title?: string;
-  url: string;
+  url?: string;
+  html?: string;
   class?: string;
   event: string;
   evented: boolean;
@@ -143,7 +145,8 @@ class Modal {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       title: '',
-      url: '',
+      url: undefined,
+      html: undefined,
       class: '',
       event: 'click',
       evented: true,
@@ -386,8 +389,12 @@ class Modal {
    * Получение контента со сторонней страницы, для последующей вставки в тело окна
    */
   async getContent(): Promise<string> {
-    const response = await fetch(this.config.url);
-    return await response.text();
+    if (this.config.url) {
+      const response = await fetch(this.config.url);
+      return await response.text();
+    } else {
+      return await this.config.html || '';
+    }
   }
 
   /**

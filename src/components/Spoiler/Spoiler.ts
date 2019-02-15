@@ -30,11 +30,13 @@ interface CallbackData {
  *   callbacks
  *     created  - пользовательский метод, исполняющийся при успешном создании спойлера
  *     opened   - пользовательский метод, исполняющийся при открытии спойлера
+ *     changed  - пользовательский метод, исполняющийся при изменении видимости спойлера
  */
 interface Config {
   callbacks: {
     created?: (data: CallbackData) => void;
     opened?: (data: CallbackData) => void;
+    changed?: (data: CallbackData) => void;
   };
 }
 
@@ -64,6 +66,7 @@ class Spoiler {
       callbacks: {
         created: undefined,
         opened: undefined,
+        changed: undefined,
       },
     };
 
@@ -123,6 +126,18 @@ class Spoiler {
             } catch (error) {
               console.error('Ошибка исполнения пользовательского метода "opened":', error);
             }
+          }
+        }
+
+        // Вызываем пользовательский метод
+        if (typeof this.config.callbacks.changed === 'function') {
+          try {
+            this.config.callbacks.changed({
+              title: this.titleNode,
+              body: this.bodyNode,
+            });
+          } catch (error) {
+            console.error('Ошибка исполнения пользовательского метода "changed":', error);
           }
         }
       });

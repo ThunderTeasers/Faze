@@ -12,11 +12,41 @@ import './Spoiler.scss';
 import Faze from '../Core/Faze';
 
 /**
+ * Структура возвращаемого объекта в пользовательском методе
+ *
+ * Содержит:
+ *   title  - заголовок спойлера
+ *   body   - тело спойлера
+ */
+interface CallbackData {
+  title: HTMLElement | null;
+  body: HTMLElement | null;
+}
+
+/**
+ * Структура конфига спойлера
+ *
+ * Содержит:
+ *   callbacks
+ *     created  - пользовательский метод, исполняющийся при успешном создании спойлера
+ *     opened   - пользовательский метод, исполняющийся при открытии спойлера
+ */
+interface Config {
+  callbacks: {
+    created?: (data: CallbackData) => void;
+    opened?: (data: CallbackData) => void;
+  };
+}
+
+/**
  * Класс дропдауна
  */
 class Spoiler {
   // DOM элемент при наведении на который появляется
   readonly node: HTMLElement;
+
+  // Конфиг с настройками
+  readonly config: Config;
 
   // DOM элемент заголовка спойлера
   readonly titleNode: HTMLElement | null;
@@ -24,10 +54,20 @@ class Spoiler {
   // DOM элемент тела спойлера
   readonly bodyNode: HTMLElement | null;
 
-  constructor(node: HTMLElement | null) {
+  constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
       throw new Error('Не задан объект спойлера');
     }
+
+    // Конфиг по умолчанию
+    const defaultConfig: Config = {
+      callbacks: {
+        created: undefined,
+        opened: undefined,
+      },
+    };
+
+    this.config = Object.assign(defaultConfig, config);
 
     // Инициализация переменных
     this.node = node;
@@ -50,6 +90,18 @@ class Spoiler {
     if (this.bodyNode) {
       this.bodyNode.classList.add('faze-body');
     }
+
+    // Вызываем пользовательский метод
+    if (typeof this.config.callbacks.created === 'function') {
+      try {
+        this.config.callbacks.created({
+          title: this.titleNode,
+          body: this.bodyNode,
+        });
+      } catch (error) {
+        console.error('Ошибка исполнения пользовательского метода "created":', error);
+      }
+    }
   }
 
   /**
@@ -59,6 +111,20 @@ class Spoiler {
     if (this.titleNode) {
       this.titleNode.addEventListener('click', () => {
         this.node.classList.toggle('faze-active');
+
+        if (this.node.classList.contains('faze-active')) {
+          // Вызываем пользовательский метод
+          if (typeof this.config.callbacks.opened === 'function') {
+            try {
+              this.config.callbacks.opened({
+                title: this.titleNode,
+                body: this.bodyNode,
+              });
+            } catch (error) {
+              console.error('Ошибка исполнения пользовательского метода "opened":', error);
+            }
+          }
+        }
       });
     }
   }

@@ -228,6 +228,9 @@ class Modal {
             console.error('Ошибка исполнения пользовательского метода "success":', e);
           }
         }
+
+        // Навешиваем события при нажатии клавиш
+        this.bindKeys();
       })
       .catch((error) => {
         console.error(`Ошибка при получении данных с сервера по адресу ${this.config.url}`, error);
@@ -287,13 +290,24 @@ class Modal {
     this.modalParts.closeButtonNode.addEventListener('click', (event) => {
       event.preventDefault();
 
-      document.body.classList.remove('faze-modal-opened');
-
-      // Сначала навешивается класс, а потом через указанное время удаляем окно со страницы, это нужно для того чтобы анимация
-      // (если она есть) успела проиграться и завершиться
-      this.modalParts.fullNode.classList.add('faze-closing');
-      setTimeout(() => this.modalParts.wrapperNode.remove(), this.config.delayToClose);
+      // Закрываем окно
+      this.close();
     });
+  }
+
+  /**
+   * Закрытие модального окна
+   */
+  close() {
+    document.body.classList.remove('faze-modal-opened');
+
+    // Сначала навешивается класс, а потом через указанное время удаляем окно со страницы, это нужно для того чтобы анимация
+    // (если она есть) успела проиграться и завершиться
+    this.modalParts.fullNode.classList.add('faze-closing');
+    setTimeout(() => this.modalParts.wrapperNode.remove(), this.config.delayToClose);
+
+    // Снимаем слушатели на нажатие кнопки
+    this.unbindKeys();
   }
 
   /**
@@ -340,6 +354,30 @@ class Modal {
 
       this.modalParts.footerNode.appendChild(buttonsNode);
     }
+  }
+
+  /**
+   * Колбек на нажатие клавиш
+   */
+  keyUpCallback(event: KeyboardEvent) {
+    // По нажатию на "Escape" закрываем окно
+    if (event.key === 'Escape') {
+      this.close();
+    }
+  }
+
+  /**
+   * Навешивание событий на нажатие клавиш
+   */
+  bindKeys() {
+    document.addEventListener('keyup', this.keyUpCallback.bind(this));
+  }
+
+  /**
+   * Удаление событий на нажатие клавиш
+   */
+  unbindKeys() {
+    document.removeEventListener('keyup', this.keyUpCallback.bind(this));
   }
 
   /**

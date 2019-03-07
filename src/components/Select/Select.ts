@@ -1,8 +1,6 @@
 /**
  * Плагин селекта
  *
- * Селект представляет из себя "стандартный" селект, только с возможностью кастомизирования через CSS стили.
- *
  * Автор: Ерохин Максим, plarson.ru
  * Дата: 26.09.2018
  *
@@ -62,6 +60,7 @@ interface CallbackData {
   title: HTMLElement | null;
   body: HTMLElement | null;
   value: string | null;
+  selectedOption?: HTMLElement;
 }
 
 /**
@@ -121,6 +120,9 @@ class Select {
    * Инициализация
    */
   initialize(): void {
+    // Простановка класса, если этого не было сделано руками
+    this.node.classList.add('faze-select');
+
     // Поиск основных элементов и проверка на то что они найдены
     this.title = this.node.querySelector('.faze-title');
     this.body = this.node.querySelector('.faze-body');
@@ -133,7 +135,7 @@ class Select {
     if (this.config.default) {
       // Вставляем изначальный(тот что был в заголовке) вариант первым
       this.initialOptionNode.className = 'faze-option';
-      this.initialOptionNode.setAttribute('data-faze-value', 'FAZE_INITIAL_TITLE');
+      this.initialOptionNode.dataset.fazeValue = 'FAZE_INITIAL_TITLE';
       this.initialOptionNode.textContent = this.title.textContent;
       this.initialOptionNode.style.display = 'none';
       this.body.insertBefore(this.initialOptionNode, this.body.firstChild);
@@ -142,10 +144,10 @@ class Select {
       this.options = this.body.querySelectorAll('.faze-option');
     } else {
       // Если нет, то делаем выбираем первую опцию по умолчанию
-      const firstOption = this.body.querySelector('.faze-option:first-child');
+      const firstOption = <HTMLElement>this.body.querySelector('.faze-option:first-child');
       if (firstOption) {
         this.title.textContent = firstOption.getAttribute('data-faze-caption') || firstOption.textContent;
-        this.value = firstOption.getAttribute('data-faze-value') || firstOption.textContent;
+        this.value = firstOption.dataset.fazeValue || firstOption.textContent;
 
         // Берем все опции в селекте
         this.options = this.body.querySelectorAll('.faze-option');
@@ -220,8 +222,8 @@ class Select {
         }
 
         // Меняем заголовок
-        this.title.textContent = option.getAttribute('data-caption') || option.textContent;
-        this.value = option.getAttribute('data-faze-value') || option.textContent;
+        this.title.textContent = option.dataset.caption || option.textContent;
+        this.value = option.dataset.fazeValue || option.textContent;
 
         // Закрываем селект
         this.node.classList.remove('faze-active');
@@ -236,6 +238,7 @@ class Select {
               title: this.title,
               body: this.body,
               value: this.value,
+              selectedOption: option,
             });
           } catch (error) {
             console.error('Ошибка исполнения пользовательского метода "changed":', error);
@@ -278,7 +281,7 @@ class Select {
    */
   hideOption(value: string | null) {
     this.options.forEach((option) => {
-      const optionValue = option.getAttribute('data-faze-value') || option.textContent;
+      const optionValue = option.dataset.fazeValue || option.textContent;
 
       if (optionValue === value) {
         option.style.display = 'none';

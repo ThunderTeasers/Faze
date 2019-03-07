@@ -29,6 +29,7 @@ import Page from '../Page/Page';
 import Filter from '../Filter/Filter';
 import Spoiler from '../Spoiler/Spoiler';
 import Gallery from '../Gallery/Gallery';
+import Slider from '../Slider/Slider';
 import REST from '../REST/REST';
 import Observer from './Observer';
 
@@ -98,6 +99,7 @@ class Faze {
   static Filter: any = Filter;
   static Dropdown: any = Dropdown;
   static Select: any = Select;
+  static Slider: any = Slider;
   static Observer: any = new Observer();
   static REST: any = REST;
 
@@ -140,7 +142,9 @@ class Faze {
       'Scroll',
       'Tab',
       'Dropdown',
+      'Slider',
       'Helpers',
+      'Observer',
       'Modal',
       'Filter',
       'REST',

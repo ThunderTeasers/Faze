@@ -30,6 +30,10 @@
         .faze-scroll .faze-scroll-vertical {
             width: 2rem !important;
         }
+
+        .js-slider {
+            margin: 2rem 0;
+        }
     </style><img src="https://via.placeholder.com/350x153" data-faze="gallery" data-faze-gallery-image="https://via.placeholder.com/350x153" alt="" >
     <script>
       function test(){
@@ -53,6 +57,8 @@
 	{ "method": "GET",  "module": "286910", "response-html": "#cart-state-1"},
 	{ "method": "GET",  "module": "286904", "response-html": "#cart-state-2"},
 	{"function":"test"}]'>ajaxDataAttr</button>
+
+    <div class="js-slider"></div>
 
     <div class="faze-tabs">
         <div class="faze-tabs-headers">
@@ -95,7 +101,7 @@
         </div>
     </div>
 
-    <form data-faze-restapi-form action="http://alfa-suvenir.plarson.ru/">
+    <form data-faze-restapi-form='[{"method":"get", "module":"123", "response_text":".offer-items-container","function":"fazeModalClose"}]' action="http://alfa-suvenir.plarson.ru/">
         <input type="hidden" name="show" value="295499">
         <input type="hidden" name="mime" value="json">
         <input type="hidden" name="order_action" value="send">

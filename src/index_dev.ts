@@ -22,10 +22,14 @@ new Faze.Modal(document.querySelector('#button'), {
   ],
 });
 
+// @ts-ignore
+window.test = () => {
+  console.log(123);
+};
+
 // Тесты
 Faze.add({
   pluginName: 'TooltipTest',
-  plugins: ['Page', 'Gallery', 'Form', 'Spoiler', 'Scroll', 'Zoom', 'Carousel', 'Select', 'Dropdown', 'Tab', 'Tooltip'],
   condition: document.querySelectorAll('#button').length > 0,
   callback: () => {
     new Faze.Tooltip(document.querySelector('#button'), {
@@ -96,6 +100,11 @@ Faze.add({
       },
     });
 
+    new Faze.Slider(document.querySelector('.js-slider'), {
+      points: [0, 10, 70],
+      range: [0, 100],
+    });
+
     // new Faze.Gallery(document.querySelectorAll('.image-product'), {});
 
     Faze.on('click', '.test-on', () => {
@@ -120,7 +129,7 @@ Faze.add({
       });
     });
 
-    const dataAttrButton = document.querySelector('[data-faze-restapi]');
+    const dataAttrButton = document.querySelector('[data-faze-restapi-attr]');
     if (dataAttrButton) {
       dataAttrButton.addEventListener('click', () => {
         Faze.REST.dataAttr(dataAttrButton);

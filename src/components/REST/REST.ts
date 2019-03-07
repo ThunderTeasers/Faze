@@ -87,6 +87,12 @@ class REST {
           });
         }
 
+        if (data['response_callback'] && typeof data['response_callback'] === 'string'
+          && data['response_callback'] in window
+          && (window as any)[data['response_callback']] instanceof Function) {
+          (window as any)[data['response_callback']](response);
+        }
+
         if (data['response_json'] && typeof data['response_json'] === 'string') {
           document.querySelectorAll(data['response_json']).forEach((el) => {
             el.innerHTML = response.message;

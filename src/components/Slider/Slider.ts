@@ -100,7 +100,7 @@ class Slider {
     this.checkConfig();
 
     // Инициализация переменных
-    this.ratio = this.node.getBoundingClientRect().width / this.config.range[1];
+    this.ratio = this.node.getBoundingClientRect().width / (this.config.range[1] - this.config.range[0]);
     this.pointsNodes = [];
     this.connectNode = null;
     this.isConnectNeeded = this.config.connect && this.config.points.length > 1;
@@ -204,8 +204,8 @@ class Slider {
        */
       const elementDrag = (event: any) => {
         // Рассчет новой позиции курсора
-        endMousePosition = startMousePosition - (event.clientX || event.touches[0].clientX);
-        startMousePosition = (event.clientX || event.touches[0].clientX);
+        endMousePosition = startMousePosition - (event.clientX || (event.touches ? event.touches[0].clientX : 0));
+        startMousePosition = (event.clientX || (event.touches ? event.touches[0].clientX : 0));
 
         // Ширина всего слайдера
         const sliderWidth = this.node.getBoundingClientRect().width;
@@ -246,7 +246,16 @@ class Slider {
         // Вызываем пользовательскую функцию
         if (typeof this.config.callbacks.changed === 'function') {
           // Собираем значения
-          const values = this.pointsNodes.map(pointNode => parseInt((parseFloat(pointNode.style.left || '0') / this.ratio).toString(), 10));
+          const values = this.pointsNodes.map((pointNode, i) => {
+            let value = Math.round(parseFloat((pointNode.offsetLeft / this.ratio).toString())) + this.config.range[0];
+
+            // Для последнего ползунка необходимо добавить значение равное половине его ширины
+            if (i === this.pointsNodes.length - 1) {
+              value += Math.round(parseFloat((pointNode.getBoundingClientRect().width / 2 / this.ratio).toString()));
+            }
+
+            return value;
+          });
 
           try {
             this.config.callbacks.changed({

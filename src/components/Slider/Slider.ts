@@ -28,6 +28,7 @@ interface CallbackData {
  *   range    - диапазон значений слайдера
  *   points   - координаты ползунков на слайдере
  *   connect  - флаг, указывающий на то, нужно ли заполнять пространство между точками или нет
+ *   pointsInPercent - флиг, указывающий на то, нужно ли делать первичный просчет расположения ползунков в процентах или нет
  *   callbacks
  *     created  - пользовательская функция, исполняющийся при успешном создании спойлера
  *     changed  - пользовательская функция, исполняющийся при изменении видимости спойлера
@@ -36,6 +37,7 @@ interface Config {
   range: number[];
   points: number[];
   connect: boolean;
+  pointsInPercent: boolean;
   callbacks: {
     created?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
@@ -83,6 +85,7 @@ class Slider {
       points,
       range: [parseInt(node.dataset.fazeSliderMin || '0', 10), parseInt(node.dataset.fazeSliderMax || '100', 10)],
       connect: true,
+      pointsInPercent: node.dataset.fazeSliderPointsInPercent === 'true',
       callbacks: {
         created: undefined,
         changed: undefined,
@@ -318,15 +321,33 @@ class Slider {
     // Создаем DOM элемент ползунка
     const pointNode = document.createElement('div');
     pointNode.className = 'faze-pointer';
-    pointNode.style.left = `${position * this.ratio}px`;
 
-    console.log(pointNode.style.left);
+    // Обычный рассчет позиции
+    let left = position * this.ratio;
+
+    // Рассчет позиции если необходимо считать через проценты
+    if (this.config.pointsInPercent) {
+      left = this.node.getBoundingClientRect().width * position / 100;
+    }
+
+    pointNode.style.left = `${left}px`;
 
     // Добавляем его в общий массив
     this.pointsNodes.push(pointNode);
 
     // Добавляем его в код страницы
     this.node.appendChild(pointNode);
+
+    // Ширина всего слайдера
+    const sliderWidth = this.node.getBoundingClientRect().width;
+
+    // Половина ширины ползунка
+    const halfPointWidth = pointNode.getBoundingClientRect().width / 2;
+
+    // Ограничение для последнего ползунка
+    if (pointNode.offsetLeft >= sliderWidth - halfPointWidth) {
+      pointNode.style.left = `${sliderWidth - halfPointWidth}px`;
+    }
   }
 
   /**

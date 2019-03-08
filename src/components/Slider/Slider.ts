@@ -287,8 +287,11 @@ class Slider {
       // Ширина - это расстояние между самыми крайними точками
       const width = this.pointsNodes[this.pointsNodes.length - 1].offsetLeft - this.pointsNodes[0].offsetLeft;
 
-      this.connectNode.style.width = `${width}px`;
-      this.connectNode.style.left = `${this.pointsNodes[0].offsetLeft + this.pointsNodes[0].getBoundingClientRect().width / 2}px`;
+      // Половина ширины ползунка
+      const halfPointWidth = this.pointsNodes[0].getBoundingClientRect().width / 2;
+
+      this.connectNode.style.width = `${width - halfPointWidth}px`;
+      this.connectNode.style.left = `${this.pointsNodes[0].offsetLeft + halfPointWidth}px`;
     }
   }
 

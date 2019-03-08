@@ -207,12 +207,15 @@ class Slider {
         // Ширина всего слайдера
         const sliderWidth = this.node.getBoundingClientRect().width;
 
+        // Половина ширины ползунка
+        const halfPointWidth = pointNode.getBoundingClientRect().width / 2;
+
         // Проверки на выход из границ
         let position = pointNode.offsetLeft - endMousePosition;
         if (position <= 0) {
           position = 0;
-        } else if (position >= sliderWidth) {
-          position = sliderWidth;
+        } else if (position >= sliderWidth - halfPointWidth) {
+          position = sliderWidth - halfPointWidth;
         }
 
         // Проверка на заезд дальше следующего ползунка
@@ -261,6 +264,11 @@ class Slider {
 
         document.removeEventListener('mousemove', <any>elementDrag);
         document.removeEventListener('touchmove', <any>elementDrag);
+
+        // Просчёт положения и размера соединительной полоски
+        if (this.isConnectNeeded) {
+          this.calculateConnect();
+        }
       };
 
       // Навешиваем событие перетаскивания
@@ -290,7 +298,13 @@ class Slider {
       // Половина ширины ползунка
       const halfPointWidth = this.pointsNodes[0].getBoundingClientRect().width / 2;
 
-      this.connectNode.style.width = `${width - halfPointWidth}px`;
+      // Проверка чтобы размер линии не ушел в минус
+      let connectWidth = width - halfPointWidth;
+      if (connectWidth < 0) {
+        connectWidth = 0;
+      }
+
+      this.connectNode.style.width = `${connectWidth}px`;
       this.connectNode.style.left = `${this.pointsNodes[0].offsetLeft + halfPointWidth}px`;
     }
   }
@@ -305,6 +319,8 @@ class Slider {
     const pointNode = document.createElement('div');
     pointNode.className = 'faze-pointer';
     pointNode.style.left = `${position * this.ratio}px`;
+
+    console.log(pointNode.style.left);
 
     // Добавляем его в общий массив
     this.pointsNodes.push(pointNode);

@@ -103,12 +103,12 @@ Faze.add({
     const slider = new Faze.Slider(document.querySelector('.js-slider'), {
       callbacks: {
         changed: (data: any) => {
-          console.log(data.values);
+          // console.log(data.values);
         },
       },
     });
 
-    slider.setValues([75]);
+    slider.setValues([0]);
 
     // new Faze.Gallery(document.querySelectorAll('.image-product'), {});
 

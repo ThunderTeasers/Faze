@@ -479,6 +479,21 @@ class Slider {
   reset() {
     this.setValues(this.config.points, this.config.pointsInPercent);
   }
+
+  /**
+   * Сброс значения ползунка
+   *
+   * @param index - индекс ползунка
+   */
+  resetValue(index: number) {
+    // Проверка на валидность
+    if (index > this.config.points.length - 1 && index < 0) {
+      this.logger.error(`Попытка сбросить несуществующий ползунок с индексом ${index}`);
+    }
+
+    // Сброс значения
+    this.setValue(index, this.config.points[index]);
+  }
 }
 
 export default Slider;

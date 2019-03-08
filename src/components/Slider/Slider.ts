@@ -334,7 +334,7 @@ class Slider {
     }
 
     // Проверка на заезд до следующего ползунка
-    if (prevPointNode && index !== 0) {
+    if (prevPointNode && index !== 0 && this.pointsNodes.length > 1) {
       if (tmpPosition <= prevPointNode.offsetLeft) {
         tmpPosition = prevPointNode.offsetLeft;
       }
@@ -455,7 +455,7 @@ class Slider {
       let value = Math.round(parseFloat((pointNode.offsetLeft / this.ratio).toString())) + this.config.range[0];
 
       // Для последнего ползунка необходимо добавить значение равное половине его ширины
-      if (i === this.pointsNodes.length - 1) {
+      if (i === this.pointsNodes.length - 1 && this.pointsNodes.length > 1) {
         value += Math.round(parseFloat((pointNode.getBoundingClientRect().width / 2 / this.ratio).toString()));
       }
 

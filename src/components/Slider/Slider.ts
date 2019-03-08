@@ -135,7 +135,7 @@ class Slider {
     // Вызываем пользовательскую функцию
     if (typeof this.config.callbacks.created === 'function') {
       // Собираем значения
-      const values = this.pointsNodes.map(pointNode => parseInt((parseFloat(pointNode.style.left || '0') / this.ratio).toString(), 10));
+      const values = this.getValues();
 
       try {
         this.config.callbacks.created({
@@ -150,7 +150,7 @@ class Slider {
   /**
    * Инициализация ползунков
    */
-  initializePoints() {
+  initializePoints(): void {
     // Создаем ползунки
     this.config.points.forEach((point) => {
       this.createPoint(point);
@@ -160,14 +160,14 @@ class Slider {
   /**
    * Навешивание событий
    */
-  bind() {
+  bind(): void {
     this.bindPoints();
   }
 
   /**
    * Навешивание событий перетаскивания мышкой и пальцем на ползунки
    */
-  bindPoints() {
+  bindPoints(): void {
     this.pointsNodes.forEach((pointNode, i) => {
       // Начальная позиция мыши
       let startMousePosition = 0;
@@ -246,16 +246,7 @@ class Slider {
         // Вызываем пользовательскую функцию
         if (typeof this.config.callbacks.changed === 'function') {
           // Собираем значения
-          const values = this.pointsNodes.map((pointNode, i) => {
-            let value = Math.round(parseFloat((pointNode.offsetLeft / this.ratio).toString())) + this.config.range[0];
-
-            // Для последнего ползунка необходимо добавить значение равное половине его ширины
-            if (i === this.pointsNodes.length - 1) {
-              value += Math.round(parseFloat((pointNode.getBoundingClientRect().width / 2 / this.ratio).toString()));
-            }
-
-            return value;
-          });
+          const values = this.getValues();
 
           try {
             this.config.callbacks.changed({
@@ -292,7 +283,7 @@ class Slider {
   /**
    * Создание соединительной полоски
    */
-  createConnect() {
+  createConnect(): void {
     this.connectNode = document.createElement('div');
     this.connectNode.className = 'faze-connect';
 
@@ -302,7 +293,7 @@ class Slider {
   /**
    * Расчет положения и ширины соединительной полоски
    */
-  calculateConnect() {
+  calculateConnect(): void {
     if (this.connectNode) {
       // Ширина - это расстояние между самыми крайними точками
       const width = this.pointsNodes[this.pointsNodes.length - 1].offsetLeft - this.pointsNodes[0].offsetLeft;
@@ -326,7 +317,7 @@ class Slider {
    *
    * @param position - его положение на слайдере
    */
-  createPoint(position: number) {
+  createPoint(position: number): void {
     // Создаем DOM элемент ползунка
     const pointNode = document.createElement('div');
     pointNode.className = 'faze-pointer';
@@ -362,14 +353,14 @@ class Slider {
   /**
    * Проверка конфига на кооректность
    */
-  checkConfig() {
+  checkConfig(): void {
     this.checkRange();
   }
 
   /**
    * Проверка диапазона
    */
-  checkRange() {
+  checkRange(): void {
     // Если не задан диапазон
     if (!this.config.range) {
       this.logger.error('Не задан диапазон значений для слайдера!');
@@ -387,7 +378,7 @@ class Slider {
    * @param index - индекс ползунка
    * @param value - значение
    */
-  setValue(index: number, value: number) {
+  setValue(index: number, value: number): void {
     const pointNode = this.pointsNodes[index];
     if (pointNode) {
       pointNode.style.left = `${value * this.ratio}px`;
@@ -402,9 +393,25 @@ class Slider {
    *
    * @param values - массив значений, где индекс значения равен индексу точки
    */
-  setValues(values: number[]) {
+  setValues(values: number[]): void {
     values.forEach((value, i) => {
       this.setValue(i, value);
+    });
+  }
+
+  /**
+   * Получение значений ползунков
+   */
+  getValues(): number[] {
+    return this.pointsNodes.map((pointNode, i) => {
+      let value = Math.round(parseFloat((pointNode.offsetLeft / this.ratio).toString())) + this.config.range[0];
+
+      // Для последнего ползунка необходимо добавить значение равное половине его ширины
+      if (i === this.pointsNodes.length - 1) {
+        value += Math.round(parseFloat((pointNode.getBoundingClientRect().width / 2 / this.ratio).toString()));
+      }
+
+      return value;
     });
   }
 }

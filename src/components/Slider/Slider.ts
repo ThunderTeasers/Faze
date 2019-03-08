@@ -65,9 +65,6 @@ class Slider {
   // DOM элемент соединительной полоски
   connectNode: HTMLElement | null;
 
-  // Флаг определяющий нужна ли соединительная полоса
-  isConnectNeeded: boolean;
-
   // Отношение ширины слайдера и его возможного максимального значения
   ratio: number;
 
@@ -106,7 +103,6 @@ class Slider {
     this.ratio = this.node.getBoundingClientRect().width / (this.config.range[1] - this.config.range[0]);
     this.pointsNodes = [];
     this.connectNode = null;
-    this.isConnectNeeded = this.config.connect && this.config.points.length > 1;
 
     // Инициализация
     this.initialize();
@@ -123,7 +119,7 @@ class Slider {
     this.node.classList.add('faze-slider');
 
     // Инициализируем соединительную полоску, если необходимо
-    if (this.isConnectNeeded) {
+    if (this.config.connect) {
       this.createConnect();
     }
 
@@ -131,7 +127,7 @@ class Slider {
     this.initializePoints();
 
     // Делаем просчёт позиции и размера полоски после инициализации точек
-    if (this.isConnectNeeded) {
+    if (this.config.connect) {
       this.calculateConnect();
     }
 
@@ -214,7 +210,7 @@ class Slider {
         this.move(pointNode, nextPointNode, prevPointNode, pointNode.offsetLeft - endMousePosition, i);
 
         // Просчёт положения и размера соединительной полоски
-        if (this.isConnectNeeded) {
+        if (this.config.connect) {
           this.calculateConnect();
         }
 
@@ -244,7 +240,7 @@ class Slider {
         document.removeEventListener('touchmove', <any>elementDrag);
 
         // Просчёт положения и размера соединительной полоски
-        if (this.isConnectNeeded) {
+        if (this.config.connect) {
           this.calculateConnect();
         }
 
@@ -296,8 +292,14 @@ class Slider {
         connectWidth = 0;
       }
 
-      this.connectNode.style.width = `${connectWidth}px`;
-      this.connectNode.style.left = `${this.pointsNodes[0].offsetLeft + halfPointWidth}px`;
+      // Если только один ползунок, тогда считаем от левого края до него, если несколько то между первым и последним
+      if (this.pointsNodes.length === 1) {
+        this.connectNode.style.width = `${this.pointsNodes[0].offsetLeft}px`;
+        this.connectNode.style.left = '0';
+      } else {
+        this.connectNode.style.width = `${connectWidth}px`;
+        this.connectNode.style.left = `${this.pointsNodes[0].offsetLeft + halfPointWidth}px`;
+      }
     }
   }
 

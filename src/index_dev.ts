@@ -100,7 +100,8 @@ Faze.add({
       },
     });
 
-    const slider = new Faze.Slider(document.querySelector('.js-slider'), {
+    // const slider =
+    new Faze.Slider(document.querySelector('.js-slider'), {
       callbacks: {
         changed: (data: any) => {
           console.log(data.values);
@@ -108,8 +109,8 @@ Faze.add({
       },
     });
 
-    slider.setValues([0, 100], true);
-    slider.reset();
+    // slider.setValues([0, 100], true);
+    // slider.reset();
 
     // new Faze.Gallery(document.querySelectorAll('.image-product'), {});
 

@@ -376,11 +376,11 @@ class Slider {
     const sliderWidth = this.node.getBoundingClientRect().width;
 
     // Половина ширины ползунка
-    const halfPointWidth = pointNode.getBoundingClientRect().width / 2;
+    const pointWidth = pointNode.getBoundingClientRect().width;
 
     // Ограничение для последнего ползунка
-    if (pointNode.offsetLeft >= sliderWidth - halfPointWidth) {
-      pointNode.style.left = `${sliderWidth - halfPointWidth}px`;
+    if (pointNode.offsetLeft >= sliderWidth - pointWidth) {
+      pointNode.style.left = `${sliderWidth - pointWidth}px`;
     }
   }
 

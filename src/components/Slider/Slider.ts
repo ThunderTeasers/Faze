@@ -32,6 +32,7 @@ interface CallbackData {
  *   callbacks
  *     created  - пользовательская функция, исполняющийся при успешном создании спойлера
  *     changed  - пользовательская функция, исполняющийся при изменении видимости спойлера
+ *     stopped  - пользовательская функция, исполняющаяся после отпускания пальца/мышки
  */
 interface Config {
   range: number[];
@@ -41,6 +42,7 @@ interface Config {
   callbacks: {
     created?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
+    stopped?: (data: CallbackData) => void;
   };
 }
 
@@ -89,6 +91,7 @@ class Slider {
       callbacks: {
         created: undefined,
         changed: undefined,
+        stopped: undefined,
       },
     };
 
@@ -271,6 +274,20 @@ class Slider {
         // Просчёт положения и размера соединительной полоски
         if (this.isConnectNeeded) {
           this.calculateConnect();
+        }
+
+        // Вызываем пользовательскую функцию
+        if (typeof this.config.callbacks.stopped === 'function') {
+          // Собираем значения
+          const values = this.getValues();
+
+          try {
+            this.config.callbacks.stopped({
+              values,
+            });
+          } catch (error) {
+            this.logger.error(`Ошибка исполнения пользовательского метода "stopped", дословно: ${error}!`);
+          }
         }
       };
 

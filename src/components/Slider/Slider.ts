@@ -210,36 +210,8 @@ class Slider {
         endMousePosition = startMousePosition - (event.clientX || (event.touches ? event.touches[0].clientX : 0));
         startMousePosition = (event.clientX || (event.touches ? event.touches[0].clientX : 0));
 
-        // Ширина всего слайдера
-        const sliderWidth = this.node.getBoundingClientRect().width;
-
-        // Половина ширины ползунка
-        const halfPointWidth = pointNode.getBoundingClientRect().width / 2;
-
-        // Проверки на выход из границ
-        let position = pointNode.offsetLeft - endMousePosition;
-        if (position <= 0) {
-          position = 0;
-        } else if (position >= sliderWidth - halfPointWidth) {
-          position = sliderWidth - halfPointWidth;
-        }
-
-        // Проверка на заезд дальше следующего ползунка
-        if (nextPointNode) {
-          if (position >= nextPointNode.offsetLeft) {
-            position = nextPointNode.offsetLeft;
-          }
-        }
-
-        // Проверка на заезд до следующего ползунка
-        if (prevPointNode && i !== 0) {
-          if (position <= prevPointNode.offsetLeft) {
-            position = prevPointNode.offsetLeft;
-          }
-        }
-
-        // Рассчет новой позиции скролбара
-        pointNode.style.left = `${position}px`;
+        // Передвижение ползунка
+        this.move(pointNode, nextPointNode, prevPointNode, pointNode.offsetLeft - endMousePosition, i);
 
         // Просчёт положения и размера соединительной полоски
         if (this.isConnectNeeded) {
@@ -330,6 +302,49 @@ class Slider {
   }
 
   /**
+   * Передвижение ползунка
+   *
+   * @param pointNode     - DOM элемент ползунка
+   * @param nextPointNode - DOM элемент следующего ползунка
+   * @param prevPointNode - DOM элемент предыдущего ползунка
+   * @param position      - новое значение ползунка
+   * @param index         - индекс ползунка
+   */
+  move(pointNode: HTMLElement, nextPointNode: HTMLElement, prevPointNode: HTMLElement, position: number, index: number) {
+    let tmpPosition = position;
+
+    // Ширина всего слайдера
+    const sliderWidth = this.node.getBoundingClientRect().width;
+
+    // Половина ширины ползунка
+    const halfPointWidth = pointNode.getBoundingClientRect().width / 2;
+
+    // Проверки на выход из границ
+    if (tmpPosition <= 0) {
+      tmpPosition = 0;
+    } else if (position >= sliderWidth - halfPointWidth) {
+      tmpPosition = sliderWidth - halfPointWidth;
+    }
+
+    // Проверка на заезд дальше следующего ползунка
+    if (nextPointNode) {
+      if (tmpPosition >= nextPointNode.offsetLeft) {
+        tmpPosition = nextPointNode.offsetLeft;
+      }
+    }
+
+    // Проверка на заезд до следующего ползунка
+    if (prevPointNode && index !== 0) {
+      if (tmpPosition <= prevPointNode.offsetLeft) {
+        tmpPosition = prevPointNode.offsetLeft;
+      }
+    }
+
+    // Рассчет новой позиции скролбара
+    pointNode.style.left = `${tmpPosition}px`;
+  }
+
+  /**
    * Создание ползунка
    *
    * @param position - его положение на слайдере
@@ -396,9 +411,25 @@ class Slider {
    * @param value - значение
    */
   setValue(index: number, value: number): void {
+    // DOM элемент ползунка
     const pointNode = this.pointsNodes[index];
     if (pointNode) {
-      pointNode.style.left = `${value * this.ratio}px`;
+      // DOM элемент следующего ползунка
+      const nextPointNode = <HTMLElement>pointNode.nextSibling;
+
+      // DOM элемент предыдущего ползунка
+      const prevPointNode = <HTMLElement>pointNode.previousSibling;
+
+      // Высчитываем значение
+      let position = value - this.config.range[0];
+
+      // Ограничения
+      if (position <= 0) {
+        position = 0;
+      }
+
+      // Передвигаем ползунок на нужное место
+      this.move(pointNode, nextPointNode, prevPointNode, position * this.ratio, index);
     }
 
     // Пересчёт соединительной полосы

@@ -108,7 +108,8 @@ Faze.add({
       },
     });
 
-    slider.setValues([0]);
+    slider.setValues([0, 100], true);
+    slider.reset();
 
     // new Faze.Gallery(document.querySelectorAll('.image-product'), {});
 

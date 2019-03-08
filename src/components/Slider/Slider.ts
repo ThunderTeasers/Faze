@@ -407,10 +407,11 @@ class Slider {
   /**
    * Простановка значения для точки с указанным индексом
    *
-   * @param index - индекс ползунка
-   * @param value - значение
+   * @param index     - индекс ползунка
+   * @param value     - значение
+   * @param inPercent - значение в процентах или нет
    */
-  setValue(index: number, value: number): void {
+  setValue(index: number, value: number, inPercent: boolean = false): void {
     // DOM элемент ползунка
     const pointNode = this.pointsNodes[index];
     if (pointNode) {
@@ -420,16 +421,24 @@ class Slider {
       // DOM элемент предыдущего ползунка
       const prevPointNode = <HTMLElement>pointNode.previousSibling;
 
-      // Высчитываем значение
+      // Высчитываем значение, необходимо отнять минимальное значение т.к. оно принимается за начало отсчета
       let position = value - this.config.range[0];
 
-      // Ограничения
+      // Ограничиваем выход в минус
       if (position <= 0) {
         position = 0;
       }
 
+      // Обычный рассчет позиции
+      let left = position * this.ratio;
+
+      // Рассчет позиции если необходимо считать через проценты
+      if (inPercent) {
+        left = this.node.getBoundingClientRect().width * value / 100;
+      }
+
       // Передвигаем ползунок на нужное место
-      this.move(pointNode, nextPointNode, prevPointNode, position * this.ratio, index);
+      this.move(pointNode, nextPointNode, prevPointNode, left, index);
     }
 
     // Пересчёт соединительной полосы
@@ -440,10 +449,11 @@ class Slider {
    * Простановка значений для точек
    *
    * @param values - массив значений, где индекс значения равен индексу точки
+   * @param inPercent - значение в процентах или нет
    */
-  setValues(values: number[]): void {
+  setValues(values: number[], inPercent: boolean = false): void {
     values.forEach((value, i) => {
-      this.setValue(i, value);
+      this.setValue(i, value, inPercent);
     });
   }
 
@@ -461,6 +471,13 @@ class Slider {
 
       return value;
     });
+  }
+
+  /**
+   * Сброс слайдера в первоначальное положение
+   */
+  reset() {
+    this.setValues(this.config.points, this.config.pointsInPercent);
   }
 }
 

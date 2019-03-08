@@ -122,6 +122,20 @@ class Slider {
     if (this.isConnectNeeded) {
       this.calculateConnect();
     }
+
+    // Вызываем пользовательскую функцию
+    if (typeof this.config.callbacks.created === 'function') {
+      // Собираем значения
+      const values = this.pointsNodes.map(pointNode => parseInt((parseFloat(pointNode.style.left || '0') / this.ratio).toString(), 10));
+
+      try {
+        this.config.callbacks.created({
+          values,
+        });
+      } catch (error) {
+        this.logger.error(`Ошибка исполнения пользовательского метода "created", дословно: ${error}!`);
+      }
+    }
   }
 
   /**
@@ -227,7 +241,7 @@ class Slider {
               values,
             });
           } catch (error) {
-            console.error('Ошибка исполнения пользовательского метода "changed":', error);
+            this.logger.error(`Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`);
           }
         }
       };

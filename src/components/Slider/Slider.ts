@@ -74,7 +74,7 @@ class Slider {
 
     // Конфиг по умолчанию
     const defaultConfig: Config = {
-      range: [0, 100],
+      range: [parseInt(node.dataset.fazeSliderMin || '0', 10), parseInt(node.dataset.fazeSliderMax || '100', 10)],
       points: [50],
       connect: true,
       callbacks: {

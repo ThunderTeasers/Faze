@@ -101,7 +101,6 @@ Faze.add({
     });
 
     const slider = new Faze.Slider(document.querySelector('.js-slider'), {
-      points: [0],
       callbacks: {
         changed: (data: any) => {
           console.log(data.values);

@@ -72,10 +72,16 @@ class Slider {
       throw new Error('Не задан объект слайдера!');
     }
 
+    // Инициализация переменных из конфига
+    let points = [0];
+    if (node && node.dataset.fazeSliderPoints) {
+      points = node.dataset.fazeSliderPoints.split(',').map(point => parseInt(point, 10));
+    }
+
     // Конфиг по умолчанию
     const defaultConfig: Config = {
+      points,
       range: [parseInt(node.dataset.fazeSliderMin || '0', 10), parseInt(node.dataset.fazeSliderMax || '100', 10)],
-      points: [50],
       connect: true,
       callbacks: {
         created: undefined,
@@ -337,6 +343,9 @@ class Slider {
     if (pointNode) {
       pointNode.style.left = `${value * this.ratio}px`;
     }
+
+    // Пересчёт соединительной полосы
+    this.calculateConnect();
   }
 
   /**

@@ -28,4 +28,14 @@
 
     user-select: none;
   }
+
+  // Соединительная полоса
+  .faze-connect {
+    position: absolute;
+    top: 0;
+
+    height: 0.3rem;
+
+    background-color: #000;
+  }
 }

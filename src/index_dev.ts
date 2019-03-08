@@ -100,10 +100,17 @@ Faze.add({
       },
     });
 
-    new Faze.Slider(document.querySelector('.js-slider'), {
-      points: [0, 10, 70],
+    const slider = new Faze.Slider(document.querySelector('.js-slider'), {
+      points: [0],
       range: [0, 100],
+      callbacks: {
+        changed: (data: any) => {
+          // console.log(data.values);
+        },
+      },
     });
+
+    slider.setValues([75]);
 
     // new Faze.Gallery(document.querySelectorAll('.image-product'), {});
 

@@ -319,14 +319,7 @@ class Slider {
     const sliderWidth = this.node.getBoundingClientRect().width;
 
     // Половина ширины ползунка
-    const halfPointWidth = pointNode.getBoundingClientRect().width / 2;
-
-    // Проверки на выход из границ
-    if (tmpPosition <= 0) {
-      tmpPosition = 0;
-    } else if (position >= sliderWidth - halfPointWidth) {
-      tmpPosition = sliderWidth - halfPointWidth;
-    }
+    const pointWidth = pointNode.getBoundingClientRect().width;
 
     // Проверка на заезд дальше следующего ползунка
     if (nextPointNode) {
@@ -340,6 +333,13 @@ class Slider {
       if (tmpPosition <= prevPointNode.offsetLeft) {
         tmpPosition = prevPointNode.offsetLeft;
       }
+    }
+
+    // Проверки на выход из границ
+    if (tmpPosition <= 0) {
+      tmpPosition = 0;
+    } else if (position >= sliderWidth - pointWidth) {
+      tmpPosition = sliderWidth - pointWidth;
     }
 
     // Рассчет новой позиции скролбара
@@ -468,7 +468,7 @@ class Slider {
 
       // Для последнего ползунка необходимо добавить значение равное половине его ширины
       if (i === this.pointsNodes.length - 1 && this.pointsNodes.length > 1) {
-        value += Math.round(parseFloat((pointNode.getBoundingClientRect().width / 2 / this.ratio).toString()));
+        value += Math.round(parseFloat((pointNode.getBoundingClientRect().width / this.ratio).toString()));
       }
 
       return value;

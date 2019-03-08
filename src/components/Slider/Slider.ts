@@ -494,7 +494,7 @@ class Slider {
     }
 
     // Сброс значения
-    this.setValue(index, this.config.points[index]);
+    this.setValue(index, this.config.points[index], this.config.pointsInPercent);
   }
 }
 

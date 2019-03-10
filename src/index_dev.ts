@@ -43,8 +43,8 @@ Faze.add({
       strictPosition: true,
     });
 
-    new Faze.Select(document.querySelector('.faze-select'), {
-      default: false,
+    const fazeSelect = new Faze.Select(document.querySelector('.faze-select'), {
+      default: true,
       callbacks: {
         created: (data: any) => {
           console.log(data);
@@ -52,8 +52,13 @@ Faze.add({
         opened: (data: any) => {
           console.log('opened', data);
         },
+        changed: (data: any) => {
+          console.log('changed', data);
+        },
       },
     });
+
+    fazeSelect.setValue('Выбор 2');
 
     new Faze.Carousel(document.querySelector('.carousel-test'), {
       autoplay: false,

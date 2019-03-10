@@ -141,7 +141,7 @@ class Slider {
           values,
         });
       } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "created", дословно: ${error}!`);
+        return this.logger.error(`Ошибка исполнения пользовательского метода "created", дословно: ${error}!`);
       }
     }
   }
@@ -201,7 +201,7 @@ class Slider {
        *
        * @param event - событие мыши
        */
-      const elementDrag = (event: any) => {
+      const elementDrag = (event: any): void => {
         // Рассчет новой позиции курсора
         endMousePosition = startMousePosition - (event.clientX || (event.touches ? event.touches[0].clientX : 0));
         startMousePosition = (event.clientX || (event.touches ? event.touches[0].clientX : 0));
@@ -224,7 +224,7 @@ class Slider {
               values,
             });
           } catch (error) {
-            this.logger.error(`Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`);
+            return this.logger.error(`Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`);
           }
         }
       };
@@ -232,7 +232,7 @@ class Slider {
       /**
        * Завершение перетаскивания(момент отпускания кнопки мыши), удаляем все слушатели, т.к. они создаются при каждом новом перетаскивании
        */
-      const endDragElement = () => {
+      const endDragElement = (): void => {
         document.removeEventListener('mouseup', <any>endDragElement);
         document.removeEventListener('touchend', <any>endDragElement);
 
@@ -254,7 +254,7 @@ class Slider {
               values,
             });
           } catch (error) {
-            this.logger.error(`Ошибка исполнения пользовательского метода "stopped", дословно: ${error}!`);
+            return this.logger.error(`Ошибка исполнения пользовательского метода "stopped", дословно: ${error}!`);
           }
         }
       };
@@ -397,12 +397,12 @@ class Slider {
   checkRange(): void {
     // Если не задан диапазон
     if (!this.config.range) {
-      this.logger.error('Не задан диапазон значений для слайдера!');
+      return this.logger.error('Не задан диапазон значений для слайдера!');
     }
 
     // Если только одно значение
     if (this.config.range.length !== 2) {
-      this.logger.error('Необходимо задать два значения в поле "range"!');
+      return this.logger.error('Необходимо задать два значения в поле "range"!');
     }
   }
 
@@ -478,7 +478,7 @@ class Slider {
   /**
    * Сброс слайдера в первоначальное положение
    */
-  reset() {
+  reset(): void {
     this.setValues(this.config.points, this.config.pointsInPercent);
   }
 
@@ -487,10 +487,10 @@ class Slider {
    *
    * @param index - индекс ползунка
    */
-  resetValue(index: number) {
+  resetValue(index: number): void {
     // Проверка на валидность
     if (index > this.config.points.length - 1 && index < 0) {
-      this.logger.error(`Попытка сбросить несуществующий ползунок с индексом ${index}`);
+      return this.logger.error(`Попытка сбросить несуществующий ползунок с индексом ${index}`);
     }
 
     // Сброс значения

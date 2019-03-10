@@ -21,7 +21,7 @@ class Logger {
    *
    * @param message - сообщение которое необходимо отобразить
    */
-  error(message: string) {
+  error(message: string): never {
     throw new Error(`${this.prefix} ${message} ${this.postfix}`);
   }
 }

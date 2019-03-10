@@ -28,11 +28,13 @@
  */
 
 import './Select.scss';
+import Logger from './../Core/Logger';
 
 /**
  * Структура конфига дропдауна
  *
  * Содержит:
+ *   name - имя для скрытого инпута
  *   positionTopOffset  - сдвиг тела от верхнего края заголовка, например для отображения там стрелочки
  *   callbacks
  *     created - пользовательская футкция, исполняющаяся при успешном создании селекта
@@ -40,6 +42,7 @@ import './Select.scss';
  *     opened  - пользовательская футкция, исполняющаяся при открытии селекта
  */
 interface Config {
+  name?: string;
   default: boolean;
   positionTopOffset: number;
   callbacks: {
@@ -73,14 +76,20 @@ class Select {
   // Конфиг с настройками
   readonly config: Config;
 
+  // Помощник для логирования
+  readonly logger: Logger;
+
   // Заголовок дропдауна
-  title: HTMLElement | null;
+  titleNode: HTMLElement | null;
 
   // Тело дропдауна
-  body: HTMLElement | null;
+  bodyNode: HTMLElement | null;
 
   // Опции селекта которые можно выбирать
-  options: NodeListOf<HTMLElement>;
+  optionsNodes: NodeListOf<HTMLElement>;
+
+  // DOM элемент срытого инпута с значением
+  readonly valueInputNode: HTMLInputElement;
 
   // Выбранное значение
   value: string | null;
@@ -90,11 +99,12 @@ class Select {
 
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
-      throw new Error('Не задан объект селекта');
+      throw new Error('Не задан объект селекта!');
     }
 
     // Конфиг по умолчанию
     const defaultConfig: Config = {
+      name: undefined,
       default: true,
       positionTopOffset: 0,
       callbacks: {
@@ -104,12 +114,17 @@ class Select {
       },
     };
 
-    this.config = Object.assign(defaultConfig, config);
+    this.config = {...defaultConfig, ...config};
     this.node = node;
+    this.logger = new Logger('Модуль Faze.Select:');
 
     // Инициализация переменных
     if (this.config.default) {
       this.initialOptionNode = document.createElement('div');
+    }
+
+    if ('fazeSelectName' in this.node.dataset) {
+      this.valueInputNode = document.createElement('input');
     }
 
     this.initialize();
@@ -124,11 +139,11 @@ class Select {
     this.node.classList.add('faze-select');
 
     // Поиск основных элементов и проверка на то что они найдены
-    this.title = this.node.querySelector('.faze-title');
-    this.body = this.node.querySelector('.faze-body');
+    this.titleNode = this.node.querySelector('.faze-title');
+    this.bodyNode = this.node.querySelector('.faze-body');
 
-    if (!this.title || !this.body) {
-      throw new Error('Для селекта не найдены шапка и тело');
+    if (!this.titleNode || !this.bodyNode) {
+      return this.logger.error('Для селекта не найдены шапка и тело!');
     }
 
     // Если имеется первичное значение селекта
@@ -136,42 +151,51 @@ class Select {
       // Вставляем изначальный(тот что был в заголовке) вариант первым
       this.initialOptionNode.className = 'faze-option';
       this.initialOptionNode.dataset.fazeValue = 'FAZE_INITIAL_TITLE';
-      this.initialOptionNode.textContent = this.title.textContent;
+      this.initialOptionNode.textContent = this.titleNode.textContent;
       this.initialOptionNode.style.display = 'none';
-      this.body.insertBefore(this.initialOptionNode, this.body.firstChild);
+      this.bodyNode.insertBefore(this.initialOptionNode, this.bodyNode.firstChild);
 
       // Берем все опции в селекте
-      this.options = this.body.querySelectorAll('.faze-option');
+      this.optionsNodes = this.bodyNode.querySelectorAll('.faze-option');
     } else {
       // Если нет, то делаем выбираем первую опцию по умолчанию
-      const firstOption = <HTMLElement>this.body.querySelector('.faze-option:first-child');
+      const firstOption = <HTMLElement>this.bodyNode.querySelector('.faze-option:first-child');
       if (firstOption) {
-        this.title.textContent = firstOption.getAttribute('data-faze-caption') || firstOption.textContent;
+        this.titleNode.textContent = firstOption.getAttribute('data-faze-caption') || firstOption.textContent;
         this.value = firstOption.dataset.fazeValue || firstOption.textContent;
 
         // Берем все опции в селекте
-        this.options = this.body.querySelectorAll('.faze-option');
+        this.optionsNodes = this.bodyNode.querySelectorAll('.faze-option');
 
         this.hideOption(this.value);
       }
     }
 
     // Присвоение сдвига для тела
-    this.body.style.top = `${this.title.offsetHeight + this.config.positionTopOffset}px`;
+    this.bodyNode.style.top = `${this.titleNode.offsetHeight + this.config.positionTopOffset}px`;
 
     // Пересоздаем заголовок чтобы удалить с него все бинды
     this.resetTitle();
+
+    // Инициализация скрытого инпута
+    if (this.valueInputNode) {
+      this.valueInputNode.type = 'hidden';
+      this.valueInputNode.name = this.node.dataset.fazeSelectName || '';
+      this.valueInputNode.value = this.value || '';
+
+      this.node.appendChild(this.valueInputNode);
+    }
 
     // Вызываем пользовательскую функцию
     if (typeof this.config.callbacks.created === 'function') {
       try {
         this.config.callbacks.created({
-          title: this.title,
-          body: this.body,
+          title: this.titleNode,
+          body: this.bodyNode,
           value: this.value,
         });
       } catch (error) {
-        console.error('Ошибка исполнения пользовательского метода "created":', error);
+        this.logger.error(`Ошибка исполнения пользовательского метода "created", дословно: ${error}`);
       }
     }
   }
@@ -180,15 +204,15 @@ class Select {
    * Навешивание событий
    */
   bind(): void {
-    if (!this.title || !this.body) {
-      throw new Error('Не заданы шапка и тело селекта');
+    if (!this.titleNode || !this.bodyNode) {
+      return this.logger.error('Не заданы шапка и тело селекта');
     }
 
     // Пересоздаем заголовок чтобы удалить с него все бинды
     this.resetTitle();
 
     // При нажатии на заголовок, меняем видимость тела селекта
-    this.title.addEventListener('click', (event) => {
+    this.titleNode.addEventListener('click', (event) => {
       event.preventDefault();
 
       if (!this.node.classList.contains('faze-disabled')) {
@@ -200,12 +224,12 @@ class Select {
         if (typeof this.config.callbacks.opened === 'function') {
           try {
             this.config.callbacks.opened({
-              title: this.title,
-              body: this.body,
+              title: this.titleNode,
+              body: this.bodyNode,
               value: this.value,
             });
           } catch (error) {
-            console.error('Ошибка исполнения пользовательского метода "opened":', error);
+            this.logger.error(`Ошибка исполнения пользовательского метода "opened", дословно: ${error}`);
           }
         }
       }
@@ -213,37 +237,14 @@ class Select {
 
     // Навешиваем события на нажатие по опциям, при нажатии нужно сделать её активной,
     // то есть её надпись поставить в заголовок селекта и запомнить выбранное значение
-    this.options.forEach((option) => {
-      option.addEventListener('click', (event) => {
+    this.optionsNodes.forEach((optionNode) => {
+      optionNode.addEventListener('click', (event) => {
         event.preventDefault();
 
-        if (!this.title) {
-          throw new Error('Не задана шапка селекта');
-        }
+        // Выбранное значение, сначала проверяем дата атрибут, если его нет, то берем текст внутри
+        const value = optionNode.dataset.fazeValue ? optionNode.dataset.fazeValue || '' : optionNode.textContent || '';
 
-        // Меняем заголовок
-        this.title.textContent = option.dataset.caption || option.textContent;
-        this.value = option.dataset.fazeValue || option.textContent;
-
-        // Закрываем селект
-        this.node.classList.remove('faze-active');
-
-        // Скрываем выбранную опцию
-        this.hideOption(this.value);
-
-        // Вызываем пользовательскую функцию
-        if (typeof this.config.callbacks.changed === 'function') {
-          try {
-            this.config.callbacks.changed({
-              title: this.title,
-              body: this.body,
-              value: this.value,
-              selectedOption: option,
-            });
-          } catch (error) {
-            console.error('Ошибка исполнения пользовательского метода "changed":', error);
-          }
-        }
+        this.setValue(value);
       });
     });
 
@@ -259,18 +260,66 @@ class Select {
   }
 
   /**
+   * Присвоение нового значение селекта
+   *
+   * @param value - значение опции которую нужно выбрать
+   */
+  setValue(value: string): void {
+    if (!this.titleNode) {
+      return this.logger.error('Не задана шапка селекта');
+    }
+
+    // Ищем нужную опцию
+    const optionNode = Array.from(this.optionsNodes)
+      .find(option => option.dataset.fazeValue === value || option.textContent === value);
+
+    if (!optionNode) {
+      return this.logger.error('Не существует опции с таким значением в селекте!');
+    }
+
+    // Меняем заголовок
+    this.titleNode.textContent = optionNode.dataset.caption || optionNode.textContent;
+    this.value = optionNode.dataset.fazeValue || optionNode.textContent;
+
+    // Закрываем селект
+    this.node.classList.remove('faze-active');
+
+    // Скрываем выбранную опцию
+    this.hideOption(this.value);
+
+    // Присваиваем выбранное значение инпуту, если он есть
+    if (this.valueInputNode) {
+      this.valueInputNode.value = this.value || '';
+    }
+
+    // Вызываем пользовательскую функцию
+    if (typeof this.config.callbacks.changed === 'function') {
+      try {
+        this.config.callbacks.changed({
+          title: this.titleNode,
+          body: this.bodyNode,
+          value: this.value,
+          selectedOption: optionNode,
+        });
+      } catch (error) {
+        console.error('Ошибка исполнения пользовательского метода "changed":', error);
+      }
+    }
+  }
+
+  /**
    * Пересоздание заголовка, для сброса всех биндов на нём
    * Нужно для реинициализации дропдауна
    */
   resetTitle(): void {
-    if (!this.title) {
-      throw new Error('Не задана шапка дропдауна');
+    if (!this.titleNode) {
+      return this.logger.error('Не задана шапка дропдауна');
     }
 
-    const cloneTitle = this.title.cloneNode(true);
-    if (this.title.parentNode) {
-      this.title.parentNode.replaceChild(cloneTitle, this.title);
-      this.title = <HTMLElement>cloneTitle;
+    const cloneTitle = this.titleNode.cloneNode(true);
+    if (this.titleNode.parentNode) {
+      this.titleNode.parentNode.replaceChild(cloneTitle, this.titleNode);
+      this.titleNode = <HTMLElement>cloneTitle;
     }
   }
 
@@ -280,13 +329,13 @@ class Select {
    * @param value - значение, если у опции такое же, то скрываем её
    */
   hideOption(value: string | null) {
-    this.options.forEach((option) => {
-      const optionValue = option.dataset.fazeValue || option.textContent;
+    this.optionsNodes.forEach((optionNode) => {
+      const optionValue = optionNode.dataset.fazeValue || optionNode.textContent;
 
       if (optionValue === value) {
-        option.style.display = 'none';
+        optionNode.style.display = 'none';
       } else {
-        option.style.display = 'block';
+        optionNode.style.display = 'block';
       }
     });
   }

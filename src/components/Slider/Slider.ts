@@ -74,7 +74,7 @@ class Slider {
     }
 
     // Инициализация переменных из конфига
-    let points = [0];
+    let points: number[] = [];
     if (node && node.dataset.fazeSliderPoints) {
       points = node.dataset.fazeSliderPoints.split(',').map(point => parseInt(point, 10));
     }

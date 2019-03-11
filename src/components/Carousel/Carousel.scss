@@ -145,6 +145,56 @@
       height: 100%;
 
       z-index: 3;
+
+      & > .faze-carousel-arrow {
+        position: absolute;
+        top: 0;
+
+        width: 10rem;
+        height: 100%;
+
+        &:after {
+          content: '';
+
+          display: block;
+          width: 2rem;
+          height: 2rem;
+
+          position: absolute;
+          top: 50%;
+          left: 50%;
+
+          border-top: 0.3rem solid #000;
+        }
+
+        &.faze-carousel-arrow-prev {
+          left: 0;
+
+          &:after {
+            border-left: 0.3rem solid #000;
+
+            transform: translate(-50%, -50%) rotateZ(-45deg);
+          }
+        }
+
+        &.faze-carousel-arrow-next {
+          right: 0;
+
+          &:after {
+            border-right: 0.3rem solid #000;
+
+            transform: translate(-50%, -50%) rotateZ(45deg);
+          }
+        }
+
+        &:hover {
+          cursor: pointer;
+
+          &:after {
+            border-color: #666;
+          }
+        }
+      }
     }
 
     // Счетчик
@@ -164,8 +214,7 @@
     }
   }
 
-  // Стрелка
-  .faze-carousel-arrow {
+  & > .faze-carousel-arrow {
     position: absolute;
     top: 0;
 

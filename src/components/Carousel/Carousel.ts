@@ -49,7 +49,6 @@ import Faze from '../Core/Faze';
  *   counter    - отображать ли счетчик слайдов
  *   pages      - отображать ли пагинацию слайдов
  *   arrows     - отображать ли стрелки переключения
- *   arrowsOutside - флаг, определяющий будут ли стрелки выведены за карусель
  *   duration   - время смены слайдов, в мс.
  *   useSlideFullSize - учитывать ли при измерении размера слайда его margin
  *   animation
@@ -65,7 +64,6 @@ interface Config {
   counter: boolean;
   pages: boolean;
   arrows: boolean;
-  arrowsOutside: boolean;
   duration: number;
   useSlideFullSize: boolean;
   animation: {
@@ -193,7 +191,6 @@ class Carousel {
       counter: false,
       pages: false,
       arrows: true,
-      arrowsOutside: false,
       duration: 3000,
       useSlideFullSize: false,
       animation: {
@@ -397,7 +394,7 @@ class Carousel {
    * Создание дополнительных элементов карусели, таких как: пагинация, стрелки, счетчик
    */
   createControls() {
-    if ((this.config.arrows && !this.config.arrowsOutside) || this.config.pages || this.config.counter) {
+    if (this.config.arrows || this.config.pages || this.config.counter) {
       this.controlsNode.className = 'faze-carousel-controls';
       this.node.appendChild(this.controlsNode);
 
@@ -406,15 +403,15 @@ class Carousel {
         this.createPagination();
       }
 
+      // Создание стрелок переключения, если это указано в конфиге
+      if (this.config.arrows) {
+        this.createArrows();
+      }
+
       // Создание счетчика, если это указано в конфиге
       if (this.config.counter) {
         this.createSlidesCounter();
       }
-    }
-
-    // Создание стрелок переключения, если это указано в конфиге
-    if (this.config.arrows) {
-      this.createArrows();
     }
   }
 
@@ -467,21 +464,14 @@ class Carousel {
    * Создание стрелок переключения слайдов вперед/назад(либо вверх вниз в вертикальном виде)
    */
   createArrows(): void {
-    if (!this.config.arrowsOutside) {
-      this.arrowsNode.className = 'faze-carousel-arrows';
-      this.controlsNode.appendChild(this.arrowsNode);
-    }
+    this.arrowsNode.className = 'faze-carousel-arrows';
+    this.controlsNode.appendChild(this.arrowsNode);
 
     this.arrowsNodes.left.className = 'faze-carousel-arrow faze-carousel-arrow-prev';
-    this.arrowsNodes.right.className = 'faze-carousel-arrow faze-carousel-arrow-next';
+    this.arrowsNode.appendChild(this.arrowsNodes.left);
 
-    if (this.config.arrowsOutside) {
-      this.node.appendChild(this.arrowsNodes.right);
-      this.node.appendChild(this.arrowsNodes.left);
-    } else {
-      this.arrowsNode.appendChild(this.arrowsNodes.right);
-      this.arrowsNode.appendChild(this.arrowsNodes.left);
-    }
+    this.arrowsNodes.right.className = 'faze-carousel-arrow faze-carousel-arrow-next';
+    this.arrowsNode.appendChild(this.arrowsNodes.right);
   }
 
   /**

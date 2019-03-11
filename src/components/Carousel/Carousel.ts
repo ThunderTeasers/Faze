@@ -569,8 +569,13 @@ class Carousel {
               this.itemsHolderNode.style.top = `-${this.slideHeight}px`;
             }
 
-            // После того как CSS анимация выполнилась,
-            // стили сбрасываются в первоначальное состояние
+            // Присваиваем следующему слайду класс
+            const nextSlide = this.slidesNodes[1];
+            if (nextSlide) {
+              nextSlide.classList.add('faze-next');
+            }
+
+            // После того как CSS анимация выполнилась, стили сбрасываются в первоначальное состояние
             setTimeout(() => {
               this.itemsHolderNode.style.transitionDuration = '';
               if (this.config.animation.direction === 'horizontal') {
@@ -581,6 +586,11 @@ class Carousel {
 
               // Так же крайний левый слайд перемещается в конец
               this.itemsHolderNode.appendChild(this.slidesNodes[0]);
+
+              // Удаляем класс со "следующего" слайда, т.к. он уже стал текущим
+              if (nextSlide) {
+                nextSlide.classList.remove('faze-next');
+              }
 
               // Присваиваем текущий слайд
               currentSlide = this.slidesNodes[this.index];
@@ -600,6 +610,12 @@ class Carousel {
             }
             this.itemsHolderNode.style.transitionDuration = '';
 
+            // Присваиваем предыдущему слайду класс
+            const prevSlide = this.slidesNodes[this.totalSlides - 1];
+            if (prevSlide) {
+              prevSlide.classList.add('faze-prev');
+            }
+
             // Хак для включения транзишина
             setTimeout(() => {
               if (this.config.animation.direction === 'horizontal') {
@@ -613,6 +629,11 @@ class Carousel {
             // И после выполнения анимации, ставится флаг, что карусель свободна
             setTimeout(() => {
               currentSlide = this.slidesNodes[this.index];
+
+              // Удаляем класс с "предыдущего" слайда, т.к. он уже стал текущим
+              if (prevSlide) {
+                prevSlide.classList.remove('faze-prev');
+              }
 
               // Выставление флага, что карусель в простое и готова к новой анимации
               this.isIdle = true;

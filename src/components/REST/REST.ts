@@ -400,7 +400,7 @@ class REST {
     const data = <any>chainData.shift();
 
     // Тип ответа от сервера
-    const dataType = data.type || null;
+    let dataType = data.type || null;
 
     // Если это функция, то выполняем её, иначе - это объект, разбираем его и в любом случае снова рекурсивно запускаем ajaxChain
     if (typeof data === 'function') {
@@ -409,9 +409,9 @@ class REST {
       } catch (error) {
         console.error('Ошибка исполнения пользовательской функции переданной через "function" в ajaxChain, текст ошибки:', error);
       }
-      REST.chain(chainData, finalCallback);
+      REST.chain(chainData, finalCallback, response);
     }
-    // Если это функция записанная строкой, то есть только имя, то тоже выполним её
+    // Если это функция записанная строкой, то есть только имя, тоже выполним её
     else if (typeof data === 'string' && data in window && (window as any)[data] && (window as any)[data] instanceof Function) {
       try {
         (window as any)[data]();
@@ -432,7 +432,7 @@ class REST {
           }
         }
 
-        REST.chain(chainData, finalCallback);
+        REST.chain(chainData, finalCallback, response);
       }
       // Если в объекте присутствует поле "method" значит это объект с настройками для отправки через ajaxRequest
       else if ('method' in data) {
@@ -454,7 +454,10 @@ class REST {
         if (method.toLowerCase() === 'post') {
           data['update'] = data['module'];
           data['from'] = window.location.href;
-          data['mime'] = 'json';
+
+          if (!('mime' in data)) {
+            data['mime'] = 'json';
+          }
         } else if (!('mime' in data)) {
           data['mime'] = 'txt';
         }
@@ -468,6 +471,8 @@ class REST {
         delete data['page'];
         delete data['callback'];
 
+        dataType = data['mime'] === 'json' ? 'json' : 'html';
+
         // Отправляем запрос, после выполнения которого снова вызываем ajaxChain
         REST.request(method, dataType, url, data, (response: any) => {
           if (typeof callback === 'function') {
@@ -478,7 +483,7 @@ class REST {
             }
           }
 
-          REST.chain(chainData, finalCallback);
+          REST.chain(chainData, finalCallback, response);
         });
       } else {
         throw new Error('Не указан обязательный параметр "method" или "function" в ajaxChain');

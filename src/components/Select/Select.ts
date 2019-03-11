@@ -151,7 +151,7 @@ class Select {
     if (this.config.default) {
       // Вставляем изначальный(тот что был в заголовке) вариант первым
       this.initialOptionNode.className = 'faze-option';
-      this.initialOptionNode.dataset.fazeValue = 'FAZE_INITIAL_TITLE';
+      this.initialOptionNode.dataset.fazeSelectValue = 'FAZE_INITIAL_TITLE';
       this.initialOptionNode.textContent = this.titleNode.textContent;
       this.initialOptionNode.style.display = 'none';
       this.bodyNode.insertBefore(this.initialOptionNode, this.bodyNode.firstChild);
@@ -163,7 +163,7 @@ class Select {
       const firstOption = <HTMLElement>this.bodyNode.querySelector('.faze-option:first-child');
       if (firstOption) {
         this.titleNode.textContent = firstOption.getAttribute('data-faze-caption') || firstOption.textContent;
-        this.value = firstOption.dataset.fazeValue || firstOption.textContent;
+        this.value = firstOption.dataset.fazeSelectValue || firstOption.textContent;
 
         // Берем все опции в селекте
         this.optionsNodes = this.bodyNode.querySelectorAll('.faze-option');
@@ -186,6 +186,9 @@ class Select {
 
       this.node.appendChild(this.valueInputNode);
     }
+
+    // Простановка заданного значения
+    this.setValue(this.node.dataset.fazeSelectInitialValue || '');
 
     // Вызываем пользовательскую функцию
     if (typeof this.config.callbacks.created === 'function') {
@@ -243,7 +246,7 @@ class Select {
         event.preventDefault();
 
         // Выбранное значение, сначала проверяем дата атрибут, если его нет, то берем текст внутри
-        const value = optionNode.dataset.fazeValue ? optionNode.dataset.fazeValue || '' : optionNode.textContent || '';
+        const value = optionNode.dataset.fazeSelectValue ? optionNode.dataset.fazeSelectValue || '' : optionNode.textContent || '';
 
         this.setValue(value);
       });
@@ -272,15 +275,16 @@ class Select {
 
     // Ищем нужную опцию
     const optionNode = Array.from(this.optionsNodes)
-      .find(option => option.dataset.fazeValue === value || option.textContent === value);
+      .find(option => option.dataset.fazeSelectValue === value || option.textContent === value);
 
+    // Если нет такой опции
     if (!optionNode) {
-      return this.logger.error('Не существует опции с таким значением в селекте!');
+      return;
     }
 
     // Меняем заголовок
     this.titleNode.textContent = optionNode.dataset.caption || optionNode.textContent;
-    this.value = optionNode.dataset.fazeValue || optionNode.textContent;
+    this.value = optionNode.dataset.fazeSelectValue || optionNode.textContent;
 
     // Закрываем селект
     this.node.classList.remove('faze-active');
@@ -291,6 +295,7 @@ class Select {
     // Присваиваем выбранное значение инпуту, если он есть
     if (this.valueInputNode) {
       this.valueInputNode.value = this.value || '';
+      this.valueInputNode.dispatchEvent(new Event('change', {bubbles: true}));
     }
 
     // Вызываем пользовательскую функцию
@@ -331,7 +336,7 @@ class Select {
    */
   hideOption(value: string | null) {
     this.optionsNodes.forEach((optionNode) => {
-      const optionValue = optionNode.dataset.fazeValue || optionNode.textContent;
+      const optionValue = optionNode.dataset.fazeSelectValue || optionNode.textContent;
 
       if (optionValue === value) {
         optionNode.style.display = 'none';

@@ -248,6 +248,7 @@ class Faze {
     Faze.Carousel.hotInitialize();
     Faze.Tooltip.hotInitialize();
     Faze.Zoom.hotInitialize();
+    Faze.Select.hotInitialize();
   }
 }
 

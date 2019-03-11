@@ -29,6 +29,7 @@
 
 import './Select.scss';
 import Logger from './../Core/Logger';
+import Faze from "../Core/Faze";
 
 /**
  * Структура конфига дропдауна
@@ -337,6 +338,19 @@ class Select {
       } else {
         optionNode.style.display = 'block';
       }
+    });
+  }
+
+  /**
+   * Инициализация модуля по data атрибутам
+   */
+  static hotInitialize(): void {
+    document.querySelectorAll('[data-faze="select"]').forEach((selectNode: any) => {
+      new Faze.Select(selectNode, {
+        name: selectNode.dataset.fazeSelectName,
+        default: (selectNode.dataset.fazeSelectDefault || 'false') === 'true',
+        positionTopOffset: parseInt(selectNode.dataset.fazeSelectPositionTopOffset || '0', 10),
+      });
     });
   }
 }

@@ -10,16 +10,16 @@ module.exports = merge(common, {
   mode: 'production',
   optimization: {
     minimizer: [
-      new UglifyJsPlugin({
-        cache: true,
-        parallel: true,
-        uglifyOptions: {
-          compress: false,
-          ecma: 6,
-          mangle: true,
-        },
-        sourceMap: true,
-      }),
+      // new UglifyJsPlugin({
+      //   cache: true,
+      //   parallel: true,
+      //   uglifyOptions: {
+      //     compress: false,
+      //     ecma: 6,
+      //     mangle: true,
+      //   },
+      //   sourceMap: true,
+      // }),
       new OptimizeCSSAssetsPlugin({}),
     ],
   },

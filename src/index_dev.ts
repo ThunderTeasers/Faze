@@ -60,22 +60,23 @@ Faze.add({
 
     fazeSelect.setValue('Выбор 2');
 
-    new Faze.Carousel(document.querySelector('.carousel-test'), {
-      autoplay: false,
-      pages: true,
-      arrows: true,
-      counter: false,
-      animation: {
-        type: 'slide',
-        time: 1000,
-        direction: 'horizontal',
-      },
-      callbacks: {
-        created: (data: any) => {
-          console.log(data);
-        },
-      },
-    });
+    // new Faze.Carousel(document.querySelector('.carousel-test'), {
+    //   autoplay: false,
+    //   pages: false,
+    //   arrows: true,
+    //   arrowsOutside: true,
+    //   counter: false,
+    //   animation: {
+    //     type: 'slide',
+    //     time: 1000,
+    //     direction: 'horizontal',
+    //   },
+    //   callbacks: {
+    //     created: (data: any) => {
+    //       console.log(data);
+    //     },
+    //   },
+    // });
 
     const zoom = new Faze.Zoom(document.querySelector('.image'), {
       side: 'right',

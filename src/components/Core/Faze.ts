@@ -249,6 +249,7 @@ class Faze {
     Faze.Tooltip.hotInitialize();
     Faze.Zoom.hotInitialize();
     Faze.Select.hotInitialize();
+    Faze.Dropdown.hotInitialize();
   }
 }
 

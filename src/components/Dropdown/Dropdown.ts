@@ -27,6 +27,7 @@
  */
 
 import './Dropdown.scss';
+import Faze from '../Core/Faze';
 
 /**
  * Структура конфига дропдауна
@@ -192,6 +193,18 @@ class Dropdown {
       this.title.parentNode.replaceChild(cloneTitle, this.title);
       this.title = <HTMLElement>cloneTitle;
     }
+  }
+
+  /**
+   * Инициализация модуля по data атрибутам
+   */
+  static hotInitialize(): void {
+    document.querySelectorAll('[data-faze="dropdown"]').forEach((selectNode: any) => {
+      new Faze.Dropdown(selectNode, {
+        strictPosition: (selectNode.dataset.fazeDropdownStrictPosition || 'false') === 'true',
+        positionTopOffset: parseInt(selectNode.dataset.fazeDropdownPositionTopOffset || '0', 10),
+      });
+    });
   }
 }
 

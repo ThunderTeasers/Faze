@@ -12,13 +12,28 @@
 
   overflow: hidden;
 
+  touch-action: none;
+
+  // Общие стили скролов
   .faze-scroll-vertical, .faze-scroll-horizontal {
     position: absolute;
+
+    background-color: #000;
+  }
+
+  // Скролл вертикальной прокрутки
+  .faze-scroll-vertical {
     top: 0;
     right: 0;
 
-    background-color: #000;
-
     width: 0.5rem;
+  }
+
+  // Скролл вертикальной прокрутки
+  .faze-scroll-horizontal {
+    bottom: 0;
+    left: 0;
+
+    height: 0.5rem;
   }
 }

@@ -60,22 +60,33 @@ class Helpers {
    * то форматируем у неё только левую часть, то есть ту которая до точки, после этого склеиваем обе части и возвращаем их.
    *
    * @param numberToFormat - число или строка содержащая число которое будет форматироваться
+   * @param separator      - разделитель копеек
+   *
    * @return строка разделенная пробелами каждые 3 символа
    */
-  static numberWithSpaces(numberToFormat: number | string): string {
+  static numberWithSpaces(numberToFormat: number | string, separator: string = '.'): string {
     const numberString = numberToFormat.toString();
     let result = '';
 
-    if (numberString.includes('.')) {
-      const parts = numberString.split('.');
+    if (numberString.includes(separator)) {
+      const parts = numberString.split(separator);
       parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
-      result = parts.join('.');
+      result = parts.join(separator);
     } else {
       result = numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     }
 
     return result;
+  }
+
+  /**
+   * Заменяем двойные кавычки на HTML символы
+   *
+   * @param text - текст который необходимо обработать
+   */
+  static escapeString(text: string) {
+    return text.replace(/"/g, '&quot;');
   }
 
   /**

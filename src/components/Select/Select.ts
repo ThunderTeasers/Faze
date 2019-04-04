@@ -29,7 +29,7 @@
 
 import './Select.scss';
 import Logger from './../Core/Logger';
-import Faze from "../Core/Faze";
+import Faze from '../Core/Faze';
 
 /**
  * Структура конфига дропдауна
@@ -105,7 +105,7 @@ class Select {
 
     // Конфиг по умолчанию
     const defaultConfig: Config = {
-      name: undefined,
+      name: node.dataset.fazeSelectName,
       default: true,
       positionTopOffset: 0,
       callbacks: {
@@ -124,7 +124,7 @@ class Select {
       this.initialOptionNode = document.createElement('div');
     }
 
-    if ('fazeSelectName' in this.node.dataset) {
+    if (this.config.name) {
       this.valueInputNode = document.createElement('input');
     }
 
@@ -181,7 +181,7 @@ class Select {
     // Инициализация скрытого инпута
     if (this.valueInputNode) {
       this.valueInputNode.type = 'hidden';
-      this.valueInputNode.name = this.node.dataset.fazeSelectName || '';
+      this.valueInputNode.name = this.config.name || '';
       this.valueInputNode.value = this.value || '';
 
       this.node.appendChild(this.valueInputNode);
@@ -249,6 +249,20 @@ class Select {
         const value = optionNode.dataset.fazeSelectValue ? optionNode.dataset.fazeSelectValue || '' : optionNode.textContent || '';
 
         this.setValue(value);
+
+        // Вызываем пользовательскую функцию
+        if (typeof this.config.callbacks.changed === 'function') {
+          try {
+            this.config.callbacks.changed({
+              title: this.titleNode,
+              body: this.bodyNode,
+              value: this.value,
+              selectedOption: optionNode,
+            });
+          } catch (error) {
+            console.error('Ошибка исполнения пользовательского метода "changed":', error);
+          }
+        }
       });
     });
 
@@ -295,21 +309,6 @@ class Select {
     // Присваиваем выбранное значение инпуту, если он есть
     if (this.valueInputNode) {
       this.valueInputNode.value = this.value || '';
-      this.valueInputNode.dispatchEvent(new Event('change', {bubbles: true}));
-    }
-
-    // Вызываем пользовательскую функцию
-    if (typeof this.config.callbacks.changed === 'function') {
-      try {
-        this.config.callbacks.changed({
-          title: this.titleNode,
-          body: this.bodyNode,
-          value: this.value,
-          selectedOption: optionNode,
-        });
-      } catch (error) {
-        console.error('Ошибка исполнения пользовательского метода "changed":', error);
-      }
     }
   }
 

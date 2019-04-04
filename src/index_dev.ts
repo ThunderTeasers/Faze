@@ -87,7 +87,6 @@ Faze.add({
 
     new Faze.Scroll(document.querySelector('.for-scroll'), {
       width: '100%',
-      height: '200',
     });
 
     new Faze.Form(document.querySelector('.form-order'), {

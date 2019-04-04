@@ -93,7 +93,7 @@ class Scroll {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       width: '100%',
-      height: '300px',
+      height: '0',
       transition: 'top 0.5s ease',
     };
 
@@ -123,24 +123,32 @@ class Scroll {
 
     // Ширина враппера
     let wrapperWidth = '';
-    if (this.config.width.includes('%')) {
-      wrapperWidth = `${parseFloat(this.config.width)}%`;
+    if (this.config.width && parseFloat(this.config.width) !== 0) {
+      if (this.config.width.toString().includes('%')) {
+        wrapperWidth = `${parseFloat(this.config.width)}%`;
+      } else {
+        wrapperWidth = `${parseFloat(this.config.width)}px`;
+      }
     } else {
-      wrapperWidth = `${parseFloat(this.config.width)}px`;
+      wrapperWidth = `${this.node.getBoundingClientRect().width}px`;
     }
+    this.wrapperNode.style.width = wrapperWidth;
 
     // Высота враппера
     let wrapperHeight = '';
-    if (this.config.height.includes('%')) {
-      wrapperHeight = `${parseFloat(this.config.height)}%`;
+    if (this.config.height && parseFloat(this.config.height) !== 0) {
+      if (this.config.height.toString().includes('%')) {
+        wrapperHeight = `${parseFloat(this.config.height)}%`;
+      } else {
+        wrapperHeight = `${parseFloat(this.config.height)}px`;
+      }
     } else {
-      wrapperHeight = `${parseFloat(this.config.height)}px`;
+      wrapperHeight = `${this.node.getBoundingClientRect().height}px`;
     }
+    this.wrapperNode.style.height = wrapperHeight;
 
     // Создаем обертку
     this.wrapperNode.className = 'faze-scroll';
-    this.wrapperNode.style.width = wrapperWidth;
-    this.wrapperNode.style.height = wrapperHeight;
 
     if (this.node.parentNode) {
       this.node.parentNode.insertBefore(this.wrapperNode, this.node);
@@ -178,7 +186,7 @@ class Scroll {
    * Навешивание события перерасчета размеров при изменении размера окна
    */
   bindResizeRecalculate(): void {
-    if (this.config.width.includes('%') || this.config.height.includes('%')) {
+    if (this.config.width.toString().includes('%') || this.config.height.toString().includes('%')) {
       window.addEventListener('resize', () => {
         // Обновляем полную высоту и ширину элемента
         this.calculateHeight();
@@ -504,25 +512,6 @@ class Scroll {
   }
 
   /**
-   * Расчет высоты скрол баров и области скрола
-   */
-  calculateHeight(): void {
-    if (this.config.height) {
-      this.heightScrollNode = this.node.getBoundingClientRect().height;
-      this.heightWrapperNode = this.wrapperNode.getBoundingClientRect().height;
-    }
-
-    if (this.heightScrollNode > this.heightWrapperNode) {
-      this.isVertical = true;
-
-      if (this.scrollBarVerticalNode) {
-        this.scrollVerticalHeightInPercents = <any>(parseInt(this.config.height, 10) / this.heightScrollNode).toFixed(3) * 100;
-        this.scrollBarVerticalNode.style.height = `${this.scrollVerticalHeightInPercents}%`;
-      }
-    }
-  }
-
-  /**
    * Расчет ширины скрол баров и области скрола
    */
   calculateWidth(): void {
@@ -537,6 +526,25 @@ class Scroll {
       if (this.scrollBarHorizontalNode) {
         this.scrollHorizontalWidthInPercents = <any>(this.widthWrapperNode / this.widthScrollNode).toFixed(3) * 100;
         this.scrollBarHorizontalNode.style.width = `${this.scrollHorizontalWidthInPercents}%`;
+      }
+    }
+  }
+
+  /**
+   * Расчет высоты скрол баров и области скрола
+   */
+  calculateHeight(): void {
+    if (this.config.height) {
+      this.heightScrollNode = this.node.getBoundingClientRect().height;
+      this.heightWrapperNode = this.wrapperNode.getBoundingClientRect().height;
+    }
+
+    if (this.heightScrollNode > this.heightWrapperNode) {
+      this.isVertical = true;
+
+      if (this.scrollBarVerticalNode) {
+        this.scrollVerticalHeightInPercents = <any>(parseInt(this.config.height, 10) / this.heightScrollNode).toFixed(3) * 100;
+        this.scrollBarVerticalNode.style.height = `${this.scrollVerticalHeightInPercents}%`;
       }
     }
   }

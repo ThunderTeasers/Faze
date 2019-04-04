@@ -50,7 +50,7 @@ import Faze from '../Core/Faze';
 interface Button {
   caption: string;
   class?: string;
-  callback: (modalParts: Partial<ModalParts>) => void;
+  callback: (modalParts: Partial<ModalParts>, buttonNode: HTMLButtonElement) => void;
 }
 
 /**
@@ -343,7 +343,7 @@ class Modal {
         // Исполняем пользовательский метод при нажатии на кнопку
         if (typeof buttonData.callback === 'function') {
           try {
-            buttonNode.addEventListener('click', () => buttonData.callback(this.modalParts));
+            buttonNode.addEventListener('click', () => buttonData.callback(this.modalParts, buttonNode));
           } catch (e) {
             console.error(e);
           }

@@ -129,6 +129,9 @@ class Scroll {
       } else {
         wrapperWidth = `${parseFloat(this.config.width)}px`;
       }
+
+      // Проставляем класс
+      this.wrapperNode.classList.add('faze-scroll-horizontal');
     } else {
       wrapperWidth = `${this.node.getBoundingClientRect().width}px`;
     }
@@ -142,13 +145,16 @@ class Scroll {
       } else {
         wrapperHeight = `${parseFloat(this.config.height)}px`;
       }
+
+      // Проставляем класс
+      this.wrapperNode.classList.add('faze-scroll-vertical');
     } else {
       wrapperHeight = `${this.node.getBoundingClientRect().height}px`;
     }
     this.wrapperNode.style.height = wrapperHeight;
 
     // Создаем обертку
-    this.wrapperNode.className = 'faze-scroll';
+    this.wrapperNode.classList.add('faze-scroll');
 
     if (this.node.parentNode) {
       this.node.parentNode.insertBefore(this.wrapperNode, this.node);
@@ -160,20 +166,14 @@ class Scroll {
     this.calculateWidth();
 
     // Создаем вертикальный скролл
-    if (this.isVertical) {
-      this.scrollBarVerticalNode.className = 'faze-scroll-vertical';
-      this.scrollBarVerticalNode.style.transition = this.config.transition;
-      this.wrapperNode.appendChild(this.scrollBarVerticalNode);
-      this.wrapperNode.classList.add('faze-scroll-vertical');
-    }
+    this.scrollBarVerticalNode.className = 'faze-scroll-vertical';
+    this.scrollBarVerticalNode.style.transition = this.config.transition;
+    this.wrapperNode.appendChild(this.scrollBarVerticalNode);
 
     // Создаем вертикальный скролл
-    if (this.isHorizontal) {
-      this.scrollBarHorizontalNode.className = 'faze-scroll-horizontal';
-      this.scrollBarHorizontalNode.style.transition = this.config.transition;
-      this.wrapperNode.appendChild(this.scrollBarHorizontalNode);
-      this.wrapperNode.classList.add('faze-scroll-horizontal');
-    }
+    this.scrollBarHorizontalNode.className = 'faze-scroll-horizontal';
+    this.scrollBarHorizontalNode.style.transition = this.config.transition;
+    this.wrapperNode.appendChild(this.scrollBarHorizontalNode);
   }
 
   /**
@@ -181,19 +181,11 @@ class Scroll {
    */
   bind(): void {
     this.bindResizeRecalculate();
-
-    // Навешиваем события на вертикальный скролл
-    if (this.isVertical) {
-      this.bindMouseWheel();
-      this.bindMouseDragVertical();
-      this.bindMouseTouchVertical();
-    }
-
-    // Навешиваем события на горизонтальный скролл
-    if (this.isHorizontal) {
-      this.bindMouseDragHorizontal();
-      this.bindMouseTouchHorizontal();
-    }
+    this.bindMouseWheel();
+    this.bindMouseDragVertical();
+    this.bindMouseTouchVertical();
+    this.bindMouseDragHorizontal();
+    this.bindMouseTouchHorizontal();
   }
 
   /**
@@ -214,9 +206,9 @@ class Scroll {
    */
   bindMouseWheel(): void {
     this.wrapperNode.addEventListener('wheel', (event) => {
-      event.preventDefault();
-
       if (this.isVertical) {
+        event.preventDefault();
+
         // Определяем направление
         const delta = event.deltaY > 0 ? 100 : -100;
 
@@ -532,14 +524,22 @@ class Scroll {
     if (this.config.width) {
       this.widthScrollNode = this.node.getBoundingClientRect().width;
       this.widthWrapperNode = this.wrapperNode.getBoundingClientRect().width;
-    }
-
-    if (this.widthScrollNode > this.widthWrapperNode) {
-      this.isHorizontal = true;
 
       if (this.scrollBarHorizontalNode) {
-        this.scrollHorizontalWidthInPercents = <any>(this.widthWrapperNode / this.widthScrollNode).toFixed(3) * 100;
-        this.scrollBarHorizontalNode.style.width = `${this.scrollHorizontalWidthInPercents}%`;
+        if (this.widthScrollNode > this.widthWrapperNode) {
+          this.isHorizontal = true;
+
+          // Показываем скролл если ширина контента больше ширины области видимости
+          this.scrollBarHorizontalNode.classList.remove('faze-hide');
+
+          this.scrollHorizontalWidthInPercents = <any>(this.widthWrapperNode / this.widthScrollNode).toFixed(3) * 100;
+          this.scrollBarHorizontalNode.style.width = `${this.scrollHorizontalWidthInPercents}%`;
+        } else {
+          this.isHorizontal = false;
+
+          // Если меньше то скрываем скролл
+          this.scrollBarHorizontalNode.classList.add('faze-hide');
+        }
       }
     }
   }
@@ -553,12 +553,20 @@ class Scroll {
       this.heightWrapperNode = this.wrapperNode.getBoundingClientRect().height;
     }
 
-    if (this.heightScrollNode > this.heightWrapperNode) {
-      this.isVertical = true;
+    if (this.scrollBarVerticalNode) {
+      if (this.heightScrollNode > this.heightWrapperNode) {
+        this.isVertical = true;
 
-      if (this.scrollBarVerticalNode) {
+        // Показываем скролл если ширина контента больше ширины области видимости
+        this.scrollBarVerticalNode.classList.remove('faze-hide');
+
         this.scrollVerticalHeightInPercents = <any>(parseInt(this.config.height, 10) / this.heightScrollNode).toFixed(3) * 100;
         this.scrollBarVerticalNode.style.height = `${this.scrollVerticalHeightInPercents}%`;
+      } else {
+        this.isVertical = false;
+
+        // Если меньше то скрываем скролл
+        this.scrollBarVerticalNode.classList.add('faze-hide');
       }
     }
   }

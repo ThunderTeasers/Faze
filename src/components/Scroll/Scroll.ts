@@ -491,30 +491,26 @@ class Scroll {
    */
   calculateWidth(): void {
     if (this.config.width) {
+      // Дополнительная высота за счет паддингов
+      const styles = window.getComputedStyle(this.wrapperNode);
+      const additionalWidth = parseFloat(styles.paddingLeft || '0') + parseFloat(styles.paddingRight || '0');
+
       // Ширина враппера
       let wrapperWidth = '';
       if (this.config.width && parseFloat(this.config.width) !== 0) {
         if (this.config.width.toString().includes('%')) {
           wrapperWidth = `${parseFloat(this.config.width)}%`;
         } else {
-          wrapperWidth = `${parseFloat(this.config.width)}px`;
+          wrapperWidth = `${parseFloat(this.config.width) + additionalWidth}px`;
         }
       } else {
-        const styles = window.getComputedStyle(this.wrapperNode);
-
-        wrapperWidth = `${
-          this.node.offsetHeight +
-          parseFloat(styles.marginLeft || '0') +
-          parseFloat(styles.marginRight || '0') +
-          parseFloat(styles.paddingLeft || '0') +
-          parseFloat(styles.paddingRight || '0')
-        }px`;
+        wrapperWidth = `${this.node.offsetHeight + additionalWidth}px`;
       }
       this.wrapperNode.style.width = wrapperWidth;
 
       // Получаем данные о размерах
       this.widthScrollNode = this.node.getBoundingClientRect().width;
-      this.widthWrapperNode = this.wrapperNode.getBoundingClientRect().width;
+      this.widthWrapperNode = this.wrapperNode.getBoundingClientRect().width - additionalWidth;
 
       if (this.scrollBarHorizontalNode) {
         // Показываем скролл и делаем рассчеты если ширина контента больше ширины области видимости
@@ -542,30 +538,27 @@ class Scroll {
   calculateHeight(): void {
     if (this.config.height) {
       if (this.scrollBarVerticalNode) {
+        // Дополнительная высота за счет паддингов
+        const styles = window.getComputedStyle(this.wrapperNode);
+        const additionalHeight = parseFloat(styles.paddingTop || '0') + parseFloat(styles.paddingBottom || '0');
+
         // Высота враппера
         let wrapperHeight = '';
+
         if (this.config.height && parseFloat(this.config.height) !== 0) {
           if (this.config.height.toString().includes('%')) {
             wrapperHeight = `${parseFloat(this.config.height)}%`;
           } else {
-            wrapperHeight = `${parseFloat(this.config.height)}px`;
+            wrapperHeight = `${parseFloat(this.config.height) + additionalHeight}px`;
           }
         } else {
-          const styles = window.getComputedStyle(this.wrapperNode);
-
-          wrapperHeight = `${
-            this.node.offsetHeight +
-            parseFloat(styles.marginTop || '0') +
-            parseFloat(styles.marginBottom || '0') +
-            parseFloat(styles.paddingTop || '0') +
-            parseFloat(styles.paddingBottom || '0')
-          }px`;
+          wrapperHeight = `${this.node.offsetHeight + additionalHeight}px`;
         }
         this.wrapperNode.style.height = wrapperHeight;
 
         // Получаем данные о размерах
         this.heightScrollNode = this.node.getBoundingClientRect().height;
-        this.heightWrapperNode = this.wrapperNode.getBoundingClientRect().height;
+        this.heightWrapperNode = this.wrapperNode.getBoundingClientRect().height - additionalHeight;
 
         // Показываем скролл и делаем рассчеты если ширина контента больше ширины области видимости
         if (this.heightScrollNode > this.heightWrapperNode) {

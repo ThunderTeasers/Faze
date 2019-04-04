@@ -164,6 +164,7 @@ class Scroll {
       this.scrollBarVerticalNode.className = 'faze-scroll-vertical';
       this.scrollBarVerticalNode.style.transition = this.config.transition;
       this.wrapperNode.appendChild(this.scrollBarVerticalNode);
+      this.wrapperNode.classList.add('faze-scroll-vertical');
     }
 
     // Создаем вертикальный скролл
@@ -171,6 +172,7 @@ class Scroll {
       this.scrollBarHorizontalNode.className = 'faze-scroll-horizontal';
       this.scrollBarHorizontalNode.style.transition = this.config.transition;
       this.wrapperNode.appendChild(this.scrollBarHorizontalNode);
+      this.wrapperNode.classList.add('faze-scroll-horizontal');
     }
   }
 

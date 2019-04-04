@@ -405,7 +405,7 @@ class REST {
     // Если это функция, то выполняем её, иначе - это объект, разбираем его и в любом случае снова рекурсивно запускаем ajaxChain
     if (typeof data === 'function') {
       try {
-        data();
+        data(response);
       } catch (error) {
         console.error('Ошибка исполнения пользовательской функции переданной через "function" в ajaxChain, текст ошибки:', error);
       }

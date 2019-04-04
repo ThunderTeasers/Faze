@@ -87,6 +87,11 @@ class Tooltip {
    */
   bind(): void {
     this.node.addEventListener('mouseenter', () => {
+      // Если не нужно показывать тултип, то выходим из метода
+      if (this.node.dataset.fazeTooltipDisabled === 'true') {
+        return;
+      }
+
       // Для начала скрываем тултип для первичного рассчета его данных
       this.tooltip.style.visibility = 'hidden';
       document.body.appendChild(this.tooltip);

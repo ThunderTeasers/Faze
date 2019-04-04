@@ -15,6 +15,11 @@ class Shortcuts {
         closeButtonNode.dispatchEvent(new Event('click'));
       });
     };
+
+    // Перезагрузка страницы
+    (window as any).fazePageReload = () => {
+      window.location.reload();
+    };
   }
 }
 

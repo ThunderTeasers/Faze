@@ -18,6 +18,8 @@
   .faze-scroll-vertical, .faze-scroll-horizontal {
     position: absolute;
 
+    display: none;
+
     background-color: #000;
   }
 
@@ -35,5 +37,18 @@
     left: 0;
 
     height: 0.5rem;
+  }
+
+  // Показ скроллбаров только если это нужно
+  &.faze-scroll-vertical {
+    .faze-scroll-vertical {
+      display: block;
+    }
+  }
+
+  &.faze-scroll-horizontal {
+    .faze-scroll-horizontal {
+      display: block;
+    }
   }
 }

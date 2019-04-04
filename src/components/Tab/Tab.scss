@@ -20,6 +20,8 @@
       border: 0.1rem solid #000;
       border-bottom: none;
 
+      user-select: none;
+
       &:not(:first-child) {
         border-left: none;
       }

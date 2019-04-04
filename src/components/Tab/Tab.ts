@@ -56,7 +56,7 @@ class Tab {
       },
     };
 
-    this.config = Object.assign(defaultConfig, config);
+    this.config = {...defaultConfig, ...config};
     this.node = node;
 
     this.initialize();
@@ -72,7 +72,7 @@ class Tab {
     this.bodiesNodes = this.node.querySelectorAll(this.config.selectors.bodies);
 
     // Активация первой вкладки по умолчанию
-    this.activateTab(this.headersNodes[0].getAttribute('data-faze-tab-body'));
+    this.activateTab(this.headersNodes[0].dataset.fazeTabBody || '');
   }
 
   /**
@@ -83,7 +83,7 @@ class Tab {
       header.addEventListener('click', (event) => {
         event.preventDefault();
 
-        this.activateTab(header.getAttribute('data-faze-tab-body'));
+        this.activateTab(header.dataset.fazeTabBody || '');
       });
     });
   }
@@ -95,11 +95,12 @@ class Tab {
    */
   activateTab(key: string | null): void {
     this.headersNodes.forEach((headerNode) => {
-      headerNode.classList.toggle('faze-active', headerNode.getAttribute('data-faze-tab-body') === key);
+      headerNode.classList.toggle('faze-active', headerNode.dataset.fazeTabBody === key);
     });
 
     this.bodiesNodes.forEach((bodyNode) => {
-      bodyNode.style.display = bodyNode.getAttribute('data-faze-tab-body') === key ? 'block' : 'none';
+      bodyNode.style.display = bodyNode.dataset.fazeTabBody === key ? 'block' : 'none';
+      bodyNode.classList.toggle('faze-active', bodyNode.dataset.fazeTabBody === key);
     });
   }
 

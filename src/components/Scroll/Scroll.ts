@@ -155,19 +155,23 @@ class Scroll {
     }
     this.wrapperNode.appendChild(this.node);
 
-    // Создаем вертикальный скролл
-    this.scrollBarVerticalNode.className = 'faze-scroll-vertical';
-    this.scrollBarVerticalNode.style.transition = this.config.transition;
-    this.wrapperNode.appendChild(this.scrollBarVerticalNode);
-
-    // Создаем вертикальный скролл
-    this.scrollBarHorizontalNode.className = 'faze-scroll-horizontal';
-    this.scrollBarHorizontalNode.style.transition = this.config.transition;
-    this.wrapperNode.appendChild(this.scrollBarHorizontalNode);
-
     // Получаем полную высоту и ширину элемента
     this.calculateHeight();
     this.calculateWidth();
+
+    // Создаем вертикальный скролл
+    if (this.isVertical) {
+      this.scrollBarVerticalNode.className = 'faze-scroll-vertical';
+      this.scrollBarVerticalNode.style.transition = this.config.transition;
+      this.wrapperNode.appendChild(this.scrollBarVerticalNode);
+    }
+
+    // Создаем вертикальный скролл
+    if (this.isHorizontal) {
+      this.scrollBarHorizontalNode.className = 'faze-scroll-horizontal';
+      this.scrollBarHorizontalNode.style.transition = this.config.transition;
+      this.wrapperNode.appendChild(this.scrollBarHorizontalNode);
+    }
   }
 
   /**
@@ -175,11 +179,19 @@ class Scroll {
    */
   bind(): void {
     this.bindResizeRecalculate();
-    this.bindMouseWheel();
-    this.bindMouseDragVertical();
-    this.bindMouseDragHorizontal();
-    this.bindMouseTouchVertical();
-    this.bindMouseTouchHorizontal();
+
+    // Навешиваем события на вертикальный скролл
+    if (this.isVertical) {
+      this.bindMouseWheel();
+      this.bindMouseDragVertical();
+      this.bindMouseTouchVertical();
+    }
+
+    // Навешиваем события на горизонтальный скролл
+    if (this.isHorizontal) {
+      this.bindMouseDragHorizontal();
+      this.bindMouseTouchHorizontal();
+    }
   }
 
   /**

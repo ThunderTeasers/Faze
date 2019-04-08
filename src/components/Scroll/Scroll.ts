@@ -33,13 +33,16 @@ import './Scroll.scss';
  * Структура конфига
  *
  * Содержит:
+ *   width      - ширина окна скрола
  *   height     - высота окна скрола
  *   transition - CSS стиль для задания движения в окне
+ *   class      - дополнительный CSS класс для враппера
  */
 interface Config {
   width: string;
   height: string;
   transition: string;
+  class: string;
 }
 
 /**
@@ -95,6 +98,7 @@ class Scroll {
       width: '100%',
       height: '0',
       transition: 'top 0.5s ease',
+      class: '',
     };
 
     this.config = {...defaultConfig, ...config};
@@ -122,7 +126,7 @@ class Scroll {
     this.node.style.transition = this.config.transition;
 
     // Создаем обертку
-    this.wrapperNode.classList.add('faze-scroll');
+    this.wrapperNode.className = `faze-scroll ${this.config.class}`;
     if (this.node.parentNode) {
       this.node.parentNode.insertBefore(this.wrapperNode, this.node);
     }

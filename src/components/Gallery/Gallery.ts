@@ -309,7 +309,7 @@ class Gallery {
 
     Faze.on('click', '[data-faze="gallery"]:not([data-faze-gallery-passive])', (event, callerNode) => {
       const group: string | null = callerNode.getAttribute('data-faze-gallery-group');
-      const callerNodes = document.querySelectorAll(`[data-faze-gallery-group=${group}]`);
+      const callerNodes = document.querySelectorAll(`[data-faze-gallery-group="${group}"]`);
 
       new Faze.Gallery(callerNodes, {
         group,

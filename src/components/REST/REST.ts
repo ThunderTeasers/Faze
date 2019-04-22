@@ -445,6 +445,21 @@ class REST {
           data['show'] = data['module'];
         } else if (data['module']) {
           url = window.location.pathname;
+
+          // Системный параметры
+          const systemParams = ['module', 'show', 'page', 'mime', 'from', 'update', 'method'];
+
+          // Добавляем параметры к запросу, если они не относятся к "системным"
+          const params = new URLSearchParams(window.location.search);
+          Array.from(params).forEach((param) => {
+            const name = param[0];
+            const value = param[1];
+
+            if (!systemParams.includes(name)) {
+              data[name] = value;
+            }
+          });
+
           data['show'] = data['module'];
         } else if (data['page']) {
           url = /^\//.test(data['page']) ? data['page'] : `/${data['page']}.txt`;

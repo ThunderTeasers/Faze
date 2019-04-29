@@ -92,7 +92,7 @@ class Slider {
       },
     };
 
-    this.config = {...defaultConfig, ...config};
+    this.config = Object.assign(defaultConfig, config);
     this.node = node;
     this.logger = new Logger('Модуль Faze.Slider:');
 
@@ -144,6 +144,20 @@ class Slider {
         return this.logger.error(`Ошибка исполнения пользовательского метода "created", дословно: ${error}!`);
       }
     }
+  }
+
+  /**
+   * Переинициализация
+   */
+  reinitialize(config: Partial<Config> = {}) {
+    // Очищаем внутренности
+    this.node.innerHTML = '';
+
+    // Сборка конфига
+    const newConfig = Object.assign(this.config, config);
+
+    // Инициализация
+    new Slider(this.node, newConfig);
   }
 
   /**

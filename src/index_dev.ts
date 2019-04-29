@@ -106,14 +106,22 @@ Faze.add({
       },
     });
 
-    // const slider =
-    new Faze.Slider(document.querySelector('.js-slider'), {
+    const slider = new Faze.Slider(document.querySelector('.js-slider'), {
       callbacks: {
         changed: (data: any) => {
-          // console.log(data.values);
+          console.log(data.values);
         },
       },
     });
+
+    const button = document.querySelector('.slider-reinitialize');
+    if (button) {
+      button.addEventListener('click', () => {
+        slider.reinitialize({
+          range: [0, 100],
+        });
+      });
+    }
 
     // slider.setValues([0, 100], true);
     // slider.reset();

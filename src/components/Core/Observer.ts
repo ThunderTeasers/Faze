@@ -87,7 +87,6 @@ class Observer {
 
                   // Обновляем уже существующие элементы у слушателя, чтобы при следующем добавлении элемента, пользовательская
                   // функция срабатывала только на последний, а не на все которые были добавлены после инициализации
-                  // listener.alreadyExistedNodes = document.querySelectorAll(listener.selector);
                   listener.alreadyExistedNodes.push(<HTMLElement>insertedElement);
                 }
               }

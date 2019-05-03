@@ -6,14 +6,24 @@
  */
 class Logger {
   // То что будет приписываться до текста
-  prefix: string;
+  readonly prefix: string;
 
   // То что будет приписываться после текста
-  postfix: string;
+  readonly postfix: string;
 
   constructor(prefix: string = '', postfix: string = '') {
     this.prefix = prefix;
     this.postfix = postfix;
+  }
+
+  /**
+   * Вывод предупреждения в консоль
+   *
+   * @param message - сообщение которое необходимо отобразить
+   * @param node    - DOM элемент, если необходимо
+   */
+  warning(message: string, node: HTMLElement): void {
+    console.warn(`${this.prefix} ${message} ${this.postfix}`, node ? node : '');
   }
 
   /**

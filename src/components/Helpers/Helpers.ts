@@ -107,7 +107,7 @@ class Helpers {
       }
 
       // Добавление цифры, проверка на цифры и что номер меньше 18 знаков(включая -, ( и ))
-      if (event.which > 47 && event.which < 58 && value.length < 18) {
+      if (((event.which > 47 && event.which < 58) || (event.which > 95 && event.which < 106)) && value.length < 18) {
         value += event.key;
         if (value.length === 7) {
           value += ') ';

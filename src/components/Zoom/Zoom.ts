@@ -304,7 +304,7 @@ class Zoom {
    *
    * @param source - путь до картинки
    */
-  setImage(source: string | null) {
+  setImage(source: string | null): void {
     if (source) {
       const bigImage = new Image();
       bigImage.src = source;

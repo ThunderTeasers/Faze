@@ -10,6 +10,7 @@
 
 import './Tooltip.scss';
 import Faze from '../Core/Faze';
+import Logger from '../Core/Logger';
 
 /**
  * Структура конфига тултипа
@@ -37,6 +38,9 @@ class Tooltip {
   // DOM элемент при наведении на который появляется тултип
   readonly node: HTMLElement;
 
+  // Помощник для логирования
+  readonly logger: Logger;
+
   // Конфиг с настройками
   readonly config: Config;
 
@@ -46,6 +50,14 @@ class Tooltip {
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
       throw new Error('Не задан объект у которого должен отображаться тултип.');
+    }
+
+    // Инициализация логгера
+    this.logger = new Logger('Модуль Faze.Tooltip:');
+
+    if (node.classList.contains('faze-tooltip-initialized')) {
+      this.logger.warning('Плагин Tooltip уже был инициализирован на этот DOM элемент:', node);
+      return;
     }
 
     // Конфиг по умолчанию
@@ -77,6 +89,9 @@ class Tooltip {
    * Инициализация
    */
   initialize(): void {
+    // Задаем атрибут, что на DOM элемент уже был инициализирован плагин
+    this.node.classList.add('faze-tooltip-initialized');
+
     this.tooltip.className = `faze-tooltip faze-tooltip-${this.config.side}`;
     this.tooltip.style.visibility = 'hidden';
     this.tooltip.innerHTML = this.config.text || this.node.getAttribute('data-faze-tooltip-text') || '';

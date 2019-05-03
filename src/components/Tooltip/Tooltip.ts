@@ -164,15 +164,23 @@ class Tooltip {
     this.tooltip.style.left = `${centerX}px`;
   }
 
+  static initializeByDataAttributes(tooltipNode: HTMLElement) {
+    new Faze.Tooltip(tooltipNode, {
+      text: tooltipNode.dataset.fazeTooltipText || '',
+      side: tooltipNode.dataset.fazeTooltipSide || 'bottom',
+    });
+  }
+
   /**
    * Инициализация модуля по data атрибутам
    */
   static hotInitialize(): void {
-    document.querySelectorAll('[data-faze="tooltip"]').forEach((tooltipNode) => {
-      new Faze.Tooltip(tooltipNode, {
-        text: tooltipNode.getAttribute('data-faze-tooltip-text') || '',
-        side: tooltipNode.getAttribute('data-faze-tooltip-side') || 'bottom',
-      });
+    Faze.Observer.ready('[data-faze="tooltip"]', (tooltipNode: HTMLElement) => {
+      Tooltip.initializeByDataAttributes(tooltipNode);
+    });
+
+    document.querySelectorAll('[data-faze="tooltip"]').forEach((tooltipNode: any) => {
+      Tooltip.initializeByDataAttributes(<HTMLElement>tooltipNode);
     });
   }
 }

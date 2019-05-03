@@ -21,7 +21,7 @@
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.23.1",
-    "ts-loader": "^5.4.4",
+    "ts-loader": "^5.4.5",
     "tslint": "^5.16.0",
     "tslint-config-airbnb": "^5.11.1",
     "tslint-eslint-rules": "^5.4.0",

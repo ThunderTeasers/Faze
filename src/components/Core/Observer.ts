@@ -50,7 +50,7 @@ class Observer {
    * @param selector - CSS селектор DOM элемента для отслеживания
    * @param callback - пользовательский метод, исполняющийся после добавления нужного DOM элемента
    */
-  ready(selector: string, callback: (addedNode: HTMLElement) => void) {
+  watch(selector: string, callback: (addedNode: HTMLElement) => void) {
     this.listeners.push({
       selector,
       callback,
@@ -65,9 +65,9 @@ class Observer {
    */
   private check(mutationRecords: MutationRecord[]) {
     // Проходимся по всем слушателям
-    this.listeners.forEach((listener) => {
+    this.listeners.forEach((listener: Listener) => {
       // Проходимся по всем изменениям
-      mutationRecords.forEach((mutationRecord) => {
+      mutationRecords.forEach((mutationRecord: MutationRecord) => {
         // Проходимся по всем добавленым DOM элементам
         mutationRecord.addedNodes.forEach((addedNode: Node) => {
           const parentNode = addedNode.parentNode;

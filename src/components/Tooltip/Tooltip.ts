@@ -190,11 +190,11 @@ class Tooltip {
    * Инициализация модуля по data атрибутам
    */
   static hotInitialize(): void {
-    Faze.Observer.watch('[data-faze="tooltip"]', (tooltipNode: HTMLElement) => {
+    Faze.Observer.watch('[data-faze~="tooltip"]', (tooltipNode: HTMLElement) => {
       Tooltip.initializeByDataAttributes(tooltipNode);
     });
 
-    document.querySelectorAll('[data-faze="tooltip"]').forEach((tooltipNode: any) => {
+    document.querySelectorAll('[data-faze~="tooltip"]').forEach((tooltipNode: any) => {
       Tooltip.initializeByDataAttributes(<HTMLElement>tooltipNode);
     });
   }

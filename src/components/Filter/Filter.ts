@@ -179,7 +179,7 @@ class Filter {
         const formDataURLString = new URLSearchParams(<any>formData);
 
         // URL для вставки в строку поиска в браузере(HTML5 history)
-        const urlForHistory = `?${formDataURLString.toString()}`;
+        const urlForHistory = `${this.node.dataset.fazeFilterPath || ''}?${formDataURLString.toString()}`;
         formDataURLString.append('mime', 'txt');
 
         const module = this.config.modules.get || this.node.dataset.fazeFilterModuleGet;

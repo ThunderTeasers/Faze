@@ -94,7 +94,7 @@ class Tooltip {
 
     this.tooltip.className = `faze-tooltip faze-tooltip-${this.config.side}`;
     this.tooltip.style.visibility = 'hidden';
-    this.tooltip.innerHTML = this.config.text || this.node.getAttribute('data-faze-tooltip-text') || '';
+    this.tooltip.innerHTML = this.config.text || this.node.dataset.fazeTooltipText || this.node.title || '';
   }
 
   /**

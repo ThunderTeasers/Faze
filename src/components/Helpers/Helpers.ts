@@ -18,6 +18,55 @@ interface NotificationOptions {
 
 class Helpers {
   /**
+   * Инициализация методов, которые должны работать всегда, а не по указанию пользователя
+   */
+  static initialize() {
+    Helpers.bindCopyText();
+  }
+
+  /**
+   * Копирование текста(textContent) при нажатии на DOM элемент с классом "faze-copy-text"
+   */
+  static bindCopyText() {
+    // Проходимся по всем элементам
+    document.querySelectorAll('.faze-copy-text').forEach((textNode) => {
+      // Копируем при нажатии
+      textNode.addEventListener('click', (event: any) => {
+        // Если есть что копировать
+        if (textNode.textContent) {
+          // Создаем инпут с этим текстом и позицианированием "absolute" чтобы вьюпорт не прыгал вниз
+          const inputNode = document.createElement('input');
+          inputNode.value = textNode.textContent || '';
+          inputNode.style.position = 'absolute';
+          inputNode.style.top = `${event.clientY}px`;
+          inputNode.style.left = `${event.clientX}px`;
+          inputNode.style.opacity = '0';
+          document.body.appendChild(inputNode);
+
+          // Выделяем и копируем текст
+          inputNode.focus();
+          inputNode.select();
+          document.execCommand('copy');
+
+          // Обязательно удаляем инпут, он больше не нужен
+          inputNode.remove();
+
+          // Создаем элемент для информационного сообщения
+          const notificationNode = document.createElement('div');
+          notificationNode.className = 'faze-notification';
+          notificationNode.textContent = 'Скопировано!';
+          textNode.appendChild(notificationNode);
+
+          // Через время удаляем
+          setTimeout(() => {
+            notificationNode.remove();
+          }, 3000);
+        }
+      });
+    });
+  }
+
+  /**
    * Асинхронная загрузка дополнительного JS
    *
    * Пример использования:

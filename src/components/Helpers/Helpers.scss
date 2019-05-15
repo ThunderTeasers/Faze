@@ -5,6 +5,7 @@
  * Дата: 17.01.2019
  */
 
+// Анимация появления информационного сообщения
 @keyframes faze-notification-appear {
   from {
     opacity: 0;
@@ -39,5 +40,46 @@
 
     animation-name: faze-notification-appear;
     animation-duration: 1s;
+  }
+}
+
+// Анимация исчезновения информационного сообщения о копировании
+@keyframes faze-copy-notification-disappear {
+  0% {
+    opacity: 1;
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+// Класс для элемента при нажатии на который должны скопировать его текстовое содержимое в буфер обмена
+.faze-copy-text {
+  position: relative;
+
+  // Информирование о копировании
+  .faze-notification {
+    position: absolute;
+    left: 0;
+    bottom: -1rem;
+
+    font-size: 1rem;
+    font-weight: normal;
+    line-height: 1;
+
+    opacity: 0;
+
+    animation-name: faze-copy-notification-disappear;
+    animation-duration: 2s;
+  }
+
+  // При наведении
+  &:hover {
+    cursor: pointer;
   }
 }

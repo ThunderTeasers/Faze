@@ -1,7 +1,11 @@
 import Faze from './components/Core/Faze';
+import Helpers from './components/Helpers/Helpers';
 
 // Инициализация плагинов по data атрибутам
 Faze.hotInitialize();
+
+// Инициализация помощников
+Helpers.initialize();
 
 // @ts-ignore
 window.Faze = Faze;

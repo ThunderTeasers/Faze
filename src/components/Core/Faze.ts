@@ -149,6 +149,7 @@ class Faze {
       'Modal',
       'Filter',
       'REST',
+      'Logger',
     ];
 
     // Проверка на ошибки

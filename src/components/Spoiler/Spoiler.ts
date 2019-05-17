@@ -10,6 +10,7 @@
 
 import './Spoiler.scss';
 import Faze from '../Core/Faze';
+import Logger from '../Core/Logger';
 
 /**
  * Структура возвращаемого объекта в пользовательском методе
@@ -47,6 +48,9 @@ class Spoiler {
   // DOM элемент при наведении на который появляется
   readonly node: HTMLElement;
 
+  // Помощник для логирования
+  readonly logger: Logger;
+
   // Конфиг с настройками
   readonly config: Config;
 
@@ -59,6 +63,15 @@ class Spoiler {
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
       throw new Error('Не задан объект спойлера');
+    }
+
+    // Инициализация логгера
+    this.logger = new Logger('Модуль Faze.Spoiler:');
+
+    // Проверка на двойную инициализацию
+    if (node.classList.contains('faze-spoiler')) {
+      this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
+      return;
     }
 
     // Конфиг по умолчанию
@@ -102,7 +115,7 @@ class Spoiler {
           body: this.bodyNode,
         });
       } catch (error) {
-        console.error('Ошибка исполнения пользовательского метода "created":', error);
+        this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
       }
     }
   }
@@ -124,7 +137,7 @@ class Spoiler {
                 body: this.bodyNode,
               });
             } catch (error) {
-              console.error('Ошибка исполнения пользовательского метода "opened":', error);
+              this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
             }
           }
         }
@@ -137,7 +150,7 @@ class Spoiler {
               body: this.bodyNode,
             });
           } catch (error) {
-            console.error('Ошибка исполнения пользовательского метода "changed":', error);
+            this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
           }
         }
       });

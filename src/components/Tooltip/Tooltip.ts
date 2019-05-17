@@ -120,7 +120,7 @@ class Tooltip {
         try {
           this.config.callbacks.opened();
         } catch (error) {
-          this.logger.error(error);
+          this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
         }
       }
     });

@@ -28,6 +28,7 @@
 
 import './Dropdown.scss';
 import Faze from '../Core/Faze';
+import Logger from '../Core/Logger';
 
 /**
  * Структура конфига дропдауна
@@ -67,6 +68,9 @@ class Dropdown {
   // DOM элемент дропдауна
   readonly node: HTMLElement;
 
+  // Помощник для логирования
+  readonly logger: Logger;
+
   // Конфиг с настройками
   readonly config: Config;
 
@@ -78,7 +82,16 @@ class Dropdown {
 
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
-      throw new Error('Не задан объект дропдауна');
+      return this.logger.error('Не задан объект дропдауна');
+    }
+
+    // Инициализация логгера
+    this.logger = new Logger('Модуль Faze.Dropdown:');
+
+    // Проверка на двойную инициализацию
+    if (node.classList.contains('faze-dropdown')) {
+      this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
+      return;
     }
 
     // Конфиг по умолчанию
@@ -107,7 +120,7 @@ class Dropdown {
     this.body = this.node.querySelector('.faze-body');
 
     if (!this.title || !this.body) {
-      throw new Error('Для дропдауна не найдены шапка и тело');
+      return this.logger.error('Для дропдауна не найдены шапка и тело');
     }
 
     // Присвоение сдвига для тела
@@ -134,7 +147,7 @@ class Dropdown {
           body: this.body,
         });
       } catch (error) {
-        console.error('Ошибка исполнения пользовательского метода "created":', error);
+        this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
       }
     }
   }
@@ -144,13 +157,11 @@ class Dropdown {
    */
   bind(): void {
     if (!this.title || !this.body) {
-      throw new Error('Не заданы шапка и тело дропдауна');
+      return this.logger.error('Не заданы шапка и тело дропдауна');
     }
 
     // При нажатии на заголовок, меняем видимость тела дропдауна
-    this.title.addEventListener('click', (event) => {
-      event.preventDefault();
-
+    this.title.addEventListener('click', () => {
       this.node.classList.toggle('faze-active');
 
       if (this.node.classList.contains('faze-active')) {
@@ -162,7 +173,7 @@ class Dropdown {
               body: this.body,
             });
           } catch (error) {
-            console.error('Ошибка исполнения пользовательского метода "opened":', error);
+            this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
           }
         }
       }
@@ -185,7 +196,7 @@ class Dropdown {
    */
   resetTitle(): void {
     if (!this.title) {
-      throw new Error('Не задана шапка дропдауна');
+      return this.logger.error('Не задана шапка дропдауна');
     }
 
     const cloneTitle = this.title.cloneNode(true);

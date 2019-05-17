@@ -51,6 +51,7 @@ import Faze from '../Core/Faze';
  *   arrows     - отображать ли стрелки переключения
  *   duration   - время смены слайдов, в мс.
  *   useSlideFullSize - учитывать ли при измерении размера слайда его margin
+ *   hoverOnStop - флаг, останавливать ли при наведении
  *   animation
  *     type     - тип анимации, может быть: 'slide', 'fade'
  *     time     - длительность анимации в миллисекундах
@@ -66,6 +67,7 @@ interface Config {
   arrows: boolean;
   duration: number;
   useSlideFullSize: boolean;
+  hoverOnStop: boolean;
   animation: {
     type: string;
     time: number;
@@ -193,6 +195,7 @@ class Carousel {
       arrows: true,
       duration: 3000,
       useSlideFullSize: false,
+      hoverOnStop: false,
       animation: {
         type: 'fade',
         time: 1000,
@@ -335,6 +338,28 @@ class Carousel {
 
     // Навешиваем события жестов
     this.bindGestures();
+
+    // Навешиваем события остановки при наведении
+    if (this.config.hoverOnStop && this.config.autoplay) {
+      this.bindStopOnHover();
+    }
+  }
+
+  /**
+   * Навешивание событий для остановление карусели при наведении курсора
+   */
+  bindStopOnHover(): void {
+    // Останавливаем при наведении
+    this.node.addEventListener('mouseover', () => {
+      clearInterval(this.timer);
+    });
+
+    // Включаем после того как убрали курсор
+    this.node.addEventListener('mouseleave', () => {
+      this.timer = setInterval(() => {
+        this.next();
+      }, this.config.duration);
+    });
   }
 
   /**
@@ -748,6 +773,7 @@ class Carousel {
         arrowsOutside: (carouselNode.getAttribute('data-faze-carousel-arrows-outside') || 'true') === 'true',
         duration: carouselNode.getAttribute('data-faze-carousel-duration') || 3000,
         useSlideFullSize: (carouselNode.getAttribute('data-faze-carousel-use-slide-full-size') || 'false') === 'true',
+        hoverOnStop: (carouselNode.getAttribute('data-faze-carousel-hover-on-stop') || 'false') === 'true',
         animation: {
           type: carouselNode.getAttribute('data-faze-carousel-animation-type') || 'fade',
           time: carouselNode.getAttribute('data-faze-carousel-animation-time') || 1000,

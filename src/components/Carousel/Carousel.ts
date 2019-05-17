@@ -40,6 +40,7 @@
 
 import './Carousel.scss';
 import Faze from '../Core/Faze';
+import Logger from '../Core/Logger';
 
 /**
  * Структура конфига карусели
@@ -119,6 +120,9 @@ class Carousel {
   // DOM элемент карусели
   readonly node: HTMLElement;
 
+  // Помощник для логирования
+  readonly logger: Logger;
+
   // Конфиг с настройками
   readonly config: Config;
 
@@ -185,6 +189,15 @@ class Carousel {
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
       throw new Error('Не задан объект карусели');
+    }
+
+    // Инициализация логгера
+    this.logger = new Logger('Модуль Faze.Carousel:');
+
+    // Проверка на двойную инициализацию
+    if (node.classList.contains('faze-carousel')) {
+      this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
+      return;
     }
 
     // Конфиг по умолчанию
@@ -314,7 +327,7 @@ class Carousel {
           currentSlideNode: this.slidesNodes[this.index],
         });
       } catch (error) {
-        console.error('Ошибка исполнения пользовательского метода "created":', error);
+        this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
       }
     }
   }
@@ -445,7 +458,7 @@ class Carousel {
    */
   createPagination(): void {
     if (!this.pagesNode) {
-      throw new Error('Родительский элемент пагинации не найден');
+      this.logger.error('Родительский элемент пагинации не найден');
     }
 
     this.pagesNode.className = 'faze-carousel-pages';
@@ -690,7 +703,7 @@ class Carousel {
           pagesNode: this.pagesNode,
         });
       } catch (error) {
-        console.error('Ошибка исполнения пользовательского метода "changed":', error);
+        this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
       }
     }
   }

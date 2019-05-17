@@ -177,6 +177,11 @@ class Tooltip {
     this.tooltip.style.left = `${centerX}px`;
   }
 
+  /**
+   * Инициализация модуля по data атрибутам
+   *
+   * @param tooltipNode - DOM элемент на который нужно инициализировать плагин
+   */
   static initializeByDataAttributes(tooltipNode: HTMLElement) {
     new Faze.Tooltip(tooltipNode, {
       text: tooltipNode.dataset.fazeTooltipText || '',
@@ -185,7 +190,7 @@ class Tooltip {
   }
 
   /**
-   * Инициализация модуля по data атрибутам
+   * Инициализация модуля либо по data атрибутам либо через observer
    */
   static hotInitialize(): void {
     Faze.Observer.watch('[data-faze~="tooltip"]', (tooltipNode: HTMLElement) => {

@@ -775,24 +775,37 @@ class Carousel {
 
   /**
    * Инициализация модуля по data атрибутам
+   *
+   * @param carouselNode - DOM элемент на который нужно инициализировать плагин
+   */
+  static initializeByDataAttributes(carouselNode: HTMLElement) {
+    new Faze.Carousel(carouselNode, {
+      autoplay: (carouselNode.getAttribute('data-faze-carousel-autoplay') || 'false') === 'true',
+      counter: (carouselNode.getAttribute('data-faze-carousel-counter') || 'false') === 'true',
+      pages: (carouselNode.getAttribute('data-faze-carousel-pages') || 'false') === 'true',
+      arrows: (carouselNode.getAttribute('data-faze-carousel-arrows') || 'true') === 'true',
+      arrowsOutside: (carouselNode.getAttribute('data-faze-carousel-arrows-outside') || 'true') === 'true',
+      duration: carouselNode.getAttribute('data-faze-carousel-duration') || 3000,
+      useSlideFullSize: (carouselNode.getAttribute('data-faze-carousel-use-slide-full-size') || 'false') === 'true',
+      stopOnHover: (carouselNode.getAttribute('data-faze-carousel-stop-on-hover') || 'false') === 'true',
+      animation: {
+        type: carouselNode.getAttribute('data-faze-carousel-animation-type') || 'fade',
+        time: carouselNode.getAttribute('data-faze-carousel-animation-time') || 1000,
+        direction: carouselNode.getAttribute('data-faze-carousel-animation-direction') || 'horizontal',
+      },
+    });
+  }
+
+  /**
+   * Инициализация модуля либо по data атрибутам либо через observer
    */
   static hotInitialize(): void {
-    document.querySelectorAll('[data-faze="carousel"]').forEach((carouselNode) => {
-      new Faze.Carousel(carouselNode, {
-        autoplay: (carouselNode.getAttribute('data-faze-carousel-autoplay') || 'false') === 'true',
-        counter: (carouselNode.getAttribute('data-faze-carousel-counter') || 'false') === 'true',
-        pages: (carouselNode.getAttribute('data-faze-carousel-pages') || 'false') === 'true',
-        arrows: (carouselNode.getAttribute('data-faze-carousel-arrows') || 'true') === 'true',
-        arrowsOutside: (carouselNode.getAttribute('data-faze-carousel-arrows-outside') || 'true') === 'true',
-        duration: carouselNode.getAttribute('data-faze-carousel-duration') || 3000,
-        useSlideFullSize: (carouselNode.getAttribute('data-faze-carousel-use-slide-full-size') || 'false') === 'true',
-        stopOnHover: (carouselNode.getAttribute('data-faze-carousel-stop-on-hover') || 'false') === 'true',
-        animation: {
-          type: carouselNode.getAttribute('data-faze-carousel-animation-type') || 'fade',
-          time: carouselNode.getAttribute('data-faze-carousel-animation-time') || 1000,
-          direction: carouselNode.getAttribute('data-faze-carousel-animation-direction') || 'horizontal',
-        },
-      });
+    Faze.Observer.watch('[data-faze~="carousel"]', (carouselNode: HTMLElement) => {
+      Carousel.initializeByDataAttributes(carouselNode);
+    });
+
+    document.querySelectorAll('[data-faze~="carousel"]').forEach((carouselNode: any) => {
+      this.initializeByDataAttributes(carouselNode);
     });
   }
 }

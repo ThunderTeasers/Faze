@@ -55,8 +55,9 @@ class Tooltip {
     // Инициализация логгера
     this.logger = new Logger('Модуль Faze.Tooltip:');
 
-    if (node.classList.contains('faze-tooltip-initialized')) {
-      this.logger.warning('Плагин Tooltip уже был инициализирован на этот DOM элемент:', node);
+    // Проверка на двойную инициализацию
+    if (node.classList.contains('faze-tooltip')) {
+      this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
       return;
     }
 
@@ -74,7 +75,7 @@ class Tooltip {
 
     // Проверка на то, что сторона задана правильно
     if (!['top', 'bottom', 'right', 'left'].includes(this.config.side)) {
-      throw new Error('Параметр "side" задан верно! Корректные значения: "top", "right", "bottom", "left".');
+      this.logger.error('Параметр "side" задан верно! Корректные значения: "top", "right", "bottom", "left".');
     }
 
     // Инициализация переменных
@@ -89,9 +90,6 @@ class Tooltip {
    * Инициализация
    */
   initialize(): void {
-    // Задаем атрибут, что на DOM элемент уже был инициализирован плагин
-    this.node.classList.add('faze-tooltip-initialized');
-
     this.tooltip.className = `faze-tooltip faze-tooltip-${this.config.side}`;
     this.tooltip.style.visibility = 'hidden';
     this.tooltip.innerHTML = this.config.text || this.node.dataset.fazeTooltipText || this.node.title || '';
@@ -121,8 +119,8 @@ class Tooltip {
       if (typeof this.config.callbacks.opened === 'function') {
         try {
           this.config.callbacks.opened();
-        } catch (e) {
-          throw new Error(e);
+        } catch (error) {
+          this.logger.error(error);
         }
       }
     });

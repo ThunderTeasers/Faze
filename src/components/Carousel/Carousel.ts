@@ -805,7 +805,7 @@ class Carousel {
     });
 
     document.querySelectorAll('[data-faze~="carousel"]').forEach((carouselNode: any) => {
-      this.initializeByDataAttributes(carouselNode);
+      Carousel.initializeByDataAttributes(carouselNode);
     });
   }
 }

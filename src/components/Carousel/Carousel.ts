@@ -67,7 +67,7 @@ interface Config {
   arrows: boolean;
   duration: number;
   useSlideFullSize: boolean;
-  hoverOnStop: boolean;
+  stopOnHover: boolean;
   animation: {
     type: string;
     time: number;
@@ -195,7 +195,7 @@ class Carousel {
       arrows: true,
       duration: 3000,
       useSlideFullSize: false,
-      hoverOnStop: false,
+      stopOnHover: false,
       animation: {
         type: 'fade',
         time: 1000,
@@ -340,7 +340,7 @@ class Carousel {
     this.bindGestures();
 
     // Навешиваем события остановки при наведении
-    if (this.config.hoverOnStop && this.config.autoplay) {
+    if (this.config.stopOnHover && this.config.autoplay) {
       this.bindStopOnHover();
     }
   }
@@ -773,7 +773,7 @@ class Carousel {
         arrowsOutside: (carouselNode.getAttribute('data-faze-carousel-arrows-outside') || 'true') === 'true',
         duration: carouselNode.getAttribute('data-faze-carousel-duration') || 3000,
         useSlideFullSize: (carouselNode.getAttribute('data-faze-carousel-use-slide-full-size') || 'false') === 'true',
-        hoverOnStop: (carouselNode.getAttribute('data-faze-carousel-hover-on-stop') || 'false') === 'true',
+        stopOnHover: (carouselNode.getAttribute('data-faze-carousel-stop-on-hover') || 'false') === 'true',
         animation: {
           type: carouselNode.getAttribute('data-faze-carousel-animation-type') || 'fade',
           time: carouselNode.getAttribute('data-faze-carousel-animation-time') || 1000,

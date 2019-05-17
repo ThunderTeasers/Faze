@@ -26,10 +26,19 @@ new Faze.Modal(document.querySelector('#button'), {
   ],
 });
 
-// @ts-ignore
-window.test = () => {
-  console.log(123);
-};
+// Тесты
+Faze.add({
+  pluginName: 'ObserveTest',
+  condition: document.querySelectorAll('.js-notification').length > 0,
+  observableSelector: '.js-notification',
+  callback: () => {
+    document.querySelectorAll('.js-notification').forEach((buttonNode) => {
+      buttonNode.addEventListener('click', () => {
+        console.log(123);
+      });
+    });
+  },
+});
 
 // Тесты
 Faze.add({

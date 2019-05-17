@@ -42,12 +42,14 @@ import Observer from './Observer';
  *   plugins    - список подключаемых плагинов
  *   condition  - условие, при котором плагин будет исполняться, если условия нет, плагин считается "закрытым", то есть выполнится только
  *                при вызове его в другом плагине через plugins
+ *   observableSelector - наблюдаемый CSS селектор, если указан то выполняем этот модель при появлении DOM элемента с этим селектором
  *   callback   - метод исполняющийся при инициализации(или вызове, см. condition) плагина
  */
 interface PluginConfig {
   pluginName: string;
   plugins: string[];
   condition: boolean;
+  observableSelector: string;
   callback: (modules?: InnerPluginsData) => void;
 }
 
@@ -202,8 +204,14 @@ class Faze {
       if (typeof config.callback === 'function') {
         try {
           config.callback(currentPlugins);
-        } catch (e) {
-          console.error(`Error in plugin "${config.pluginName}", exception:`, e);
+
+          console.log(config.observableSelector);
+
+          if (config.observableSelector) {
+            Faze.Observer.watch(config.observableSelector, config.callback);
+          }
+        } catch (error) {
+          console.error(`Error in plugin "${config.pluginName}", exception:`, error);
         }
       }
     }

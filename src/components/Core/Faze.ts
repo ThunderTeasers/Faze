@@ -205,8 +205,7 @@ class Faze {
         try {
           config.callback(currentPlugins);
 
-          console.log(config.observableSelector);
-
+          // Если присутствует селектор для отслеживания модуля, то ставим его на отслеживание
           if (config.observableSelector) {
             Faze.Observer.watch(config.observableSelector, config.callback);
           }

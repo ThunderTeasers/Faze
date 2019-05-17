@@ -148,7 +148,11 @@ class Spoiler {
    * Инициализация модуля по data атрибутам
    */
   static hotInitialize(): void {
-    document.querySelectorAll('[data-faze="spoiler"]').forEach((spoilerNode) => {
+    Faze.Observer.watch('[data-faze~="spoiler"]', (spoilerNode: HTMLElement) => {
+      new Faze.Spoiler(spoilerNode);
+    });
+
+    document.querySelectorAll('[data-faze~="spoiler"]').forEach((spoilerNode) => {
       new Faze.Spoiler(spoilerNode);
     });
   }

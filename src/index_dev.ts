@@ -52,9 +52,7 @@ Faze.add({
 
     new Faze.Tab(document.querySelector('.faze-tabs'));
 
-    new Faze.Dropdown(document.querySelector('.faze-dropdown'), {
-      strictPosition: true,
-    });
+    new Faze.Dropdown(document.querySelector('.js-dropdown'));
 
     const fazeSelect = new Faze.Select(document.querySelector('.faze-select'), {
       default: true,

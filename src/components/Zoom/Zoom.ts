@@ -10,6 +10,7 @@
 
 import './Zoom.scss';
 import Faze from '../Core/Faze';
+import Logger from '../Core/Logger';
 
 /**
  * Структура конфига
@@ -33,6 +34,9 @@ interface Config {
 class Zoom {
   // DOM элемент зума
   readonly node: HTMLElement;
+
+  // Помощник для логирования
+  readonly logger: Logger;
 
   // Конфиг с настройками
   readonly config: Config;
@@ -92,6 +96,14 @@ class Zoom {
       throw new Error('Не задан объект зума');
     }
 
+    // Инициализация логгера
+    this.logger = new Logger('Модуль Faze.Zoom:');
+
+    // Проверка на двойную инициализацию
+    if (node.classList.contains('faze-zoom-initialized')) {
+      return;
+    }
+
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       image: undefined,
@@ -123,6 +135,9 @@ class Zoom {
    * Инициализация
    */
   initialize(): void {
+    // Простановка стандартных классов
+    this.node.classList.add('faze-zoom-initialized');
+
     // Создаем обертку
     this.wrapperNode.className = 'faze-zoom';
 
@@ -166,12 +181,12 @@ class Zoom {
     }
 
     this.bigImageNode.className = 'faze-zoom-big-image';
-    const bigImageSource = this.config.image || this.node.getAttribute('data-faze-full-image');
+    const bigImageSource = this.config.image || this.node.dataset.fazeFullImage;
     if (bigImageSource) {
       const bigImage = new Image();
       bigImage.src = bigImageSource;
       bigImage.onload = () => {
-        this.bigImageNode.setAttribute('src', bigImageSource);
+        this.bigImageNode.src = bigImageSource;
         this.bigImageWrapperNode.appendChild(this.bigImageNode);
         this.wrapperNode.appendChild(this.bigImageWrapperNode);
 
@@ -212,7 +227,7 @@ class Zoom {
    *
    * @param event - JS событие, требуется для получения координат курсора
    */
-  move(event: any) {
+  move(event: any): void {
     if (this.isEnabled) {
       // Определяем положение курсора относительно изображения, а не экрана
       this.position.x = event.clientX - this.node.getBoundingClientRect().left;
@@ -253,7 +268,7 @@ class Zoom {
   /**
    * Рассчет переменных, требуемых для корректной работы
    */
-  calculate() {
+  calculate(): void {
     // Данные о размере большого изображения
     const bigImageWidth = this.bigImageSize.width;
     const bigImageHeight = this.bigImageSize.height;
@@ -311,7 +326,7 @@ class Zoom {
       bigImage.onload = () => {
         this.isEnabled = true;
 
-        this.bigImageNode.setAttribute('src', source);
+        this.bigImageNode.src = source;
         this.bigImageWrapperNode.appendChild(this.bigImageNode);
         this.wrapperNode.appendChild(this.bigImageWrapperNode);
 
@@ -325,15 +340,28 @@ class Zoom {
 
   /**
    * Инициализация модуля по data атрибутам
+   *
+   * @param zoomNode - DOM элемент на который нужно инициализировать плагин
+   */
+  static initializeByDataAttributes(zoomNode: HTMLElement) {
+    new Faze.Zoom(zoomNode, {
+      image: zoomNode.dataset.fazeZoomImage,
+      side: zoomNode.dataset.fazeZoomSide || 'right',
+      width: parseInt(zoomNode.dataset.fazeZoomWidth || '300', 10),
+      height: parseInt(zoomNode.dataset.fazeZoomHeight || '300', 10),
+    });
+  }
+
+  /**
+   * Инициализация модуля либо по data атрибутам либо через observer
    */
   static hotInitialize(): void {
-    document.querySelectorAll('[data-faze="zoom"]').forEach((zoomNode) => {
-      new Faze.Zoom(zoomNode, {
-        image: zoomNode.getAttribute('data-faze-zoom-image'),
-        side: zoomNode.getAttribute('data-faze-zoom-side') || 'right',
-        width: parseInt(zoomNode.getAttribute('data-faze-zoom-width') || '300', 10),
-        height: parseInt(zoomNode.getAttribute('data-faze-zoom-height') || '300', 10),
-      });
+    Faze.Observer.watch('[data-faze~="zoom"]', (zoomNode: HTMLElement) => {
+      Zoom.initializeByDataAttributes(zoomNode);
+    });
+
+    document.querySelectorAll('[data-faze~="zoom"]').forEach((zoomNode: any) => {
+      Zoom.initializeByDataAttributes(<HTMLElement>zoomNode);
     });
   }
 }

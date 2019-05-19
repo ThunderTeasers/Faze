@@ -1,29 +1,11 @@
 /**
  * Плагин дропдауна
  *
- * Дропдаун из себя представляет "шапку" при нажатии на которую снизу появляется "тело". "Тело" имеет свойство "position: absolute;" то
- * есть другими словами - не сдвигает блоки находящиеся снизу.
+ * Дропдаун из себя представляет "шапку" при нажатии на которую снизу появляется "тело".
  *
  * Автор: Ерохин Максим, plarson.ru
  * Дата: 26.09.2018
- *
- *
- * Пример использования
- * В JS:
- *   Faze.add({
- *     pluginName: 'FilterDropdowns',
- *     plugins: ['Dropdown'],
- *     condition: document.querySelectorAll('.faze-dropdown').length,
- *     callback: () => {
- *       new Faze.Dropdown(document.querySelector('.faze-dropdown'));
- *     }
- *   });
- *
- * В HTML:
- *   <div class="faze-dropdown">
- *     <div class="faze-title">Дропдаун</div>
- *     <div class="faze-body">Тело дропдауна</div>
- *   </div>
+ * Документация: https://github.com/ThunderTeasers/Faze/wiki/%D0%9C%D0%BE%D0%B4%D1%83%D0%BB%D1%8C-Select
  */
 
 import './Dropdown.scss';

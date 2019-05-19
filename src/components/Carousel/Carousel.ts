@@ -12,30 +12,7 @@
  *
  * Автор: Ерохин Максим, plarson.ru
  * Дата: 29.09.2018
- *
- *
- * Пример использования
- * В JS:
- *   Faze.add({
- *     pluginName: 'ProductCarousel',
- *     plugins: ['Carousel'],
- *     condition: document.querySelectorAll('.carousel-product').length,
- *     callback: () => {
- *       new Faze.Carousel(document.querySelector('.carousel-product'), {
- *         autoplay: true,
- *         pages: true,
- *         counter: true,
- *       });
- *     }
- *   });
- *
- * В HTML:
- *   <div class="carousel-product">
- *     <img src="https://via.placeholder.com/350x150">
- *     <img src="https://via.placeholder.com/350x150">
- *     <img src="https://via.placeholder.com/350x150">
- *     <img src="https://via.placeholder.com/350x150">
- *   </div>
+ * Документация: https://github.com/ThunderTeasers/Faze/wiki/%D0%9C%D0%BE%D0%B4%D1%83%D0%BB%D1%8C-Carousel
  */
 
 import './Carousel.scss';
@@ -46,19 +23,19 @@ import Logger from '../Core/Logger';
  * Структура конфига карусели
  *
  * Содержит:
- *   autoplay   - флаг авто воспроизведения карусели
+ *   autoplay   - флаг автовоспроизведения карусели
  *   counter    - отображать ли счетчик слайдов
  *   pages      - отображать ли пагинацию слайдов
  *   arrows     - отображать ли стрелки переключения
  *   duration   - время смены слайдов, в мс.
  *   useSlideFullSize - учитывать ли при измерении размера слайда его margin
- *   hoverOnStop - флаг, останавливать ли при наведении
+ *   hoverOnStop - флаг остановки ли при наведении
  *   animation
  *     type     - тип анимации, может быть: 'slide', 'fade'
  *     time     - длительность анимации в миллисекундах
  *     direction - направление смены слайдов, может быть: 'vertical', 'horizontal'. Используется только для анимации 'slide'
  *   callbacks
- *     changed  - пользовательская функция, исполняющаяся при создании карусели
+ *     created  - пользовательская функция, исполняющаяся при создании карусели
  *     changed  - пользовательская функция, исполняющаяся при изменении слайда
  */
 interface Config {
@@ -780,18 +757,18 @@ class Carousel {
    */
   static initializeByDataAttributes(carouselNode: HTMLElement) {
     new Faze.Carousel(carouselNode, {
-      autoplay: (carouselNode.getAttribute('data-faze-carousel-autoplay') || 'false') === 'true',
-      counter: (carouselNode.getAttribute('data-faze-carousel-counter') || 'false') === 'true',
-      pages: (carouselNode.getAttribute('data-faze-carousel-pages') || 'false') === 'true',
-      arrows: (carouselNode.getAttribute('data-faze-carousel-arrows') || 'true') === 'true',
-      arrowsOutside: (carouselNode.getAttribute('data-faze-carousel-arrows-outside') || 'true') === 'true',
-      duration: carouselNode.getAttribute('data-faze-carousel-duration') || 3000,
-      useSlideFullSize: (carouselNode.getAttribute('data-faze-carousel-use-slide-full-size') || 'false') === 'true',
-      stopOnHover: (carouselNode.getAttribute('data-faze-carousel-stop-on-hover') || 'false') === 'true',
+      autoplay: (carouselNode.dataset.fazeCarouselAutoplay || 'false') === 'true',
+      counter: (carouselNode.dataset.fazeCarouselCounter || 'false') === 'true',
+      pages: (carouselNode.dataset.fazeCarouselPages || 'false') === 'true',
+      arrows: (carouselNode.dataset.fazeCarouselArrows || 'true') === 'true',
+      arrowsOutside: (carouselNode.dataset.fazeCarouselArrowsOutside || 'true') === 'true',
+      duration: carouselNode.dataset.fazeCarouselDuration || 3000,
+      useSlideFullSize: (carouselNode.dataset.fazeCarouselUseSlideFullSize || 'false') === 'true',
+      stopOnHover: (carouselNode.dataset.fazeCarouselStopOnHover || 'false') === 'true',
       animation: {
-        type: carouselNode.getAttribute('data-faze-carousel-animation-type') || 'fade',
-        time: carouselNode.getAttribute('data-faze-carousel-animation-time') || 1000,
-        direction: carouselNode.getAttribute('data-faze-carousel-animation-direction') || 'horizontal',
+        type: carouselNode.dataset.fazeCarouselAnimationType || 'fade',
+        time: carouselNode.dataset.fazeCarouselAnimationTime || 1000,
+        direction: carouselNode.dataset.fazeCarouselAnimationDuration || 'horizontal',
       },
     });
   }

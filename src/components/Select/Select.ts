@@ -1,30 +1,11 @@
 /**
  * Плагин селекта
  *
+ * Селект представляет из себя стандартный селект, но с дополнительным функционалом + с возможностью стилизации
+ *
  * Автор: Ерохин Максим, plarson.ru
  * Дата: 26.09.2018
- *
- *
- * Пример использования
- * В JS:
- *   Faze.add({
- *     pluginName: 'FilterSelects',
- *     plugins: ['Select'],
- *     condition: document.querySelectorAll('.faze-select').length,
- *     callback: () => {
- *       new Faze.Select(document.querySelector('.faze-select'));
- *     }
- *   });
- *
- * В HTML:
- *   <div class="faze-select">
- *     <div class="faze-title">Селект</div>
- *      <div class="faze-body">
- *        <div class="faze-option">Выбор 1</div>
- *        <div class="faze-option">Выбор 2</div>
- *        <div class="faze-option">Выбор 3</div>
- *      </div>
- *   </div>
+ * Документация: https://github.com/ThunderTeasers/Faze/wiki/%D0%9C%D0%BE%D0%B4%D1%83%D0%BB%D1%8C-Select
  */
 
 import './Select.scss';

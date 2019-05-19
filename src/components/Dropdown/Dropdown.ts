@@ -71,7 +71,7 @@ class Dropdown {
     this.logger = new Logger('Модуль Faze.Dropdown:');
 
     // Проверка на двойную инициализацию
-    if (node.classList.contains('faze-dropdown')) {
+    if (node.classList.contains('faze-dropdown-initialized')) {
       this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
       return;
     }
@@ -97,6 +97,10 @@ class Dropdown {
    * Инициализация
    */
   initialize(): void {
+    // Простановка стандартных классов
+    this.node.classList.add('faze-dropdown');
+    this.node.classList.add('faze-dropdown-initialized');
+
     // Поиск основных элементов и проверка на то что они найдены
     this.title = this.node.querySelector('.faze-title');
     this.body = this.node.querySelector('.faze-body');

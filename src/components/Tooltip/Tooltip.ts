@@ -56,7 +56,7 @@ class Tooltip {
     this.logger = new Logger('Модуль Faze.Tooltip:');
 
     // Проверка на двойную инициализацию
-    if (node.classList.contains('faze-tooltip')) {
+    if (node.classList.contains('faze-tooltip-initialized')) {
       this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
       return;
     }
@@ -90,7 +90,7 @@ class Tooltip {
    * Инициализация
    */
   initialize(): void {
-    this.tooltip.className = `faze-tooltip faze-tooltip-${this.config.side}`;
+    this.tooltip.className = `faze-tooltip faze-tooltip-initialized faze-tooltip-${this.config.side}`;
     this.tooltip.style.visibility = 'hidden';
     this.tooltip.innerHTML = this.config.text || this.node.dataset.fazeTooltipText || this.node.title || '';
   }

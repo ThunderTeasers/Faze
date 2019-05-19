@@ -172,7 +172,7 @@ class Carousel {
     this.logger = new Logger('Модуль Faze.Carousel:');
 
     // Проверка на двойную инициализацию
-    if (node.classList.contains('faze-carousel')) {
+    if (node.classList.contains('faze-carousel-initialized')) {
       this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
       return;
     }
@@ -255,6 +255,9 @@ class Carousel {
    * Инициализация
    */
   initialize(): void {
+    // Простановка стандартных классов
+    this.node.classList.add('faze-carousel-initialized');
+
     // Изначально индекс равен нулю
     this.index = 0;
 

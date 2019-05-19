@@ -69,7 +69,7 @@ class Spoiler {
     this.logger = new Logger('Модуль Faze.Spoiler:');
 
     // Проверка на двойную инициализацию
-    if (node.classList.contains('faze-spoiler')) {
+    if (node.classList.contains('faze-spoiler-initialized')) {
       this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
       return;
     }
@@ -99,7 +99,10 @@ class Spoiler {
    * Инициализация
    */
   initialize() {
+    // Простановка стандартных классов
     this.node.classList.add('faze-spoiler');
+    this.node.classList.add('faze-spoiler-initialized');
+
     if (this.titleNode) {
       this.titleNode.classList.add('faze-title');
     }

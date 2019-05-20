@@ -754,6 +754,23 @@ class Carousel {
   }
 
   /**
+   * Изменение направления анимации
+   *
+   * @param direction - новое направление
+   */
+  changeAnimationDirection(direction: string): void {
+    // Удаляем все предыдущие классы направления анимации
+    this.node.classList.remove('faze-direction-vertical');
+    this.node.classList.remove('faze-direction-horizontal');
+
+    // Проставляем переданный
+    this.node.classList.add(`faze-direction-${direction}`);
+
+    // Изменение конфига
+    this.config.animation.direction = direction;
+  }
+
+  /**
    * Инициализация модуля по data атрибутам
    *
    * @param carouselNode - DOM элемент на который нужно инициализировать плагин

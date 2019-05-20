@@ -71,23 +71,25 @@ Faze.add({
 
     fazeSelect.setValue('Выбор 2');
 
-    // new Faze.Carousel(document.querySelector('.carousel-test'), {
-    //   autoplay: false,
-    //   pages: false,
-    //   arrows: true,
-    //   arrowsOutside: true,
-    //   counter: false,
-    //   animation: {
-    //     type: 'slide',
-    //     time: 1000,
-    //     direction: 'horizontal',
-    //   },
-    //   callbacks: {
-    //     created: (data: any) => {
-    //       console.log(data);
-    //     },
-    //   },
-    // });
+    const carousel = new Faze.Carousel(document.querySelector('.carousel-test'), {
+      autoplay: false,
+      pages: false,
+      arrows: true,
+      arrowsOutside: true,
+      counter: false,
+      animation: {
+        type: 'slide',
+        time: 1000,
+        direction: 'horizontal',
+      },
+      callbacks: {
+        created: (data: any) => {
+          console.log(data);
+        },
+      },
+    });
+
+    carousel.changeAnimationDirection('vertical');
 
     const zoom = new Faze.Zoom(document.querySelector('.image'), {
       side: 'right',

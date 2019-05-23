@@ -35,12 +35,14 @@ import './Scroll.scss';
  * Содержит:
  *   width      - ширина окна скрола
  *   height     - высота окна скрола
+ *   shrink     - уменьшать ли размер враппера если реальный размер контента меньше него
  *   transition - CSS стиль для задания движения в окне
  *   class      - дополнительный CSS класс для враппера
  */
 interface Config {
   width: string;
   height: string;
+  shrink: boolean;
   transition: string;
   class: string;
 }
@@ -97,6 +99,7 @@ class Scroll {
     const defaultConfig: Config = {
       width: '100%',
       height: '0',
+      shrink: true,
       transition: 'top 0.5s ease',
       class: '',
     };
@@ -177,8 +180,6 @@ class Scroll {
    */
   bindMouseWheel(): void {
     this.wrapperNode.addEventListener('wheel', (event) => {
-      console.log(this.isVertical);
-
       if (this.isVertical) {
         event.preventDefault();
 
@@ -541,7 +542,12 @@ class Scroll {
    */
   calculateHeight(): void {
     if (this.config.height) {
-      if (this.scrollBarVerticalNode) {
+      // Проверяем не слишком ли большая высота задана в конфиге и если это так то уменьшаем высоту враппера до реальной
+      if (!this.config.height.toString().includes('%') && this.node.getBoundingClientRect().height <= parseInt(this.config.height, 10)) {
+        this.isVertical = false;
+        this.wrapperNode.classList.remove('faze-scroll-vertical');
+        this.wrapperNode.style.height = `${this.node.getBoundingClientRect().height || 0}px`;
+      } else if (this.scrollBarVerticalNode) {
         // Дополнительная высота за счет паддингов
         const styles = window.getComputedStyle(this.wrapperNode);
         const additionalHeight = parseFloat(styles.paddingTop || '0') + parseFloat(styles.paddingBottom || '0');

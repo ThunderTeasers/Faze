@@ -84,6 +84,15 @@ class Select {
       throw new Error('Не задан объект селекта!');
     }
 
+    // Инициализация логгера
+    this.logger = new Logger('Модуль Faze.Select:');
+
+    // Проверка на двойную инициализацию
+    if (node.classList.contains('faze-select-initialized')) {
+      this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
+      return;
+    }
+
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       name: node.dataset.fazeSelectName,
@@ -98,7 +107,6 @@ class Select {
 
     this.config = {...defaultConfig, ...config};
     this.node = node;
-    this.logger = new Logger('Модуль Faze.Select:');
 
     // Инициализация переменных
     if (this.config.default) {
@@ -330,7 +338,7 @@ class Select {
    * Инициализация модуля по data атрибутам
    */
   static hotInitialize(): void {
-    document.querySelectorAll('[data-faze="select"]').forEach((selectNode: any) => {
+    document.querySelectorAll('[data-faze~="select"]').forEach((selectNode: any) => {
       new Faze.Select(selectNode, {
         name: selectNode.dataset.fazeSelectName,
         default: (selectNode.dataset.fazeSelectDefault || 'false') === 'true',

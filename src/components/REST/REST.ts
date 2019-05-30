@@ -243,7 +243,15 @@ class REST {
 
     // Определение, какой тип ответа запрашивать
     let typeForResponse = 'text';
-    const notificationNode: any = formNode.querySelector('[data-faze-restapi-notification]');
+    let notificationNode: any = null;
+
+    // Ищем DOM элемент для вывода информационного сообщения
+    if (formNode.dataset.fazeRestapiNotification) {
+      notificationNode = formNode;
+    } else {
+      notificationNode = formNode.querySelector('[data-faze-restapi-notification]');
+    }
+
     if (notificationNode) {
       if (notificationNode.dataset.fazeRestapiNotification === 'response_json') {
         typeForResponse = 'json';
@@ -256,14 +264,17 @@ class REST {
         REST.chain(formNode.dataset.fazeRestapiForm || null, callback, response);
       }
 
-      // Если есть контейнер(ы) <span data-faze-restapi-notification="text/json"></span>
-      formNode.querySelectorAll('[data-faze-restapi-notification]').forEach((itemNode: any) => {
-        if (itemNode.dataset.fazeRestapiNotification === 'response_json') {
-          itemNode.innerHTML = response.message;
+      // Проставляем класс, сигнализирующий о том, что запрос выполнился и ответ пришел
+      formNode.classList.add('faze-restapi-form-success');
+
+      // Если есть контейнер с [data-faze-restapi-notification="text/json"]
+      if (notificationNode) {
+        if (notificationNode.dataset.fazeRestapiNotification === 'response_json') {
+          notificationNode.innerHTML = response.message;
         } else {
-          itemNode.innerHTML = response;
+          notificationNode.innerHTML = response;
         }
-      });
+      }
     };
 
     // Добавляем специальное поле для обхода защиты от спама

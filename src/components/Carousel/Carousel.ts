@@ -18,6 +18,7 @@
 import './Carousel.scss';
 import Faze from '../Core/Faze';
 import Logger from '../Core/Logger';
+import Timeout = NodeJS.Timeout;
 
 /**
  * Структура конфига карусели
@@ -137,7 +138,7 @@ class Carousel {
   index: number;
 
   // ID таймера переключения слайдов
-  timer: number;
+  timer: Timeout;
 
   // Определяет состояние карусели, в состоянии покоя или проигрывается анимация
   isIdle: boolean;

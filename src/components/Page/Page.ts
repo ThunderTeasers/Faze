@@ -209,8 +209,11 @@ class Page {
       // Блокировка кнопки от повторного нажатия
       this.lockButton();
 
+      // Путь для запроса новых элементов
+      const url = `${this.node.dataset.fazePagePath || window.location.pathname}?${this.params.toString()}`;
+
       // Получение новых элементов
-      fetch(`${window.location.pathname}?${this.params.toString()}`)
+      fetch(url)
         .then(response => response.text())
         .then((response) => {
           // Парсинг ответа

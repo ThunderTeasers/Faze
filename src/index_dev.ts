@@ -73,7 +73,7 @@ Faze.add({
 
     const carousel = new Faze.Carousel(document.querySelector('.carousel-test'), {
       autoplay: false,
-      pages: false,
+      pages: true,
       arrows: true,
       arrowsOutside: true,
       counter: false,
@@ -89,7 +89,14 @@ Faze.add({
       },
     });
 
-    carousel.changeAnimationDirection('vertical');
+    const carouselChangeButtonNode = document.querySelector('.js-notification');
+    if (carouselChangeButtonNode) {
+      carouselChangeButtonNode.addEventListener('click', () => {
+        carousel.change(0);
+      });
+    }
+
+    // carousel.changeAnimationDirection('vertical');
 
     const zoom = new Faze.Zoom(document.querySelector('.image'), {
       side: 'right',
@@ -172,9 +179,7 @@ Faze.add({
 
     const notificationButtonNode = document.querySelector('.js-notification');
     if (notificationButtonNode) {
-      notificationButtonNode.addEventListener('click', (event) => {
-        event.preventDefault();
-
+      notificationButtonNode.addEventListener('click', () => {
         Faze.Helpers.showNotification('Тест', {
           isNested: false,
         });

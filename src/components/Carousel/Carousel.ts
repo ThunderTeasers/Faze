@@ -18,7 +18,6 @@
 import './Carousel.scss';
 import Faze from '../Core/Faze';
 import Logger from '../Core/Logger';
-import Timeout = NodeJS.Timeout;
 
 /**
  * Структура конфига карусели
@@ -138,7 +137,7 @@ class Carousel {
   index: number;
 
   // ID таймера переключения слайдов
-  timer: Timeout;
+  timer: number;
 
   // Определяет состояние карусели, в состоянии покоя или проигрывается анимация
   isIdle: boolean;
@@ -350,7 +349,7 @@ class Carousel {
 
     // Включаем после того как убрали курсор
     this.node.addEventListener('mouseleave', () => {
-      this.timer = setInterval(() => {
+      this.timer = window.setInterval(() => {
         this.next();
       }, this.config.duration);
     });
@@ -522,12 +521,42 @@ class Carousel {
   }
 
   /**
+   * Изменение текущего слайда на указанный индекс
+   *
+   * @param index - индекс нужного слайда
+   */
+  change(index: number): void {
+    // Определяем направление и количество слайдов
+    let direction = '';
+    let amount = 1;
+
+    if (this.index > index) {
+      // Текущий индекс больше, значит надо листать влево(вниз)
+      direction = 'prev';
+      amount = this.index - index;
+    } else if (this.index < index) {
+      // Текущий индекс меньше, значит надо листать вправо(вверх)
+      direction = 'next';
+      amount = index - this.index;
+    } else {
+      // Индексы равны или иной случай, просто выходим из метода
+      return;
+    }
+
+    // Присваиваем текущий индекс
+    this.index = index;
+
+    // Применяем изменения
+    this.changeSlide(direction, amount);
+  }
+
+  /**
    * Сброс таймера автоматического переключения слайдов
    */
   resetInterval(): void {
     clearInterval(this.timer);
     if (this.config.autoplay) {
-      this.timer = setInterval(() => {
+      this.timer = window.setInterval(() => {
         this.next();
       }, this.config.duration);
     }
@@ -537,8 +566,11 @@ class Carousel {
    * Метод изменения текущего слайда
    *
    * @param direction - направление изменения(нужно только для анимации slide)
+   * @param amount    - количество слайдов
+   *
+   * @private
    */
-  changeSlide(direction: string | null) {
+  private changeSlide(direction: string | null, amount: number = 1) {
     // Сброс предыдущей анимации
     this.resetInterval();
 
@@ -583,13 +615,13 @@ class Carousel {
             // Задаем карусели необходимые стили для сдвига влево
             this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
             if (this.config.animation.direction === 'horizontal') {
-              this.itemsHolderNode.style.left = `-${this.slideWidth}px`;
+              this.itemsHolderNode.style.left = `-${this.slideWidth * amount}px`;
             } else if (this.config.animation.direction === 'vertical') {
-              this.itemsHolderNode.style.top = `-${this.slideHeight}px`;
+              this.itemsHolderNode.style.top = `-${this.slideHeight * amount}px`;
             }
 
             // Присваиваем следующему слайду класс
-            const nextSlide = this.slidesNodes[1];
+            const nextSlide = this.slidesNodes[amount];
             if (nextSlide) {
               nextSlide.classList.add('faze-next');
             }
@@ -603,8 +635,10 @@ class Carousel {
                 this.itemsHolderNode.style.top = '0';
               }
 
-              // Так же крайний левый слайд перемещается в конец
-              this.itemsHolderNode.appendChild(this.slidesNodes[0]);
+              // Так же крайние левые слайды перемещаются в конец
+              for (let i = 0; i < amount; i += 1) {
+                this.itemsHolderNode.appendChild(this.slidesNodes[i]);
+              }
 
               // Удаляем класс со "следующего" слайда, т.к. он уже стал текущим
               if (nextSlide) {
@@ -618,14 +652,16 @@ class Carousel {
               this.isIdle = true;
             }, this.config.animation.time);
           } else if (direction === 'prev') {
-            // При направлении влево, сначала перемещаем крайний правый слайд в начало
-            this.itemsHolderNode.insertBefore(this.slidesNodes[this.totalSlides - 1], this.slidesNodes[0]);
+            // При направлении влево, сначала перемещаем крайние правые слайды в начало
+            for (let i = amount; i !== 0; i -= 1) {
+              this.itemsHolderNode.insertBefore(this.slidesNodes[this.totalSlides - i], this.slidesNodes[0]);
+            }
 
             // Задаем стили
             if (this.config.animation.direction === 'horizontal') {
-              this.itemsHolderNode.style.left = `-${this.slideWidth}px`;
+              this.itemsHolderNode.style.left = `-${this.slideWidth * amount}px`;
             } else if (this.config.animation.direction === 'vertical') {
-              this.itemsHolderNode.style.top = `-${this.slideHeight}px`;
+              this.itemsHolderNode.style.top = `-${this.slideHeight * amount}px`;
             }
             this.itemsHolderNode.style.transitionDuration = '';
 

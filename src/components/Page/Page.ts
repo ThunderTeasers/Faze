@@ -72,6 +72,7 @@ interface CallbackData {
 interface Config {
   offset: number;
   quantity: number;
+  modifyPath: boolean;
   tableName?: string;
   modules: {
     get?: number;
@@ -102,6 +103,9 @@ class Page {
   // DOM элемент кнопки загрузки
   readonly buttonLoadModeNode: HTMLButtonElement;
 
+  // GET параметр сдвига(offset) при выборке элементов
+  readonly offsetString: string;
+
   // Текущий сдвиг для получения запроса с сервера, работает так же как и в OFFSET в SQL
   offset: number;
 
@@ -121,6 +125,7 @@ class Page {
       offset: 10,
       quantity: 10,
       tableName: undefined,
+      modifyPath: false,
       modules: {
         get: undefined,
       },
@@ -143,6 +148,9 @@ class Page {
     // Инициализация переменных
     this.buttonLoadModeNode = document.createElement('button');
 
+    // Сдвиг для выборки
+    this.offsetString = `first${this.config.tableName}`;
+
     this.initialize();
     this.bind();
   }
@@ -163,11 +171,16 @@ class Page {
     // Создание кнопки
     this.createButton();
 
-    // Проверка кнопки на необходимость скрытия
-    this.checkButton();
-
     // Инициализация параметров
     this.params = new URLSearchParams(window.location.search);
+
+    const initialOffset: number = parseInt(this.params.get(this.offsetString) || '0', 10);
+    if (initialOffset > 0) {
+      this.offset = initialOffset + this.config.quantity;
+    }
+
+    // Проверка кнопки на необходимость скрытия
+    this.checkButton();
 
     // Выполнение кастомной функции
     if (typeof this.config.callbacks.created === 'function') {
@@ -188,23 +201,23 @@ class Page {
    * Навешивание событий
    */
   bind(): void {
-    const tableString = `first${this.config.tableName}`;
-
-    // Сборка строки параметров
-    this.params.append(tableString, this.offset.toString());
-    if (this.config.modules.get) {
-      this.params.append('show', this.config.modules.get.toString());
-    } else {
-      console.error('Не задан ID модуля для "show"!');
-    }
-    this.params.append('mime', 'txt');
-
     // Бинд клика на кнопку, при котором происходит подгрузка новых элементов
-    this.buttonLoadModeNode.addEventListener('click', (event) => {
-      event.preventDefault();
+    this.buttonLoadModeNode.addEventListener('click', () => {
+      // Переинициализация параметров
+      this.params = new URLSearchParams(window.location.search);
 
       // Обновление сдвига в строке параметров
-      this.params.set(tableString, this.offset.toString());
+      this.params.set(this.offsetString, this.offset.toString());
+
+      // Строка для изменения пути по сайту
+      const historyURL = `?${this.params.toString()}`;
+
+      if (this.config.modules.get) {
+        this.params.append('show', this.config.modules.get.toString());
+      } else {
+        console.error('Не задан ID модуля для "show"!');
+      }
+      this.params.append('mime', 'txt');
 
       // Блокировка кнопки от повторного нажатия
       this.lockButton();
@@ -235,6 +248,12 @@ class Page {
 
           // Проверка кнопки на необходимость скрытия
           this.checkButton();
+
+          // Изменение пути
+          if (this.config.modifyPath) {
+            // Обновление строки в браузере
+            window.history.pushState({}, '', historyURL);
+          }
 
           // Выполнение кастомной функции
           if (typeof this.config.callbacks.loaded === 'function') {
@@ -335,6 +354,7 @@ class Page {
         offset: parseInt(pageInitializator.getAttribute('data-faze-page-offset') || '10', 10),
         quantity: parseInt(pageInitializator.getAttribute('data-faze-page-quantity') || '10', 10),
         tableName: pageInitializator.getAttribute('data-faze-page-table_name'),
+        modifyPath: pageInitializator.getAttribute('data-faze-page-modify_path'),
         modules: {
           get: pageInitializator.getAttribute('data-faze-page-modules-get'),
         },

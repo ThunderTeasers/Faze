@@ -365,8 +365,7 @@ class Carousel {
 
         const index = page.getAttribute('data-faze-index');
         if (index) {
-          this.index = parseInt(index, 10);
-          this.changeSlide(null);
+          this.change(parseInt(index, 10));
         }
       });
     });

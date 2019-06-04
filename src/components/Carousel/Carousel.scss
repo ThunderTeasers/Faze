@@ -107,9 +107,6 @@
 
       transform: translateX(-50%);
 
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
       user-select: none;
 
       z-index: 4;
@@ -214,6 +211,7 @@
     }
   }
 
+  // Стрелки
   & > .faze-carousel-arrow {
     position: absolute;
     top: 0;

@@ -19,6 +19,7 @@ import Logger from '../Core/Logger';
  *   text   - текст подсказки
  *   side   - сторона с которой должена появляться подсказка
  *   margin - отступ от выбранной стороны(side) в пикселях
+ *   class  - кастомный класс
  *   callbacks
  *     opened  - пользовательская функция, срабатывающая при показе тултипа
  */
@@ -26,6 +27,7 @@ interface Config {
   text: string;
   side: string;
   margin: number;
+  class: string;
   callbacks: {
     opened?: () => void;
   };
@@ -66,6 +68,7 @@ class Tooltip {
       text: '',
       side: 'bottom',
       margin: 10,
+      class: '',
       callbacks: {
         opened: undefined,
       },
@@ -90,7 +93,7 @@ class Tooltip {
    * Инициализация
    */
   initialize(): void {
-    this.tooltip.className = `faze-tooltip faze-tooltip-initialized faze-tooltip-${this.config.side}`;
+    this.tooltip.className = `faze-tooltip faze-tooltip-initialized faze-tooltip-${this.config.side} ${this.config.class}`;
     this.tooltip.style.visibility = 'hidden';
     this.tooltip.innerHTML = this.config.text || this.node.dataset.fazeTooltipText || this.node.title || '';
   }
@@ -186,6 +189,7 @@ class Tooltip {
     new Faze.Tooltip(tooltipNode, {
       text: tooltipNode.dataset.fazeTooltipText || '',
       side: tooltipNode.dataset.fazeTooltipSide || 'bottom',
+      class: tooltipNode.dataset.fazeTooltipClass || '',
     });
   }
 

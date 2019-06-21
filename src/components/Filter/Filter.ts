@@ -197,7 +197,8 @@ class Filter {
             // Парсинг ответа от сервера
             const responseHTML = (new DOMParser()).parseFromString(response, 'text/html');
 
-            const responseNode = responseHTML.querySelector(`.${this.node.className.replace(' ', '.')}`);
+            // Ищем в ответе от сервера DOM элемент с такими же классами как у элемента фильтра
+            const responseNode = responseHTML.querySelector(`.${Array.from(this.node.classList).join('.')}`);
             if (responseNode) {
               if (this.itemsHolderNode) {
                 // Проверка, если отфильтрованных элементов больше 0, тогда происходит их вывод

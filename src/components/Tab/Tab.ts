@@ -71,8 +71,16 @@ class Tab {
     this.headersNodes = this.node.querySelectorAll(this.config.selectors.headers);
     this.bodiesNodes = this.node.querySelectorAll(this.config.selectors.bodies);
 
+    let fazeBody = '';
+    const alreadyActiveTabNode = Array.from(this.headersNodes).find(headerNode => headerNode.classList.contains('faze-active'));
+    if (alreadyActiveTabNode) {
+      fazeBody = alreadyActiveTabNode.dataset.fazeTabBody || '';
+    } else {
+      fazeBody = this.headersNodes[0].dataset.fazeTabBody || '';
+    }
+
     // Активация первой вкладки по умолчанию
-    this.activateTab(this.headersNodes[0].dataset.fazeTabBody || '');
+    this.activateTab(fazeBody);
   }
 
   /**

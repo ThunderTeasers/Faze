@@ -87,6 +87,7 @@ interface CallbackData {
   counterNode?: HTMLElement;
   totalSlides: number;
   index: number;
+  direction?: string;
   currentSlideNode: HTMLElement | null;
 }
 
@@ -569,14 +570,14 @@ class Carousel {
    *
    * @private
    */
-  private changeSlide(direction: string | null, amount: number = 1) {
+  private changeSlide(direction?: string, amount: number = 1) {
     // Сброс предыдущей анимации
     this.resetInterval();
 
     // Получение актуальной информации о размере слайде
     this.calculateSlideSize();
 
-    let currentSlide = null;
+    let currentSlide: HTMLElement | null = null;
     switch (this.config.animation.type) {
       // Анимация 'fade', заключается в исчезновении предыдущего и появлении следующего слайда
       case 'fade':
@@ -594,6 +595,10 @@ class Carousel {
             slide.classList.remove('faze-active');
           }
         });
+
+        // Вызываем пользовательскую функцию
+        this.changeCallbackCall(currentSlide, direction);
+
         break;
       // Анимация 'slide', заключается в плавном смещении одного слайда другим в бок.
       // Вся анимация выполняется средствами CSS
@@ -649,6 +654,9 @@ class Carousel {
 
               // Выставление флага, что карусель в простое и готова к новой анимации
               this.isIdle = true;
+
+              // Вызываем пользовательскую функцию
+              this.changeCallbackCall(currentSlide, direction);
             }, this.config.animation.time);
           } else if (direction === 'prev') {
             // При направлении влево, сначала перемещаем крайние правые слайды в начало
@@ -691,6 +699,9 @@ class Carousel {
 
               // Выставление флага, что карусель в простое и готова к новой анимации
               this.isIdle = true;
+
+              // Вызываем пользовательскую функцию
+              this.changeCallbackCall(currentSlide, direction);
             }, this.config.animation.time);
           }
         }
@@ -701,11 +712,19 @@ class Carousel {
 
     // Инменяем индикаторы
     this.changeControls();
+  }
 
-    // Выполнение пользовательской функции
+  /**
+   * Выполнение пользовательской функции
+   *
+   * @param currentSlide - DOM элемент текущего слайда
+   * @param direction - направление карусели
+   */
+  changeCallbackCall(currentSlide: HTMLElement | null, direction?: string): void {
     if (typeof this.config.callbacks.changed === 'function') {
       try {
         this.config.callbacks.changed({
+          direction,
           holderNode: this.itemsHolderNode,
           carouselNode: this.node,
           slidesNodes: this.slidesNodes,

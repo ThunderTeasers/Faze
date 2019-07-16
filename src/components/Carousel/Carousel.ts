@@ -843,7 +843,7 @@ class Carousel {
       animation: {
         type: carouselNode.dataset.fazeCarouselAnimationType || 'fade',
         time: carouselNode.dataset.fazeCarouselAnimationTime || 1000,
-        direction: carouselNode.dataset.fazeCarouselAnimationDuration || 'horizontal',
+        direction: carouselNode.dataset.fazeCarouselAnimationDirection || 'horizontal',
       },
     });
   }

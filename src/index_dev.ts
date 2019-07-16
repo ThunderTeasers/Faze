@@ -86,6 +86,9 @@ Faze.add({
         created: (data: any) => {
           console.log(data);
         },
+        changed: ({direction}: {direction?: string}) => {
+          console.log(direction);
+        },
       },
     });
 

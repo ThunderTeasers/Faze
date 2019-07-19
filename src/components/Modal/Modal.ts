@@ -391,17 +391,13 @@ class Modal {
       this.modalParts.fullNode.classList.add('faze-modal-draggable');
     }
 
-    // Если окно можно ресайзить проставляем дополнительный класс
-    if (this.config.resizable) {
-      this.modalParts.fullNode.classList.add('faze-modal-resizable');
-    }
-
     this.modalParts.fullNode.appendChild(this.modalParts.headerNode);
     this.modalParts.fullNode.appendChild(this.modalParts.bodyNode);
     this.modalParts.fullNode.appendChild(this.modalParts.footerNode);
 
-    // Если поставлен флаг на ресайз создаем границы для навешивания событий
-    if (this.config.draggable) {
+    // Если поставлен флаг на ресайз создаем границы для навешивания событий и проставляем класс
+    if (this.config.resizable) {
+      this.modalParts.fullNode.classList.add('faze-modal-resizable');
       this.buildBordersForResize();
     }
   }

@@ -143,12 +143,16 @@
 
       z-index: 3;
 
+      pointer-events: none;
+
       & > .faze-carousel-arrow {
         position: absolute;
         top: 0;
 
         width: 10rem;
         height: 100%;
+
+        pointer-events: all;
 
         &:after {
           content: '';

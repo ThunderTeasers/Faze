@@ -227,14 +227,18 @@ class Helpers {
    *
    * @param name - Имя куки
    * @param value - Значение куки
-   * @param exdays - Время жизни в днях
+   * @param expiresInDays - Время жизни в днях
+   * @param encode - Нужно ли кодировать значение
    */
-  static setCookie(name: string, value: string, exdays: number) {
-    const date = new Date();
-    date.setTime(date.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  static setCookie(name: string, value: string, expiresInDays?: number, encode: boolean = false) {
+    let expires = '';
+    if (expiresInDays) {
+      const date = new Date();
+      date.setTime(date.getTime() + (expiresInDays * 24 * 60 * 60 * 1000));
+      expires = `;expires=${date.toUTCString()}`;
+    }
 
-    const expires = `expires=${date.toUTCString()}`;
-    document.cookie = `${name}=${value};${expires};path=/`;
+    document.cookie = `${name}=${encode ? encodeURIComponent(value) : value}${expires};path=/`;
   }
 
   /**

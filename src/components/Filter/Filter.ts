@@ -293,8 +293,10 @@ class Filter {
    * @param type - тип инпута
    * @param callback - найденный DOM элемент
    */
-  restoreFilteredInput(type: string, callback: (foundNode: HTMLInputElement) => void) {
+  restoreFilteredInput(type: string, callback: (foundNode: HTMLInputElement, foundValue?: string) => void) {
     if (this.formNode) {
+      const inputFields = ['text', 'number', 'date', 'phone', 'email', 'datetime', 'textarea'];
+
       this.formNode.querySelectorAll(`input[type="${type}"]`).forEach((foundNode: any) => {
         const foundNodeName = foundNode.name;
         const foundNodeValue = foundNode.value;
@@ -304,9 +306,22 @@ class Filter {
           if (typeof callback === 'function') {
             callback(foundNode);
           }
+        } else if (inputFields.includes(type) && values.length > 0) {
+          if (typeof callback === 'function') {
+            callback(foundNode, values[0]);
+          }
         }
       });
     }
+  }
+
+  /**
+   * Восстановление текстовых значений после перезагрузки страницы
+   */
+  restoreFilteredTextFields(): void {
+    this.restoreFilteredInput('text', (textNode: HTMLInputElement, value?: string) => {
+      textNode.value = value || '';
+    });
   }
 
   /**
@@ -349,6 +364,12 @@ class Filter {
   restoreStoredParams(): void {
     this.config.cookie.params.forEach((storedParamName) => {
       const cookieValue: string = Faze.Helpers.getCookie(storedParamName);
+
+      // Если такой параметр уже есть, то пропускаем его
+      if (this.params.getAll(storedParamName).length > 0) {
+        return;
+      }
+
       if (cookieValue) {
         // Если в значении присутствует разделитель, то это сборная строка из чекбоксов, её надо разобрать
         if (cookieValue.includes(this.config.cookie.delimiter)) {
@@ -376,7 +397,7 @@ class Filter {
    * Восстановление значений выбранных инпутов после перезагрузки страницы
    */
   restoreFilteredInputs(): void {
-    // this.restoreFilteredTextFields();
+    this.restoreFilteredTextFields();
     this.restoreFilteredCheckboxes();
     this.restoreFilteredRadioButtons();
   }

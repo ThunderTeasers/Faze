@@ -250,45 +250,43 @@ class Filter {
   }
 
   /**
-   * Восстановление значений выбранных инпутов после перезагрузки страницы
+   * Нахождение DOM элемента для восстановление и передача его в колбек для кастомизации восстановления его значения
+   *
+   * @param type - тип инпута
+   * @param callback - найденный DOM элемент
    */
-  restoreFilteredInputs() {
-    this.restoreFilteredCheckboxes();
-    this.restoreFilteredRadioButtons();
+  restoreFilteredInput(type: string, callback: (foundNode: HTMLInputElement) => void) {
+    if (this.formNode) {
+      this.formNode.querySelectorAll(`input[type="${type}"]`).forEach((foundNode: any) => {
+        const foundNodeName = foundNode.name;
+        const foundNodeValue = foundNode.value;
+
+        const values = this.params.getAll(foundNodeName);
+        if (values.includes(foundNodeValue)) {
+          if (typeof callback === 'function') {
+            callback(foundNode);
+          }
+        }
+      });
+    }
   }
 
   /**
    * Восстановление значений выбранных чекбоксов после перезагрузки страницы
    */
-  restoreFilteredCheckboxes() {
-    if (this.formNode) {
-      this.formNode.querySelectorAll('input[type="checkbox"]').forEach((checkboxNode: any) => {
-        const checkboxName = checkboxNode.name;
-        const checkboxValue = checkboxNode.value;
-
-        const values = this.params.getAll(checkboxName);
-        if (values.includes(checkboxValue)) {
-          checkboxNode.checked = true;
-        }
-      });
-    }
+  restoreFilteredCheckboxes(): void {
+    this.restoreFilteredInput('checkbox', (checkboxNode: HTMLInputElement) => {
+      checkboxNode.checked = true;
+    });
   }
 
   /**
    * Восстановление значений выбранных радио кнопок после перезагрузки страницы
    */
-  restoreFilteredRadioButtons() {
-    if (this.formNode) {
-      this.formNode.querySelectorAll('input[type="radio"]').forEach((radioNode: any) => {
-        const checkboxName = radioNode.name;
-        const checkboxValue = radioNode.value;
-
-        const values = this.params.getAll(checkboxName);
-        if (values.includes(checkboxValue)) {
-          radioNode.checked = true;
-        }
-      });
-    }
+  restoreFilteredRadioButtons(): void {
+    this.restoreFilteredInput('radio', (radioNode: HTMLInputElement) => {
+      radioNode.checked = true;
+    });
   }
 
   /**

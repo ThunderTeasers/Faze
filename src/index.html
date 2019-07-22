@@ -72,6 +72,44 @@
     </script>
 </head>
 <body>
+    <div class="filter js-filter" data-faze-filter-stored-params="product_chr_search,product_enm_sale,product_set_color" data-faze-filter-stored-params-delimiter="," data-faze-filter-stored-params-encode="false">
+        <form class="faze-filter-form">
+            <label>
+                <input type="text" name="product_chr_search" placeholder="Поиск...">
+            </label>
+            <div class="radios">
+                <div>Распродажа</div>
+                <label>
+                    <span>Да</span>
+                    <input type="radio" name="product_enm_sale" value="YES">
+                </label>
+                <label>
+                    <span>Нет</span>
+                    <input type="radio" name="product_enm_sale" value="NO">
+                </label>
+            </div>
+            <div class="checkboxes">
+                <div>Цвета</div>
+                <label>
+                    <span>Белый</span>
+                    <input type="checkbox" name="product_set_color" value="белый">
+                </label>
+                <label>
+                    <span>Красный</span>
+                    <input type="checkbox" name="product_set_color" value="красный">
+                </label>
+                <label>
+                    <span>Чёрный</span>
+                    <input type="checkbox" name="product_set_color" value="чёрный">
+                </label>
+            </div>
+            <button type="submit">Найти</button>
+        </form>
+        <div class="faze-filter-items">
+
+        </div>
+    </div>
+
     <a data-faze="modal" data-faze-modal-title="Заголовок" data-faze-modal-resizable="true" data-faze-modal-draggable="true" data-faze-modal-class="modal-test" data-faze-modal-url="https://doubletreemoscow.ru/list-4.html?show=226922&array=226922&mime=json">Модальное окно</a>
 
     <button data-faze-restapi-attr='[{"method":"get", "module":"285330", "response-text":"main .section"},

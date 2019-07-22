@@ -42,12 +42,22 @@ Faze.add({
 
 // Тесты
 Faze.add({
-  pluginName: 'TooltipTest',
+  pluginName: 'Tests',
   condition: document.querySelectorAll('#button').length > 0,
   callback: () => {
+    Faze.Helpers.setCookie('test', 'test');
+
     new Faze.Tooltip(document.querySelector('#button'), {
       text: '123',
       side: 'right',
+    });
+
+    new Faze.Filter(document.querySelector('.js-filter'), {
+      tableName: 'product',
+      hasButton: true,
+      modules: {
+        get: '123',
+      },
     });
 
     new Faze.Tab(document.querySelector('.faze-tabs'));

@@ -363,7 +363,7 @@ class Filter {
    */
   restoreStoredParams(): void {
     this.config.cookie.params.forEach((storedParamName) => {
-      const cookieValue: string = Faze.Helpers.getCookie(storedParamName);
+      let cookieValue: string = Faze.Helpers.getCookie(storedParamName);
 
       // Если такой параметр уже есть, то пропускаем его
       if (this.params.getAll(storedParamName).length > 0) {
@@ -371,6 +371,9 @@ class Filter {
       }
 
       if (cookieValue) {
+        // Декодируем значение, в любом случае
+        cookieValue = decodeURIComponent(cookieValue);
+
         // Если в значении присутствует разделитель, то это сборная строка из чекбоксов, её надо разобрать
         if (cookieValue.includes(this.config.cookie.delimiter)) {
           cookieValue.split(this.config.cookie.delimiter).forEach((paramValue: string) => {

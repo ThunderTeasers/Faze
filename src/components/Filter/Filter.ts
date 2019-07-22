@@ -1,4 +1,5 @@
 import './Filter.scss';
+import Faze from '../Core/Faze';
 
 /**
  * Структура возвращаемого объекта в пользовательских функциях
@@ -30,6 +31,10 @@ interface CallbackData {
  *   showTotal  - показывать и обновлять общее количество отфильтрованных элементов
  *   modules
  *     get      - модуль show в plarson
+ *   cookie
+ *     params     - массив названий параметров для хранения в cookie
+ *     delimiter  - разделитель значений параметров если их множество
+ *     encode     - нужно ли кодировать значение в cookie(может пригодиться если используем например разделитель ';')
  *   selectors
  *     form         - CSS селектор формы фильтра
  *     itemsHolder  - CSS селектор родителя содержащего элементы которые фильтруются
@@ -45,6 +50,11 @@ interface Config {
   showTotal: boolean;
   modules: {
     get?: number;
+  };
+  cookie: {
+    delimiter: string;
+    params: string[];
+    encode: boolean;
   };
   selectors: {
     form: string;
@@ -97,6 +107,11 @@ class Filter {
       modules: {
         get: undefined,
       },
+      cookie: {
+        delimiter: '|',
+        params: [],
+        encode: false,
+      },
       selectors: {
         form: '.faze-filter-form',
         itemsHolder: '.faze-filter-items',
@@ -136,6 +151,9 @@ class Filter {
    * Инициализация
    */
   initialize(): void {
+    // Инициализация конфига
+    this.initializeConfig();
+
     // Обновляем хранимые параметры
     this.updateSearchParams();
 
@@ -143,6 +161,9 @@ class Filter {
     if (this.config.showTotal && this.totalNode) {
       this.totalNode.textContent = this.node.dataset.fazeFilterTotal || '';
     }
+
+    // Посстанавливаем значения из cookie
+    this.restoreStoredParams();
 
     // Восстанавливаем заданые значения
     this.restoreFilteredInputs();
@@ -161,6 +182,20 @@ class Filter {
         console.error('Ошибка исполнения пользовательской функции "created"', error);
       }
     }
+  }
+
+  /**
+   * Инициализация значений конфига или их переопределение
+   */
+  initializeConfig(): void {
+    // Настройка хранимых параметров
+    if (this.node.dataset.fazeFilterStoredParams) {
+      this.config.cookie.params = this.node.dataset.fazeFilterStoredParams.split(',') || this.config.cookie.params;
+    }
+    if (this.node.dataset.fazeFilterStoredParamsEncode) {
+      this.config.cookie.encode = this.node.dataset.fazeFilterStoredParamsEncode.toLowerCase() === 'true' || this.config.cookie.encode;
+    }
+    this.config.cookie.delimiter = this.node.dataset.fazeFilterStoredParamsDelimiter || this.config.cookie.delimiter;
   }
 
   /**
@@ -225,6 +260,9 @@ class Filter {
             // Обновляем хранимые параметры
             this.updateSearchParams();
 
+            // Сохраняем указанные значения в cookie
+            this.saveStoredParams();
+
             // Выполняем пользовательскую функцию
             if (typeof this.config.callbacks.filtered === 'function') {
               try {
@@ -287,6 +325,60 @@ class Filter {
     this.restoreFilteredInput('radio', (radioNode: HTMLInputElement) => {
       radioNode.checked = true;
     });
+  }
+
+  /**
+   * Сохранение указанных параметров в cookie
+   */
+  saveStoredParams(): void {
+    // Сначала удаляем все неиспользованные
+    this.cleanStoredParams();
+
+    // Далее добавляем/перезаписываем нужные
+    this.config.cookie.params.forEach((storedParamName) => {
+      const cookieValue = this.params.getAll(storedParamName).join(this.config.cookie.delimiter);
+      if (cookieValue) {
+        Faze.Helpers.setCookie(storedParamName, cookieValue, undefined, this.config.cookie.encode);
+      }
+    });
+  }
+
+  /**
+   * Восстановление хранимых в cookie параметров
+   */
+  restoreStoredParams(): void {
+    this.config.cookie.params.forEach((storedParamName) => {
+      const cookieValue: string = Faze.Helpers.getCookie(storedParamName);
+      if (cookieValue) {
+        // Если в значении присутствует разделитель, то это сборная строка из чекбоксов, её надо разобрать
+        if (cookieValue.includes(this.config.cookie.delimiter)) {
+          cookieValue.split(this.config.cookie.delimiter).forEach((paramValue: string) => {
+            this.params.append(storedParamName, paramValue);
+          });
+        } else {
+          // Иначе просто задаем нужное значение
+          this.params.append(storedParamName, cookieValue);
+        }
+      }
+    });
+  }
+
+  /**
+   * Удаление неиспользованных в текущей итерации фильтрации параметров
+   */
+  cleanStoredParams(): void {
+    this.config.cookie.params.forEach((storedParamName) => {
+      Faze.Helpers.setCookie(storedParamName, '', -1);
+    });
+  }
+
+  /**
+   * Восстановление значений выбранных инпутов после перезагрузки страницы
+   */
+  restoreFilteredInputs(): void {
+    // this.restoreFilteredTextFields();
+    this.restoreFilteredCheckboxes();
+    this.restoreFilteredRadioButtons();
   }
 
   /**

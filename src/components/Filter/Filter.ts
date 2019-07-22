@@ -141,7 +141,7 @@ class Filter {
 
     // Простановка общего числа элементов
     if (this.config.showTotal && this.totalNode) {
-      this.totalNode.textContent = this.node.getAttribute('data-faze-filter-total');
+      this.totalNode.textContent = this.node.dataset.fazeFilterTotal || '';
     }
 
     // Восстанавливаем заданые значения
@@ -155,7 +155,7 @@ class Filter {
           formNode: this.formNode,
           itemsHolderNode: this.itemsHolderNode,
           params: this.params,
-          total: parseInt(this.node.getAttribute('data-faze-filter-total') || '0', 10),
+          total: parseInt(this.node.dataset.fazeFilterTotal || '0', 10),
         });
       } catch (error) {
         console.error('Ошибка исполнения пользовательской функции "created"', error);
@@ -237,8 +237,8 @@ class Filter {
                   params: this.params,
                   total: parseInt(this.node.getAttribute('data-faze-filter-total') || '0', 10),
                 });
-              } catch (e) {
-                console.error(e);
+              } catch (error) {
+                console.error(error);
               }
             }
 
@@ -292,14 +292,14 @@ class Filter {
   /**
    * Обновление внутненних параметров поиска, для того чтобы они совпадали с теми, что содержатся в поисковой строке
    */
-  updateSearchParams() {
+  updateSearchParams(): void {
     this.params = new URLSearchParams(window.location.search);
   }
 
   /**
    * Блокирует кнопку от нажатия, так же запоминает оригинальный тест
    */
-  lockButton() {
+  lockButton(): void {
     if (this.buttonSubmitNode) {
       this.buttonSubmitNode.setAttribute('disabled', 'disabled');
       this.buttonSubmitNode.setAttribute('data-faze-initial-text', this.buttonSubmitNode.textContent || '');
@@ -311,7 +311,7 @@ class Filter {
   /**
    * Разблокирует кнопку, ставя ей обратно текст который был на ней изначально, до блокировки
    */
-  unlockButton() {
+  unlockButton(): void {
     if (this.buttonSubmitNode) {
       this.buttonSubmitNode.removeAttribute('disabled');
       this.buttonSubmitNode.classList.remove('faze-disabled');
@@ -322,7 +322,7 @@ class Filter {
   /**
    * Обновление фильтра(эмуляция события сабмит)
    */
-  updateFilter() {
+  updateFilter(): void {
     if (this.formNode) {
       this.formNode.dispatchEvent(new Event('submit'));
     }

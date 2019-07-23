@@ -440,7 +440,7 @@ class Filter {
    */
   updateFilter(): void {
     if (this.formNode) {
-      this.formNode.dispatchEvent(new Event('submit'));
+      this.formNode.dispatchEvent(new Event('submit', {cancelable: true}));
     }
   }
 }

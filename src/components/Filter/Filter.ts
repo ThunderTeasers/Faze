@@ -110,7 +110,7 @@ class Filter {
       cookie: {
         delimiter: '|',
         params: [],
-        encode: false,
+        encode: true,
       },
       selectors: {
         form: '.faze-filter-form',
@@ -351,9 +351,17 @@ class Filter {
 
     // Далее добавляем/перезаписываем нужные
     this.config.cookie.params.forEach((storedParamName) => {
-      const cookieValue = this.params.getAll(storedParamName).join(this.config.cookie.delimiter);
+      let paramsValues = this.params.getAll(storedParamName);
+
+      // Если необходимо кодировать значения, делаем это
+      if (this.config.cookie.encode) {
+        paramsValues = paramsValues.map(paramValue => encodeURIComponent(paramValue));
+      }
+
+      // Составляем итоговое значение cookie
+      const cookieValue = paramsValues.join(this.config.cookie.delimiter);
       if (cookieValue) {
-        Faze.Helpers.setCookie(storedParamName, cookieValue, undefined, this.config.cookie.encode);
+        Faze.Helpers.setCookie(storedParamName, cookieValue);
       }
     });
   }
@@ -363,7 +371,7 @@ class Filter {
    */
   restoreStoredParams(): void {
     this.config.cookie.params.forEach((storedParamName) => {
-      let cookieValue: string = Faze.Helpers.getCookie(storedParamName);
+      const cookieValue: string = Faze.Helpers.getCookie(storedParamName);
 
       // Если такой параметр уже есть, то пропускаем его
       if (this.params.getAll(storedParamName).length > 0) {
@@ -371,17 +379,14 @@ class Filter {
       }
 
       if (cookieValue) {
-        // Декодируем значение, в любом случае
-        cookieValue = decodeURIComponent(cookieValue);
-
         // Если в значении присутствует разделитель, то это сборная строка из чекбоксов, её надо разобрать
         if (cookieValue.includes(this.config.cookie.delimiter)) {
           cookieValue.split(this.config.cookie.delimiter).forEach((paramValue: string) => {
-            this.params.append(storedParamName, paramValue);
+            this.params.append(storedParamName, decodeURIComponent(paramValue));
           });
         } else {
           // Иначе просто задаем нужное значение
-          this.params.append(storedParamName, cookieValue);
+          this.params.append(storedParamName, decodeURIComponent(cookieValue));
         }
       }
     });

@@ -320,7 +320,7 @@ class Filter {
    */
   restoreFilteredTextFields(): void {
     this.restoreFilteredInput('text', (textNode: HTMLInputElement, value?: string) => {
-      textNode.value = value || '';
+      textNode.value = value || textNode.value || '';
     });
   }
 

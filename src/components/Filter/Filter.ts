@@ -189,13 +189,13 @@ class Filter {
    */
   initializeConfig(): void {
     // Настройка хранимых параметров
-    if (this.node.dataset.fazeFilterStoredParams) {
-      this.config.cookie.params = this.node.dataset.fazeFilterStoredParams.split(',') || this.config.cookie.params;
+    if (this.node.dataset.fazeFilterStored) {
+      this.config.cookie.params = this.node.dataset.fazeFilterStored.split(',') || this.config.cookie.params;
     }
-    if (this.node.dataset.fazeFilterStoredParamsEncode) {
-      this.config.cookie.encode = this.node.dataset.fazeFilterStoredParamsEncode.toLowerCase() === 'true' || this.config.cookie.encode;
+    if (this.node.dataset.fazeFilterStoredEncode) {
+      this.config.cookie.encode = this.node.dataset.fazeFilterStoredEncode.toLowerCase() === 'true' || this.config.cookie.encode;
     }
-    this.config.cookie.delimiter = this.node.dataset.fazeFilterStoredParamsDelimiter || this.config.cookie.delimiter;
+    this.config.cookie.delimiter = this.node.dataset.fazeFilterStoredDelimiter || this.config.cookie.delimiter;
   }
 
   /**

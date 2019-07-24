@@ -11,6 +11,7 @@
  */
 
 import './LazyImage.scss';
+import './img/lazy_image-placeholder.svg';
 import Faze from '../Core/Faze';
 
 /**

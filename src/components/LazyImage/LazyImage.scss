@@ -22,9 +22,4 @@
   max-height: 100%;
 
   background-color: #ccc;
-
-  // Если появился истояник изображения, то убираем бэкграунд
-  &[src] {
-    background: none;
-  }
 }

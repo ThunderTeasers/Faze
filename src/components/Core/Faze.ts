@@ -31,6 +31,8 @@ import Filter from '../Filter/Filter';
 import Spoiler from '../Spoiler/Spoiler';
 import Gallery from '../Gallery/Gallery';
 import Slider from '../Slider/Slider';
+import LazyImage from '../LazyImage/LazyImage';
+import LazyImageController from '../LazyImage/LazyImageController';
 import REST from '../REST/REST';
 import Observer from './Observer';
 
@@ -103,8 +105,17 @@ class Faze {
   static Dropdown: any = Dropdown;
   static Select: any = Select;
   static Slider: any = Slider;
+  static LazyImage: any = LazyImage;
+  static LazyImageController: any = new LazyImageController();
   static Observer: any = new Observer();
   static REST: any = REST;
+
+  /**
+   * Навешивание общих событий
+   */
+  static bind() {
+    Faze.LazyImageController.bind();
+  }
 
   /**
    * Метод добавления нового плагина по предоставленному конфигу.
@@ -259,6 +270,7 @@ class Faze {
     Faze.Zoom.hotInitialize();
     Faze.Select.hotInitialize();
     Faze.Dropdown.hotInitialize();
+    Faze.LazyImage.hotInitialize();
   }
 }
 

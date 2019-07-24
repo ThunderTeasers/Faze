@@ -32,6 +32,9 @@ class LazyImageController {
    */
   add(lazyImage: LazyImage) {
     this.lazyImages.add(lazyImage);
+
+    // Проверяем сразу это изображение
+    this.checkImage(lazyImage);
   }
 
   /**
@@ -39,10 +42,19 @@ class LazyImageController {
    */
   watch() {
     this.lazyImages.forEach((lazyImage) => {
-      if (lazyImage.check()) {
-        this.lazyImages.delete(lazyImage);
-      }
+      this.checkImage(lazyImage);
     });
+  }
+
+  /**
+   * Проверка изображеня
+   *
+   * @param lazyImage - объект изображения
+   */
+  checkImage(lazyImage: LazyImage) {
+    if (lazyImage.check()) {
+      this.lazyImages.delete(lazyImage);
+    }
   }
 
   /**

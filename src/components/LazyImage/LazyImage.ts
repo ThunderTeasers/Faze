@@ -97,7 +97,7 @@ class LazyImage {
    * Проверка видимо ли изображение на экране
    */
   isVisible(): boolean {
-    return (window.scrollY + window.innerHeight + this.config.offset) > this.node.offsetTop;
+    return ((window.scrollY + window.innerHeight + this.config.offset) > this.node.offsetTop) && (this.node.offsetParent !== null);
   }
 
   /**

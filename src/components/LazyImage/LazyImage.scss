@@ -22,4 +22,8 @@
   max-height: 100%;
 
   background-color: #ccc;
+
+  &:not(.faze-lazy_image-initialized) {
+    object-fit: contain;
+  }
 }

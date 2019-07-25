@@ -25,6 +25,9 @@ interface Config {
     headers: string;
     bodies: string;
   };
+  callbacks: {
+    changed?: () => void;
+  };
 }
 
 /**
@@ -53,6 +56,9 @@ class Tab {
       selectors: {
         headers: '.faze-tabs-headers .faze-tab-header',
         bodies: '.faze-tabs-bodies .faze-tab-body',
+      },
+      callbacks: {
+        changed: undefined,
       },
     };
 
@@ -110,6 +116,15 @@ class Tab {
       bodyNode.style.display = bodyNode.dataset.fazeTabBody === key ? 'block' : 'none';
       bodyNode.classList.toggle('faze-active', bodyNode.dataset.fazeTabBody === key);
     });
+
+    // Вызываем пользовательский метод
+    if (typeof this.config.callbacks.changed === 'function') {
+      try {
+        this.config.callbacks.changed();
+      } catch (error) {
+        console.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
+      }
+    }
   }
 
   /**

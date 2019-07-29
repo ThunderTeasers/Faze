@@ -619,7 +619,21 @@ class Modal {
    */
   static hotInitialize(): void {
     Faze.on('click', '[data-faze="modal"]', (event, callerNode) => {
+      // HTML контент модального окна
+      let html = null;
+
+      // Если есть данный data атрибут
+      if (callerNode.dataset.fazeModalHtml) {
+        // Пытаемся получить DOM элемент по заданному селектору
+        const dataNode = document.querySelector(callerNode.dataset.fazeModalHtml);
+        if (dataNode) {
+          // Если получается, получаем его внутренности
+          html = dataNode.innerHTML;
+        }
+      }
+
       new Faze.Modal(callerNode, {
+        html,
         title: callerNode.dataset.fazeModalTitle || '',
         evented: false,
         draggable: callerNode.dataset.fazeModalDraggable === 'true',

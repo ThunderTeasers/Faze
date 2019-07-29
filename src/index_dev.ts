@@ -15,8 +15,8 @@ window.Faze = Faze;
 
 new Faze.Modal(document.querySelector('#button'), {
   title: 'Тестирование модального окна',
-  // url: 'https://jsonplaceholder.typicode.com/todos/1',
-  html: '<p>Hello!</p>',
+  url: 'https://jsonplaceholder.typicode.com/todos/1',
+  // html: '<p>Hello!</p>',
   draggable: true,
   buttons: [
     {

@@ -211,7 +211,13 @@ class Filter {
 
         // Составление запроса для фильтрации
         const formData = new FormData(<HTMLFormElement>this.formNode);
-        const formDataURLString = new URLSearchParams(<any>formData);
+
+        // Собираем вручную строку запроса из FormData т.к. Edge и другие отсталые браузеры, даже имея официалиьную поддержку
+        // URLSearchParams не имеют возможности создать её через передачу параметра FormData в конструкторе.
+        const formDataQuery = [...formData.entries()].map(entry => `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(<any>entry[1])}`).join('&');
+
+        // Парсим данные формы
+        const formDataURLString = new URLSearchParams(formDataQuery);
 
         // URL для вставки в строку поиска в браузере(HTML5 history)
         const urlForHistory = `${this.node.dataset.fazeFilterPath || ''}?${formDataURLString.toString()}`;

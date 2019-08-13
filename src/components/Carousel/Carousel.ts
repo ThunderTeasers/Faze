@@ -29,7 +29,8 @@ import Logger from '../Core/Logger';
  *   arrows     - отображать ли стрелки переключения
  *   duration   - время смены слайдов, в мс.
  *   useSlideFullSize - учитывать ли при измерении размера слайда его margin
- *   hoverOnStop - флаг остановки ли при наведении
+ *   stopOnHover - флаг остановки ли при наведении
+ *   amountPerSlide - количества слайдов перелистываемых за один раз
  *   animation
  *     type     - тип анимации, может быть: 'slide', 'fade'
  *     time     - длительность анимации в миллисекундах
@@ -46,6 +47,7 @@ interface Config {
   duration: number;
   useSlideFullSize: boolean;
   stopOnHover: boolean;
+  amountPerSlide: number;
   animation: {
     type: string;
     time: number;
@@ -71,6 +73,7 @@ interface Config {
  *   counterNode  - DOM элемент счетчика слайдов
  *   totalSlides  - общее число слайдов
  *   index        - индекс активного слайда
+ *   direction    - направление карусели(может быть "vertical" и "horizontal")
  *   currentSlideNode - DOM элемент активного слайда
  */
 interface CallbackData {
@@ -187,6 +190,7 @@ class Carousel {
       duration: 3000,
       useSlideFullSize: false,
       stopOnHover: false,
+      amountPerSlide: 1,
       animation: {
         type: 'fade',
         time: 1000,
@@ -493,31 +497,32 @@ class Carousel {
   }
 
   /**
-   * Переключение карусели влево
+   * Переключение карусели вперед
    */
   next(): void {
     if (this.isIdle) {
-      this.index += 1;
+      this.index += this.config.amountPerSlide;
       if (this.index >= this.totalSlides) {
-        this.index = 0;
+        this.index = Math.max(this.index - this.totalSlides, 0);
       }
     }
 
-    this.changeSlide('next');
+    this.changeSlide('next', this.config.amountPerSlide);
   }
 
   /**
-   * Переключение карусели вправо
+   * Переключение карусели назад
    */
   prev(): void {
     if (this.isIdle) {
-      this.index -= 1;
+      console.log(this.index);
+      this.index -= this.config.amountPerSlide;
       if (this.index < 0) {
-        this.index = this.totalSlides - 1;
+        this.index = Math.min(this.totalSlides - Math.abs(this.index), this.totalSlides - 1);
       }
     }
 
-    this.changeSlide('prev');
+    this.changeSlide('prev', this.config.amountPerSlide);
   }
 
   /**
@@ -840,6 +845,7 @@ class Carousel {
       duration: carouselNode.dataset.fazeCarouselDuration || 3000,
       useSlideFullSize: (carouselNode.dataset.fazeCarouselUseSlideFullSize || 'false') === 'true',
       stopOnHover: (carouselNode.dataset.fazeCarouselStopOnHover || 'false') === 'true',
+      amountPerSlide: parseInt(carouselNode.dataset.fazeCarouselAmountPerSlide || '1', 10),
       animation: {
         type: carouselNode.dataset.fazeCarouselAnimationType || 'fade',
         time: carouselNode.dataset.fazeCarouselAnimationTime || 1000,

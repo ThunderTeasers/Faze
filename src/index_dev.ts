@@ -90,6 +90,7 @@ Faze.add({
       arrows: true,
       arrowsOutside: true,
       counter: false,
+      amountPerSlide: 2,
       animation: {
         type: 'slide',
         time: 1000,
@@ -99,7 +100,7 @@ Faze.add({
         created: (data: any) => {
           console.log(data);
         },
-        changed: ({direction}: {direction?: string}) => {
+        changed: ({direction}: { direction?: string }) => {
           console.log(direction);
         },
       },

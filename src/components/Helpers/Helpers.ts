@@ -29,14 +29,14 @@ class Helpers {
    */
   static bindCopyText() {
     // Проходимся по всем элементам
-    document.querySelectorAll('.faze-copy-text').forEach((textNode) => {
+    document.querySelectorAll('.faze-copy-text').forEach((textNode: any) => {
       // Копируем при нажатии
-      textNode.addEventListener('click', (event: any) => {
+      textNode.addEventListener('click', (event: MouseEvent) => {
         // Если есть что копировать
         if (textNode.textContent) {
           // Создаем инпут с этим текстом и позицианированием "absolute" чтобы вьюпорт не прыгал вниз
           const inputNode = document.createElement('input');
-          inputNode.value = textNode.textContent || '';
+          inputNode.value = textNode.dataset.fazeCopyTextValue || textNode.textContent || '';
           inputNode.style.position = 'absolute';
           inputNode.style.top = `${event.clientY}px`;
           inputNode.style.left = `${event.clientX}px`;

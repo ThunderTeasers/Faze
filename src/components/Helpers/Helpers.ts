@@ -223,6 +223,17 @@ class Helpers {
   }
 
   /**
+   * Подбор склонения для числительных, возвращает ТОЛЬКО окончание
+   *
+   * @param quantity - число для проверки
+   * @param endings  - массив окончаний
+   */
+  static wordEnd(quantity: number, endings: string[] = ['', 'а', 'ов']): string {
+    const cases = [2, 0, 1, 1, 1, 2];
+    return endings[(quantity % 100 > 4 && quantity % 100 < 20) ? 2 : cases[(quantity % 10 < 5) ? quantity % 10 : 5]];
+  }
+
+  /**
    * Запись куки
    *
    * @param name - Имя куки

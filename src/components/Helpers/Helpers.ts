@@ -22,6 +22,16 @@ class Helpers {
    */
   static initialize() {
     Helpers.bindCopyText();
+    Helpers.bindMobileMask();
+  }
+
+  /**
+   * Маска мобильного телефона для поля ввода
+   */
+  static bindMobileMask() {
+    document.querySelectorAll('.faze-mask-mobile').forEach((inputNode: any) => {
+      Helpers.mobileMask(inputNode);
+    });
   }
 
   /**

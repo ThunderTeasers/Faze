@@ -156,13 +156,24 @@ class Helpers {
   static mobileMask(input: HTMLInputElement) {
     let value = '';
 
+    input.addEventListener('focus', (event) => {
+      // Проверка на пустую строку, если это так и пользователь нажимает не backspace то добавляется начало телефона
+      if (value.length === 0 && event.which !== 8) {
+        value += '+7 (';
+      }
+
+      // Присваиваем собранный номер
+      input.value = value;
+    });
+
     input.addEventListener('keydown', (event) => {
       event.preventDefault();
 
-      // Проверка на пустую строку, если это так и пользователь нажимает не бекспейс
-      // то добавляется начало телефона
-      if (value.length === 0 && event.which !== 8) {
-        value += '+7 (';
+      // Если это backspace то не удаляем дальше чем 3 символа
+      if (event.which === 8) {
+        if (value.length <= 5) {
+          value = '+7 ( ';
+        }
       }
 
       // Добавление цифры, проверка на цифры и что номер меньше 18 знаков(включая -, ( и ))

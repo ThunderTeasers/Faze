@@ -21,10 +21,6 @@ import Faze from '../Core/Faze';
  *     bodies   - CSS селекторы тел табов
  */
 interface Config {
-  selectors: {
-    headers: string;
-    bodies: string;
-  };
   callbacks: {
     changed?: () => void;
   };
@@ -53,10 +49,6 @@ class Tab {
 
     // Конфиг по умолчанию
     const defaultConfig: Config = {
-      selectors: {
-        headers: '.faze-tabs-headers .faze-tab-header',
-        bodies: '.faze-tabs-bodies .faze-tab-body',
-      },
       callbacks: {
         changed: undefined,
       },
@@ -74,8 +66,22 @@ class Tab {
    */
   initialize(): void {
     this.node.classList.add('faze-tabs');
-    this.headersNodes = this.node.querySelectorAll(this.config.selectors.headers);
-    this.bodiesNodes = this.node.querySelectorAll(this.config.selectors.bodies);
+
+    // Получаем шапки
+    const headersNode = this.node.querySelector('.faze-tabs-headers');
+    if (headersNode) {
+      this.headersNodes = <any>Array.from(headersNode.children).filter(childNode => childNode.classList.contains('faze-tab-header'));
+    } else {
+      throw new Error('Не задар объект с шапками для табов!');
+    }
+
+    // Получаем тела
+    const bodiesNode = this.node.querySelector('.faze-tabs-bodies');
+    if (bodiesNode) {
+      this.bodiesNodes = <any>Array.from(bodiesNode.children).filter(childNode => childNode.classList.contains('faze-tab-body'));
+    } else {
+      throw new Error('Не задар объект с телами для табов!');
+    }
 
     let fazeBody = '';
     const alreadyActiveTabNode = Array.from(this.headersNodes).find(headerNode => headerNode.classList.contains('faze-active'));

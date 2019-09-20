@@ -29,6 +29,7 @@ interface CallbackData {
  * Содержит:
  *   tableName  - префикс таблицы в plarson
  *   showTotal  - показывать и обновлять общее количество отфильтрованных элементов
+ *   changeButton - нужно ли изменять кнопку(блокировать, писать "Обработка" и т.д.)
  *   modules
  *     get      - модуль show в plarson
  *   cookie
@@ -48,6 +49,7 @@ interface CallbackData {
 interface Config {
   tableName?: string;
   showTotal: boolean;
+  changeButton: boolean;
   modules: {
     get?: number;
   };
@@ -92,6 +94,12 @@ class Filter {
   // DOM элемент содержащий текст об общем количестве отфильтрованных элементов
   readonly totalNode: HTMLElement | null;
 
+  // Заранее заданная поисковая строка(кейс для сокращенных ссылок)
+  readonly presetQuery?: string;
+
+  // Флаг отключающий работу по заданной строке поиска
+  disablePresetQuery: boolean;
+
   // Параметры фильтра, должны совпадать с параметрами в поисковой строке
   params: URLSearchParams;
 
@@ -104,6 +112,7 @@ class Filter {
     const defaultConfig: Config = {
       tableName: undefined,
       showTotal: true,
+      changeButton: true,
       modules: {
         get: undefined,
       },
@@ -138,6 +147,8 @@ class Filter {
     this.buttonSubmitNode = this.node.querySelector(`${this.config.selectors.form} [type="submit"]`);
     this.formNode = document.querySelector(this.config.selectors.form);
     this.itemsHolderNode = document.querySelector(this.config.selectors.itemsHolder);
+    this.disablePresetQuery = this.node.dataset.fazeFilterQueryDisable !== undefined;
+    this.presetQuery = this.node.dataset.fazeFilterQuery;
 
     if (this.config.showTotal && this.formNode) {
       this.totalNode = this.node.querySelector(this.config.selectors.total);
@@ -219,8 +230,14 @@ class Filter {
         // Парсим данные формы
         const formDataURLString = new URLSearchParams(formDataQuery);
 
+        // Если есть заданное значение строки, то нужно взять базу оттуда, иначе запрос будет отдавать 404
+        let basePath = '';
+        if (this.presetQuery && !this.disablePresetQuery) {
+          basePath = this.presetQuery.split('?')[0];
+        }
+
         // URL для вставки в строку поиска в браузере(HTML5 history)
-        const urlForHistory = `${this.node.dataset.fazeFilterPath || ''}?${formDataURLString.toString()}`;
+        const urlForHistory = `${basePath}?${formDataURLString.toString()}`;
         formDataURLString.append('mime', 'txt');
 
         const module = this.config.modules.get || this.node.dataset.fazeFilterModuleGet;
@@ -229,7 +246,7 @@ class Filter {
         }
 
         // URL для запроса к серверу
-        const urlForRequest = `?${formDataURLString.toString()}`;
+        const urlForRequest = `${basePath}?${formDataURLString.toString()}`;
 
         // Отправка запрос на сервер
         fetch(urlForRequest)
@@ -262,6 +279,9 @@ class Filter {
 
             // Обновление строки в браузере
             window.history.pushState({}, '', urlForHistory);
+
+            // По заданной строке поиска поработали, теперь отключаем её
+            this.disablePresetQuery = true;
 
             // Обновляем хранимые параметры
             this.updateSearchParams();
@@ -420,14 +440,19 @@ class Filter {
    * Обновление внутненних параметров поиска, для того чтобы они совпадали с теми, что содержатся в поисковой строке
    */
   updateSearchParams(): void {
-    this.params = new URLSearchParams(window.location.search);
+    let queryParams = undefined;
+    if (this.node.dataset.fazeFilterQuery && !this.disablePresetQuery) {
+      queryParams = this.node.dataset.fazeFilterQuery.split('?')[1];
+    }
+
+    this.params = new URLSearchParams(queryParams || window.location.search);
   }
 
   /**
    * Блокирует кнопку от нажатия, так же запоминает оригинальный тест
    */
   lockButton(): void {
-    if (this.buttonSubmitNode) {
+    if (this.buttonSubmitNode && this.config.changeButton) {
       this.buttonSubmitNode.setAttribute('disabled', 'disabled');
       this.buttonSubmitNode.setAttribute('data-faze-initial-text', this.buttonSubmitNode.textContent || '');
       this.buttonSubmitNode.classList.add('faze-disabled');
@@ -439,7 +464,7 @@ class Filter {
    * Разблокирует кнопку, ставя ей обратно текст который был на ней изначально, до блокировки
    */
   unlockButton(): void {
-    if (this.buttonSubmitNode) {
+    if (this.buttonSubmitNode && this.config.changeButton) {
       this.buttonSubmitNode.removeAttribute('disabled');
       this.buttonSubmitNode.classList.remove('faze-disabled');
       this.buttonSubmitNode.textContent = this.buttonSubmitNode.getAttribute('data-faze-initial-text') || 'Готово!';

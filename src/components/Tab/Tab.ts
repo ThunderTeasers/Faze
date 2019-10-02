@@ -72,7 +72,7 @@ class Tab {
     if (headersNode) {
       this.headersNodes = <any>Array.from(headersNode.children).filter(childNode => childNode.classList.contains('faze-tab-header'));
     } else {
-      throw new Error('Не задар объект с шапками для табов!');
+      throw new Error('Не задан объект с шапками для табов!');
     }
 
     // Получаем тела
@@ -80,7 +80,7 @@ class Tab {
     if (bodiesNode) {
       this.bodiesNodes = <any>Array.from(bodiesNode.children).filter(childNode => childNode.classList.contains('faze-tab-body'));
     } else {
-      throw new Error('Не задар объект с телами для табов!');
+      throw new Error('Не задан объект с телами для табов!');
     }
 
     let fazeBody = '';

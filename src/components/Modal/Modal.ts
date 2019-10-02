@@ -424,7 +424,7 @@ class Modal {
    */
   async getContent(): Promise<string> {
     if (this.config.url) {
-      const response = await fetch(this.config.url);
+      const response = await fetch(this.config.url, {credentials: 'same-origin'});
       return await response.text();
     } else {
       return await this.config.html || '';

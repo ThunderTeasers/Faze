@@ -1,18 +1,6 @@
 import Faze from '../Core/Faze';
 import Helpers from '../Helpers/Helpers';
 
-/**
- * Структура параметров запроса на сервер
- *
- * Содержит:
- *   method   - метод передаваемый в запросе
- *   body     - тело запроса
- */
-interface FetchOptions {
-  method: string;
-  body?: any;
-}
-
 class REST {
   static request(method: string, type: string | null, url: string, data: any, callbackSuccess: ((response: any) => void) | null) {
     let formData: FormData = new FormData();
@@ -31,8 +19,9 @@ class REST {
 
     // Параметры запроса, вынесены в отдельную переменую, чтобы иметь возможность задать "body", если это POST запрос и не делать этого
     // если GET. Т.к. при передаче даже пустоты(пустой строки, null, undefined) fetch выдает ошибку что GET запрос не может иметь body.
-    const fetchOptions: FetchOptions = {
+    const fetchOptions: RequestInit = {
       method: testedMethod,
+      credentials: 'same-origin',
     };
 
     // Определим тип переменной и в соответствии с ней заполняем FormData
@@ -59,7 +48,7 @@ class REST {
     }
 
     fetch(`${currentURL}`, fetchOptions)
-      .then((response) => {
+      .then((response: any) => {
         let data = null;
 
         // В зависимости от типа запроса нужно по разному получить ответ от сервера
@@ -71,7 +60,7 @@ class REST {
 
         return data;
       })
-      .then((response) => {
+      .then((response: any) => {
         if (data['response_html'] && typeof data['response_html'] === 'string') {
           // Парсинг ответа
           const responseHTML = (new DOMParser()).parseFromString(response, 'text/html');
@@ -108,7 +97,7 @@ class REST {
           }
         }
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error('Ошибка при взаимодействии с сервером: ', error);
 
         // Выполнение пользовательской функции
@@ -421,11 +410,10 @@ class REST {
         console.error('Ошибка исполнения пользовательской функции переданной через "function" в ajaxChain, текст ошибки:', error);
       }
       REST.chain(chainData, finalCallback, response);
-    }
-    // Если это функция записанная строкой, то есть только имя, тоже выполним её
-    else if (typeof data === 'string' && data in window && (window as any)[data] && (window as any)[data] instanceof Function) {
+    } else if (typeof data === 'string' && data in window && (window as any)[data] && (window as any)[data] instanceof Function) {
+      // Если это функция записанная строкой, то есть только имя, тоже выполним её
       try {
-        (window as any)[data]();
+        (window as any)[data](response);
       } catch (error) {
         console.error('Ошибка исполнения пользовательской функции переданной строкой в ajaxChain, текст ошибки:', error);
       }
@@ -437,16 +425,15 @@ class REST {
         // Проверим существование функции
         if (functionName in window && typeof (window as any)[functionName] === 'function') {
           try {
-            (window as any)[functionName]();
+            (window as any)[functionName](response);
           } catch (error) {
             console.error(`Ошибка в пользовательской функции в параметре "function" с именем ${functionName}, текст ошибки:`, error);
           }
         }
 
         REST.chain(chainData, finalCallback, response);
-      }
-      // Если в объекте присутствует поле "method" значит это объект с настройками для отправки через ajaxRequest
-      else if ('method' in data) {
+      } else if ('method' in data) {
+        // Если в объекте присутствует поле "method" значит это объект с настройками для отправки через ajaxRequest
         const method = data['method'];
         let url = window.location.pathname;
 

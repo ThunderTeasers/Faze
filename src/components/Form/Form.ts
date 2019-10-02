@@ -165,6 +165,7 @@ class Form {
       fetch(url, {
         method: 'POST',
         body: formData,
+        credentials: 'same-origin',
       })
         .then(response => response.json())
         .then((response) => {

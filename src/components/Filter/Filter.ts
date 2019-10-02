@@ -249,7 +249,7 @@ class Filter {
         const urlForRequest = `${basePath}?${formDataURLString.toString()}`;
 
         // Отправка запрос на сервер
-        fetch(urlForRequest)
+        fetch(urlForRequest, {credentials: 'same-origin'})
           .then(response => response.text())
           .then((response) => {
             // Парсинг ответа от сервера

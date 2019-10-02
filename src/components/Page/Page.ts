@@ -226,7 +226,7 @@ class Page {
       const url = `${this.node.dataset.fazePagePath || window.location.pathname}?${this.params.toString()}`;
 
       // Получение новых элементов
-      fetch(url)
+      fetch(url, {credentials: 'same-origin'})
         .then(response => response.text())
         .then((response) => {
           // Парсинг ответа

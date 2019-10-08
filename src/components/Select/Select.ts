@@ -355,7 +355,7 @@ class Select {
       Select.initializeByDataAttributes(selectNode);
     });
 
-    document.querySelectorAll('[data-faze~="select"]').forEach((selectNode: any) => {
+    document.querySelectorAll<HTMLElement>('[data-faze~="select"]').forEach((selectNode: HTMLElement) => {
       Select.initializeByDataAttributes(selectNode);
     });
   }

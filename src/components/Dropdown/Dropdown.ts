@@ -212,7 +212,7 @@ class Dropdown {
       Dropdown.initializeByDataAttributes(dropdownNode);
     });
 
-    document.querySelectorAll('[data-faze~="dropdown"]').forEach((dropdownNode: any) => {
+    document.querySelectorAll<HTMLElement>('[data-faze~="dropdown"]').forEach((dropdownNode: HTMLElement) => {
       Dropdown.initializeByDataAttributes(dropdownNode);
     });
   }

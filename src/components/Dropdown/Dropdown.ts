@@ -195,12 +195,12 @@ class Dropdown {
   /**
    * Инициализация модуля по data атрибутам
    *
-   * @param selectNode - DOM элемент на который нужно инициализировать плагин
+   * @param dropdownNode - DOM элемент на который нужно инициализировать плагин
    */
-  static initializeByDataAttributes(selectNode: HTMLElement) {
-    new Faze.Dropdown(selectNode, {
-      strictPosition: (selectNode.dataset.fazeDropdownStrictPosition || 'false') === 'true',
-      positionTopOffset: parseInt(selectNode.dataset.fazeDropdownPositionTopOffset || '0', 10),
+  static initializeByDataAttributes(dropdownNode: HTMLElement) {
+    new Faze.Dropdown(dropdownNode, {
+      strictPosition: (dropdownNode.dataset.fazeDropdownStrictPosition || 'false') === 'true',
+      positionTopOffset: parseInt(dropdownNode.dataset.fazeDropdownPositionTopOffset || '0', 10),
     });
   }
 
@@ -208,12 +208,12 @@ class Dropdown {
    * Инициализация модуля либо по data атрибутам либо через observer
    */
   static hotInitialize(): void {
-    Faze.Observer.watch('[data-faze~="dropdown"]', (selectNode: HTMLElement) => {
-      Dropdown.initializeByDataAttributes(selectNode);
+    Faze.Observer.watch('[data-faze~="dropdown"]', (dropdownNode: HTMLElement) => {
+      Dropdown.initializeByDataAttributes(dropdownNode);
     });
 
-    document.querySelectorAll('[data-faze~="dropdown"]').forEach((selectNode: any) => {
-      Dropdown.initializeByDataAttributes(selectNode);
+    document.querySelectorAll('[data-faze~="dropdown"]').forEach((dropdownNode: any) => {
+      Dropdown.initializeByDataAttributes(dropdownNode);
     });
   }
 }

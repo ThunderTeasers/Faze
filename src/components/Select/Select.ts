@@ -336,14 +336,27 @@ class Select {
 
   /**
    * Инициализация модуля по data атрибутам
+   *
+   * @param selectNode - DOM элемент на который нужно инициализировать плагин
+   */
+  static initializeByDataAttributes(selectNode: HTMLElement): void {
+    new Faze.Select(selectNode, {
+      name: selectNode.dataset.fazeSelectName,
+      default: (selectNode.dataset.fazeSelectDefault || 'false') === 'true',
+      positionTopOffset: parseInt(selectNode.dataset.fazeSelectPositionTopOffset || '0', 10),
+    });
+  }
+
+  /**
+   * Инициализация модуля либо по data атрибутам либо через observer
    */
   static hotInitialize(): void {
+    Faze.Observer.watch('[data-faze~="select"]', (selectNode: HTMLElement) => {
+      Select.initializeByDataAttributes(selectNode);
+    });
+
     document.querySelectorAll('[data-faze~="select"]').forEach((selectNode: any) => {
-      new Faze.Select(selectNode, {
-        name: selectNode.dataset.fazeSelectName,
-        default: (selectNode.dataset.fazeSelectDefault || 'false') === 'true',
-        positionTopOffset: parseInt(selectNode.dataset.fazeSelectPositionTopOffset || '0', 10),
-      });
+      Select.initializeByDataAttributes(selectNode);
     });
   }
 }

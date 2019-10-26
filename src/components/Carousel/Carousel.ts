@@ -135,7 +135,7 @@ class Carousel {
   readonly counterNode: HTMLElement;
 
   // Общее количество слайдов
-  readonly totalSlides: number;
+  totalSlides: number;
 
   // Индекс текущего слайда
   index: number;
@@ -268,24 +268,21 @@ class Carousel {
 
     // Инициализируем держатель для элементов карусели и перемещаем их в него
     this.itemsHolderNode.className = 'faze-carousel-holder';
-    this.slidesNodes.forEach((slide: HTMLElement, i: number) => {
-      // Необходимо для соединения между "пагинацией" и самими слайдами
-      slide.setAttribute('data-faze-index', i.toString());
 
-      slide.classList.add('faze-item');
+    // Создаём слайды
+    this.createSlides();
 
-      // Задаем время анимации слайда
-      slide.style.transitionDuration = this.transitionDuration;
-
-      // Перевещаем слайд в родителя
-      this.itemsHolderNode.appendChild(slide);
-    });
+    // Добавляем холдер слайдов в карусель
     this.node.appendChild(this.itemsHolderNode);
 
     // Присвоение DOM объекту карусели необходимых классов и стилей для работы самой карусели
     this.node.classList.add('faze-carousel');
     this.node.classList.add(`faze-animation-${this.config.animation.type}`, `faze-direction-${this.config.animation.direction}`);
     this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
+
+    if (this.config.amountPerSlide !== 1) {
+      this.node.classList.add('faze-carousel-grouped');
+    }
 
     // Активания первого слайда по умолчанию, нужно только для анимации "fade"
     if (this.config.animation.type === 'fade') {
@@ -413,6 +410,59 @@ class Carousel {
   }
 
   /**
+   * Создание слайдов
+   */
+  createSlides() {
+    if (this.config.amountPerSlide === 1) {
+      // Если количество слайдов в одной действие равно одному, это стандартная карусель
+      this.slidesNodes.forEach((slide: HTMLElement, i: number) => {
+        // Необходимо для соединения между "пагинацией" и самими слайдами
+        slide.dataset.fazeIndex = i.toString();
+
+        slide.classList.add('faze-item');
+
+        // Задаем время анимации слайда
+        slide.style.transitionDuration = this.transitionDuration;
+
+        // Перевещаем слайд в родителя
+        this.itemsHolderNode.appendChild(slide);
+      });
+    } else {
+      // Иначе нужно сгруппировать элементы
+      // Высчитываем сколько групп нужно
+      const groupCount = Math.ceil(this.slidesNodes.length / this.config.amountPerSlide);
+
+      // Группы слайдов
+      const slidesGroupNodes = [];
+
+      // Создаём эти группы
+      for (let i = 0; i < groupCount; i += 1) {
+        const sliderGroupNode = document.createElement('div');
+        sliderGroupNode.className = 'faze-item';
+        sliderGroupNode.dataset.fazeIndex = i.toString();
+        sliderGroupNode.style.transitionDuration = this.transitionDuration;
+
+        // Перемещаем в неё слайды
+        this.slidesNodes.slice(i * this.config.amountPerSlide, i * this.config.amountPerSlide + this.config.amountPerSlide).forEach((slideNode) => {
+          sliderGroupNode.appendChild(slideNode);
+        });
+
+        // Перевещаем слайд в родителя
+        this.itemsHolderNode.appendChild(sliderGroupNode);
+
+        // Добавляем группу в общий массив
+        slidesGroupNodes.push(sliderGroupNode);
+      }
+
+      // Переназначаем слайды, т.к. ими в таком случае уже становятся группы
+      this.slidesNodes = slidesGroupNodes;
+
+      // Переназначаем общее количество слайдов, т.к. при группировке их количество изменилось
+      this.totalSlides = this.slidesNodes.length;
+    }
+  }
+
+  /**
    * Создание дополнительных элементов карусели, таких как: пагинация, стрелки, счетчик
    */
   createControls(): void {
@@ -501,13 +551,13 @@ class Carousel {
    */
   next(): void {
     if (this.isIdle) {
-      this.index += this.config.amountPerSlide;
+      this.index += 1;
       if (this.index >= this.totalSlides) {
         this.index = Math.max(this.index - this.totalSlides, 0);
       }
     }
 
-    this.changeSlide('next', this.config.amountPerSlide);
+    this.changeSlide('next', 1);
   }
 
   /**
@@ -515,14 +565,13 @@ class Carousel {
    */
   prev(): void {
     if (this.isIdle) {
-      console.log(this.index);
-      this.index -= this.config.amountPerSlide;
+      this.index -= 1;
       if (this.index < 0) {
         this.index = Math.min(this.totalSlides - Math.abs(this.index), this.totalSlides - 1);
       }
     }
 
-    this.changeSlide('prev', this.config.amountPerSlide);
+    this.changeSlide('prev', 1);
   }
 
   /**
@@ -533,16 +582,12 @@ class Carousel {
   change(index: number): void {
     // Определяем направление и количество слайдов
     let direction = '';
-    let amount = 1;
-
     if (this.index > index) {
       // Текущий индекс больше, значит надо листать влево(вниз)
       direction = 'prev';
-      amount = this.index - index;
     } else if (this.index < index) {
       // Текущий индекс меньше, значит надо листать вправо(вверх)
       direction = 'next';
-      amount = index - this.index;
     } else {
       // Индексы равны или иной случай, просто выходим из метода
       return;
@@ -552,7 +597,7 @@ class Carousel {
     this.index = index;
 
     // Применяем изменения
-    this.changeSlide(direction, amount);
+    this.changeSlide(direction, 1);
   }
 
   /**

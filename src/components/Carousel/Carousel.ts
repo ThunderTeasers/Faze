@@ -398,7 +398,7 @@ class Carousel {
   /**
    * Навешивание событий для отслеживания жестов
    */
-  bindGestures() {
+  bindGestures(): void {
     this.itemsHolderNode.addEventListener('touchstart', (event) => {
       this.touchStart.x = event.changedTouches[0].screenX;
       this.touchStart.y = event.changedTouches[0].screenY;
@@ -415,7 +415,7 @@ class Carousel {
   /**
    * Создание дополнительных элементов карусели, таких как: пагинация, стрелки, счетчик
    */
-  createControls() {
+  createControls(): void {
     if (this.config.arrows || this.config.pages || this.config.counter) {
       this.controlsNode.className = 'faze-carousel-controls';
       this.node.appendChild(this.controlsNode);
@@ -766,7 +766,7 @@ class Carousel {
   /**
    * Изменение активной точки в пагинации
    */
-  changePagination() {
+  changePagination(): void {
     this.pagesNodes.forEach((indicator, i) => {
       if (this.index === i) {
         indicator.classList.add('faze-active');
@@ -779,7 +779,7 @@ class Carousel {
   /**
    * Получение размеров слайда
    */
-  calculateSlideSize() {
+  calculateSlideSize(): void {
     const slideNode = this.slidesNodes[0];
 
     if (this.config.useSlideFullSize) {
@@ -805,7 +805,7 @@ class Carousel {
   /**
    * Отслеживание жестов и выполнение действий при них
    */
-  handleGestures() {
+  handleGestures(): void {
     if (this.touchEnd.x <= this.touchStart.x) {
       this.next();
     } else if (this.touchEnd.x >= this.touchStart.x) {
@@ -835,7 +835,7 @@ class Carousel {
    *
    * @param carouselNode - DOM элемент на который нужно инициализировать плагин
    */
-  static initializeByDataAttributes(carouselNode: HTMLElement) {
+  static initializeByDataAttributes(carouselNode: HTMLElement): void {
     new Faze.Carousel(carouselNode, {
       autoplay: (carouselNode.dataset.fazeCarouselAutoplay || 'false') === 'true',
       counter: (carouselNode.dataset.fazeCarouselCounter || 'false') === 'true',
@@ -862,7 +862,7 @@ class Carousel {
       Carousel.initializeByDataAttributes(carouselNode);
     });
 
-    document.querySelectorAll('[data-faze~="carousel"]').forEach((carouselNode: any) => {
+    document.querySelectorAll<HTMLElement>('[data-faze~="carousel"]').forEach((carouselNode: HTMLElement) => {
       Carousel.initializeByDataAttributes(carouselNode);
     });
   }

@@ -1,0 +1,43 @@
+/**
+ * Стили для плагина шагов
+ *
+ * Автор: Ерохин Максим, plarson.ru
+ * Дата: 02.11.2018
+ */
+
+.faze-steps {
+  // Заголовки табов
+  .faze-steps-headers {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    border-bottom: 0.1rem solid #000;
+
+    .faze-steps-header {
+      padding: 1rem;
+
+      border: 0.1rem solid #000;
+      border-bottom: none;
+
+      user-select: none;
+
+      &.faze-active {
+        background-color: #efefef;
+      }
+    }
+  }
+
+  // Тела табов
+  .faze-steps-bodies {
+    .faze-steps-body {
+      display: none;
+
+      padding-top: 1rem;
+
+      &.faze-active {
+        display: block;
+      }
+    }
+  }
+}

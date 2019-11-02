@@ -31,6 +31,7 @@ import Filter from '../Filter/Filter';
 import Spoiler from '../Spoiler/Spoiler';
 import Gallery from '../Gallery/Gallery';
 import Slider from '../Slider/Slider';
+import Steps from '../Steps/Steps';
 import LazyImage from '../LazyImage/LazyImage';
 import LazyImageController from '../LazyImage/LazyImageController';
 import REST from '../REST/REST';
@@ -105,6 +106,7 @@ class Faze {
   static Dropdown: any = Dropdown;
   static Select: any = Select;
   static Slider: any = Slider;
+  static Steps: any = Steps;
   static LazyImage: any = LazyImage;
   static LazyImageController: any = new LazyImageController();
   static Observer: any = new Observer();
@@ -157,6 +159,7 @@ class Faze {
       'Tab',
       'Dropdown',
       'Slider',
+      'Steps',
       'Helpers',
       'Observer',
       'Modal',
@@ -269,6 +272,7 @@ class Faze {
     Faze.Tooltip.hotInitialize();
     Faze.Zoom.hotInitialize();
     Faze.Select.hotInitialize();
+    Faze.Steps.hotInitialize();
     Faze.Dropdown.hotInitialize();
     Faze.LazyImage.hotInitialize();
   }

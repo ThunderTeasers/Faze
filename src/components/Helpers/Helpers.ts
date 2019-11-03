@@ -263,7 +263,7 @@ class Helpers {
    * @param showMinutes  - показывать ли минуты, имеет приоритет выше, чем "showEmpty"
    * @param showSeconds  - показывать ли секунды, имеет приоритет выше, чем "showEmpty"
    */
-  secondsToTime({totalSeconds = 0, showEmpty = false, showHours = true, showMinutes = true, showSeconds = true} = {}): string {
+  static secondsToTime({totalSeconds = 0, showEmpty = false, showHours = true, showMinutes = true, showSeconds = true} = {}): string {
     let totalSecondsRaw: number = totalSeconds;
 
     // Время в человекопонимаемом формате

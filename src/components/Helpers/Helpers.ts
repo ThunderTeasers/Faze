@@ -255,6 +255,41 @@ class Helpers {
   }
 
   /**
+   * Конвертация секунд во время, например 3602 -> 1 час 0 минут 2 секунды
+   *
+   * @param totalSeconds - общее количество секунд
+   * @param showEmpty    - показывать ли пустые данные, например "0 часов" или "0 минут"
+   * @param showHours    - показывать ли часы, имеет приоритет выше, чем "showEmpty"
+   * @param showMinutes  - показывать ли минуты, имеет приоритет выше, чем "showEmpty"
+   * @param showSeconds  - показывать ли секунды, имеет приоритет выше, чем "showEmpty"
+   */
+  secondsToTime({totalSeconds = 0, showEmpty = false, showHours = true, showMinutes = true, showSeconds = true} = {}): string {
+    let totalSecondsRaw: number = totalSeconds;
+
+    // Время в человекопонимаемом формате
+    let resultTime: string = '';
+
+    const hours: number = Math.floor(totalSecondsRaw / 3600);
+    totalSecondsRaw %= 3600;
+    const minutes: number = Math.floor(totalSecondsRaw / 60);
+    const seconds: number = totalSecondsRaw % 60;
+
+    if ((hours !== 0 || showEmpty) && showHours) {
+      resultTime += `${hours} час${Helpers.wordEnd(hours, ['', 'а', 'ов'])} `;
+    }
+
+    if ((minutes !== 0 || showEmpty) && showMinutes) {
+      resultTime += `${minutes} минут${Helpers.wordEnd(minutes, ['а', 'ы', ''])} `;
+    }
+
+    if ((seconds !== 0 || showEmpty) && showSeconds) {
+      resultTime += `${seconds} секунд${Helpers.wordEnd(seconds, ['а', 'ы', ''])}`;
+    }
+
+    return resultTime;
+  }
+
+  /**
    * Запись куки
    *
    * @param name - Имя куки

@@ -26,13 +26,15 @@ interface CallbackData {
  *
  * Содержит:
  *   callbacks
- *     created  - пользовательская функция, исполняющаяся при успешном создании спойлера
- *     changed  - пользовательская функция, исполняющаяся при изменении видимости спойлера
+ *     created  - пользовательская функция, исполняющаяся при успешном создании модуля
+ *     changed  - пользовательская функция, исполняющаяся при изменении шага
+ *     finished - пользовательская функция, исполняющаяся при завершении прохода по шагам
  */
 interface Config {
   callbacks: {
     created?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
+    finished?: (data: CallbackData) => void;
   };
 }
 
@@ -190,6 +192,17 @@ class Steps {
           event.preventDefault();
 
           this.activateStep(this.bodiesNodes.length - 1);
+
+          // Вызываем пользовательский метод
+          if (typeof this.config.callbacks.finished === 'function') {
+            try {
+              this.config.callbacks.finished({
+                bodyNode: this.bodiesNodes[0],
+              });
+            } catch (error) {
+              this.logger.error(`Ошибка исполнения пользовательского метода "finished": ${error}`);
+            }
+          }
         });
       });
     });

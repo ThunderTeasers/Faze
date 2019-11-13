@@ -28,6 +28,7 @@ import Logger from '../Core/Logger';
  *   pages      - отображать ли пагинацию слайдов
  *   arrows     - отображать ли стрелки переключения
  *   duration   - время смены слайдов, в мс.
+ *   infinite   - флаг бесконечной прокрутки
  *   useSlideFullSize - учитывать ли при измерении размера слайда его margin
  *   stopOnHover - флаг остановки ли при наведении
  *   amountPerSlide - количества слайдов перелистываемых за один раз
@@ -45,6 +46,7 @@ interface Config {
   pages: boolean;
   arrows: boolean;
   duration: number;
+  infinite: boolean;
   useSlideFullSize: boolean;
   stopOnHover: boolean;
   amountPerSlide: number;
@@ -188,6 +190,7 @@ class Carousel {
       pages: false,
       arrows: true,
       duration: 3000,
+      infinite: true,
       useSlideFullSize: false,
       stopOnHover: false,
       amountPerSlide: 1,
@@ -292,6 +295,11 @@ class Carousel {
     // Создание дополнительных элементов карусели
     this.createControls();
 
+    // Проверка на границы
+    if (!this.config.infinite) {
+      this.checkBounds();
+    }
+
     // Выполнение пользовательской функции
     if (typeof this.config.callbacks.created === 'function') {
       try {
@@ -381,14 +389,18 @@ class Carousel {
     this.arrowsNodes.left.addEventListener('click', (event) => {
       event.preventDefault();
 
-      this.prev();
+      if (!this.arrowsNodes.left.classList.contains('faze-disabled')) {
+        this.prev();
+      }
     });
 
     // Стрелка вправо
     this.arrowsNodes.right.addEventListener('click', (event) => {
       event.preventDefault();
 
-      this.next();
+      if (!this.arrowsNodes.right.classList.contains('faze-disabled')) {
+        this.next();
+      }
     });
   }
 
@@ -601,6 +613,27 @@ class Carousel {
   }
 
   /**
+   * Проверка на границы при переключении слайдов, чтобы выключить соответствующую стрелку
+   *
+   * @private
+   */
+  private checkBounds() {
+    // Проверка на левую стрелку
+    if (this.index === 0) {
+      this.arrowsNodes.left.classList.add('faze-disabled');
+    } else {
+      this.arrowsNodes.left.classList.remove('faze-disabled');
+    }
+
+    // Проверка на правую стрелку
+    if (this.index === this.totalSlides - 1) {
+      this.arrowsNodes.right.classList.add('faze-disabled');
+    } else {
+      this.arrowsNodes.right.classList.remove('faze-disabled');
+    }
+  }
+
+  /**
    * Сброс таймера автоматического переключения слайдов
    */
   resetInterval(): void {
@@ -621,6 +654,11 @@ class Carousel {
    * @private
    */
   private changeSlide(direction?: string, amount: number = 1) {
+    // Проверка на границы
+    if (!this.config.infinite) {
+      this.checkBounds();
+    }
+
     // Сброс предыдущей анимации
     this.resetInterval();
 
@@ -888,6 +926,7 @@ class Carousel {
       arrows: (carouselNode.dataset.fazeCarouselArrows || 'true') === 'true',
       arrowsOutside: (carouselNode.dataset.fazeCarouselArrowsOutside || 'true') === 'true',
       duration: carouselNode.dataset.fazeCarouselDuration || 3000,
+      infinite: (carouselNode.dataset.fazeCarouselInfinite || 'true') === 'true',
       useSlideFullSize: (carouselNode.dataset.fazeCarouselUseSlideFullSize || 'false') === 'true',
       stopOnHover: (carouselNode.dataset.fazeCarouselStopOnHover || 'false') === 'true',
       amountPerSlide: parseInt(carouselNode.dataset.fazeCarouselAmountPerSlide || '1', 10),

@@ -227,7 +227,18 @@
           }
         }
 
-        &:hover {
+        // Выключенное состояние
+        &.faze-disabled {
+          opacity: 0.5;
+
+          // При наведении
+          &:hover {
+            cursor: default;
+          }
+        }
+
+        // При наведении
+        &:hover:not(.faze-disabled) {
           cursor: pointer;
 
           &:after {

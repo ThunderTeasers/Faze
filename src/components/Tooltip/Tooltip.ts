@@ -201,8 +201,8 @@ class Tooltip {
       Tooltip.initializeByDataAttributes(tooltipNode);
     });
 
-    document.querySelectorAll('[data-faze~="tooltip"]').forEach((tooltipNode: any) => {
-      Tooltip.initializeByDataAttributes(<HTMLElement>tooltipNode);
+    document.querySelectorAll<HTMLElement>('[data-faze~="tooltip"]').forEach((tooltipNode: HTMLElement) => {
+      Tooltip.initializeByDataAttributes(tooltipNode);
     });
   }
 }

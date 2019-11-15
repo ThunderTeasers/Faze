@@ -290,6 +290,26 @@ class Helpers {
   }
 
   /**
+   * Определяет, выбран ли чекбокс
+   *
+   * @param name        - имя чекбокса
+   * @param parentNode  - DOM элемент родителя, по умолчанию ищем везде, то есть document
+   */
+  static isCheckboxChecked(name: string, parentNode: HTMLElement | Document = document): boolean {
+    return parentNode.querySelectorAll('input[type="checkbox"]:checked').length > 0;
+  }
+
+  /**
+   * Определяет, выбрана ли радио кнопка
+   *
+   * @param name        - имя чекбокса
+   * @param parentNode  - DOM элемент родителя, по умолчанию ищем везде, то есть document
+   */
+  static isRadioChecked(name: string, parentNode: HTMLElement | Document = document): boolean {
+    return parentNode.querySelectorAll('input[type="radio"]:checked').length > 0;
+  }
+
+  /**
    * Запись куки
    *
    * @param name - Имя куки

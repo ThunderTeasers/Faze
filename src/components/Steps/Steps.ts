@@ -10,6 +10,7 @@
 import './Steps.scss';
 import Faze from '../Core/Faze';
 import Logger from '../Core/Logger';
+import Helpers from '../Helpers/Helpers';
 
 /**
  * Структура возвращаемого объекта в пользовательском методе
@@ -25,12 +26,14 @@ interface CallbackData {
  * Структура конфига ступеней
  *
  * Содержит:
+ *   formMode   - режим формы, в нём кнопка следующего шага будет недоступна пока не заполнены все обязательные поля формы на текущем шаге
  *   callbacks
  *     created  - пользовательская функция, исполняющаяся при успешном создании модуля
  *     changed  - пользовательская функция, исполняющаяся при изменении шага
  *     finished - пользовательская функция, исполняющаяся при завершении прохода по шагам
  */
 interface Config {
+  formMode: boolean;
   callbacks: {
     created?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
@@ -76,6 +79,7 @@ class Steps {
 
     // Конфиг по умолчанию
     const defaultConfig: Config = {
+      formMode: true,
       callbacks: {
         created: undefined,
         changed: undefined,
@@ -123,6 +127,50 @@ class Steps {
    */
   bind(): void {
     this.bindButtons();
+
+    if (this.config.formMode) {
+      this.bindFormInputs();
+    }
+  }
+
+  /**
+   * Навешивание событий на элементы формы, если включен флаг "formMode"
+   *
+   * @private
+   */
+  private bindFormInputs() {
+    // Проходимся по всем шагам
+    this.bodiesNodes.forEach((bodyNode) => {
+      // DOM элементы полей ввода
+      const inputsNodes = bodyNode.querySelectorAll<HTMLInputElement>('input[required], textarea[required]');
+
+      // Если если поля, то блокируем кнопки перехода
+      if (inputsNodes.length > 0) {
+        // Блокировка кнопок
+        this.lockButton(bodyNode);
+
+        // Проходимся по всем полям ввода
+        inputsNodes.forEach((inputNode: HTMLInputElement) => {
+          // Тип события которое надо отслеживать
+          let eventType = 'keyup';
+
+          // Проверка на чекбоксы
+          if (['checkbox', 'radio'].includes(inputNode.type)) {
+            eventType = 'change';
+          }
+
+          // Навешиваем событие на изменение
+          inputNode.addEventListener(eventType, () => {
+            // Если на шаге всё заполнено, то разблокируем кнопки
+            if (this.checkStepInputs(inputsNodes)) {
+              this.unlockButton(bodyNode);
+            } else {
+              this.lockButton(bodyNode);
+            }
+          });
+        });
+      }
+    });
   }
 
   /**
@@ -209,6 +257,59 @@ class Steps {
   }
 
   /**
+   * Проверка шага на то что все поля ввода заполнены
+   *
+   * @param inputsNodes - DOM элементы полей ввода
+   *
+   * @private
+   */
+  private checkStepInputs(inputsNodes: NodeListOf<HTMLInputElement>): boolean {
+    let isValid = true;
+
+    // Родительский элемент для всех чекбоксов,
+    const parentNode: HTMLElement | Document = inputsNodes[0].closest<HTMLElement>('.faze-steps-body') || document;
+
+    inputsNodes.forEach((inputNode) => {
+      // Проверка, является ли инпут чекбоксом
+      const isCheckboxChecked = inputNode.type === 'checkbox' ? Helpers.isCheckboxChecked(inputNode.name, parentNode) : true;
+
+      // Проверка, является ли инпут радио кнопкой
+      const isRadioChecked = inputNode.type === 'radio' ? Helpers.isRadioChecked(inputNode.name, parentNode) : true;
+
+      // Проверка на валидность
+      if (!inputNode.value || !isCheckboxChecked || !isRadioChecked) {
+        isValid = false;
+      }
+    });
+
+    return isValid;
+  }
+
+  /**
+   * Блокируем кнопки на шаге
+   *
+   * @param bodyNode - DOM элемент шага
+   */
+  private lockButton(bodyNode: HTMLElement): void {
+    bodyNode.querySelectorAll<HTMLButtonElement>('.faze-steps-finish, .faze-steps-next').forEach((buttonNode: HTMLButtonElement) => {
+      buttonNode.disabled = true;
+      buttonNode.classList.add('disabled');
+    });
+  }
+
+  /**
+   * Разблокируем кнопки на шаге
+   *
+   * @param bodyNode - DOM элемент шага
+   */
+  private unlockButton(bodyNode: HTMLElement): void {
+    bodyNode.querySelectorAll<HTMLButtonElement>('.faze-steps-finish, .faze-steps-next').forEach((buttonNode: HTMLButtonElement) => {
+      buttonNode.disabled = false;
+      buttonNode.classList.remove('disabled');
+    });
+  }
+
+  /**
    * Активация шака, посредством проставления активному телу и шапке класс 'active' и убирая его у всех остальных
    *
    * @param index - индекс шага для активации
@@ -236,14 +337,25 @@ class Steps {
 
   /**
    * Инициализация модуля по data атрибутам
+   *
+   * @param stepsNode - DOM элемент на который нужно инициализировать плагин
+   */
+  static initializeByDataAttributes(stepsNode: HTMLElement): void {
+    new Faze.Steps(stepsNode, {
+      formMode: (stepsNode.dataset.fazeStepsFormMode || 'true') === 'true',
+    });
+  }
+
+  /**
+   * Инициализация модуля по data атрибутам
    */
   static hotInitialize(): void {
     Faze.Observer.watch('[data-faze~="steps"]', (stepsNode: HTMLElement) => {
-      new Faze.Steps(stepsNode);
+      Steps.initializeByDataAttributes(stepsNode);
     });
 
     document.querySelectorAll<HTMLElement>('[data-faze~="steps"]').forEach((stepsNode: HTMLElement) => {
-      new Faze.Steps(stepsNode);
+      Steps.initializeByDataAttributes(stepsNode);
     });
   }
 }

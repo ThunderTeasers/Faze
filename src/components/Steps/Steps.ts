@@ -155,7 +155,7 @@ class Steps {
           let eventType = 'keyup';
 
           // Проверка на чекбоксы
-          if (['checkbox', 'radio'].includes(inputNode.type)) {
+          if (['checkbox', 'radio', 'file'].includes(inputNode.type)) {
             eventType = 'change';
           }
 

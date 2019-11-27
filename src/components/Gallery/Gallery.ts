@@ -86,14 +86,14 @@ class Gallery {
   /**
    * Инициализация
    */
-  initialize() {
+  initialize(): void {
     // Проставляем класс всем элементам галереи
-    this.callerNodes.forEach((node) => {
-      node.classList.add('faze-gallery-caller');
+    this.callerNodes.forEach((callerNode: HTMLElement) => {
+      callerNode.classList.add('faze-gallery-caller');
 
       // Присваиваем стандартную группу, если она не указана
-      if (!node.hasAttribute('data-faze-gallery-group')) {
-        node.setAttribute('data-faze-gallery-group', this.config.group);
+      if (!callerNode.hasAttribute('data-faze-gallery-group')) {
+        callerNode.setAttribute('data-faze-gallery-group', this.config.group);
       }
     });
   }
@@ -101,21 +101,21 @@ class Gallery {
   /**
    * Навешивание событий
    */
-  bind() {
+  bind(): void {
     if (this.config.evented) {
-      this.callerNodes.forEach((node) => {
+      this.callerNodes.forEach((callerNode: HTMLElement) => {
         // Вызываем галерею только на элементах у которых нет data атрибута "data-faze-gallery-passive"
-        if (!node.hasAttribute('data-faze-gallery-passive')) {
-          node.addEventListener(this.config.event, () => {
+        if (!callerNode.hasAttribute('data-faze-gallery-passive')) {
+          callerNode.addEventListener(this.config.event, () => {
             // Фильтруем только элементы у которых такая же группа, как и у элемента по которому инициализируем галерею
             this.activeNodes = Array.from(this.callerNodes)
-              .filter(callerNode => callerNode.getAttribute('data-faze-gallery-group') === node.getAttribute('data-faze-gallery-group'));
+              .filter(callerNode => callerNode.getAttribute('data-faze-gallery-group') === callerNode.getAttribute('data-faze-gallery-group'));
 
             // Обновляем общее количество элементов
             this.totalImages = this.activeNodes.length;
 
             // Присвоение корректного индекса
-            this.index = this.activeNodes.indexOf(node);
+            this.index = this.activeNodes.indexOf(callerNode);
 
             // Построение галереи
             this.build();
@@ -150,7 +150,7 @@ class Gallery {
   /**
    * Создание галереи
    */
-  build() {
+  build(): void {
     // Создание элементов
     this.wrapperNode = document.createElement('div');
     this.arrowsNodes = {
@@ -175,7 +175,7 @@ class Gallery {
     // Сборка элементов друг с другом
     this.wrapperNode.appendChild(this.arrowsNodes.prev);
 
-    const source = this.activeNodes[this.index].getAttribute('data-faze-gallery-image');
+    const source: string | undefined = this.activeNodes[this.index].dataset.fazeGalleryImage;
     if (source) {
       this.imageNode.src = source;
     }
@@ -193,16 +193,16 @@ class Gallery {
   /**
    * Навешивание событий на стрелки переключения фотографий
    */
-  bindArrows() {
+  bindArrows(): void {
     // Кнопка перелистывания назад
-    this.arrowsNodes.prev.addEventListener('click', (event) => {
+    this.arrowsNodes.prev.addEventListener('click', (event: Event) => {
       event.preventDefault();
 
       this.prev();
     });
 
     // Кнопка перелистывания вперед
-    this.arrowsNodes.next.addEventListener('click', (event) => {
+    this.arrowsNodes.next.addEventListener('click', (event: Event) => {
       event.preventDefault();
 
       this.next();
@@ -212,7 +212,7 @@ class Gallery {
   /**
    * Навешивание событий переключения фотографий при нажатии на соответствующие клавиши
    */
-  bindKeyboardButtons() {
+  bindKeyboardButtons(): void {
     const callbackFn = (event: KeyboardEvent) => {
       switch (event.code) {
         case 'ArrowRight':
@@ -238,8 +238,8 @@ class Gallery {
   /**
    * Навешивание события на кнопку закрытия
    */
-  bindCloseButton() {
-    this.closeButtonNode.addEventListener('click', (event) => {
+  bindCloseButton(): void {
+    this.closeButtonNode.addEventListener('click', (event: Event) => {
       event.preventDefault();
 
       this.close();
@@ -249,7 +249,7 @@ class Gallery {
   /**
    * Закрытие галереи
    */
-  close() {
+  close(): void {
     this.wrapperNode.remove();
     document.body.classList.remove('faze-gallery');
   }
@@ -257,13 +257,13 @@ class Gallery {
   /**
    * Переключение галареи на одну фотографию вперед
    */
-  next() {
+  next(): void {
     this.index += 1;
     if (this.index >= this.totalImages) {
       this.index = 0;
     }
 
-    const source = this.activeNodes[this.index].getAttribute('data-faze-gallery-image');
+    const source: string | undefined = this.activeNodes[this.index].dataset.fazeGalleryImage;
     if (source) {
       this.imageNode.src = source;
     }
@@ -272,13 +272,13 @@ class Gallery {
   /**
    * Переключение галареи на одну фотографию назад
    */
-  prev() {
+  prev(): void {
     this.index -= 1;
     if (this.index < 0) {
       this.index = this.totalImages - 1;
     }
 
-    const source = this.activeNodes[this.index].getAttribute('data-faze-gallery-image');
+    const source: string | undefined = this.activeNodes[this.index].dataset.fazeGalleryImage;
     if (source) {
       this.imageNode.src = source;
     }
@@ -287,7 +287,7 @@ class Gallery {
   /**
    * Проверка конфиг файла на ошибки
    */
-  checkConfig() {
+  checkConfig(): void {
     // Если задано значение положения превью и оно не равно нужным, выдаем ошибку
     if (this.config.thumbnailsPosition && !['left', 'right', 'top', 'bottom'].includes(this.config.thumbnailsPosition)) {
       throw new Error('Значение "thumbnailsPosition" некорректно, возможные значения: "left", "right", "top", "bottom".');

@@ -110,10 +110,10 @@ class Dropdown {
     }
 
     // Присвоение сдвига для тела
-    let topOffset = this.title.offsetHeight + this.config.positionTopOffset;
+    let topOffset: number = this.title.offsetHeight + this.config.positionTopOffset;
     if (this.config.strictPosition) {
-      const callerRect = this.node.getBoundingClientRect();
-      const documentElement = document.documentElement;
+      const callerRect: DOMRect = this.node.getBoundingClientRect();
+      const documentElement: HTMLElement = document.documentElement;
 
       if (documentElement) {
         topOffset += (window.pageYOffset || documentElement.scrollTop) + callerRect.top;
@@ -166,10 +166,10 @@ class Dropdown {
     });
 
     // Проверка на нажатие за пределами селекта
-    document.addEventListener('click', (event: any) => {
-      const path = event.path || (event.composedPath && event.composedPath());
+    document.addEventListener('click', (event: Event) => {
+      const path = (<any>event).path || (event.composedPath && event.composedPath());
       if (path) {
-        if (!path.find((element: any) => element === this.node)) {
+        if (!path.find((element: HTMLElement) => element === this.node)) {
           this.node.classList.remove('faze-active');
         }
       }
@@ -197,7 +197,7 @@ class Dropdown {
    *
    * @param dropdownNode - DOM элемент на который нужно инициализировать плагин
    */
-  static initializeByDataAttributes(dropdownNode: HTMLElement) {
+  static initializeByDataAttributes(dropdownNode: HTMLElement): void {
     new Faze.Dropdown(dropdownNode, {
       strictPosition: (dropdownNode.dataset.fazeDropdownStrictPosition || 'false') === 'true',
       positionTopOffset: parseInt(dropdownNode.dataset.fazeDropdownPositionTopOffset || '0', 10),

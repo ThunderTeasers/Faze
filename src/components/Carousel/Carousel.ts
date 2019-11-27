@@ -97,6 +97,14 @@ interface CallbackData {
 }
 
 /**
+ * Позиция касания пальца(или мышки)
+ */
+type TouchPosition = {
+  x: number;
+  y: number;
+};
+
+/**
  * Класс карусели
  */
 class Carousel {
@@ -158,16 +166,10 @@ class Carousel {
   slideHeight: number;
 
   // Начало касания пальца
-  readonly touchStart: {
-    x: number;
-    y: number;
-  };
+  readonly touchStart: TouchPosition;
 
   // Конец касания пальца
-  readonly touchEnd: {
-    x: number;
-    y: number;
-  };
+  readonly touchEnd: TouchPosition;
 
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
@@ -369,8 +371,8 @@ class Carousel {
    * Навешивание событий на нажитие по страницам пагинации слайдов для их переключения
    */
   bindPagination(): void {
-    this.pagesNodes.forEach((page) => {
-      page.addEventListener('click', (event) => {
+    this.pagesNodes.forEach((page: HTMLElement) => {
+      page.addEventListener('click', (event: Event) => {
         event.preventDefault();
 
         const index = page.getAttribute('data-faze-index');
@@ -386,7 +388,7 @@ class Carousel {
    */
   bindArrows(): void {
     // Стрелка влево
-    this.arrowsNodes.left.addEventListener('click', (event) => {
+    this.arrowsNodes.left.addEventListener('click', (event: Event) => {
       event.preventDefault();
 
       if (!this.arrowsNodes.left.classList.contains('faze-disabled')) {
@@ -395,7 +397,7 @@ class Carousel {
     });
 
     // Стрелка вправо
-    this.arrowsNodes.right.addEventListener('click', (event) => {
+    this.arrowsNodes.right.addEventListener('click', (event: Event) => {
       event.preventDefault();
 
       if (!this.arrowsNodes.right.classList.contains('faze-disabled')) {
@@ -408,12 +410,12 @@ class Carousel {
    * Навешивание событий для отслеживания жестов
    */
   bindGestures(): void {
-    this.itemsHolderNode.addEventListener('touchstart', (event) => {
+    this.itemsHolderNode.addEventListener('touchstart', (event: TouchEvent) => {
       this.touchStart.x = event.changedTouches[0].screenX;
       this.touchStart.y = event.changedTouches[0].screenY;
     });
 
-    this.itemsHolderNode.addEventListener('touchmove', (event) => {
+    this.itemsHolderNode.addEventListener('touchmove', (event: TouchEvent) => {
       this.touchEnd.x = event.changedTouches[0].screenX;
       this.touchEnd.y = event.changedTouches[0].screenY;
 
@@ -510,7 +512,7 @@ class Carousel {
     this.pagesNode.className = 'faze-carousel-pages';
     this.node.appendChild(this.pagesNode);
 
-    let pagesHTML = '';
+    let pagesHTML: string = '';
     for (let i = 0; i < this.totalSlides; i += 1) {
       pagesHTML += `<div class="faze-page" data-faze-index="${i}"></div>`;
     }
@@ -593,7 +595,7 @@ class Carousel {
    */
   change(index: number): void {
     // Определяем направление и количество слайдов
-    let direction = '';
+    let direction: string = '';
     if (this.index > index) {
       // Текущий индекс больше, значит надо листать влево(вниз)
       direction = 'prev';
@@ -653,7 +655,7 @@ class Carousel {
    *
    * @private
    */
-  private changeSlide(direction?: string, amount: number = 1) {
+  private changeSlide(direction?: string, amount: number = 1): void {
     // Проверка на границы
     if (!this.config.infinite) {
       this.checkBounds();
@@ -673,7 +675,7 @@ class Carousel {
         // индекс совпадает с текущим индексом, ставим класс 'current', у остальных же этот
         // класс удаляем.
         // Вся анимация происходит за счет CSS.
-        this.slidesNodes.forEach((slide, index) => {
+        this.slidesNodes.forEach((slide: HTMLElement, index: number) => {
           if (this.index === index) {
             slide.classList.add('faze-active');
 
@@ -713,7 +715,7 @@ class Carousel {
             }
 
             // Присваиваем следующему слайду класс
-            const nextSlide = this.slidesNodes[amount];
+            const nextSlide: HTMLElement = this.slidesNodes[amount];
             if (nextSlide) {
               nextSlide.classList.add('faze-next');
             }
@@ -761,7 +763,7 @@ class Carousel {
             this.itemsHolderNode.style.transitionDuration = '';
 
             // Присваиваем предыдущему слайду класс
-            const prevSlide = this.slidesNodes[this.totalSlides - 1];
+            const prevSlide: HTMLElement = this.slidesNodes[this.totalSlides - 1];
             if (prevSlide) {
               prevSlide.classList.add('faze-prev');
             }
@@ -850,11 +852,11 @@ class Carousel {
    * Изменение активной точки в пагинации
    */
   changePagination(): void {
-    this.pagesNodes.forEach((indicator, i) => {
-      if (this.index === i) {
-        indicator.classList.add('faze-active');
+    this.pagesNodes.forEach((pageNode: HTMLElement, pageIndex: number) => {
+      if (this.index === pageIndex) {
+        pageNode.classList.add('faze-active');
       } else {
-        indicator.classList.remove('faze-active');
+        pageNode.classList.remove('faze-active');
       }
     });
   }
@@ -863,10 +865,10 @@ class Carousel {
    * Получение размеров слайда
    */
   calculateSlideSize(): void {
-    const slideNode = this.slidesNodes[0];
+    const slideNode: HTMLElement = this.slidesNodes[0];
 
     if (this.config.useSlideFullSize) {
-      const style = window.getComputedStyle(slideNode);
+      const style: CSSStyleDeclaration = window.getComputedStyle(slideNode);
 
       this.slideWidth = slideNode.offsetWidth +
         parseFloat(style.marginLeft || '0') +

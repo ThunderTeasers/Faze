@@ -50,6 +50,7 @@ interface Config {
   tableName?: string;
   showTotal: boolean;
   changeButton: boolean;
+  usePathnameFromQuery: boolean;
   modules: {
     get?: number;
   };
@@ -113,6 +114,7 @@ class Filter {
       tableName: undefined,
       showTotal: true,
       changeButton: true,
+      usePathnameFromQuery: true,
       modules: {
         get: undefined,
       },
@@ -232,7 +234,7 @@ class Filter {
 
         // Если есть заданное значение строки, то нужно взять базу оттуда, иначе запрос будет отдавать 404
         let basePath = '';
-        if (this.presetQuery && !this.disablePresetQuery) {
+        if (this.presetQuery && !this.disablePresetQuery && (this.node.dataset.fazeFilterUsePathname || 'true') === 'true') {
           basePath = this.presetQuery.split('?')[0];
         }
 

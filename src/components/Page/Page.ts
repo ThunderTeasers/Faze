@@ -351,15 +351,15 @@ class Page {
     const pageInitializators: NodeListOf<HTMLElement> = document.querySelectorAll('[data-faze~="page"]');
     pageInitializators.forEach((pageInitializator: any) => {
       new Page(pageInitializator, {
-        offset: parseInt(pageInitializator.getAttribute('data-faze-page-offset') || '10', 10),
-        quantity: parseInt(pageInitializator.getAttribute('data-faze-page-quantity') || '10', 10),
+        offset: parseInt(pageInitializator.dataset.fazePageOffset || '10', 10),
+        quantity: parseInt(pageInitializator.dataset.fazePageQuantity || '10', 10),
         tableName: pageInitializator.getAttribute('data-faze-page-table_name'),
         modifyPath: pageInitializator.getAttribute('data-faze-page-modify_path'),
         modules: {
-          get: pageInitializator.getAttribute('data-faze-page-modules-get'),
+          get: pageInitializator.dataset.fazePageModulesGet('data-faze-page-modules-get'),
         },
         selectors: {
-          items: pageInitializator.getAttribute('data-faze-page-selectors-items') || '.item',
+          items: pageInitializator.dataset.fazePageSelectorsItems || '.item',
         },
       });
     });

@@ -70,7 +70,7 @@ class Observer {
       mutationRecords.forEach((mutationRecord: MutationRecord) => {
         // Проходимся по всем добавленым DOM элементам
         mutationRecord.addedNodes.forEach((addedNode: Node) => {
-          const parentNode = addedNode.parentNode;
+          const parentNode: HTMLElement | null = addedNode.parentNode as HTMLElement;
           if (parentNode) {
             // Делаем выборку по селектору у родителя вставленного элемента, для того чтобы избежать случая, когда в "addedNode"
             // передаются элементы которые не соответствуют заданному в "listener" селектору

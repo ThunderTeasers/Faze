@@ -146,7 +146,7 @@ class Faze {
     const currentPlugins: InnerPluginsData = {};
 
     // Зарезервированные имена
-    const predefinedNames = [
+    const predefinedNames: string[] = [
       'Zoom',
       'Tooltip',
       'Carousel',
@@ -238,11 +238,10 @@ class Faze {
    * @param callback      - пользовательская функция которая будет исполнена после срабатывания события
    */
   static on(eventName: string, childSelector: string, callback: (event: Event, child: HTMLElement) => void): void {
-    window.addEventListener(eventName, (event) => {
-      const clickedElement = <any>event.target;
+    window.addEventListener(eventName, (event: Event) => {
+      const clickedElement: HTMLElement | null = event.target as HTMLElement;
       if (clickedElement) {
-        const matchingChild = clickedElement.closest(childSelector);
-
+        const matchingChild: HTMLElement | null = clickedElement.closest(childSelector);
         if (matchingChild) {
           callback(event, matchingChild);
         }

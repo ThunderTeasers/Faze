@@ -124,7 +124,7 @@ Faze.add({
     new Faze.Spoiler(document.querySelector('.spoiler-test'));
 
     new Faze.Scroll(document.querySelector('.for-scroll'), {
-      width: '500',
+      width: '100%',
       height: '300',
     });
 

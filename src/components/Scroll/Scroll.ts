@@ -48,6 +48,14 @@ interface Config {
 }
 
 /**
+ * Направление движения
+ */
+enum Direction {
+  Horizontal,
+  Vertical,
+}
+
+/**
  * Класс скролл
  */
 class Scroll {
@@ -73,10 +81,10 @@ class Scroll {
   heightScrollNode: number;
 
   // Общая ширина области враппера
-  widthWrapperNode: number;
+  wrapperWidth: number;
 
   // Общая высота области враппера
-  heightWrapperNode: number;
+  wrapperHeight: number;
 
   // Размер вертикального скрола в процентах относительно области скрола
   scrollVerticalHeightInPercents: number;
@@ -104,7 +112,7 @@ class Scroll {
       class: '',
     };
 
-    this.config = {...defaultConfig, ...config};
+    this.config = Object.assign(defaultConfig, config);
     this.node = node;
 
     // Инициализация переменных
@@ -156,10 +164,8 @@ class Scroll {
   bind(): void {
     this.bindResizeRecalculate();
     this.bindMouseWheel();
-    this.bindMouseDragVertical();
-    this.bindMouseTouchVertical();
-    this.bindMouseDragHorizontal();
-    this.bindMouseTouchHorizontal();
+    this.bindTouchDrag();
+    this.bindMouseDrag();
   }
 
   /**
@@ -184,10 +190,10 @@ class Scroll {
         event.preventDefault();
 
         // Определяем направление
-        const delta = event.deltaY > 0 ? 100 : -100;
+        const delta: number = event.deltaY > 0 ? 100 : -100;
 
         // Изменяем текущую позицию
-        let positionY = parseInt(this.node.style.top || '0', 10) - delta;
+        let positionY: number = parseInt(this.node.style.top || '0', 10) - delta;
 
         // Проверяем чтобы позиция не уехала за рамки
         if (positionY >= 0) {
@@ -206,14 +212,27 @@ class Scroll {
   }
 
   /**
-   * Навешивание события прокрутки области видимости пальцем
+   * Навешиевание событий на движения полосы прокрутки(а соответственно и поля просмотра) в стороны с помощью пальца
    */
-  bindMouseTouchVertical(): void {
-    // Начальная позиция мыши
-    let startTouchPosition = 0;
+  bindTouchDrag(): void {
+    this.bindTouchDragDirection(Direction.Vertical);
+    this.bindTouchDragDirection(Direction.Horizontal);
+  }
 
-    // КОнечная позиция мыши
-    let endTouchPosition = 0;
+  /**
+   * Навашивание событий на движения полосы прокрутки(а соответственно и поля просмотра) в определенную сторону с помощью мыши
+   *
+   * @param direction - направление движения
+   */
+  bindTouchDragDirection(direction: Direction): void {
+    // Начальная позиция пальца
+    let startTouchPosition: number = 0;
+
+    // Конечная позиция пальца
+    let endTouchPosition: number = 0;
+
+    // DOM элемент полосы прокрутки
+    const scrollbarNode: HTMLDivElement = (direction === Direction.Horizontal ? this.scrollBarHorizontalNode : this.scrollBarVerticalNode);
 
     /**
      * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
@@ -221,42 +240,57 @@ class Scroll {
      * @param event - событие мыши
      */
     const dragTouchDown = (event: TouchEvent) => {
-      // Получение позиции курсора при нажатии на элемент
-      startTouchPosition = event.touches[0].clientY;
+      // Получение пальца при нажатии на элемент
+      startTouchPosition = (direction === Direction.Horizontal ? event.touches[0].clientX : event.touches[0].clientY);
 
       // Выключаем плавную прокрутку при движении мышкой
-      this.scrollBarVerticalNode.style.transition = '';
+      scrollbarNode.style.transition = '';
       this.node.style.transition = '';
 
       this.wrapperNode.addEventListener('touchend', endDragElement);
-      this.wrapperNode.addEventListener('touchmove', elementDrag);
+      this.wrapperNode.addEventListener('touchmove', dragElement);
     };
 
     /**
-     * Функция перетаскивания модального окна.
-     * Тут идет расчет координат и они присваиваются окну через стили "top" и "left", окно в таком случае естественно должно иметь
-     * позиционирование "absolute"
+     * Функция перетаскивания области скрола.
+     * Происходит расчёт координат и они присваиваются через стили "top" и "left".
      *
-     * @param event - событие мыши
+     * @param event - событие пальца
      */
-    const elementDrag = (event: TouchEvent) => {
-      // Рассчет новой позиции курсора
-      endTouchPosition = startTouchPosition - event.touches[0].clientY;
-      startTouchPosition = event.touches[0].clientY;
+    const dragElement = (event: TouchEvent) => {
+      event.preventDefault();
 
-      let positionNode = this.node.offsetTop - endTouchPosition;
+      // Рассчет новой позиции пальца
+      endTouchPosition = startTouchPosition - (direction === Direction.Horizontal ? event.touches[0].clientX : event.touches[0].clientY);
+      startTouchPosition = (direction === Direction.Horizontal ? event.touches[0].clientX : event.touches[0].clientY);
 
-      if (positionNode <= -(this.node.offsetHeight - this.heightWrapperNode)) {
-        positionNode = -(this.node.offsetHeight - this.heightWrapperNode);
-      } else if (positionNode >= 0) {
-        positionNode = 0;
+      let position = 0;
+      if (direction === Direction.Horizontal) {
+        position = this.node.offsetLeft - endTouchPosition;
+
+        if (position <= -(this.node.offsetWidth - this.wrapperWidth)) {
+          position = -(this.node.offsetWidth - this.wrapperWidth);
+        } else if (position >= 0) {
+          position = 0;
+        }
+      } else {
+        position = this.node.offsetTop - endTouchPosition;
+
+        if (position <= -(this.node.offsetHeight - this.wrapperHeight)) {
+          position = -(this.node.offsetHeight - this.wrapperHeight);
+        } else if (position >= 0) {
+          position = 0;
+        }
       }
 
-      // Задаем позицию вертикальному скрол бару
-      this.node.style.top = `${positionNode}px`;
-
-      // Рассчет новой позиции скролбара
-      this.scrollBarVerticalNode.style.top = `${-parseInt(this.node.style.top || '', 10) * this.scrollVerticalHeightInPercents / 100}px`;
+      // Рассчет новой позиции скролбара и задаем позицию вертикальному скрол бару
+      if (direction === Direction.Horizontal) {
+        this.node.style.left = `${position}px`;
+        scrollbarNode.style.left = `${-parseInt(this.node.style.left || '', 10) * this.scrollHorizontalWidthInPercents / 100}px`;
+      } else {
+        this.node.style.top = `${position}px`;
+        scrollbarNode.style.top = `${-parseInt(this.node.style.top || '', 10) * this.scrollVerticalHeightInPercents / 100}px`;
+      }
     };
 
     /**
@@ -264,11 +298,11 @@ class Scroll {
      */
     const endDragElement = () => {
       // Включаем плавную прокрутку обратно после того как закончили двигать скрол бар мышкой
-      this.scrollBarVerticalNode.style.transition = this.config.transition;
+      scrollbarNode.style.transition = this.config.transition;
       this.node.style.transition = this.config.transition;
 
       this.wrapperNode.removeEventListener('touchend', endDragElement);
-      this.wrapperNode.removeEventListener('touchend', elementDrag);
+      this.wrapperNode.removeEventListener('touchend', dragElement);
     };
 
     // Навешиваем событие перетаскивания окна по нажатию на его заголовок
@@ -276,84 +310,27 @@ class Scroll {
   }
 
   /**
-   * Навешивание события прокрутки области видимости пальцем
+   * Навешиевание событий на движения полосы прокрутки(а соответственно и поля просмотра) в стороны с помощью мыши
    */
-  bindMouseTouchHorizontal(): void {
-    // Начальная позиция мыши
-    let startTouchPosition = 0;
-
-    // КОнечная позиция мыши
-    let endTouchPosition = 0;
-
-    /**
-     * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
-     *
-     * @param event - событие мыши
-     */
-    const dragTouchDown = (event: TouchEvent) => {
-      // Получение позиции курсора при нажатии на элемент
-      startTouchPosition = event.touches[0].clientX;
-
-      // Выключаем плавную прокрутку при движении мышкой
-      this.scrollBarHorizontalNode.style.transition = '';
-      this.node.style.transition = '';
-
-      this.wrapperNode.addEventListener('touchend', endDragElement);
-      this.wrapperNode.addEventListener('touchmove', elementDrag);
-    };
-
-    /**
-     * Функция перетаскивания модального окна.
-     * Тут идет расчет координат и они присваиваются окну через стили "top" и "left", окно в таком случае естественно должно иметь
-     * позиционирование "absolute"
-     *
-     * @param event - событие мыши
-     */
-    const elementDrag = (event: TouchEvent) => {
-      // Рассчет новой позиции курсора
-      endTouchPosition = startTouchPosition - event.touches[0].clientX;
-      startTouchPosition = event.touches[0].clientX;
-
-      let positionNode = this.node.offsetLeft - endTouchPosition;
-
-      if (positionNode <= -(this.node.offsetWidth - this.widthWrapperNode)) {
-        positionNode = -(this.node.offsetWidth - this.widthWrapperNode);
-      } else if (positionNode >= 0) {
-        positionNode = 0;
-      }
-
-      // Задаем позицию вертикальному скрол бару
-      this.node.style.left = `${positionNode}px`;
-
-      // Рассчет новой позиции скролбара
-      this.scrollBarHorizontalNode.style.left = `${-parseInt(this.node.style.left || '0', 10) * this.scrollHorizontalWidthInPercents / 100}px`;
-    };
-
-    /**
-     * Завершение перетаскивания(момент отпускания кнопки мыши), удаляем все слушатели, т.к. они создаются при каждом новом перетаскивании
-     */
-    const endDragElement = () => {
-      // Включаем плавную прокрутку обратно после того как закончили двигать скрол бар мышкой
-      this.scrollBarHorizontalNode.style.transition = this.config.transition;
-      this.node.style.transition = this.config.transition;
-
-      this.wrapperNode.removeEventListener('touchend', endDragElement);
-      this.wrapperNode.removeEventListener('touchend', elementDrag);
-    };
-
-    // Навешиваем событие перетаскивания окна по нажатию на его заголовок
-    this.wrapperNode.addEventListener('touchstart', dragTouchDown);
+  bindMouseDrag(): void {
+    this.bindMouseDragDirection(Direction.Vertical);
+    this.bindMouseDragDirection(Direction.Horizontal);
   }
 
   /**
-   * Навешивание события прокрутки области видимости с помощью скролбара
+   * Навашивание событий на движения полосы прокрутки(а соответственно и поля просмотра) в определенную сторону с помощью мыши
+   *
+   * @param direction - направление движения
    */
-  bindMouseDragVertical(): void {
+  bindMouseDragDirection(direction: Direction): void {
     // Начальная позиция мыши
-    let startMousePosition = 0;
+    let startMousePosition: number = 0;
 
-    // КОнечная позиция мыши
-    let endMousePosition = 0;
+    // Конечная позиция мыши
+    let endMousePosition: number = 0;
+
+    // DOM элемент полосы прокрутки
+    const scrollbarNode: HTMLDivElement = (direction === Direction.Horizontal ? this.scrollBarHorizontalNode : this.scrollBarVerticalNode);
 
     /**
      * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
@@ -364,14 +341,14 @@ class Scroll {
       event.preventDefault();
 
       // Получение позиции курсора при нажатии на элемент
-      startMousePosition = event.clientY;
+      startMousePosition = direction === Direction.Horizontal ? event.clientX : event.clientY;
 
       // Выключаем плавную прокрутку при движении мышкой
-      this.scrollBarVerticalNode.style.transition = '';
+      scrollbarNode.style.transition = '';
       this.node.style.transition = '';
 
-      document.addEventListener('mouseup', endDragElement);
-      document.addEventListener('mousemove', elementDrag);
+      this.wrapperNode.addEventListener('mouseup', endDragElement);
+      this.wrapperNode.addEventListener('mousemove', dragElement);
     };
 
     /**
@@ -381,25 +358,46 @@ class Scroll {
      *
      * @param event - событие мыши
      */
-    const elementDrag = (event: MouseEvent) => {
+    const dragElement = (event: MouseEvent) => {
       event.preventDefault();
 
-      // Рассчет новой позиции курсора
-      endMousePosition = startMousePosition - event.clientY;
-      startMousePosition = event.clientY;
-
-      let position = this.scrollBarVerticalNode.offsetTop - endMousePosition;
-      if (position <= 0) {
-        position = 0;
-      } else if (position >= this.heightWrapperNode - this.scrollBarVerticalNode.offsetHeight) {
-        position = this.heightWrapperNode - this.scrollBarVerticalNode.offsetHeight;
+      // Ставим ограничение на передвижение полосы если мышь за её пределами
+      if (direction === Direction.Horizontal) {
+        if (scrollbarNode.getBoundingClientRect().right < event.clientX || scrollbarNode.getBoundingClientRect().left > event.clientX) {
+          return;
+        }
+      } else {
+        if (scrollbarNode.getBoundingClientRect().bottom < event.clientY || scrollbarNode.getBoundingClientRect().top > event.clientY) {
+          return;
+        }
       }
 
-      // Рассчет новой позиции скролбара
-      this.scrollBarVerticalNode.style.top = `${position}px`;
+      // Рассчет новой позиции курсора
+      endMousePosition = startMousePosition - (direction === Direction.Horizontal ? event.clientX : event.clientY);
+      startMousePosition = (direction === Direction.Horizontal ? event.clientX : event.clientY);
 
-      // Задаем позицию вертикальному скрол бару
-      this.node.style.top = `${-parseInt(this.scrollBarVerticalNode.style.top, 10) / this.scrollVerticalHeightInPercents * 100}px`;
+      let maxPosition = 0;
+      if (direction === Direction.Horizontal) {
+        maxPosition = this.wrapperWidth - scrollbarNode.offsetWidth;
+      } else {
+        maxPosition = this.wrapperHeight - scrollbarNode.offsetHeight;
+      }
+
+      let position: number = (direction === Direction.Horizontal ? scrollbarNode.offsetLeft : scrollbarNode.offsetTop) - endMousePosition;
+      if (position <= 0) {
+        position = 0;
+      } else if (position >= maxPosition) {
+        position = maxPosition;
+      }
+
+      // Рассчет новой позиции скролбара и задаем позицию вертикальному скрол бару
+      if (direction === Direction.Horizontal) {
+        scrollbarNode.style.left = `${position}px`;
+        this.node.style.left = `${-parseInt(scrollbarNode.style.left, 10) / this.scrollHorizontalWidthInPercents * 100}px`;
+      } else {
+        scrollbarNode.style.top = `${position}px`;
+        this.node.style.top = `${-parseInt(scrollbarNode.style.top, 10) / this.scrollVerticalHeightInPercents * 100}px`;
+      }
     };
 
     /**
@@ -407,88 +405,15 @@ class Scroll {
      */
     const endDragElement = () => {
       // Включаем плавную прокрутку обратно после того как закончили двигать скрол бар мышкой
-      this.scrollBarVerticalNode.style.transition = this.config.transition;
+      scrollbarNode.style.transition = this.config.transition;
       this.node.style.transition = this.config.transition;
 
-      document.removeEventListener('mouseup', endDragElement);
-      document.removeEventListener('mousemove', elementDrag);
+      this.wrapperNode.removeEventListener('mouseup', endDragElement);
+      this.wrapperNode.removeEventListener('mousemove', dragElement);
     };
 
     // Навешиваем событие перетаскивания окна по нажатию на его заголовок
-    this.scrollBarVerticalNode.addEventListener('mousedown', dragMouseDown);
-  }
-
-  /**
-   * Навешивание события прокрутки области видимости с помощью скролбара
-   */
-  bindMouseDragHorizontal(): void {
-    // Начальная позиция мыши
-    let startMousePosition = 0;
-
-    // КОнечная позиция мыши
-    let endMousePosition = 0;
-
-    /**
-     * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
-     *
-     * @param event - событие мыши
-     */
-    const dragMouseDown = (event: MouseEvent) => {
-      event.preventDefault();
-
-      // Получение позиции курсора при нажатии на элемент
-      startMousePosition = event.clientX;
-
-      // Выключаем плавную прокрутку при движении мышкой
-      this.scrollBarVerticalNode.style.transition = '';
-      this.node.style.transition = '';
-
-      document.addEventListener('mouseup', endDragElement);
-      document.addEventListener('mousemove', elementDrag);
-    };
-
-    /**
-     * Функция перетаскивания модального окна.
-     * Тут идет расчет координат и они присваиваются окну через стили "top" и "left", окно в таком случае естественно должно иметь
-     * позиционирование "absolute"
-     *
-     * @param event - событие мыши
-     */
-    const elementDrag = (event: MouseEvent) => {
-      event.preventDefault();
-
-      // Рассчет новой позиции курсора
-      endMousePosition = startMousePosition - event.clientX;
-      startMousePosition = event.clientX;
-
-      let position = this.scrollBarHorizontalNode.offsetLeft - endMousePosition;
-      if (position <= 0) {
-        position = 0;
-      } else if (position >= this.widthWrapperNode - this.scrollBarHorizontalNode.offsetWidth) {
-        position = this.widthWrapperNode - this.scrollBarHorizontalNode.offsetWidth;
-      }
-
-      // Рассчет новой позиции скролбара
-      this.scrollBarHorizontalNode.style.left = `${position}px`;
-
-      // Задаем позицию вертикальному скрол бару
-      this.node.style.left = `${-parseInt(this.scrollBarHorizontalNode.style.left || '0', 10) / this.scrollHorizontalWidthInPercents * 100}px`;
-    };
-
-    /**
-     * Завершение перетаскивания(момент отпускания кнопки мыши), удаляем все слушатели, т.к. они создаются при каждом новом перетаскивании
-     */
-    const endDragElement = () => {
-      // Включаем плавную прокрутку обратно после того как закончили двигать скрол бар мышкой
-      this.scrollBarHorizontalNode.style.transition = this.config.transition;
-      this.node.style.transition = this.config.transition;
-
-      document.removeEventListener('mouseup', endDragElement);
-      document.removeEventListener('mousemove', elementDrag);
-    };
-
-    // Навешиваем событие перетаскивания окна по нажатию на его заголовок
-    this.scrollBarHorizontalNode.addEventListener('mousedown', dragMouseDown);
+    scrollbarNode.addEventListener('mousedown', dragMouseDown);
   }
 
   /**
@@ -515,17 +440,17 @@ class Scroll {
 
       // Получаем данные о размерах
       this.widthScrollNode = this.node.getBoundingClientRect().width;
-      this.widthWrapperNode = this.wrapperNode.getBoundingClientRect().width - additionalWidth;
+      this.wrapperWidth = this.wrapperNode.getBoundingClientRect().width - additionalWidth;
 
       if (this.scrollBarHorizontalNode) {
         // Показываем скролл и делаем рассчеты если ширина контента больше ширины области видимости
-        if (this.widthScrollNode > this.widthWrapperNode) {
+        if (this.widthScrollNode > this.wrapperWidth) {
           this.isHorizontal = true;
 
           // Проставляем класс
           this.wrapperNode.classList.add('faze-scroll-horizontal');
 
-          this.scrollHorizontalWidthInPercents = <any>(this.widthWrapperNode / this.widthScrollNode).toFixed(3) * 100;
+          this.scrollHorizontalWidthInPercents = <any>(this.wrapperWidth / this.widthScrollNode).toFixed(3) * 100;
           this.scrollBarHorizontalNode.style.width = `${this.scrollHorizontalWidthInPercents}%`;
         } else {
           this.isHorizontal = false;
@@ -568,10 +493,10 @@ class Scroll {
 
         // Получаем данные о размерах
         this.heightScrollNode = this.node.getBoundingClientRect().height;
-        this.heightWrapperNode = this.wrapperNode.getBoundingClientRect().height - additionalHeight;
+        this.wrapperHeight = this.wrapperNode.getBoundingClientRect().height - additionalHeight;
 
         // Показываем скролл и делаем рассчеты если ширина контента больше ширины области видимости
-        if (this.heightScrollNode > this.heightWrapperNode) {
+        if (this.heightScrollNode > this.wrapperHeight) {
           this.isVertical = true;
 
           // Проставляем класс

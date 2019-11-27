@@ -375,7 +375,7 @@ class Carousel {
       page.addEventListener('click', (event: Event) => {
         event.preventDefault();
 
-        const index = page.getAttribute('data-faze-index');
+        const index = page.dataset.fazeIndex;
         if (index) {
           this.change(parseInt(index, 10));
         }

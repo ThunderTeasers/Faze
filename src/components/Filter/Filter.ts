@@ -216,30 +216,30 @@ class Filter {
    */
   bind(): void {
     if (this.formNode) {
-      this.formNode.addEventListener('submit', (event) => {
+      this.formNode.addEventListener('submit', (event: Event) => {
         event.preventDefault();
 
         // Блокировка кнопки для предотвращения повторного нажатия во время отправки запроса
         this.lockButton();
 
         // Составление запроса для фильтрации
-        const formData = new FormData(<HTMLFormElement>this.formNode);
+        const formData: FormData = new FormData(<HTMLFormElement>this.formNode);
 
         // Собираем вручную строку запроса из FormData т.к. Edge и другие отсталые браузеры, даже имея официалиьную поддержку
         // URLSearchParams не имеют возможности создать её через передачу параметра FormData в конструкторе.
-        const formDataQuery = [...formData.entries()].map(entry => `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(<any>entry[1])}`).join('&');
+        const formDataQuery: string = [...formData.entries()].map(entry => `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(<any>entry[1])}`).join('&');
 
         // Парсим данные формы
-        const formDataURLString = new URLSearchParams(formDataQuery);
+        const formDataURLString: URLSearchParams = new URLSearchParams(formDataQuery);
 
         // Если есть заданное значение строки, то нужно взять базу оттуда, иначе запрос будет отдавать 404
-        let basePath = '';
+        let basePath: string = '';
         if (this.presetQuery && !this.disablePresetQuery && (this.node.dataset.fazeFilterUsePathname || 'true') === 'true') {
           basePath = this.presetQuery.split('?')[0];
         }
 
         // URL для вставки в строку поиска в браузере(HTML5 history)
-        const urlForHistory = `${basePath}?${formDataURLString.toString()}`;
+        const urlForHistory: string = `${basePath}?${formDataURLString.toString()}`;
         formDataURLString.append('mime', 'txt');
 
         const module = this.config.modules.get || this.node.dataset.fazeFilterModuleGet;
@@ -248,22 +248,22 @@ class Filter {
         }
 
         // URL для запроса к серверу
-        const urlForRequest = `${basePath}?${formDataURLString.toString()}`;
+        const urlForRequest: string = `${basePath}?${formDataURLString.toString()}`;
 
         // Отправка запрос на сервер
         fetch(urlForRequest, {credentials: 'same-origin'})
-          .then(response => response.text())
-          .then((response) => {
+          .then((response: Response) => response.text())
+          .then((response: string) => {
             // Парсинг ответа от сервера
-            const responseHTML = (new DOMParser()).parseFromString(response, 'text/html');
+            const responseHTML: Document = (new DOMParser()).parseFromString(response, 'text/html');
 
             // Ищем в ответе от сервера DOM элемент с такими же классами как у элемента фильтра
-            const responseNode = responseHTML.querySelector(`.${Array.from(this.node.classList).join('.')}`);
+            const responseNode: HTMLElement | null = responseHTML.querySelector(`.${Array.from(this.node.classList).join('.')}`);
             if (responseNode) {
               if (this.itemsHolderNode) {
                 // Проверка, если отфильтрованных элементов больше 0, тогда происходит их вывод
                 // иначе сообщение об отсутствии элементов по данному запросу
-                const itemsHolderNode = responseNode.querySelector(this.config.selectors.itemsHolder);
+                const itemsHolderNode: HTMLElement | null = responseNode.querySelector(this.config.selectors.itemsHolder);
                 if (itemsHolderNode) {
                   this.itemsHolderNode.innerHTML = itemsHolderNode.innerHTML;
                 } else {
@@ -272,11 +272,11 @@ class Filter {
               }
 
               // Обновление количества элементов
-              const total = responseNode.getAttribute('data-faze-filter-total') || '0';
+              const total: string = responseNode.dataset.fazeFilterTotal || '0';
               if (this.config.showTotal && this.totalNode) {
                 this.totalNode.textContent = total;
               }
-              this.node.setAttribute('data-faze-filter-total', total);
+              this.node.dataset.fazeFilterTotal = total;
             }
 
             // Обновление строки в браузере
@@ -301,7 +301,7 @@ class Filter {
                   formNode: this.formNode,
                   itemsHolderNode: this.itemsHolderNode,
                   params: this.params,
-                  total: parseInt(this.node.getAttribute('data-faze-filter-total') || '0', 10),
+                  total: parseInt(this.node.dataset.fazeFilterTotal || '0', 10),
                 });
               } catch (error) {
                 console.error(error);
@@ -321,15 +321,15 @@ class Filter {
    * @param type - тип инпута
    * @param callback - найденный DOM элемент
    */
-  restoreFilteredInput(type: string, callback: (foundNode: HTMLInputElement, foundValue?: string) => void) {
+  restoreFilteredInput(type: string, callback: (foundNode: HTMLInputElement, foundValue?: string) => void): void {
     if (this.formNode) {
       const inputFields = ['text', 'number', 'date', 'phone', 'email', 'datetime', 'textarea'];
 
-      this.formNode.querySelectorAll(`input[type="${type}"]`).forEach((foundNode: any) => {
+      this.formNode.querySelectorAll<HTMLInputElement>(`input[type="${type}"]`).forEach((foundNode: HTMLInputElement) => {
         const foundNodeName = foundNode.name;
         const foundNodeValue = foundNode.value;
 
-        const values = this.params.getAll(foundNodeName);
+        const values: string[] = this.params.getAll(foundNodeName);
         if (values.includes(foundNodeValue)) {
           if (typeof callback === 'function') {
             callback(foundNode);
@@ -379,15 +379,15 @@ class Filter {
 
     // Далее добавляем/перезаписываем нужные
     this.config.cookie.params.forEach((storedParamName) => {
-      let paramsValues = this.params.getAll(storedParamName);
+      let paramsValues: string[] = this.params.getAll(storedParamName);
 
       // Если необходимо кодировать значения, делаем это
       if (this.config.cookie.encode) {
-        paramsValues = paramsValues.map(paramValue => encodeURIComponent(paramValue));
+        paramsValues = paramsValues.map((paramValue: string) => encodeURIComponent(paramValue));
       }
 
       // Составляем итоговое значение cookie
-      const cookieValue = paramsValues.join(this.config.cookie.delimiter);
+      const cookieValue: string = paramsValues.join(this.config.cookie.delimiter);
       if (cookieValue) {
         Faze.Helpers.setCookie(storedParamName, cookieValue);
       }
@@ -442,7 +442,7 @@ class Filter {
    * Обновление внутненних параметров поиска, для того чтобы они совпадали с теми, что содержатся в поисковой строке
    */
   updateSearchParams(): void {
-    let queryParams = undefined;
+    let queryParams: string | undefined = undefined;
     if (this.node.dataset.fazeFilterQuery && !this.disablePresetQuery) {
       queryParams = this.node.dataset.fazeFilterQuery.split('?')[1];
     }
@@ -469,7 +469,7 @@ class Filter {
     if (this.buttonSubmitNode && this.config.changeButton) {
       this.buttonSubmitNode.removeAttribute('disabled');
       this.buttonSubmitNode.classList.remove('faze-disabled');
-      this.buttonSubmitNode.textContent = this.buttonSubmitNode.getAttribute('data-faze-initial-text') || 'Готово!';
+      this.buttonSubmitNode.textContent = this.buttonSubmitNode.dataset.fazeInitialText || 'Готово!';
     }
   }
 

@@ -2,7 +2,7 @@ import Faze from '../Core/Faze';
 import Helpers from '../Helpers/Helpers';
 
 class REST {
-  static request(method: string, type: string | null, url: string, data: any, callbackSuccess: ((response: any) => void) | null) {
+  static request(method: string, type: string | null, url: string, data: any, callbackSuccess: ((response: any) => void) | null): void {
     let formData: FormData = new FormData();
     let dataType: string = '';
     let testedMethod: string = '';
@@ -48,7 +48,7 @@ class REST {
     }
 
     fetch(`${currentURL}`, fetchOptions)
-      .then((response: any) => {
+      .then((response: Response) => {
         let data = null;
 
         // В зависимости от типа запроса нужно по разному получить ответ от сервера
@@ -126,7 +126,7 @@ class REST {
    * @param formNode - DOM элемент формы из которой оправляем
    * @param callback - пользовательская функция, исполняющаяся ПОСЛЕ всех действий
    */
-  static formSubmit(formNode: HTMLFormElement, callback?: (response?: any) => void) {
+  static formSubmit(formNode: HTMLFormElement, callback?: (response?: any) => void): void {
     if (!(formNode instanceof HTMLFormElement)) {
       throw new Error('Параметр метода formSubmit не является формой');
     }
@@ -135,10 +135,10 @@ class REST {
     const formData: FormData = new FormData(formNode);
 
     // Поля, имеющие принадлежность к JSON
-    const jsonFields = formNode.querySelectorAll('[data-faze-restapi-json-name]');
+    const jsonFields: NodeListOf<HTMLElement> = formNode.querySelectorAll('[data-faze-restapi-json-name]');
 
     // Получение уникальных названий полей для сборки JSON объектов
-    const jsonNames = [...new Set(Array.from(jsonFields).map((item: any) => {
+    const jsonNames: string[] = [...new Set(Array.from(jsonFields).map((item: any) => {
       const inputDataName = item.dataset.fazeRestapiJsonName;
 
       return inputDataName.includes('.') ? inputDataName.substring(0, inputDataName.indexOf('.')) : inputDataName;
@@ -149,20 +149,20 @@ class REST {
       let jsonObject: any = {};
 
       // Проходимся по всем инпутам название в атрибуте которых начинается с имени ключа объекта в который мы собираем их
-      const inputsNodes = Array.from(formNode.querySelectorAll('[data-faze-restapi-json-name]')).filter((inputNode: any) => {
+      const inputsNodes: HTMLInputElement[] = Array.from(formNode.querySelectorAll('[data-faze-restapi-json-name]')).filter((inputNode: any) => {
         const attrJsonName = inputNode.dataset.fazeRestapiJsonName;
 
         // Проверяем, если название содержит точку, то значит нужно проверять вместе с ней, если нет - то нет, это очень важно
         return attrJsonName.includes('.') ? attrJsonName.startsWith(`${jsonName}.`) : attrJsonName.startsWith(`${jsonName}`);
-      });
+      }) as HTMLInputElement[];
 
       // Проходимся по всем инпутам и собираем итоговый объект
-      inputsNodes.forEach((itemNode: any) => {
+      inputsNodes.forEach((itemNode: HTMLInputElement) => {
         // Проверка, является ли инпут чекбоксом
-        const isCheckbox = itemNode.type === 'checkbox';
+        const isCheckbox: boolean = itemNode.type === 'checkbox';
 
         // Проверка, является ли инпут радио кнопкой
-        const isRadioButton = itemNode.type === 'radio';
+        const isRadioButton: boolean = itemNode.type === 'radio';
 
         // Пропускаем не нужные инпуты
         if (
@@ -173,32 +173,36 @@ class REST {
           (isRadioButton && !itemNode.checked) ||
 
           // Чекбоксы в неактивном положении у которых нет data атрибута с значением неактивного положения, либо атрибут пустой
-          (isCheckbox && !itemNode.checked && !itemNode.getAttribute('data-faze-restapi-disabled-value'))
+          (isCheckbox && !itemNode.checked && !itemNode.dataset.fazeRestapiDisabledValue)
         ) {
           return;
         }
 
         // Мы должны вырезать из строки всё что идет до первой точки, т.к. это ключ для отправки в formData, если точки нет, это
         // значит, что это ключ первого уровня, а для этого необходимо передать пустую строку
-        let jsonNameForObject = itemNode.dataset.fazeRestapiJsonName;
-        if (jsonNameForObject.includes('.')) {
+        let jsonNameForObject: string | undefined = itemNode.dataset.fazeRestapiJsonName;
+        if (jsonNameForObject && jsonNameForObject.includes('.')) {
           jsonNameForObject = jsonNameForObject.substring(jsonNameForObject.indexOf('.') + 1);
         } else {
           jsonNameForObject = '';
         }
 
-        const key = itemNode.getAttribute('data-faze-restapi-json-key') || itemNode.name;
-        let value = itemNode.getAttribute('data-faze-restapi-json-value') || itemNode.value;
+        const key: string = itemNode.dataset.fazeRestapiJsonKey || itemNode.name;
+        let value: string | null = itemNode.dataset.fazeRestapiJsonValue || itemNode.value;
 
         // Если это не активный чекбокс, то присваиваем ему значение из data атрибута
         // Гарантированность того, что оно задано, обеспечивает условие сверху
         if (isCheckbox && !itemNode.checked) {
-          value = itemNode.getAttribute('data-faze-restapi-disabled-value');
+          value = itemNode.dataset.fazeRestapiDisabledValue || null;
         }
 
-        const arrayGroup = itemNode.dataset.fazeRestapiJsonArrayGroup || 'default';
+        // Группа массива
+        const arrayGroup: string = itemNode.dataset.fazeRestapiJsonArrayGroup || 'default';
 
-        jsonObject = Faze.Helpers.objectFromString(jsonObject, jsonNameForObject, key, value, arrayGroup);
+        // Если есть значение, тогда создаём объект
+        if (value) {
+          jsonObject = Faze.Helpers.objectFromString(jsonObject, jsonNameForObject, key, value, arrayGroup);
+        }
 
         // Удаляем найденные поля из formdata
         if (formData.delete) {
@@ -207,12 +211,12 @@ class REST {
       });
 
       // Важно взять только то, что стоит до точки
-      const jsonRealName = jsonName.split('.')[0];
+      const jsonRealName: string = jsonName.split('.')[0];
 
       // Если есть data атрибут с объектом с которым нужно слить сгенерируемый из строк объект, то выполняем слияние
-      if (formNode.hasAttribute('data-faze-restapi-json-merge')) {
-        let objectToMerge = null;
-        const jsonData = formNode.dataset.fazeRestapiJsonMerge || '';
+      if (formNode.dataset.fazeRestapiJsonMerge) {
+        let objectToMerge: Object | null = null;
+        const jsonData: string = formNode.dataset.fazeRestapiJsonMerge;
 
         try {
           objectToMerge = JSON.parse(jsonData);
@@ -220,6 +224,7 @@ class REST {
           console.error(`Ошибка парсинга JSON объекта для слияния("data-faze-restapi-json-merge"), JSON: ${jsonData}, текст ошибки: `, error);
         }
 
+        // Объединяем объекты
         jsonObject = Helpers.mergeDeep(true, objectToMerge, jsonObject);
       }
 
@@ -228,11 +233,11 @@ class REST {
     }
 
     // Вычисляем URL для отправки запроса
-    const url = formNode.getAttribute('action') || window.location.href;
+    const url: string = formNode.getAttribute('action') || window.location.href;
 
     // Определение, какой тип ответа запрашивать
-    let typeForResponse = 'text';
-    let notificationNode: any = null;
+    let typeForResponse: string = 'text';
+    let notificationNode: HTMLElement | null = null;
 
     // Ищем DOM элемент для вывода информационного сообщения
     if (formNode.dataset.fazeRestapiNotification) {
@@ -249,8 +254,8 @@ class REST {
 
     // Футкция, которая исполнится при получении ответа от сервера
     const callbackSuccess = (response: any) => {
-      if (formNode.hasAttribute('data-faze-restapi-form')) {
-        REST.chain(formNode.dataset.fazeRestapiForm || null, callback, response);
+      if (formNode.dataset.fazeRestapiForm) {
+        REST.chain(formNode.dataset.fazeRestapiForm, callback, response);
       }
 
       // Проставляем класс, сигнализирующий о том, что запрос выполнился и ответ пришел

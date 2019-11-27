@@ -209,7 +209,7 @@ class Modal {
 
     // Получение контента
     this.getContent()
-      .then((responseText) => {
+      .then((responseText: string) => {
         this.build(responseText);
 
         if (this.config.draggable) {
@@ -273,7 +273,7 @@ class Modal {
     this.buildAndBindCloseButton();
 
     // Заголовок
-    const titleNode = document.createElement('span');
+    const titleNode: HTMLSpanElement = document.createElement('span');
     titleNode.textContent = this.config.title || '';
 
     this.modalParts.headerNode = document.createElement('header');
@@ -287,7 +287,7 @@ class Modal {
   buildAndBindCloseButton(): void {
     this.modalParts.closeButtonNode.className = 'faze-close';
 
-    this.modalParts.closeButtonNode.addEventListener('click', (event) => {
+    this.modalParts.closeButtonNode.addEventListener('click', (event: Event) => {
       event.preventDefault();
 
       // Закрываем окно
@@ -298,7 +298,7 @@ class Modal {
   /**
    * Закрытие модального окна
    */
-  close() {
+  close(): void {
     document.body.classList.remove('faze-modal-opened');
 
     // Сначала навешивается класс, а потом через указанное время удаляем окно со страницы, это нужно для того чтобы анимация
@@ -315,7 +315,7 @@ class Modal {
    *
    * @param content - контент для вставки в тело окна
    */
-  buildBody(content?: string) {
+  buildBody(content?: string): void {
     this.modalParts.bodyNode.innerHTML = content || '';
   }
 
@@ -330,13 +330,13 @@ class Modal {
   /**
    * Создания кнопок из конфига
    */
-  buildButtons() {
-    const buttonsNode = document.createElement('div');
+  buildButtons(): void {
+    const buttonsNode: HTMLDivElement = document.createElement('div');
     buttonsNode.className = 'faze-buttons';
 
     if (this.config.buttons && this.config.buttons.length > 0) {
       for (const buttonData of this.config.buttons) {
-        const buttonNode = document.createElement('button');
+        const buttonNode: HTMLButtonElement = document.createElement('button');
         buttonNode.className = buttonData.class || '';
         buttonNode.textContent = buttonData.caption || '';
 
@@ -344,8 +344,8 @@ class Modal {
         if (typeof buttonData.callback === 'function') {
           try {
             buttonNode.addEventListener('click', () => buttonData.callback(this.modalParts, buttonNode));
-          } catch (e) {
-            console.error(e);
+          } catch (error) {
+            console.error(error);
           }
         }
 
@@ -359,7 +359,7 @@ class Modal {
   /**
    * Колбек на нажатие клавиш
    */
-  keyUpCallback(event: KeyboardEvent) {
+  keyUpCallback(event: KeyboardEvent): void {
     // По нажатию на "Escape" закрываем окно
     if (event.key === 'Escape') {
       this.close();
@@ -369,14 +369,14 @@ class Modal {
   /**
    * Навешивание событий на нажатие клавиш
    */
-  bindKeys() {
+  bindKeys(): void {
     document.addEventListener('keyup', this.keyUpCallback.bind(this));
   }
 
   /**
    * Удаление событий на нажатие клавиш
    */
-  unbindKeys() {
+  unbindKeys(): void {
     document.removeEventListener('keyup', this.keyUpCallback.bind(this));
   }
 
@@ -405,7 +405,7 @@ class Modal {
   /**
    * Построение невидимых элементов по границам для возможности вешать на них события для ресайза окна
    */
-  buildBordersForResize() {
+  buildBordersForResize(): void {
     this.modalParts.resizeBorders.top.className = 'faze-modal-resize-border faze-modal-resize-border-top';
     this.modalParts.fullNode.appendChild(this.modalParts.resizeBorders.top);
 
@@ -434,7 +434,7 @@ class Modal {
   /**
    * Навешивание событий и управление ресайзом окна
    */
-  bindResize() {
+  bindResize(): void {
     // Текущие границы модального окна(на момент нажатия)
     const currentRect = {
       top: this.modalParts.fullNode.getBoundingClientRect().top,
@@ -552,7 +552,7 @@ class Modal {
   /**
    * Навешивание событий и управление перетаскиванием модального окна
    */
-  bindDrag() {
+  bindDrag(): void {
     // Начальная позиция мыши
     const startMousePosition = {
       x: 0,

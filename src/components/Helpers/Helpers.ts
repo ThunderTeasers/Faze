@@ -20,7 +20,7 @@ class Helpers {
   /**
    * Инициализация методов, которые должны работать всегда, а не по указанию пользователя
    */
-  static initialize() {
+  static initialize(): void {
     Helpers.bindCopyText();
     Helpers.bindMobileMask();
   }
@@ -28,8 +28,8 @@ class Helpers {
   /**
    * Маска мобильного телефона для поля ввода
    */
-  static bindMobileMask() {
-    document.querySelectorAll('.faze-mask-mobile').forEach((inputNode: any) => {
+  static bindMobileMask(): void {
+    document.querySelectorAll<HTMLInputElement>('.faze-mask-mobile').forEach((inputNode: HTMLInputElement) => {
       Helpers.mobileMask(inputNode);
     });
   }
@@ -37,9 +37,9 @@ class Helpers {
   /**
    * Копирование текста(textContent) при нажатии на DOM элемент с классом "faze-copy-text"
    */
-  static bindCopyText() {
+  static bindCopyText(): void {
     // Проходимся по всем элементам
-    document.querySelectorAll('.faze-copy-text').forEach((textNode: any) => {
+    document.querySelectorAll<HTMLElement>('.faze-copy-text').forEach((textNode: HTMLElement) => {
       // Копируем при нажатии
       textNode.addEventListener('click', (event: MouseEvent) => {
         // Если есть что копировать
@@ -85,7 +85,7 @@ class Helpers {
    * @param url - адрес по которому лежит JS файл
    * @returns   - промис для последующей работы при успешной или неуспешной загрузке
    */
-  static loadJS(url: string) {
+  static loadJS(url: string): Promise<any> {
     return new Promise((resolve, reject) => {
       const nodeScript = document.createElement('script');
       document.body.appendChild(nodeScript);
@@ -103,12 +103,12 @@ class Helpers {
    * @param index     - индекс искомого элемента
    * @param cssClass  - CSS класс который вешается на айтивный элемент, по умолчанию 'active'
    */
-  static activateItem(array: HTMLElement[], index: number, cssClass: string = 'active') {
-    array.forEach((item, i) => {
+  static activateItem(array: HTMLElement[], index: number, cssClass: string = 'active'): void {
+    array.forEach((itemNode: HTMLElement, i: number) => {
       if (index === i) {
-        item.classList.add(cssClass);
+        itemNode.classList.add(cssClass);
       } else {
-        item.classList.remove(cssClass);
+        itemNode.classList.remove(cssClass);
       }
     });
   }
@@ -124,11 +124,11 @@ class Helpers {
    * @return строка разделенная пробелами каждые 3 символа
    */
   static numberWithSpaces(numberToFormat: number | string, separator: string = '.'): string {
-    const numberString = numberToFormat.toString();
-    let result = '';
+    const numberString: string = numberToFormat.toString();
+    let result: string = '';
 
     if (numberString.includes(separator)) {
-      const parts = numberString.split(separator);
+      const parts: string[] = numberString.split(separator);
       parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
       result = parts.join(separator);
@@ -144,7 +144,7 @@ class Helpers {
    *
    * @param text - текст который необходимо обработать
    */
-  static escapeString(text: string) {
+  static escapeString(text: string): string {
     return text.replace(/"/g, '&quot;');
   }
 
@@ -153,10 +153,10 @@ class Helpers {
    *
    * @param input - DOM элемент ввода телефона
    */
-  static mobileMask(input: HTMLInputElement) {
-    let value = '';
+  static mobileMask(input: HTMLInputElement): void {
+    let value: string = '';
 
-    input.addEventListener('focus', (event) => {
+    input.addEventListener('focus', (event: FocusEvent) => {
       // Проверка на пустую строку, если это так и пользователь нажимает не backspace то добавляется начало телефона
       if (value.length === 0 && event.which !== 8) {
         value += '+7 (';
@@ -166,7 +166,7 @@ class Helpers {
       input.value = value;
     });
 
-    input.addEventListener('keydown', (event) => {
+    input.addEventListener('keydown', (event: KeyboardEvent) => {
       event.preventDefault();
 
       // Если это backspace то не удаляем дальше чем 3 символа
@@ -250,7 +250,7 @@ class Helpers {
    * @param endings  - массив окончаний
    */
   static wordEnd(quantity: number, endings: string[] = ['', 'а', 'ов']): string {
-    const cases = [2, 0, 1, 1, 1, 2];
+    const cases: number[] = [2, 0, 1, 1, 1, 2];
     return endings[(quantity % 100 > 4 && quantity % 100 < 20) ? 2 : cases[(quantity % 10 < 5) ? quantity % 10 : 5]];
   }
 
@@ -317,10 +317,10 @@ class Helpers {
    * @param expiresInDays - Время жизни в днях
    * @param encode - Нужно ли кодировать значение
    */
-  static setCookie(name: string, value: string, expiresInDays?: number, encode: boolean = false) {
-    let expires = '';
+  static setCookie(name: string, value: string, expiresInDays?: number, encode: boolean = false): void {
+    let expires: string = '';
     if (expiresInDays) {
-      const date = new Date();
+      const date: Date = new Date();
       date.setTime(date.getTime() + (expiresInDays * 24 * 60 * 60 * 1000));
       expires = `;expires=${date.toUTCString()}`;
     }
@@ -334,17 +334,19 @@ class Helpers {
    * @param name - Имя куки
    * @returns {string} - Значение куки
    */
-  static getCookie(name: string) {
-    const cname = `${name}=`;
-    const ca = document.cookie.split(';');
-    for (let i = 0; i < ca.length; i += 1) {
-      let cookie = ca[i];
+  static getCookie(name: string): string {
+    const cookieName: string = `${name}=`;
+    const cookieValues: string[] = document.cookie.split(';');
+
+    for (let i = 0; i < cookieValues.length; i += 1) {
+      let cookie = cookieValues[i];
 
       while (cookie.charAt(0) === ' ') {
         cookie = cookie.substring(1);
       }
-      if (cookie.indexOf(cname) === 0) {
-        return cookie.substring(cname.length, cookie.length);
+
+      if (cookie.indexOf(cookieName) === 0) {
+        return cookie.substring(cookieName.length, cookie.length);
       }
     }
 
@@ -356,7 +358,7 @@ class Helpers {
    *
    * @param item - переменная которую надо проверить
    */
-  static isObject(item: any) {
+  static isObject(item: any): boolean {
     return (item && typeof item === 'object' && !Array.isArray(item));
   }
 
@@ -365,7 +367,7 @@ class Helpers {
    *
    * @param target - объект в котором удаляем
    */
-  static removeArrays(target: any) {
+  static removeArrays(target: any): Object {
     for (const key in target) {
       if (!target.hasOwnProperty(key)) {
         continue;

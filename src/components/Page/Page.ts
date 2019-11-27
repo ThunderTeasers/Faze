@@ -210,7 +210,7 @@ class Page {
       this.params.set(this.offsetString, this.offset.toString());
 
       // Строка для изменения пути по сайту
-      const historyURL = `?${this.params.toString()}`;
+      const historyURL: string = `?${this.params.toString()}`;
 
       if (this.config.modules.get) {
         this.params.append('show', this.config.modules.get.toString());
@@ -223,21 +223,21 @@ class Page {
       this.lockButton();
 
       // Путь для запроса новых элементов
-      const url = `${this.node.dataset.fazePagePath || window.location.pathname}?${this.params.toString()}`;
+      const url: string = `${this.node.dataset.fazePagePath || window.location.pathname}?${this.params.toString()}`;
 
       // Получение новых элементов
       fetch(url, {credentials: 'same-origin'})
-        .then(response => response.text())
-        .then((response) => {
+        .then((response: Response) => response.text())
+        .then((response: string) => {
           // Парсинг ответа
-          const responseHTML = (new DOMParser()).parseFromString(response, 'text/html');
+          const responseHTML: Document = (new DOMParser()).parseFromString(response, 'text/html');
 
           // DOM элементы загруженных объектов
-          const loadedItemNodes = responseHTML.querySelectorAll(this.config.selectors.items);
+          const loadedItemNodes: NodeListOf<HTMLElement> = responseHTML.querySelectorAll(this.config.selectors.items);
 
           // Фставка новых элементов
-          loadedItemNodes.forEach((item) => {
-            this.node.append(item);
+          loadedItemNodes.forEach((loadedItemNode: HTMLElement) => {
+            this.node.append(loadedItemNode);
           });
 
           // Изменение сдвига
@@ -278,7 +278,7 @@ class Page {
   /**
    * Создание кнопки и её вставка в родительский элемент содержащий все элементы, при нажатии на неё будет совершена подгрузка
    */
-  createButton() {
+  createButton(): void {
     this.buttonLoadModeNode.textContent = this.config.texts.buttonIdle;
     this.buttonLoadModeNode.type = 'button';
     this.buttonLoadModeNode.className = 'btn btn-load_more';
@@ -289,7 +289,7 @@ class Page {
   /**
    * Блокировка кнопки, от повторного нажатия до того как текущий контент был загружен
    */
-  lockButton() {
+  lockButton(): void {
     this.buttonLoadModeNode.setAttribute('disabled', 'disabled');
     this.buttonLoadModeNode.classList.add('faze-disabled');
     this.buttonLoadModeNode.textContent = this.config.texts.buttonLoading;
@@ -298,7 +298,7 @@ class Page {
   /**
    * Возвращение кнопки в нормальное состояние
    */
-  unlockButton() {
+  unlockButton(): void {
     this.buttonLoadModeNode.removeAttribute('disabled');
     this.buttonLoadModeNode.classList.remove('faze-disabled');
     this.buttonLoadModeNode.textContent = this.config.texts.buttonIdle;
@@ -309,7 +309,7 @@ class Page {
    *
    * @param total - опциональное значение, если не задано, берется значение из атрибута "data-page-total"
    */
-  updateTotal(total?: number) {
+  updateTotal(total?: number): void {
     if (total === undefined || total === null) {
       this.total = parseInt(this.node.getAttribute('data-faze-page-total') || '9999', 10) || 9999;
     } else {
@@ -320,14 +320,14 @@ class Page {
   /**
    * Сброс количества загруженных элементов
    */
-  resetOffset() {
+  resetOffset(): void {
     this.offset = this.config.offset;
   }
 
   /**
    * Проверка, если загружены все элементы, то скрываем кнопку
    */
-  checkButton() {
+  checkButton(): void {
     if (this.offset >= this.total) {
       this.buttonLoadModeNode.classList.add('faze-hide');
     } else {
@@ -340,7 +340,7 @@ class Page {
    *
    * @param params - параметры поисковой строки
    */
-  setParams(params: URLSearchParams) {
+  setParams(params: URLSearchParams): void {
     this.params = params;
   }
 
@@ -348,7 +348,7 @@ class Page {
    * Инициализация модуля по data атрибутам
    */
   static hotInitialize(): void {
-    const pageInitializators = document.querySelectorAll('[data-faze="page"]');
+    const pageInitializators: NodeListOf<HTMLElement> = document.querySelectorAll('[data-faze~="page"]');
     pageInitializators.forEach((pageInitializator: any) => {
       new Page(pageInitializator, {
         offset: parseInt(pageInitializator.getAttribute('data-faze-page-offset') || '10', 10),

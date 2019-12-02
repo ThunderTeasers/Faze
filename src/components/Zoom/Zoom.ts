@@ -26,6 +26,9 @@ interface Config {
   side: string;
   width: number;
   height: number;
+  callbacks: {
+    created?: () => void;
+  };
 }
 
 /**
@@ -110,6 +113,9 @@ class Zoom {
       side: 'right',
       width: 300,
       height: 300,
+      callbacks: {
+        created: undefined,
+      },
     };
 
     this.config = Object.assign(defaultConfig, config);
@@ -195,6 +201,15 @@ class Zoom {
 
         this.calculate();
       };
+    }
+
+    // Выполняем пользовательскую фукнции
+    if (typeof this.config.callbacks.created === 'function') {
+      try {
+        this.config.callbacks.created();
+      } catch (error) {
+        console.error('Ошибка исполнения пользовательской функции "created"', error);
+      }
     }
   }
 

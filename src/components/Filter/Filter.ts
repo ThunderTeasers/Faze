@@ -1,5 +1,6 @@
 import './Filter.scss';
 import Faze from '../Core/Faze';
+import Logger from '../Core/Logger';
 
 /**
  * Структура возвращаемого объекта в пользовательских функциях
@@ -51,6 +52,7 @@ interface Config {
   showTotal: boolean;
   changeButton: boolean;
   usePathnameFromQuery: boolean;
+  useAPI: boolean;
   modules: {
     get?: number;
   };
@@ -80,6 +82,9 @@ class Filter {
   // DOM элемент фильтра
   readonly node: HTMLElement;
 
+  // Помощник для логирования
+  readonly logger: Logger;
+
   // Конфиг с настройками
   readonly config: Config;
 
@@ -98,6 +103,9 @@ class Filter {
   // Заранее заданная поисковая строка(кейс для сокращенных ссылок)
   readonly presetQuery?: string;
 
+  // Чистый URL, без данных фильтра, используется только с "useAPI"
+  readonly cleanPath?: string;
+
   // Флаг отключающий работу по заданной строке поиска
   disablePresetQuery: boolean;
 
@@ -109,12 +117,22 @@ class Filter {
       throw new Error('Не задан объект фильтра');
     }
 
+    // Инициализация логгера
+    this.logger = new Logger('Модуль Faze.Filter:');
+
+    // Проверка на двойную инициализацию
+    if (node.classList.contains('faze-filter-initialized')) {
+      this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
+      return;
+    }
+
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       tableName: undefined,
       showTotal: true,
       changeButton: true,
       usePathnameFromQuery: true,
+      useAPI: false,
       modules: {
         get: undefined,
       },
@@ -151,6 +169,7 @@ class Filter {
     this.itemsHolderNode = document.querySelector(this.config.selectors.itemsHolder);
     this.disablePresetQuery = this.node.dataset.fazeFilterQueryDisable !== undefined;
     this.presetQuery = this.node.dataset.fazeFilterQuery;
+    this.cleanPath = this.node.dataset.fazeFilterCleanPath;
 
     if (this.config.showTotal && this.formNode) {
       this.totalNode = this.node.querySelector(this.config.selectors.total);
@@ -164,6 +183,8 @@ class Filter {
    * Инициализация
    */
   initialize(): void {
+    this.node.classList.add('faze-filter-initialized');
+
     // Инициализация конфига
     this.initializeConfig();
 
@@ -247,6 +268,11 @@ class Filter {
           formDataURLString.append('show', module.toString());
         }
 
+        // Если включено API то базовый путь всегда должен начинатся с чистого пути
+        if (this.config.useAPI && this.cleanPath) {
+          basePath = this.cleanPath;
+        }
+
         // URL для запроса к серверу
         const urlForRequest: string = `${basePath}?${formDataURLString.toString()}`;
 
@@ -258,7 +284,7 @@ class Filter {
             const responseHTML: Document = (new DOMParser()).parseFromString(response, 'text/html');
 
             // Ищем в ответе от сервера DOM элемент с такими же классами как у элемента фильтра
-            const responseNode: HTMLElement | null = responseHTML.querySelector(`.${Array.from(this.node.classList).join('.')}`);
+            const responseNode: HTMLElement | null = responseHTML.querySelector(`.${Array.from(this.node.classList).filter(className => className !== 'faze-filter-initialized').join('.')}`);
             if (responseNode) {
               if (this.itemsHolderNode) {
                 // Проверка, если отфильтрованных элементов больше 0, тогда происходит их вывод
@@ -279,39 +305,79 @@ class Filter {
               this.node.dataset.fazeFilterTotal = total;
             }
 
-            // Обновление строки в браузере
-            window.history.pushState({}, '', urlForHistory);
+            // Если используем API то получаем ссылку из Plarson
+            if (this.config.useAPI) {
+              this.getURL(urlForHistory, this.cleanPath)
+                .then((data) => {
+                  // Обновление строки в браузере
+                  window.history.pushState({}, '', data.url);
 
-            // По заданной строке поиска поработали, теперь отключаем её
-            this.disablePresetQuery = true;
-
-            // Обновляем хранимые параметры
-            this.updateSearchParams();
-
-            // Сохраняем указанные значения в cookie
-            this.saveStoredParams();
-
-            // Выполняем пользовательскую функцию
-            if (typeof this.config.callbacks.filtered === 'function') {
-              try {
-                this.config.callbacks.filtered({
-                  response,
-                  responseHTML,
-                  filterNode: this.node,
-                  formNode: this.formNode,
-                  itemsHolderNode: this.itemsHolderNode,
-                  params: this.params,
-                  total: parseInt(this.node.dataset.fazeFilterTotal || '0', 10),
+                  // Действия выполняемые после фильтрации
+                  this.afterFilterActions(response, responseHTML, data.query);
                 });
-              } catch (error) {
-                console.error(error);
-              }
-            }
+            } else {
+              // Обновление строки в браузере
+              window.history.pushState({}, '', urlForHistory);
 
-            // Разблокировка кнопки
-            this.unlockButton();
+              // Действия выполняемые после фильтрации
+              this.afterFilterActions(response, responseHTML);
+            }
           });
       });
+    }
+  }
+
+  /**
+   * Получение ссылки для вставки в историю браузера
+   *
+   * @param queryForHistory - параметры фильтра
+   * @param pathname        - базовый pathname
+   */
+  async getURL(queryForHistory: string, pathname: string = window.location.pathname): Promise<{ url: string, query: string }> {
+    const params = new URLSearchParams(queryForHistory);
+    params.append('mime', 'api');
+    params.append('api', 'get_uri_scheme');
+
+    const response = await fetch(`${pathname}?${params.toString()}`, {credentials: 'same-origin'});
+    const data = await response.json();
+
+    return {url: data.scheme_uri_path_query, query: data.query_string};
+  }
+
+  /**
+   * Исполнение пользовательской функции
+   *
+   * @param response     - текст ответа
+   * @param responseHTML - сконвертированная в HTML версия ответа
+   * @param query        - параметры запроса
+   */
+  afterFilterActions(response: string, responseHTML: Document, query?: string) {
+    // По заданной строке поиска поработали, теперь отключаем её
+    this.disablePresetQuery = true;
+
+    // Обновляем хранимые параметры
+    this.updateSearchParams(query);
+
+    // Сохраняем указанные значения в cookie
+    this.saveStoredParams();
+
+    // Разблокировка кнопки
+    this.unlockButton();
+
+    if (typeof this.config.callbacks.filtered === 'function') {
+      try {
+        this.config.callbacks.filtered({
+          response,
+          responseHTML,
+          filterNode: this.node,
+          formNode: this.formNode,
+          itemsHolderNode: this.itemsHolderNode,
+          params: this.params,
+          total: parseInt(this.node.dataset.fazeFilterTotal || '0', 10),
+        });
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 
@@ -441,13 +507,13 @@ class Filter {
   /**
    * Обновление внутненних параметров поиска, для того чтобы они совпадали с теми, что содержатся в поисковой строке
    */
-  updateSearchParams(): void {
+  updateSearchParams(query?: string): void {
     let queryParams: string | undefined = undefined;
     if (this.node.dataset.fazeFilterQuery && !this.disablePresetQuery) {
       queryParams = this.node.dataset.fazeFilterQuery.split('?')[1];
     }
 
-    this.params = new URLSearchParams(queryParams || window.location.search);
+    this.params = new URLSearchParams(query || queryParams || window.location.search);
   }
 
   /**
@@ -480,6 +546,41 @@ class Filter {
     if (this.formNode) {
       this.formNode.dispatchEvent(new Event('submit', {cancelable: true}));
     }
+  }
+
+  /**
+   * Инициализация модуля по data атрибутам
+   *
+   * @param filterNode - DOM элемент на который нужно инициализировать плагин
+   */
+  static initializeByDataAttributes(filterNode: HTMLElement): void {
+    new Faze.Filter(filterNode, {
+      tableName: filterNode.dataset.fazeFilterTableName,
+      showTotal: filterNode.dataset.fazeFilterShowTotal === 'true',
+      changeButton: filterNode.dataset.fazeFilterChangeButton === 'true',
+      usePathnameFromQuery: filterNode.dataset.fazeFilterUsePathnameFromQuery === 'true',
+      modules: {
+        get: filterNode.dataset.fazeFilterModulesGet,
+      },
+      selectors: {
+        form: filterNode.dataset.fazeFilterSelectorsForm,
+        itemsHolder: filterNode.dataset.fazeFilterSelectorsItemsHolder,
+        total: filterNode.dataset.fazeFilterSelectorsTotal,
+      },
+    });
+  }
+
+  /**
+   * Инициализация модуля по data атрибутам
+   */
+  static hotInitialize(): void {
+    Faze.Observer.watch('[data-faze~="filter"]', (filterNode: HTMLElement) => {
+      Filter.initializeByDataAttributes(filterNode);
+    });
+
+    document.querySelectorAll<HTMLElement>('[data-faze~="filter"]').forEach((filterNode: HTMLElement) => {
+      Filter.initializeByDataAttributes(filterNode);
+    });
   }
 }
 

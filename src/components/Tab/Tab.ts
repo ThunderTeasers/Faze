@@ -16,11 +16,13 @@ import Faze from '../Core/Faze';
  * Структура конфига табов
  *
  * Содержит:
+ *   removeEmpty - удалять ли пустые табы
  *   selectors
  *     headers  - CSS селекторы заголовков табов
  *     bodies   - CSS селекторы тел табов
  */
 interface Config {
+  removeEmpty: boolean;
   callbacks: {
     changed?: () => void;
   };
@@ -49,12 +51,13 @@ class Tab {
 
     // Конфиг по умолчанию
     const defaultConfig: Config = {
+      removeEmpty: true,
       callbacks: {
         changed: undefined,
       },
     };
 
-    this.config = {...defaultConfig, ...config};
+    this.config = Object.assign(defaultConfig, config);
     this.node = node;
 
     this.initialize();
@@ -83,7 +86,12 @@ class Tab {
       throw new Error('Не задан объект с телами для табов!');
     }
 
-    let fazeBody = '';
+    // Удаляем пустые табы
+    if (this.config.removeEmpty) {
+      this.checkEmptyTabs();
+    }
+
+    let fazeBody: string;
     const alreadyActiveTabNode = Array.from(this.headersNodes).find(headerNode => headerNode.classList.contains('faze-active'));
     if (alreadyActiveTabNode) {
       fazeBody = alreadyActiveTabNode.dataset.fazeTabBody || '';
@@ -109,16 +117,48 @@ class Tab {
   }
 
   /**
+   * Проверка на табы без контента
+   */
+  private checkEmptyTabs(): void {
+    this.bodiesNodes.forEach((bodyNode: HTMLElement) => {
+      if (!bodyNode.innerHTML.trim()) {
+        this.removeTab(bodyNode.dataset.fazeTabBody || '');
+      }
+    });
+  }
+
+  /**
+   * Удаление таба(полностью, то есть и заголовка и тела)
+   *
+   * @param name - название таба
+   */
+  private removeTab(name: string): void {
+    // Удаляем заголовок
+    this.headersNodes.forEach((headerNode: HTMLElement) => {
+      if (headerNode.dataset.fazeTabBody === name) {
+        headerNode.remove();
+      }
+    });
+
+    // Удаляем тело
+    this.bodiesNodes.forEach((bodyNode: HTMLElement) => {
+      if (bodyNode.dataset.fazeTabBody === name) {
+        bodyNode.remove();
+      }
+    });
+  }
+
+  /**
    * Активация таба, посредством проставления активному телу и шапке класс 'active' и убирая его у всех остальных
    *
    * @param key - ключ в data атрибутах по которому ищем шапку и тело
    */
   activateTab(key: string | null): void {
-    this.headersNodes.forEach((headerNode) => {
+    this.headersNodes.forEach((headerNode: HTMLElement) => {
       headerNode.classList.toggle('faze-active', headerNode.dataset.fazeTabBody === key);
     });
 
-    this.bodiesNodes.forEach((bodyNode) => {
+    this.bodiesNodes.forEach((bodyNode: HTMLElement) => {
       bodyNode.style.display = bodyNode.dataset.fazeTabBody === key ? 'block' : 'none';
       bodyNode.classList.toggle('faze-active', bodyNode.dataset.fazeTabBody === key);
     });

@@ -355,6 +355,9 @@ class Filter {
     // По заданной строке поиска поработали, теперь отключаем её
     this.disablePresetQuery = true;
 
+    // Замена заголовка
+    this.changeHeading(responseHTML);
+
     // Обновляем хранимые параметры
     this.updateSearchParams(query);
 
@@ -378,6 +381,25 @@ class Filter {
       } catch (error) {
         console.error(error);
       }
+    }
+  }
+
+  /**
+   * Замена заголовка после фильтрации
+   *
+   * @param responseHTML - сконвертированная в HTML версия ответа
+   */
+  changeHeading(responseHTML: Document): void {
+    // DOM элемент текущего заголовка
+    const currentHeadingNode: HTMLElement | null = this.node.querySelector('.faze-filter-heading');
+
+    // DOM элемент нового заголовка
+    const newHeadingNode: HTMLElement | null = responseHTML.querySelector('.faze-filter-heading');
+
+    // Если оба заголовка присутствуют
+    if (currentHeadingNode && newHeadingNode) {
+      // Заменяем контент у текущего
+      currentHeadingNode.innerHTML = newHeadingNode.innerHTML;
     }
   }
 

@@ -71,7 +71,7 @@ class Tab {
     this.node.classList.add('faze-tabs');
 
     // Получаем шапки
-    const headersNode = this.node.querySelector('.faze-tabs-headers');
+    const headersNode: HTMLElement | null = this.node.querySelector('.faze-tabs-headers');
     if (headersNode) {
       this.headersNodes = <any>Array.from(headersNode.children).filter(childNode => childNode.classList.contains('faze-tab-header'));
     } else {
@@ -79,7 +79,7 @@ class Tab {
     }
 
     // Получаем тела
-    const bodiesNode = this.node.querySelector('.faze-tabs-bodies');
+    const bodiesNode: HTMLElement | null = this.node.querySelector('.faze-tabs-bodies');
     if (bodiesNode) {
       this.bodiesNodes = <any>Array.from(bodiesNode.children).filter(childNode => childNode.classList.contains('faze-tab-body'));
     } else {
@@ -92,7 +92,7 @@ class Tab {
     }
 
     let fazeBody: string;
-    const alreadyActiveTabNode = Array.from(this.headersNodes).find(headerNode => headerNode.classList.contains('faze-active'));
+    const alreadyActiveTabNode: HTMLElement | undefined = Array.from(this.headersNodes).find(headerNode => headerNode.classList.contains('faze-active'));
     if (alreadyActiveTabNode) {
       fazeBody = alreadyActiveTabNode.dataset.fazeTabBody || '';
     } else {
@@ -107,8 +107,8 @@ class Tab {
    * Навешивание событий
    */
   bind(): void {
-    this.headersNodes.forEach((header) => {
-      header.addEventListener('click', (event) => {
+    this.headersNodes.forEach((header: HTMLElement) => {
+      header.addEventListener('click', (event: MouseEvent) => {
         event.preventDefault();
 
         this.activateTab(header.dataset.fazeTabBody || '');

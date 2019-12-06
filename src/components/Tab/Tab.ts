@@ -70,21 +70,8 @@ class Tab {
   initialize(): void {
     this.node.classList.add('faze-tabs');
 
-    // Получаем шапки
-    const headersNode: HTMLElement | null = this.node.querySelector('.faze-tabs-headers');
-    if (headersNode) {
-      this.headersNodes = <any>Array.from(headersNode.children).filter(childNode => childNode.classList.contains('faze-tab-header'));
-    } else {
-      throw new Error('Не задан объект с шапками для табов!');
-    }
-
-    // Получаем тела
-    const bodiesNode: HTMLElement | null = this.node.querySelector('.faze-tabs-bodies');
-    if (bodiesNode) {
-      this.bodiesNodes = <any>Array.from(bodiesNode.children).filter(childNode => childNode.classList.contains('faze-tab-body'));
-    } else {
-      throw new Error('Не задан объект с телами для табов!');
-    }
+    // Инициализация шапок и тел табов
+    this.initializeTabs();
 
     // Удаляем пустые табы
     if (this.config.removeEmpty) {
@@ -117,6 +104,27 @@ class Tab {
   }
 
   /**
+   * Инициализация шапок и тел табов
+   */
+  private initializeTabs(): void {
+    // Получаем шапки
+    const headersNode: HTMLElement | null = this.node.querySelector('.faze-tabs-headers');
+    if (headersNode) {
+      this.headersNodes = <any>Array.from(headersNode.children).filter(childNode => childNode.classList.contains('faze-tab-header'));
+    } else {
+      throw new Error('Не задан объект с шапками для табов!');
+    }
+
+    // Получаем тела
+    const bodiesNode: HTMLElement | null = this.node.querySelector('.faze-tabs-bodies');
+    if (bodiesNode) {
+      this.bodiesNodes = <any>Array.from(bodiesNode.children).filter(childNode => childNode.classList.contains('faze-tab-body'));
+    } else {
+      throw new Error('Не задан объект с телами для табов!');
+    }
+  }
+
+  /**
    * Проверка на табы без контента
    */
   private checkEmptyTabs(): void {
@@ -125,6 +133,9 @@ class Tab {
         this.removeTab(bodyNode.dataset.fazeTabBody || '');
       }
     });
+
+    // Инициализация шапок и тел табов
+    this.initializeTabs();
   }
 
   /**

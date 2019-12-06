@@ -356,7 +356,7 @@ class Page {
         tableName: pageInitializator.getAttribute('data-faze-page-table_name'),
         modifyPath: pageInitializator.getAttribute('data-faze-page-modify_path'),
         modules: {
-          get: pageInitializator.dataset.fazePageModulesGet('data-faze-page-modules-get'),
+          get: pageInitializator.dataset.fazePageModulesGet,
         },
         selectors: {
           items: pageInitializator.dataset.fazePageSelectorsItems || '.item',

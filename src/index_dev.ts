@@ -97,6 +97,10 @@ Faze.add({
         time: 1000,
         direction: 'horizontal',
       },
+      selectors: {
+        arrowLeft: '.js-test-arrow-left',
+        arrowRight: '.js-test-arrow-right',
+      },
       callbacks: {
         created: (data: any) => {
           console.log(data);

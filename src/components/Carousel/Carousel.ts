@@ -36,6 +36,9 @@ import Logger from '../Core/Logger';
  *     type     - тип анимации, может быть: 'slide', 'fade'
  *     time     - длительность анимации в миллисекундах
  *     direction - направление смены слайдов, может быть: 'vertical', 'horizontal'. Используется только для анимации 'slide'
+ *   selectors     - CSS селекторы для переопределения элементов управления
+ *     arrowLeft   - CSS селектор кнопки пролистывания влево
+ *     arrowRight  - CSS селектор кнопки пролистывания вправо
  *   callbacks
  *     created  - пользовательская функция, исполняющаяся при создании карусели
  *     changed  - пользовательская функция, исполняющаяся при изменении слайда
@@ -54,6 +57,10 @@ interface Config {
     type: string;
     time: number;
     direction: string;
+  };
+  selectors: {
+    arrowLeft?: string;
+    arrowRight?: string;
   };
   callbacks: {
     created?: (data: CallbackData) => void;
@@ -201,6 +208,10 @@ class Carousel {
         time: 1000,
         direction: 'horizontal',
       },
+      selectors: {
+        arrowLeft: undefined,
+        arrowRight: undefined,
+      },
       callbacks: {
         created: undefined,
         changed: undefined,
@@ -235,11 +246,30 @@ class Carousel {
 
     // Для стрелок
     if (this.config.arrows) {
+      // DOM элемент содержащий кнопки переключения
       this.arrowsNode = document.createElement('div');
-      this.arrowsNodes = {
-        left: document.createElement('div'),
-        right: document.createElement('div'),
-      };
+
+      // Проверка на присутствие кастомных стрелок
+      if (this.config.selectors.arrowLeft && this.config.selectors.arrowRight) {
+        // DOM элементы стрелок управления
+        const arrowLeftNode = document.querySelector<HTMLElement>(this.config.selectors.arrowLeft);
+        const arrowRightNode = document.querySelector<HTMLElement>(this.config.selectors.arrowRight);
+
+        // Если нашли кастомные стрелки, то задаём их
+        if (arrowLeftNode && arrowRightNode) {
+          this.arrowsNodes = {
+            left: arrowLeftNode,
+            right: arrowRightNode,
+          };
+        } else {
+          this.config.arrows = false;
+        }
+      } else {
+        this.arrowsNodes = {
+          left: document.createElement('div'),
+          right: document.createElement('div'),
+        };
+      }
     }
 
     // Для счетчика
@@ -553,11 +583,13 @@ class Carousel {
     this.arrowsNode.className = 'faze-carousel-arrows';
     this.controlsNode.appendChild(this.arrowsNode);
 
-    this.arrowsNodes.left.className = 'faze-carousel-arrow faze-carousel-arrow-prev';
-    this.arrowsNode.appendChild(this.arrowsNodes.left);
+    if (!(this.config.selectors.arrowLeft && this.config.selectors.arrowRight)) {
+      this.arrowsNodes.left.className = 'faze-carousel-arrow faze-carousel-arrow-prev';
+      this.arrowsNode.appendChild(this.arrowsNodes.left);
 
-    this.arrowsNodes.right.className = 'faze-carousel-arrow faze-carousel-arrow-next';
-    this.arrowsNode.appendChild(this.arrowsNodes.right);
+      this.arrowsNodes.right.className = 'faze-carousel-arrow faze-carousel-arrow-next';
+      this.arrowsNode.appendChild(this.arrowsNodes.right);
+    }
   }
 
   /**

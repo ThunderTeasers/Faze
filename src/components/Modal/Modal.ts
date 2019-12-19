@@ -274,7 +274,7 @@ class Modal {
 
     // Заголовок
     const titleNode: HTMLSpanElement = document.createElement('span');
-    titleNode.textContent = this.config.title || '';
+    titleNode.innerHTML = this.config.title || '';
 
     this.modalParts.headerNode = document.createElement('header');
     this.modalParts.headerNode.appendChild(titleNode);

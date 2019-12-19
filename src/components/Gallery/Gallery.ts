@@ -92,8 +92,8 @@ class Gallery {
       callerNode.classList.add('faze-gallery-caller');
 
       // Присваиваем стандартную группу, если она не указана
-      if (!callerNode.hasAttribute('data-faze-gallery-group')) {
-        callerNode.setAttribute('data-faze-gallery-group', this.config.group);
+      if (!callerNode.dataset.fazeGalleryNode) {
+        callerNode.dataset.fazeGalleryNode = this.config.group;
       }
     });
   }
@@ -105,7 +105,7 @@ class Gallery {
     if (this.config.evented) {
       this.callerNodes.forEach((callerNode: HTMLElement) => {
         // Вызываем галерею только на элементах у которых нет data атрибута "data-faze-gallery-passive"
-        if (!callerNode.hasAttribute('data-faze-gallery-passive')) {
+        if (!callerNode.dataset.fazeGalleryPassive) {
           callerNode.addEventListener(this.config.event, () => {
             // Фильтруем только элементы у которых такая же группа, как и у элемента по которому инициализируем галерею
             this.activeNodes = Array.from(this.callerNodes)
@@ -129,7 +129,7 @@ class Gallery {
     } else {
       // Фильтруем только элементы у которых такая же группа, как и у элемента по которому инициализируем галерею
       this.activeNodes = Array.from(this.callerNodes)
-        .filter(callerNode => callerNode.getAttribute('data-faze-gallery-group') === this.config.group);
+        .filter(callerNode => callerNode.dataset.fazeGalleryGroup === this.config.group);
 
       // Обновляем общее количество элементов
       this.totalImages = this.activeNodes.length;
@@ -299,16 +299,16 @@ class Gallery {
    */
   static hotInitialize(): void {
     // Задаем всем элементам без группы стандартную
-    document.querySelectorAll('[data-faze="gallery"]').forEach((callerNode) => {
+    document.querySelectorAll<HTMLElement>('[data-faze="gallery"]').forEach((callerNode: HTMLElement) => {
       callerNode.classList.add('faze-gallery-caller');
 
-      if (!callerNode.hasAttribute('data-faze-gallery-group')) {
-        callerNode.setAttribute('data-faze-gallery-group', 'default');
+      if (!callerNode.dataset.fazeGalleryGroup) {
+        callerNode.dataset.fazeGalleryGroup = 'default';
       }
     });
 
-    Faze.on('click', '[data-faze="gallery"]:not([data-faze-gallery-passive])', (event, callerNode) => {
-      const group: string | null = callerNode.getAttribute('data-faze-gallery-group');
+    Faze.on('click', '[data-faze="gallery"]:not([data-faze-gallery-passive])', (event: Event, callerNode: HTMLElement) => {
+      const group: string | undefined = callerNode.dataset.fazeGalleryGroup;
       const callerNodes = document.querySelectorAll(`[data-faze-gallery-group="${group}"]`);
 
       new Faze.Gallery(callerNodes, {

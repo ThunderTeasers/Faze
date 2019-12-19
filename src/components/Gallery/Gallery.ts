@@ -11,6 +11,7 @@ import Faze from '../Core/Faze';
  *   group      - группа галереи, если на странице несколько галерей, то они связаны через это поле
  *   event      - событие по которому происходит инициализация галереи
  *   evented    - инициализировать по событию или сразу
+ *   counter    - отображать ли счетчик
  */
 interface Config {
   thumbnailsPosition?: string;
@@ -18,6 +19,7 @@ interface Config {
   index?: number;
   event: string;
   evented: boolean;
+  counter: boolean;
 }
 
 class Gallery {
@@ -54,6 +56,9 @@ class Gallery {
   // Индекс текущей картинки в галереи
   index: number;
 
+  // DOM элемент счётчика
+  counterNode: HTMLElement;
+
   constructor(nodes: HTMLElement[] | null, config: Partial<Config>) {
     if (!nodes) {
       throw new Error('Не заданы объекты галереи');
@@ -66,6 +71,7 @@ class Gallery {
       index: undefined,
       group: 'default',
       evented: true,
+      counter: false,
     };
 
     this.config = Object.assign(defaultConfig, config);
@@ -188,6 +194,30 @@ class Gallery {
 
     document.body.appendChild(this.wrapperNode);
     document.body.classList.add('faze-gallery');
+
+    // Строим пагинацию
+    if (this.config.counter) {
+      this.buildPagination();
+    }
+  }
+
+  /**
+   * Создание счётчика изображений
+   */
+  buildPagination(): void {
+    // DOM элемент счётчика
+    this.counterNode = document.createElement('div');
+    this.counterNode.className = 'faze-gallery-counter';
+    this.updateCounter();
+
+    this.wrapperNode.appendChild(this.counterNode);
+  }
+
+  /**
+   * Обновление счётчика
+   */
+  updateCounter(): void {
+    this.counterNode.innerHTML = `<span class="faze-gallery-counter-current">${this.index + 1}</span> <span class="faze-gallery-counter-delimiter">/</span> <span class="faze-gallery-counter-total">${this.totalImages}</span>`;
   }
 
   /**
@@ -267,6 +297,11 @@ class Gallery {
     if (source) {
       this.imageNode.src = source;
     }
+
+    // Обновление счётчика
+    if (this.config.counter) {
+      this.updateCounter();
+    }
   }
 
   /**
@@ -281,6 +316,11 @@ class Gallery {
     const source: string | undefined = this.activeNodes[this.index].dataset.fazeGalleryImage;
     if (source) {
       this.imageNode.src = source;
+    }
+
+    // Обновление счётчика
+    if (this.config.counter) {
+      this.updateCounter();
     }
   }
 
@@ -315,6 +355,7 @@ class Gallery {
         group,
         evented: false,
         index: Array.from(callerNodes).indexOf(callerNode),
+        counter: (callerNode.dataset.fazeGalleryCounter || 'false') === 'true',
       });
     });
   }

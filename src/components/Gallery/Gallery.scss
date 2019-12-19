@@ -140,6 +140,17 @@
       max-height: 100vh;
     }
   }
+
+  // Счётчик
+  .faze-gallery-counter {
+    position: absolute;
+    left: 50%;
+    bottom: 5rem;
+
+    color: #fff;
+
+    transform: translateX(-50%);
+  }
 }
 
 .faze-gallery-caller {

@@ -969,6 +969,10 @@ class Carousel {
         time: carouselNode.dataset.fazeCarouselAnimationTime || 1000,
         direction: carouselNode.dataset.fazeCarouselAnimationDirection || 'horizontal',
       },
+      selectors: {
+        arrowLeft: carouselNode.dataset.fazeCarouselSelectorsArrowLeft,
+        arrowRight: carouselNode.dataset.fazeCarouselSelectorsArrowRight,
+      },
     });
   }
 

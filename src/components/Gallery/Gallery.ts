@@ -92,8 +92,8 @@ class Gallery {
       callerNode.classList.add('faze-gallery-caller');
 
       // Присваиваем стандартную группу, если она не указана
-      if (!callerNode.dataset.fazeGalleryNode) {
-        callerNode.dataset.fazeGalleryNode = this.config.group;
+      if (!callerNode.dataset.fazeGalleryGroup) {
+        callerNode.dataset.fazeGalleryGroup = this.config.group;
       }
     });
   }
@@ -109,7 +109,7 @@ class Gallery {
           callerNode.addEventListener(this.config.event, () => {
             // Фильтруем только элементы у которых такая же группа, как и у элемента по которому инициализируем галерею
             this.activeNodes = Array.from(this.callerNodes)
-              .filter(callerNode => callerNode.getAttribute('data-faze-gallery-group') === callerNode.getAttribute('data-faze-gallery-group'));
+              .filter(tmpCallerNode => tmpCallerNode.dataset.fazeGalleryGroup === callerNode.dataset.fazeGalleryGroup);
 
             // Обновляем общее количество элементов
             this.totalImages = this.activeNodes.length;

@@ -140,9 +140,9 @@ class Steps {
    */
   private bindFormInputs() {
     // Проходимся по всем шагам
-    this.bodiesNodes.forEach((bodyNode) => {
+    this.bodiesNodes.forEach((bodyNode: HTMLElement) => {
       // DOM элементы полей ввода
-      const inputsNodes = bodyNode.querySelectorAll<HTMLInputElement>('input[required], textarea[required]');
+      const inputsNodes: NodeListOf<HTMLInputElement> = bodyNode.querySelectorAll<HTMLInputElement>('input[required], select[required] textarea[required]');
 
       // Если если поля, то блокируем кнопки перехода
       if (inputsNodes.length > 0) {
@@ -151,26 +151,31 @@ class Steps {
 
         // Проходимся по всем полям ввода
         inputsNodes.forEach((inputNode: HTMLInputElement) => {
-          // Тип события которое надо отслеживать
-          let eventType = 'keyup';
-
-          // Проверка на чекбоксы
-          if (['checkbox', 'radio', 'file'].includes(inputNode.type)) {
-            eventType = 'change';
-          }
-
-          // Навешиваем событие на изменение
-          inputNode.addEventListener(eventType, () => {
-            // Если на шаге всё заполнено, то разблокируем кнопки
-            if (this.checkStepInputs(inputsNodes)) {
-              this.unlockButton(bodyNode);
-            } else {
-              this.lockButton(bodyNode);
-            }
+          // Навешиваем события на изменения
+          inputNode.addEventListener('keyup', () => {
+            this.bindCheckSteps(bodyNode, inputsNodes);
+          });
+          inputNode.addEventListener('change', () => {
+            this.bindCheckSteps(bodyNode, inputsNodes);
           });
         });
       }
     });
+  }
+
+  /**
+   * Навешивание события на проверку заполненности обязательных полей текущего шага
+   *
+   * @param bodyNode    - DOM элемент тела текущего шага
+   * @param inputsNodes - DOM элементы инпутов текущего шага
+   */
+  private bindCheckSteps(bodyNode: HTMLElement, inputsNodes: NodeListOf<HTMLInputElement>): void {
+    // Если на шаге всё заполнено, то разблокируем кнопки
+    if (this.checkStepInputs(inputsNodes)) {
+      this.unlockButton(bodyNode);
+    } else {
+      this.lockButton(bodyNode);
+    }
   }
 
   /**

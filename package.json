@@ -29,7 +29,7 @@
     "tslint-eslint-rules": "^5.4.0",
     "tslint-loader": "^3.6.0",
     "tslint-microsoft-contrib": "^5.2.1",
-    "typescript": "^3.7.3",
+    "typescript": "^3.7.4",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "util": "^0.11.1",
     "webpack": "^4.41.4",

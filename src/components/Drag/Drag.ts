@@ -22,6 +22,18 @@ enum SideDirection {
 }
 
 /**
+ * Структура возвращаемого объекта в пользовательском методе
+ *
+ * Содержит:
+ *   title  - заголовок дропдауна
+ *   body   - тело дропдауна
+ */
+interface CallbackData {
+  containerNode: HTMLElement;
+  itemsNodes: NodeListOf<HTMLElement>;
+}
+
+/**
  * Структура конфига
  *
  * Содержит:
@@ -32,8 +44,8 @@ enum SideDirection {
 interface Config {
   sideDirection: SideDirection;
   callbacks: {
-    created?: () => void;
-    changed?: () => void;
+    created?: (data: CallbackData) => void;
+    changed?: (data: CallbackData) => void;
   };
 }
 
@@ -91,6 +103,18 @@ class Drag {
    */
   initialize(): void {
     this.initializeItemsIndexes();
+
+    // Исполняем пользовательский метод после инициализации
+    if (typeof this.config.callbacks.created === 'function') {
+      try {
+        this.config.callbacks.created({
+          containerNode: this.node,
+          itemsNodes: this.itemsNodes,
+        });
+      } catch (error) {
+        this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
+      }
+    }
   }
 
   /**
@@ -259,6 +283,18 @@ class Drag {
       // Удаляем все связанные события
       document.removeEventListener('mouseup', endDragElement);
       document.removeEventListener('mousemove', elementDrag);
+
+      // Исполняем пользовательский метод после перетаскивания
+      if (typeof this.config.callbacks.changed === 'function') {
+        try {
+          this.config.callbacks.changed({
+            containerNode: this.node,
+            itemsNodes: this.itemsNodes,
+          });
+        } catch (error) {
+          this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+        }
+      }
     };
 
     // Навешиваем событие перетаскивания окна по нажатию на его заголовок

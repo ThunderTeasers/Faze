@@ -16,6 +16,27 @@ interface NotificationOptions {
   time: number;
 }
 
+/**
+ * Структура показывающая на какую область DOM Элемента была наведена мышь, используется в методе "isMouseOver"
+ *
+ * Содержит
+ *   contains     - внутри ли мышь всего элемента
+ *   sides
+ *     top        - внутри верхней половины
+ *     bottom     - внутри нижней половины
+ *     left       - внутри левой половины
+ *     right      - внутри правой половины
+ */
+interface MouseOverResult {
+  contains: boolean;
+  sides: {
+    top?: boolean;
+    bottom?: boolean;
+    left?: boolean;
+    right?: boolean;
+  };
+}
+
 class Helpers {
   /**
    * Инициализация методов, которые должны работать всегда, а не по указанию пользователя
@@ -516,6 +537,67 @@ class Helpers {
 
     // Возвращаем объект собранный из переданного и только что сгенерированного
     return Helpers.mergeDeep(false, jsonObject, result);
+  }
+
+  /**
+   * Определяет зашла ли мышь внутрь данного элемента
+   *
+   * @param event           - Event движения мыши, для получения координат
+   * @param itemNode        - DOM элемент вхождение в который необходимо проверить
+   * @param calculateSides  - рассчитывать ли данные для сторон
+   *
+   * @return{boolean} - "true" если вхождение есть, "false" если нет
+   */
+  static isMouseOver(event: MouseEvent, itemNode: HTMLElement, calculateSides: { vertical: boolean, horizontal: boolean } = {
+    vertical: false,
+    horizontal: false,
+  }): MouseOverResult {
+    // DOMRect текущего элемента
+    const itemRect = itemNode.getBoundingClientRect();
+
+    // Объект с результатами проверки
+    const result: MouseOverResult = {
+      contains: ((event.clientX > itemRect.left) && (event.clientX < itemRect.left + itemRect.width))
+        && ((event.clientY > itemRect.top) && (event.clientY < itemRect.top + itemRect.height)),
+      sides: {
+        top: undefined,
+        bottom: undefined,
+        left: undefined,
+        right: undefined,
+      },
+    };
+
+    // Вычисляем входы в вертикальном направлении(верх и низ)
+    if (calculateSides.vertical) {
+      // Половина высоты
+      const halfHeight = itemRect.height / 2;
+
+      // Проверяем внутри ли мышь по горизонтали
+      const isInsideHorizontally = ((event.clientX > itemRect.left) && (event.clientX < itemRect.left + itemRect.width));
+
+      // Проверяем на вхождение в верхнюю часть
+      result.sides.top = ((event.clientY > itemRect.top) && (event.clientY < itemRect.top + halfHeight)) && isInsideHorizontally;
+
+      // Проверяем на вхождение в нижнюю часть
+      result.sides.bottom = ((event.clientY > itemRect.top + halfHeight) && (event.clientY < itemRect.top + itemRect.height)) && isInsideHorizontally;
+    }
+
+    // Вычисляем входы в горизонтальном направлении(верх и низ)
+    if (calculateSides.horizontal) {
+      // Половина высоты
+      const halfWidth = itemRect.width / 2;
+
+      // Проверяем внутри ли мышь по горизонтали
+      const isInsideVertically = ((event.clientY > itemRect.top) && (event.clientY < itemRect.top + itemRect.height));
+
+      // Проверяем на вхождение в верхнюю часть
+      result.sides.left = ((event.clientX > itemRect.left) && (event.clientX < itemRect.left + halfWidth)) && isInsideVertically;
+
+      // Проверяем на вхождение в нижнюю часть
+      result.sides.right = ((event.clientX > itemRect.left + halfWidth) && (event.clientX < itemRect.left + itemRect.width)) && isInsideVertically;
+    }
+
+    return result;
   }
 }
 

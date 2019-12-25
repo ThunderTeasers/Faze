@@ -20,6 +20,7 @@ import Helpers from '../Helpers/Helpers';
  */
 interface CallbackData {
   bodyNode: HTMLElement | null;
+  index: number;
 }
 
 /**
@@ -115,6 +116,7 @@ class Steps {
       try {
         this.config.callbacks.created({
           bodyNode: this.bodiesNodes[0],
+          index: this.currentStepIndex,
         });
       } catch (error) {
         this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
@@ -244,6 +246,7 @@ class Steps {
         buttonFinishNode.addEventListener('click', (event) => {
           event.preventDefault();
 
+          this.currentStepIndex += 1;
           this.activateStep(this.bodiesNodes.length - 1);
 
           // Вызываем пользовательский метод
@@ -251,6 +254,7 @@ class Steps {
             try {
               this.config.callbacks.finished({
                 bodyNode: this.bodiesNodes[0],
+                index: this.currentStepIndex,
               });
             } catch (error) {
               this.logger.error(`Ошибка исполнения пользовательского метода "finished": ${error}`);
@@ -329,10 +333,11 @@ class Steps {
     });
 
     // Вызываем пользовательский метод
-    if (typeof this.config.callbacks.changed === 'function') {
+    if (typeof this.config.callbacks.changed === 'function' && index !== 0) {
       try {
         this.config.callbacks.changed({
           bodyNode: this.bodiesNodes[index],
+          index: this.currentStepIndex,
         });
       } catch (error) {
         console.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);

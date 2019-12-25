@@ -56,7 +56,15 @@
             width: 2rem !important;
             height: 2rem !important;
         }
-    </style><img src="https://via.placeholder.com/350x153" data-faze="gallery" data-faze-gallery-image="https://via.placeholder.com/350x153" alt="" >
+
+        .faze-drag .faze-drag-item {
+            padding: 1rem;
+
+            background-color: #fff;
+            border: 0.1rem solid gray;
+        }
+    </style>
+    <img src="https://via.placeholder.com/350x153" data-faze="gallery" data-faze-gallery-image="https://via.placeholder.com/350x153" alt="" >
     <script>
       function test(){
         console.log('test');
@@ -113,6 +121,12 @@
 
         </div>
     </div>
+
+    <section class="faze-drag" data-faze="drag">
+        <div class="faze-drag-item"><div class="faze-drag-handle"></div>ITEM 1</div>
+        <div class="faze-drag-item"><div class="faze-drag-handle"></div>ITEM 2</div>
+        <div class="faze-drag-item">ITEM 3</div>
+    </section>
 
     <a data-faze="modal" data-faze-modal-title="Заголовок" data-faze-modal-resizable="true" data-faze-modal-draggable="true" data-faze-modal-class="modal-test" data-faze-modal-url="https://doubletreemoscow.ru/list-4.html?show=226922&array=226922&mime=json">Модальное окно</a>
 

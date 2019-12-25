@@ -20,6 +20,7 @@ import Modal from '../Modal/Modal';
 import Helpers from '../Helpers/Helpers';
 import Tooltip from '../Tooltip/Tooltip';
 import Tab from '../Tab/Tab';
+import Drag from '../Drag/Drag';
 import Dropdown from '../Dropdown/Dropdown';
 import Select from '../Select/Select';
 import Carousel from '../Carousel/Carousel';
@@ -103,6 +104,7 @@ class Faze {
   static Page: any = Page;
   static Form: any = Form;
   static Filter: any = Filter;
+  static Drag: any = Drag;
   static Dropdown: any = Dropdown;
   static Select: any = Select;
   static Slider: any = Slider;
@@ -272,6 +274,7 @@ class Faze {
     Faze.Zoom.hotInitialize();
     Faze.Select.hotInitialize();
     Faze.Steps.hotInitialize();
+    Faze.Drag.hotInitialize();
     Faze.Dropdown.hotInitialize();
     Faze.LazyImage.hotInitialize();
   }

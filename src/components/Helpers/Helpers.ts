@@ -627,6 +627,36 @@ class Helpers {
       }
     }
   }
+
+  /**
+   * Создание DOM элемент с заданными стилями и атрибутами, так же есть возможность сразу задать родителя
+   *
+   * @param tag         - тег создаваемого DOM элемента
+   * @param attributes  - атрибуты создаваемого DOM элемента
+   * @param styles      - стили создаваемого DOM элемента
+   * @param parent      - родитель создаваемого DOM элемента
+   */
+  static createElement(tag: string, attributes?: any, styles?: any, parent?: HTMLElement): HTMLElement {
+    // Создаем DOM элемент
+    const node = document.createElement(tag);
+
+    // Если есть атрибуты, присваиваем их
+    if (attributes) {
+      this.setElementAttributes(node, attributes);
+    }
+
+    // Если есть стили, присваиваем их
+    if (styles) {
+      this.setElementStyle(node, styles);
+    }
+
+    // Если задан родитель, сразу добавляем созданный элемент в него
+    if (parent) {
+      parent.appendChild(node);
+    }
+
+    return node;
+  }
 }
 
 export default Helpers;

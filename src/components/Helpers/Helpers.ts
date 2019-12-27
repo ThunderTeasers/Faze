@@ -606,7 +606,7 @@ class Helpers {
    * @param node    - DOM элемент которому присваиваем
    * @param styles  - стили которые присваиваем
    */
-  static setElementStyle(node: HTMLElement, styles: any): void {
+  static setElementStyle(node: HTMLElement, styles: { [key: string]: string }): void {
     for (const style in styles) {
       if (styles.hasOwnProperty(style)) {
         node.style[style as any] = styles[style];
@@ -620,7 +620,7 @@ class Helpers {
    * @param node        - DOM элемент которому присваиваем
    * @param attributes  - атрибуты которые присваиваем
    */
-  static setElementAttributes(node: HTMLElement, attributes: any) {
+  static setElementAttributes(node: HTMLElement, attributes: { [key: string]: string }) {
     for (const attribute in attributes) {
       if (attributes.hasOwnProperty(attribute)) {
         node.setAttribute(attribute, attributes[attribute]);
@@ -636,7 +636,7 @@ class Helpers {
    * @param styles      - стили создаваемого DOM элемента
    * @param parent      - родитель создаваемого DOM элемента
    */
-  static createElement(tag: string, attributes?: any, styles?: any, parent?: HTMLElement): HTMLElement {
+  static createElement(tag: string, attributes?: { [key: string]: string }, styles?: { [key: string]: string }, parent?: HTMLElement): HTMLElement {
     // Создаем DOM элемент
     const node = document.createElement(tag);
 

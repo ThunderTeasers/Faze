@@ -657,6 +657,31 @@ class Helpers {
 
     return node;
   }
+
+  /**
+   * Определение абсолютных координат DOM элемента на странице
+   *
+   * @param node - DOM элемент у которого вычисляем позицию
+   */
+  static getElementPosition(node: HTMLElement): { [key: string]: number } {
+    // Возвращаемый объект
+    const position = {x: node.offsetLeft, y: node.offsetTop};
+
+    // DOM элемент с которым производим действия
+    let calculatedNode: HTMLElement = node;
+
+    while (calculatedNode.offsetParent) {
+      calculatedNode = calculatedNode.offsetParent as HTMLElement;
+      position.x += calculatedNode.offsetLeft;
+      position.y += calculatedNode.offsetTop;
+      if (calculatedNode !== document.body && calculatedNode !== document.documentElement) {
+        position.x -= calculatedNode.scrollLeft;
+        position.y -= calculatedNode.scrollTop;
+      }
+    }
+
+    return position;
+  }
 }
 
 export default Helpers;

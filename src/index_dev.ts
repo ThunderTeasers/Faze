@@ -13,6 +13,9 @@ Helpers.initialize();
 // @ts-ignore
 window.Faze = Faze;
 
+Faze.Helpers.setElementStyle(document.querySelector('[name="product_chr_search"]'), {width: '123px'});
+Faze.Helpers.setElementAttributes(document.querySelector('[name="product_chr_search"]'), {width: '123px'});
+
 new Faze.Modal(document.querySelector('#button'), {
   title: 'Тестирование модального окна',
   url: 'https://jsonplaceholder.typicode.com/todos/1',

@@ -599,6 +599,34 @@ class Helpers {
 
     return result;
   }
+
+  /**
+   * Присваивание стилей DOM Элементу
+   *
+   * @param node    - DOM элемент которому присваиваем
+   * @param styles  - стили которые присваиваем
+   */
+  static setElementStyle(node: HTMLElement, styles: any): void {
+    for (const style in styles) {
+      if (styles.hasOwnProperty(style)) {
+        node.style[style as any] = styles[style];
+      }
+    }
+  }
+
+  /**
+   * Присваивание атрибутов DOM элементу
+   *
+   * @param node        - DOM элемент которому присваиваем
+   * @param attributes  - атрибуты которые присваиваем
+   */
+  static setElementAttributes(node: HTMLElement, attributes: any) {
+    for (const attribute in attributes) {
+      if (attributes.hasOwnProperty(attribute)) {
+        node.setAttribute(attribute, attributes[attribute]);
+      }
+    }
+  }
 }
 
 export default Helpers;

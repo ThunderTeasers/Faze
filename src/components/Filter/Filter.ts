@@ -31,6 +31,7 @@ interface CallbackData {
  *   tableName  - префикс таблицы в plarson
  *   showTotal  - показывать и обновлять общее количество отфильтрованных элементов
  *   changeButton - нужно ли изменять кнопку(блокировать, писать "Обработка" и т.д.)
+ *   updateQuery - нужно ли обновлять URL через HTML5 history, либо делать это скрыто
  *   modules
  *     get      - модуль show в plarson
  *   cookie
@@ -53,6 +54,7 @@ interface Config {
   changeButton: boolean;
   usePathnameFromQuery: boolean;
   useAPI: boolean;
+  updateQuery: boolean;
   modules: {
     get?: number;
   };
@@ -132,6 +134,7 @@ class Filter {
       showTotal: true,
       changeButton: true,
       usePathnameFromQuery: true,
+      updateQuery: true,
       useAPI: false,
       modules: {
         get: undefined,
@@ -310,14 +313,18 @@ class Filter {
               this.getURL(urlForHistory, this.cleanPath)
                 .then((data) => {
                   // Обновление строки в браузере
-                  window.history.pushState({}, '', data.url);
+                  if (this.config.updateQuery) {
+                    window.history.pushState({}, '', data.url);
+                  }
 
                   // Действия выполняемые после фильтрации
                   this.afterFilterActions(response, responseHTML, data.query);
                 });
             } else {
               // Обновление строки в браузере
-              window.history.pushState({}, '', urlForHistory);
+              if (this.config.updateQuery) {
+                window.history.pushState({}, '', urlForHistory);
+              }
 
               // Действия выполняемые после фильтрации
               this.afterFilterActions(response, responseHTML);
@@ -581,6 +588,7 @@ class Filter {
       showTotal: filterNode.dataset.fazeFilterShowTotal === 'true',
       changeButton: filterNode.dataset.fazeFilterChangeButton === 'true',
       usePathnameFromQuery: filterNode.dataset.fazeFilterUsePathnameFromQuery === 'true',
+      updateQuery: filterNode.dataset.fazeFilterUpdateQuery === 'true',
       modules: {
         get: filterNode.dataset.fazeFilterModulesGet,
       },

@@ -38,7 +38,9 @@ interface Config {
   callbacks: {
     created?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
+    beforeFinished?: (data: CallbackData) => void;
     finished?: (data: CallbackData) => void;
+    afterFinished?: (data: CallbackData) => void;
   };
 }
 
@@ -84,6 +86,9 @@ class Steps {
       callbacks: {
         created: undefined,
         changed: undefined,
+        beforeFinished: undefined,
+        finished: undefined,
+        afterFinished: undefined,
       },
     };
 
@@ -246,6 +251,18 @@ class Steps {
         buttonFinishNode.addEventListener('click', (event) => {
           event.preventDefault();
 
+          // Вызываем пользовательский метод
+          if (typeof this.config.callbacks.beforeFinished === 'function') {
+            try {
+              this.config.callbacks.beforeFinished({
+                bodyNode: this.bodiesNodes[0],
+                index: this.currentStepIndex,
+              });
+            } catch (error) {
+              this.logger.error(`Ошибка исполнения пользовательского метода "beforeFinished": ${error}`);
+            }
+          }
+
           this.currentStepIndex += 1;
           this.activateStep(this.bodiesNodes.length - 1);
 
@@ -258,6 +275,18 @@ class Steps {
               });
             } catch (error) {
               this.logger.error(`Ошибка исполнения пользовательского метода "finished": ${error}`);
+            }
+          }
+
+          // Вызываем пользовательский метод
+          if (typeof this.config.callbacks.afterFinished === 'function') {
+            try {
+              this.config.callbacks.afterFinished({
+                bodyNode: this.bodiesNodes[0],
+                index: this.currentStepIndex,
+              });
+            } catch (error) {
+              this.logger.error(`Ошибка исполнения пользовательского метода "afterFinished": ${error}`);
             }
           }
         });

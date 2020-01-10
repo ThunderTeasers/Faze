@@ -30,9 +30,58 @@ interface Config {
   };
 }
 
+/**
+ * Структура данных основного объекта для работы
+ *
+ * Содержит:
+ *   thumbnailNode  - DOM элемент превью изображения
+ *   fullNode       - DOM элемент полной картинки
+ *   data           - данные для работы галереи
+ *   opened         - открыто ли изображение
+ */
+interface ImageData {
+  thumbnailNode: HTMLImageElement;
+  fullNode?: HTMLImageElement;
+  data?: {
+    prevThumb: HTMLImageElement;
+    nextThumb: HTMLImageElement;
+    prevIndex: number;
+    nextIndex: number;
+  };
+  opened: boolean;
+}
+
+interface WrapperData {
+  node: HTMLElement;
+  titleNode?: HTMLElement;
+  closeNode?: HTMLElement;
+  thumbnailImageNode: HTMLImageElement;
+  thumbnailData?: {
+    width: number;
+    height: number;
+    shiftX: number;
+    shiftY: number;
+    left: number;
+    top: number;
+  };
+  fullImageNode: HTMLImageElement;
+  arrowPrevNode?: HTMLImageElement;
+  arrowNextNode?: HTMLImageElement;
+  shiftX?: number;
+  shiftY?: number;
+  viewport?: Size;
+  drag?: {
+    x: number;
+    y: number;
+  };
+  finalWidth?: number;
+  finalHeight?: number;
+}
+
 interface AnimateBoxSettings {
-  fullImage: any;
-  wrapperNode: any;
+  wrapper: WrapperData;
+  fullImage: HTMLImageElement;
+  wrapperNode: HTMLElement;
   fullWidth: number;
   fullHeight: number;
   wrapperShiftX: number;
@@ -49,7 +98,10 @@ interface AnimateBoxSettings {
  */
 class Zoombox {
   // DOM элементы фотографий из которых надо составить галерею
-  readonly callerNodes: HTMLElement[];
+  readonly callerNodes: HTMLImageElement[];
+
+  // Массив элементов для работы с модулем
+  readonly images: ImageData[];
 
   // Конфиг с настройками
   readonly config: Config;
@@ -66,7 +118,7 @@ class Zoombox {
    * @param nodes   - DOM элементы объектов при нажатии на которые происходит открытие
    * @param config  - конфиг модуля
    */
-  constructor(nodes: HTMLElement[] | null, config: Partial<Config>) {
+  constructor(nodes: HTMLImageElement[] | null, config: Partial<Config>) {
     // Инициализация логгера
     this.logger = new Logger('Модуль Faze.Zoombox:');
 
@@ -76,7 +128,7 @@ class Zoombox {
     }
 
     // Проверка на двойную инициализацию
-    nodes.forEach((node: HTMLElement) => {
+    nodes.forEach((node: HTMLImageElement) => {
       if (node.classList.contains('faze-zoombox-initialized')) {
         this.logger.warning('Модуль уже был инициализирован на этот DOM элемент:', node);
         return;
@@ -109,27 +161,94 @@ class Zoombox {
    * Инициализация
    */
   initialize(): void {
+    // Проходимся по всем DOM элементам и формируем массив со всеми данными
+    this.callerNodes.forEach((imageNode: HTMLImageElement) => {
+      Faze.Helpers.setElementStyle(imageNode, { cursor: 'zoom-in' });
 
+      const imageData: ImageData = {
+        thumbnailNode: imageNode,
+        opened: false,
+      };
+
+      // Если это галерея
+      if (imageNode.dataset.zoomboxGallery) {
+        const gallery = imageNode.dataset.zoomboxGallery;
+        const galleryThumbs = Array.from(document.querySelectorAll(`img[data-faze-zoombox-image][data-faze-zoombox-gallery="${gallery}"]`));
+        if (galleryThumbs.length > 1) {
+          const index = galleryThumbs.indexOf(imageNode);
+          const next = (index + 1 < galleryThumbs.length) ? index + 1 : 0;
+          const prev = (index - 1 >= 0) ? index - 1 : galleryThumbs.length - 1;
+
+          // Добавляем новый объект в основной массив для работы
+          imageData.data = {
+            prevThumb: galleryThumbs[prev] as HTMLImageElement,
+            nextThumb: galleryThumbs[next] as HTMLImageElement,
+            prevIndex: prev,
+            nextIndex: next,
+          };
+        }
+      }
+
+      this.images.push(imageData);
+    });
   }
 
   /**
    * Навешивание событий
    */
   bind(): void {
+    this.images.forEach((image) => {
+      image.thumbnailNode.addEventListener('click', (event: MouseEvent) => {
+        event.preventDefault();
 
+        // Если попап открыт для данной миниатюры, ничего не делаем
+        if (image.opened) {
+          return;
+        }
+
+        // Получаем путь до полной картинки
+        const fullImageSrc = image.thumbnailNode.dataset.fazeZoomboxImage;
+        if (fullImageSrc) {
+          // Загружаем её
+          const fullImage: HTMLImageElement = new Image();
+          fullImage.src = fullImageSrc;
+          fullImage.onload = () => {
+            // Присваеваем загруженное изображение данные открытого изображения
+            image.fullNode = fullImage;
+
+            // После загрузки открываем окно
+            this.openBox(image);
+          };
+        }
+      });
+    });
   }
 
   /**
    * Открываем попап с картинкой fullImage для заданной миниатюры thumbImage
    */
-  openBox(thumbnailImageNode: any, fullImageNode: any) {
-    thumbnailImageNode.fullImage = fullImageNode;
-    Faze.Helpers.setElementStyle(thumbnailImageNode, { visibility: 'hidden' });
+  openBox(image: ImageData) {
+    // Если изображение не было загружено - ничего не делаем
+    if (!image.fullNode) {
+      return;
+    }
 
-    const fullSize = this.getFullSize(thumbnailImageNode, fullImageNode);
+    // Проставляем, что данное мзображение открыто
+    image.opened = true;
+
+    Faze.Helpers.setElementStyle(image.thumbnailNode, { visibility: 'hidden' });
+
+    const fullSize = this.getFullSize(image.thumbnailNode, image.fullNode);
 
     // Создаём враппер размером 1x1 пикселя, который будет сам(!) растягиваться по контенту
     const wrapperNode = document.createElement('div');
+
+    // Главный объект враммера, хранящий все данные
+    const wrapper: WrapperData = {
+      node: wrapperNode,
+      thumbnailImageNode: image.thumbnailNode,
+      fullImageNode: image.fullNode,
+    };
 
     Faze.Helpers.setElementStyle(wrapperNode, {
       position: 'absolute',
@@ -147,15 +266,15 @@ class Zoombox {
     const wrapperShiftY = parseInt(window.getComputedStyle(wrapperNode, null).borderTopWidth, 10) + parseInt(window.getComputedStyle(wrapperNode, null).paddingTop, 10);
 
     // Вычислим сдвиг (отступ) левого верхнего угла превьюшки от изображения
-    const thumbShiftX = parseInt(window.getComputedStyle(thumbnailImageNode, null).borderLeftWidth, 10);
-    const thumbShiftY = parseInt(window.getComputedStyle(thumbnailImageNode, null).borderTopWidth, 10);
+    const thumbShiftX = parseInt(window.getComputedStyle(image.thumbnailNode, null).borderLeftWidth, 10);
+    const thumbShiftY = parseInt(window.getComputedStyle(image.thumbnailNode, null).borderTopWidth, 10);
 
     // Вычислим размер и положение попапа
-    const thumbWidth = thumbnailImageNode.width;
-    const thumbHeight = thumbnailImageNode.height;
-    const align = thumbnailImageNode.dataset.zoomboxAlign;
+    const thumbWidth = image.thumbnailNode.width;
+    const thumbHeight = image.thumbnailNode.height;
+    const align = image.thumbnailNode.dataset.fazeZoomboxAlign || 'center';
 
-    const thumbPos = Faze.Helpers.getElementPosition(thumbnailImageNode);
+    const thumbPos = Faze.Helpers.getElementPosition(image.thumbnailNode);
     const viewport = this.getPageSize();
 
     // Вычислим начальную позицию врапера
@@ -210,41 +329,37 @@ class Zoombox {
     }
 
     // Помещаем во враппер картинку
-    Faze.Helpers.setElementAttributes(fullImageNode, { border: '0' });
-    Faze.Helpers.setElementStyle(fullImageNode, {
+    Faze.Helpers.setElementAttributes(image.fullNode, { border: '0' });
+    Faze.Helpers.setElementStyle(image.fullNode, {
       display: 'block',
       width: `${thumbWidth}px`,
       height: `${thumbHeight}px`,
       transition: this.config.transition.size,
     });
-    wrapperNode.appendChild(fullImageNode);
+    wrapperNode.appendChild(image.fullNode);
 
     // Сохраним значения на будущее
-    wrapperNode.zoomdata = {
-      thumbnailImageNode,
-      fullImageNode,
-
-      wrapper_shiftX: wrapperShiftX,
-      wrapper_shiftY: wrapperShiftY,
-
-      thumb_width: thumbWidth,
-      thumb_height: thumbHeight,
-      thumb_shiftX: thumbShiftX,
-      thumb_shiftY: thumbShiftY,
-      thumb_left: thumbPos.x,
-      thumb_top: thumbPos.y,
+    wrapper.shiftX = wrapperShiftX;
+    wrapper.shiftY = wrapperShiftY;
+    wrapper.thumbnailData = {
+      width: thumbWidth,
+      height: thumbHeight,
+      shiftX: thumbShiftX,
+      shiftY: thumbShiftY,
+      left: thumbPos.x,
+      top: thumbPos.y,
     };
 
     if (this.config.showTitle) {
-      const titleDiv = Faze.Helpers.createElement('div', {}, {}, wrapperNode);
-      titleDiv.textContent = thumbnailImageNode.dataset.zoomboxTitle || fullImageNode.src.replace(/.+\/([^/]+)$/, '$1');
-      titleDiv.classList.add('zoom-box-title');
-      wrapperNode.zoomdata.titleDiv = titleDiv;
+      const titleNode = Faze.Helpers.createElement('div', {}, {}, wrapperNode);
+      titleNode.textContent = image.thumbnailNode.dataset.zoomboxTitle || image.fullNode?.src.replace(/.+\/([^/]+)$/, '$1');
+      titleNode.classList.add('zoom-box-title');
+      wrapper.titleNode = titleNode;
     }
 
     // Иконки управления можно расположить только тогда, когда уже есть размеры враппера, после вставки в него картинки
     if (this.config.showClose) {
-      const closeDiv = Faze.Helpers.createElement('i', {}, {
+      const closeNode = Faze.Helpers.createElement('i', {}, {
         position: 'absolute',
         right: '15px',
         top: '15px',
@@ -253,17 +368,17 @@ class Zoombox {
         cursor: 'pointer',
         zIndex: (this.zIndexCounter + 1).toString(),
       }, wrapperNode);
-      closeDiv.classList.add('fas');
-      closeDiv.classList.add('fa-times');
-      closeDiv.addEventListener('click', () => {
+      closeNode.classList.add('fas');
+      closeNode.classList.add('fa-times');
+      closeNode.addEventListener('click', () => {
         this.close(wrapperNode);
       });
-      wrapperNode.zoomdata.closeDiv = closeDiv;
+      wrapper.closeNode = closeNode;
     }
 
-    // Если попап это галерея
-    if (thumbnailImageNode.zoomdata && thumbnailImageNode.zoomdata.prevThumb) {
-      const prevDiv = Faze.Helpers.createElement('i', { title: thumbnailImageNode.zoomdata.prevIndex }, {
+    // Если есть изображения в галерее до текущего, отображаем стрелку
+    if (image?.data?.prevThumb) {
+      const arrowPrevNode = Faze.Helpers.createElement('i', { title: image.data.prevIndex }, {
         position: 'absolute',
         left: '15px',
         top: '50%',
@@ -272,15 +387,17 @@ class Zoombox {
         cursor: 'pointer',
         zIndex: (this.zIndexCounter + 1).toString(),
       }, wrapperNode);
-      prevDiv.classList.add('fas');
-      prevDiv.classList.add('fa-arrow-circle-left');
-      prevDiv.addEventListener('click', (event) => {
-        this.changeBox(event, wrapperNode, 'prevThumb');
+      arrowPrevNode.classList.add('fas');
+      arrowPrevNode.classList.add('fa-arrow-circle-left');
+      arrowPrevNode.addEventListener('click', (event: Event) => {
+        this.changeBox(event, wrapper, 'prevThumb');
       });
-      wrapperNode.zoomdata.prevDiv = prevDiv;
+      wrapper.arrowPrevNode = arrowPrevNode;
     }
-    if (thumbnailImageNode.zoomdata && thumbnailImageNode.zoomdata.nextThumb) {
-      const nextDiv = Faze.Helpers.createElement('i', { title: thumbnailImageNode.zoomdata.nextIndex }, {
+
+    // Если есть изображения в галерее после текущего, отображаем стрелку
+    if (image?.data?.nextThumb) {
+      const arrowNextNode = Faze.Helpers.createElement('i', { title: image.data.nextIndex }, {
         position: 'absolute',
         right: '15px',
         top: '50%',
@@ -289,12 +406,12 @@ class Zoombox {
         cursor: 'pointer',
         zIndex: (this.zIndexCounter + 1).toString(),
       }, wrapperNode);
-      nextDiv.classList.add('fas');
-      nextDiv.classList.add('fa-arrow-circle-right');
-      nextDiv.addEventListener('click', (event) => {
-        this.changeBox(event, wrapperNode, 'nextThumb');
+      arrowNextNode.classList.add('fas');
+      arrowNextNode.classList.add('fa-arrow-circle-right');
+      arrowNextNode.addEventListener('click', (event: Event) => {
+        this.changeBox(event, wrapper, 'nextThumb');
       });
-      wrapperNode.zoomdata.nextDiv = nextDiv;
+      wrapper.arrowNextNode = arrowNextNode;
     }
 
     // Исходная позиция врапера
@@ -306,20 +423,23 @@ class Zoombox {
 
     // Конечная позиция враппера
     this.animateBox({
-      fullImageNode,
+      wrapper,
       wrapperNode,
-
-      full_width: fullSize.width,
-      full_height: fullSize.height,
-
-      wrapper_shiftX: wrapperShiftX,
-      wrapper_shiftY: wrapperShiftY,
-
       align,
-      initial_left: initialLeft,
-      initial_top: initialTop,
-      initial_width: thumbWidth,
-      initial_height: thumbHeight,
+
+      wrapperShiftX,
+      wrapperShiftY,
+
+      initialLeft,
+      initialTop,
+
+      fullImage: image.fullNode,
+
+      fullWidth: fullSize.width,
+      fullHeight: fullSize.height,
+
+      initialWidth: thumbWidth,
+      initialHeight: thumbHeight,
     });
 
     /**
@@ -330,22 +450,22 @@ class Zoombox {
       event.stopPropagation();
 
       const position = Faze.Helpers.getElementPosition(wrapperNode);
-      wrapperNode.zoomdata.viewport = this.getPageSize();
+      wrapper.viewport = this.getPageSize();
 
       const deltaX = parseInt(event.clientX, 10) - parseInt(position.x, 10);
       const deltaY = parseInt(event.clientY, 10) - parseInt(position.y, 10);
 
       wrapperNode.style.transition = '';
-      wrapperNode.zoomdata.shiftX = deltaX;
-      wrapperNode.zoomdata.shiftY = deltaY;
+      wrapper.shiftX = deltaX;
+      wrapper.shiftY = deltaY;
 
-      wrapperNode.zoomdata.drag = {
-        start_x: parseInt(position.x, 10),
-        start_y: parseInt(position.y, 10),
+      wrapper.drag = {
+        x: parseInt(position.x, 10),
+        y: parseInt(position.y, 10),
       };
 
       Faze.Helpers.setElementStyle(wrapperNode, { cursor: 'move' });
-    }
+    };
 
     /**
      * Останавливаем движение
@@ -355,22 +475,21 @@ class Zoombox {
       event.stopPropagation();
 
       // Кликаем на кнопки prev/next/close
-      if (event.target && event.target.classList.contains('fas')) {
-        delete wrapperNode.zoomdata.drag;
+      if (event.target && (event.target as HTMLElement).classList.contains('fas')) {
+        delete wrapper.drag;
         Faze.Helpers.setElementStyle(wrapperNode, { cursor: 'zoom-out' });
         return;
       }
 
       const position = Faze.Helpers.getElementPosition(wrapperNode);
-      if (wrapperNode.zoomdata.drag && position.x === wrapperNode.zoomdata.drag.start_x && position.y === wrapperNode.zoomdata.drag.start_y) {
-        delete wrapperNode.zoomdata.drag;
+      if (wrapper.drag && position.x === wrapper.drag.x && position.y === wrapper.drag.y) {
+        delete wrapper.drag;
         this.close(wrapperNode);
       } else {
-        delete wrapperNode.zoomdata.drag;
+        delete wrapper.drag;
         Faze.Helpers.setElementStyle(wrapperNode, { cursor: 'zoom-out' });
       }
-
-    }
+    };
 
     /**
      * Перемещаем попап
@@ -379,13 +498,13 @@ class Zoombox {
       event.preventDefault();
       event.stopPropagation();
 
-      if (!('drag' in wrapperNode.zoomdata)) return;
+      if (!('drag' in wrapper)) return;
 
       const pos = Faze.Helpers.getElementPosition(wrapperNode);
-      const left = event.clientX - parseInt(wrapperNode.zoomdata.shiftX, 10);
-      const top = event.clientY - parseInt(wrapperNode.zoomdata.shiftY, 10);
+      const left = event.clientX - (wrapper.shiftX || 0);
+      const top = event.clientY - (wrapper.shiftY || 0);
 
-      const maxWidth = wrapperNode.zoomdata.viewport.width - left - wrapperNode.zoomdata.wrapper_shiftX;
+      const maxWidth = (wrapper?.viewport?.width || 0) - left - (wrapper.shiftX || 0);
 
       // Если очень маленький сдвиг, то ничего не делаем
       if (Math.abs(left - pos.x) < 5 && Math.abs(top - pos.y) < 5) return;
@@ -393,12 +512,12 @@ class Zoombox {
 
       Faze.Helpers.setElementStyle(wrapperNode, { left: `${left}px`, top: `${top}px` });
 
-      if (wrapperNode.zoomdata.final_width > maxWidth) {
+      if ((wrapper.finalWidth || 0) > maxWidth) {
         Faze.Helpers.setElementStyle(wrapperNode, { maxWidth: `${maxWidth}px` });
       } else {
         wrapperNode.style.maxWidth = '';
       }
-    }
+    };
 
     wrapperNode.addEventListener('mousedown', dragStart);
     wrapperNode.addEventListener('mousemove', dragContinue);
@@ -501,8 +620,8 @@ class Zoombox {
     Faze.Helpers.setElementStyle(settings.fullImage, { width: `${finalWidth}px`, height: `${finalHeight}px` });
     Faze.Helpers.setElementStyle(settings.wrapperNode, { left: `${finalLeft}px`, top: `${finalTop}px` });
 
-    settings.wrapperNode.zoomdata.final_width = finalWidth;
-    settings.wrapperNode.zoomdata.final_height = finalHeight;
+    settings.wrapper.finalWidth = finalWidth;
+    settings.wrapper.finalHeight = finalHeight;
 
     // Через секунду убираем транзишен
     setTimeout(() => {
@@ -514,89 +633,96 @@ class Zoombox {
   /**
    * Меняем картинку в попапе, работает как prevBox или nextBox
    */
-  changeBox(event, wrapperNode, dir) {
-    event.preventDefault();
-    event.stopPropagation();
+  changeBox(event: Event, wrapper: WrapperData, dir: string) {
+    // event.preventDefault();
+    // event.stopPropagation();
 
-    const oldThumb = wrapperNode.zoomdata.thumbImage;
-    const oldFull = wrapperNode.zoomdata.fullImage;
+    // const oldThumb = wrapper.thumbnailImageNode;
+    // const oldFull = wrapper.fullImageNode;
 
-    const imageWidth = oldFull.width;
-    const imageHeight = oldFull.height;
+    // const imageWidth = oldFull.width;
+    // const imageHeight = oldFull.height;
 
-    const wrapperPos = Faze.Helpers.getElementPosition(wrapperNode);		// текущее положение врапера на странице
-    const initialLeft = wrapperPos.x;
-    const initialTop = wrapperPos.y;
+    // const wrapperPos = Faze.Helpers.getElementPosition(wrapper.node);
+    // const initialLeft = wrapperPos.x;
+    // const initialTop = wrapperPos.y;
 
-    const newThumb = oldThumb.zoomdata[dir];	// где dir = prev,next
-    const fullSrc = newThumb.dataset.zoomboxImage;
-    const src = newThumb.src;
+    // const newThumb = oldThumb.zoomdata[dir];	// где dir = prev,next
+    // const fullSrc = newThumb.dataset.zoomboxImage;
 
-    const newFull = new Image;
-    newFull.src = fullSrc;
-    newFull.onload = () => {
-      Faze.Helpers.setElementStyle(oldThumb, { visibility: 'visible' });
-      delete oldThumb.fullImage;
-      wrapperNode.removeChild(oldFull);
+    // const newFull = new Image;
+    // newFull.src = fullSrc;
+    // newFull.onload = () => {
+    //   Faze.Helpers.setElementStyle(oldThumb, { visibility: 'visible' });
+    //   wrapper.node.removeChild(oldFull);
 
-      newThumb.fullImage = newFull;
-      Faze.Helpers.setElementStyle(newThumb, { visibility: 'hidden' });
+    //   newThumb.fullImage = newFull;
+    //   Faze.Helpers.setElementStyle(newThumb, { visibility: 'hidden' });
 
-      const fullSize = getFullSize(newThumb, newFull);
+    //   const fullSize = this.getFullSize(newThumb, newFull);
 
-      // Вычислим размер и положение попапа
-      const thumbWidth = newThumb.width;
-      const thumbHeight = newThumb.height;
-      const align = 'self';
+    //   // Вычислим размер и положение попапа
+    //   const thumbWidth = newThumb.width;
+    //   const thumbHeight = newThumb.height;
+    //   const align = 'self';
 
-      const thumbPos = Faze.Helpers.getElementPosition(newThumb);
+    //   const thumbPos = Faze.Helpers.getElementPosition(newThumb);
 
-      // Обновим данные для врапера
-      wrapperNode.zoomdata.thumbImage = newThumb;
-      wrapperNode.zoomdata.fullImage = newFull;
-      wrapperNode.zoomdata.thumb_width = thumbWidth;
-      wrapperNode.zoomdata.thumb_height = thumbHeight;
-      wrapperNode.zoomdata.thumb_left = thumbPos.x;
-      wrapperNode.zoomdata.thumb_top = thumbPos.y;
+    //   // Обновим данные для врапера
+    //   wrapper.thumbnailImageNode = newThumb;
+    //   wrapper.fullImageNode = newFull;
+    //   wrapper.thumbnailData = {
+    //     width: thumbWidth,
+    //     height: thumbHeight,
+    //     left: thumbPos.x,
+    //     top: thumbPos.y,
+    //     shiftX: 0,
+    //     shiftY: 0,
+    //   };
 
-      // Помещаем во враппер картинку
-      Faze.Helpers.setElementAttributes(newFull, { border: 0, width: imageWidth, height: imageHeight });
-      Faze.Helpers.setElementStyle(newFull, {
-        display: 'block',
-        width: `${imageWidth}px`,
-        height: `${imageHeight}px`,
-        transition: this.config.transition.size,
-      });
+    //   // Помещаем во враппер картинку
+    //   Faze.Helpers.setElementAttributes(newFull, { border: 0, width: imageWidth, height: imageHeight });
+    //   Faze.Helpers.setElementStyle(newFull, {
+    //     display: 'block',
+    //     width: `${imageWidth}px`,
+    //     height: `${imageHeight}px`,
+    //     transition: this.config.transition.size,
+    //   });
 
-      wrapperNode.insertBefore(newFull, wrapperNode.firstChild);
+    //   wrapper.node.insertBefore(newFull, wrapper.node.firstChild);
 
-      // Меняем заголовок
-      if (wrapperNode.zoomdata.titleDiv) wrapperNode.zoomdata.titleDiv.textContent = newThumb.dataset.zoomboxTitle || newFull.src.replace(/.+\/([^/]+)$/, '$1');
+    //   // Меняем заголовок
+    //   if (wrapper.titleNode) {
+    //     wrapper.titleNode.textContent = newThumb.dataset.zoomboxTitle || newFull.src.replace(/.+\/([^/]+)$/, '$1');
+    //   }
 
-      // Исходная позиция врапера
-      Faze.Helpers.setElementStyle(wrapperNode, {
-        maxWidth: '',
-        transition: this.config.transition.move,
-      });
+    //   // Исходная позиция врапера
+    //   Faze.Helpers.setElementStyle(wrapper.node, {
+    //     maxWidth: '',
+    //     transition: this.config.transition.move,
+    //   });
 
-      // Конечная позиция враппера
-      this.animateBox({
-        fullImage: newFull,
-        wrapperNode,
+    //   // Конечная позиция враппера
+    //   this.animateBox({
+    //     wrapper,
+    //     align,
+    //     initialLeft,
+    //     initialTop,
 
-        full_width: fullSize.width,
-        full_height: fullSize.height,
+    //     wrapperNode: wrapper.node,
 
-        wrapper_shiftX: wrapperNode.zoomdata.wrapper_shiftX,
-        wrapper_shiftY: wrapperNode.zoomdata.wrapper_shiftY,
+    //     fullImage: newFull,
 
-        align: align,
-        initial_left: initialLeft,
-        initial_top: initialTop,
-        initial_width: imageWidth,
-        initial_height: imageHeight,
-      });
-    }; // onload
+    //     fullWidth: fullSize.width,
+    //     fullHeight: fullSize.height,
+
+    //     wrapperShiftX: wrapper.shiftX || 0,
+    //     wrapperShiftY: wrapper.shiftY || 0,
+
+    //     initialWidth: imageWidth,
+    //     initialHeight: imageHeight,
+    //   });
+    // };
   }
 
   /**
@@ -629,7 +755,7 @@ class Zoombox {
    *
    * @return{Size} - Настоящий размер картинки, который помещается во вьюпорт
    */
-  private getFullSize(thumbnailImageNode: HTMLImageElement, fullImageNode: HTMLImageElement): Size {
+  private getFullSize(thumbnailImageNode: HTMLElement, fullImageNode?: HTMLImageElement): Size {
     let fullWidth;
     let fullHeight;
 
@@ -638,18 +764,18 @@ class Zoombox {
       // Заданы оба атрибута
       fullWidth = parseInt(thumbnailImageNode.dataset.fazeZoomboxWidth, 10);
       fullHeight = parseInt(thumbnailImageNode.dataset.fazeZoomboxHeight, 10);
-    } else if (thumbnailImageNode.dataset.fazeZoomboxWidth) {
+    } else if (thumbnailImageNode.dataset.fazeZoomboxWidth && fullImageNode) {
       // Задана только ширина
       fullWidth = parseInt(thumbnailImageNode.dataset.fazeZoomboxWidth, 10);
       fullHeight = fullWidth * fullImageNode.height / fullImageNode.width;
-    } else if (thumbnailImageNode.dataset.fazeZoomboxHeight) {
+    } else if (thumbnailImageNode.dataset.fazeZoomboxHeight && fullImageNode) {
       // Задана только высота
       fullHeight = parseInt(thumbnailImageNode.dataset.fazeZoomboxHeight, 10);
       fullWidth = fullHeight * fullImageNode.width / fullImageNode.height;
     } else {
       // Атрибуты не заданы
-      fullWidth = fullImageNode.width || thumbnailImageNode.width;
-      fullHeight = fullImageNode.height || thumbnailImageNode.height;
+      fullWidth = fullImageNode?.width || 0;
+      fullHeight = fullImageNode?.height || 0;
     }
 
     return {
@@ -681,7 +807,7 @@ class Zoombox {
     Faze.Helpers.setElementStyle(fullImage, {
       transition: this.config.transition.size,
       width: `${finalWidth}px`,
-      height: `${finalHeight}px`
+      height: `${finalHeight}px`,
     });
     Faze.Helpers.setElementStyle(wrapperNode, { transition: this.config.transition.move, left: `${finalLeft}px`, top: `${finalTop}px` });
   }

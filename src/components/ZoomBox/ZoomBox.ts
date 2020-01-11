@@ -75,9 +75,11 @@ class ZoomBox {
     this.ANIMATION_TIME = 500;
     this.currentIndex = Array.from(this.callerNodes).indexOf(this.callerNode);
     this.viewport = {
-      width: document.body.scrollWidth,
-      height: window.innerHeight,
+      width: document.documentElement.clientWidth,
+      height: document.documentElement.clientHeight,
     };
+
+    console.log(this.viewport);
 
     // Вызов стандартных методов плагина
     this.initialize();

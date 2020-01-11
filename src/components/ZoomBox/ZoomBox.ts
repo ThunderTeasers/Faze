@@ -17,12 +17,21 @@ import '../Core/Interfaces';
  * Содержит:
  *   group - группа для разделения зумбоксов пользователем
  *   showClose - показывать ли крестик закрытия
+ *   showCaption - показывать ли подпись
  *   showArrow - показывать ли стрелки переключения
+ *   callbacks
+ *     beforeOpened - пользовательская функция, выполняющаяся до открытия
+ *     afterOpened - пользовательская функция, выполняющаяся после открытия
  */
 interface Config {
   group: string;
   showClose: boolean;
+  showCaption: boolean;
   showArrows: boolean;
+  callbacks: {
+    beforeOpened?: () => void;
+    afterOpened?: () => void;
+  };
 }
 
 /**
@@ -87,6 +96,11 @@ class ZoomBox {
       group: 'default',
       showClose: true,
       showArrows: true,
+      showCaption: false,
+      callbacks: {
+        beforeOpened: undefined,
+        afterOpened: undefined,
+      },
     };
 
     this.config = Object.assign(defaultConfig, config);
@@ -115,6 +129,15 @@ class ZoomBox {
 
     // Т.к. изображение уже получено, сразу добавляем его в общий объект с данными
     this.wrapperData.imageNode = imageNode;
+
+    // Вызываем пользовательскую функцию
+    if (typeof this.config.callbacks.beforeOpened === 'function') {
+      try {
+        this.config.callbacks.beforeOpened();
+      } catch (error) {
+        console.error('Ошибка исполнения пользовательского метода "beforeOpened":', error);
+      }
+    }
 
     // Открываем зумбокс
     this.open(size);

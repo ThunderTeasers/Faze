@@ -1,3 +1,12 @@
+/**
+ * Плагин селекта
+ *
+ * Зумбокс предоставляющий возможность увеличения картинки по подобию известного плагина LightBox
+ *
+ * Автор: Ерохин Максим, plarson.ru
+ * Дата: 11.01.2020
+ */
+
 import './ZoomBox.scss';
 import Faze from '../Core/Faze';
 import '../Core/Interfaces';
@@ -6,7 +15,9 @@ import '../Core/Interfaces';
  * Структура конфига
  *
  * Содержит:
- *   group  - группа для разделения зумбоксов пользователем
+ *   group - группа для разделения зумбоксов пользователем
+ *   showClose - показывать ли крестик закрытия
+ *   showArrow - показывать ли стрелки переключения
  */
 interface Config {
   group: string;
@@ -14,6 +25,18 @@ interface Config {
   showArrows: boolean;
 }
 
+/**
+ * Структура основного объекта модуля, враппера содержащего все необходимые DOM элементы
+ *
+ * Содержит:
+ *   node - DOM элемент самого враппера
+ *   imageNode - DOM элемент изображения
+ *   controlsNodes
+ *     close - DOM элемент кнопки закрытия
+ *     arrows
+ *       next - DOM элемент стрелки переключения вперед
+ *       prev - DOM элемент стрелки переключения назад
+ */
 interface WrapperData {
   node?: HTMLDivElement;
   imageNode?: HTMLImageElement;
@@ -241,6 +264,10 @@ class ZoomBox {
     this.animate(this.wrapperData.node, this.currentThumbnailPositionAndSize, fullImagePositionAndSize);
   }
 
+  /**
+   * Определения местоположения и размера изображения для нормального показа во вьюпорте
+   * @param size - Исходный размер изображения
+   */
   private getFullImagePositionAndSize(size: FazeSize): FazePositionAndSize {
     // Финальные размеры картинки
     let finalWidth;
@@ -258,27 +285,21 @@ class ZoomBox {
       finalWidth = finalHeight * size.width / size.height;
     }
 
-    const final = {
-      x: {
-        center: this.viewport.width / 2 - finalWidth / 2,
-      },
-      y: {
-        center: window.pageYOffset + this.viewport.height / 2 - finalHeight / 2,
-      },
-    };
-
     return {
       size: {
         width: finalWidth,
         height: finalHeight,
       },
       position: {
-        x: final.x.center,
-        y: final.y.center,
+        x: this.viewport.width / 2 - finalWidth / 2,
+        y: window.pageYOffset + this.viewport.height / 2 - finalHeight / 2,
       },
     };
   }
 
+  /**
+   * Создание стрелок переключения изображений
+   */
   private buildArrows(): void {
     // Создаём объект для хранения стрелок
     this.wrapperData.controlsNodes.arrows = {};

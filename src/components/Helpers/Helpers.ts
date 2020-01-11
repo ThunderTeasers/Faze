@@ -224,7 +224,7 @@ class Helpers {
    * @param options - настройки
    */
   static showNotification(message: string, options: NotificationOptions): void {
-    const {className = '', isNested = true, time = 3000, backgroundColor = '#00b938'} = options;
+    const { className = '', isNested = true, time = 3000, backgroundColor = '#00b938' } = options;
 
     // DOM элемент обертки для информационнах сообщений, она нужна для того, чтобы сообщения шли друг под другом, если их несколько
     let notificationWrapperNode: HTMLDivElement | null = document.querySelector('.faze-notification-wrapper');
@@ -284,7 +284,7 @@ class Helpers {
    * @param showMinutes  - показывать ли минуты, имеет приоритет выше, чем "showEmpty"
    * @param showSeconds  - показывать ли секунды, имеет приоритет выше, чем "showEmpty"
    */
-  static secondsToTime({totalSeconds = 0, showEmpty = false, showHours = true, showMinutes = true, showSeconds = true} = {}): string {
+  static secondsToTime({ totalSeconds = 0, showEmpty = false, showHours = true, showMinutes = true, showSeconds = true } = {}): string {
     let totalSecondsRaw: number = totalSeconds;
 
     // Время в человекопонимаемом формате
@@ -420,7 +420,7 @@ class Helpers {
         if (source.hasOwnProperty(key)) {
           if (Helpers.isObject(source[key])) {
             if (!target[key]) {
-              Object.assign(target, {[key]: {}});
+              Object.assign(target, { [key]: {} });
             }
 
             Helpers.mergeDeep(arraysReplace, target[key], source[key]);
@@ -446,7 +446,7 @@ class Helpers {
                   target[key].push(...source[key][0]);
                 } else {
                   // Если нашли, то объединяем объекты этого элемента с новым
-                  target[key][foundIndex] = {...foundElement, ...source[key][0]};
+                  target[key][foundIndex] = { ...foundElement, ...source[key][0] };
                 }
               } else {
                 // Если не содержит, то это просто элемент массива, значит пушим его
@@ -457,7 +457,7 @@ class Helpers {
                 }
               }
             } else {
-              Object.assign(target, {[key]: source[key]});
+              Object.assign(target, { [key]: source[key] });
             }
           }
         }
@@ -663,9 +663,9 @@ class Helpers {
    *
    * @param node - DOM элемент у которого вычисляем позицию
    */
-  static getElementPosition(node: HTMLElement): { [key: string]: number } {
+  static getElementPosition(node: HTMLElement): FazePosition {
     // Возвращаемый объект
-    const position = {x: node.offsetLeft, y: node.offsetTop};
+    const position = { x: node.offsetLeft, y: node.offsetTop };
 
     // DOM элемент с которым производим действия
     let calculatedNode: HTMLElement = node;
@@ -681,6 +681,21 @@ class Helpers {
     }
 
     return position;
+  }
+
+  /**
+   * Определяет координаты и размер DOM элемента на странице
+   * @param thumbnailNode{HTMLElement} - DOM элемент
+   * @returns{FazePositionAndSize} - Координаты и размеры DOM элемента на странице
+   */
+  static getElementPositionAndSize(thumbnailNode: HTMLElement): FazePositionAndSize {
+    return {
+      size: {
+        width: thumbnailNode.getBoundingClientRect().width,
+        height: thumbnailNode.getBoundingClientRect().height,
+      },
+      position: this.getElementPosition(thumbnailNode),
+    };
   }
 }
 

@@ -25,6 +25,7 @@ import Dropdown from '../Dropdown/Dropdown';
 import Select from '../Select/Select';
 import Carousel from '../Carousel/Carousel';
 import Zoom from '../Zoom/Zoom';
+import ZoomBox from '../ZoomBox/ZoomBox';
 import Scroll from '../Scroll/Scroll';
 import Form from '../Form/Form';
 import Page from '../Page/Page';
@@ -97,6 +98,7 @@ class Faze {
   static Tab: any = Tab;
   static Carousel: any = Carousel;
   static Zoom: any = Zoom;
+  static ZoomBox: any = ZoomBox;
   static Gallery: any = Gallery;
   static Helpers: any = Helpers;
   static Scroll: any = Scroll;
@@ -272,6 +274,7 @@ class Faze {
     Faze.Carousel.hotInitialize();
     Faze.Tooltip.hotInitialize();
     Faze.Zoom.hotInitialize();
+    Faze.ZoomBox.hotInitialize();
     Faze.Select.hotInitialize();
     Faze.Steps.hotInitialize();
     Faze.Drag.hotInitialize();

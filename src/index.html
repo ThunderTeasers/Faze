@@ -1,448 +1,517 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    <style>
-        * {
-            outline: none;
-            box-sizing: border-box;
-            font-family: sans-serif;
-            font-size: 1.4rem;
-        }
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+  <style>
+    * {
+      outline: none;
+      box-sizing: border-box;
+      font-family: sans-serif;
+      font-size: 1.4rem;
+    }
 
-        html {
-            font-size: 10px;
-        }
+    html {
+      font-size: 10px;
+    }
 
-        h1 {
-            font-size: 2em;
-        }
+    h1 {
+      font-size: 2em;
+    }
 
-        .carousel-test {
-            width: 70rem;
-        }
+    .carousel-test {
+      width: 70rem;
+    }
 
-        .carousel-test.faze-carousel.faze-animation-slide.faze-direction-horizontal > .faze-carousel-holder > .faze-item {
-            /*width: 1%;*/
-        }
+    .carousel-test.faze-carousel.faze-animation-slide.faze-direction-horizontal>.faze-carousel-holder>.faze-item {
+      /*width: 1%;*/
+    }
 
-        .faze-carousel-holder {
-            height: 48rem !important;
-        }
+    .faze-carousel-holder {
+      height: 48rem !important;
+    }
 
-        .faze-carousel-holder img {
-            padding-top: 1rem;
-        }
+    .faze-carousel-holder img {
+      padding-top: 1rem;
+    }
 
-        .faze-scroll .faze-scroll-vertical {
-            width: 2rem !important;
-        }
+    .faze-scroll .faze-scroll-vertical {
+      width: 2rem !important;
+    }
 
-        .faze-scroll {
-            padding-bottom: 4rem;
-        }
+    .faze-scroll {
+      padding-bottom: 4rem;
+    }
 
-        .faze-scroll .faze-scroll-horizontal {
-            height: 2rem !important;
-        }
+    .faze-scroll .faze-scroll-horizontal {
+      height: 2rem !important;
+    }
 
-        .js-slider {
-            margin: 2rem 0;
-        }
+    .js-slider {
+      margin: 2rem 0;
+    }
 
-        .faze-slider .faze-pointer {
-            width: 2rem !important;
-            height: 2rem !important;
-        }
+    .faze-slider .faze-pointer {
+      width: 2rem !important;
+      height: 2rem !important;
+    }
 
-        .faze-drag .faze-drag-item {
-            padding: 1rem;
+    .faze-drag .faze-drag-item {
+      padding: 1rem;
 
-            background-color: #fff;
-            border: 0.1rem solid gray;
-        }
-    </style>
-    <img src="https://via.placeholder.com/350x153" data-faze="gallery" data-faze-gallery-image="https://via.placeholder.com/350x153" alt="" >
-    <script>
-      function test(){
-        console.log('test');
-      }
+      background-color: #fff;
+      border: 0.1rem solid gray;
+    }
+  </style>
+  <img src="https://via.placeholder.com/350x153" data-faze="gallery"
+    data-faze-gallery-image="https://via.placeholder.com/350x153" alt="">
+  <script>
+    function test() {
+      console.log('test');
+    }
 
-      function addPhoto() {
-        const photoNode = document.createElement('img');
-        photoNode.src = 'https://via.placeholder.com/350x153';
-        photoNode.setAttribute('data-faze', 'gallery');
-        photoNode.setAttribute('data-faze-gallery-image', 'https://via.placeholder.com/200x200');
+    function addPhoto() {
+      const photoNode = document.createElement('img');
+      photoNode.src = 'https://via.placeholder.com/350x153';
+      photoNode.setAttribute('data-faze', 'gallery');
+      photoNode.setAttribute('data-faze-gallery-image', 'https://via.placeholder.com/200x200');
 
-        photoNode.setAttribute('data-faze', 'tooltip');
-        photoNode.setAttribute('data-faze-tooltip-text', 'Привет!');
+      photoNode.setAttribute('data-faze', 'tooltip');
+      photoNode.setAttribute('data-faze-tooltip-text', 'Привет!');
 
-        document.querySelector('.gallery').appendChild(photoNode);
-      }
-    </script>
+      document.querySelector('.gallery').appendChild(photoNode);
+    }
+  </script>
 </head>
+
 <body>
-    <div class="filter js-filter" data-faze-filter-stored="product_chr_search,product_enm_sale,product_set_color" data-faze-filter-stored-delimiter="," data-faze-filter-stored-encode="true">
-        <form class="faze-filter-form">
-            <label>
-                <input type="text" name="product_chr_search" placeholder="Поиск...">
-            </label>
-            <div class="radios">
-                <div>Распродажа</div>
-                <label>
-                    <span>Да</span>
-                    <input type="radio" name="product_enm_sale" value="YES">
-                </label>
-                <label>
-                    <span>Нет</span>
-                    <input type="radio" name="product_enm_sale" value="NO">
-                </label>
-            </div>
-            <div class="checkboxes">
-                <div>Цвета</div>
-                <label>
-                    <span>Белый</span>
-                    <input type="checkbox" name="product_set_color" value="белый">
-                </label>
-                <label>
-                    <span>Красный</span>
-                    <input type="checkbox" name="product_set_color" value="красный">
-                </label>
-                <label>
-                    <span>Чёрный</span>
-                    <input type="checkbox" name="product_set_color" value="чёрный">
-                </label>
-            </div>
-            <button type="submit">Найти</button>
-        </form>
-        <div class="faze-filter-items">
+  <div class="filter js-filter" data-faze-filter-stored="product_chr_search,product_enm_sale,product_set_color"
+    data-faze-filter-stored-delimiter="," data-faze-filter-stored-encode="true">
+    <form class="faze-filter-form">
+      <label>
+        <input type="text" name="product_chr_search" placeholder="Поиск...">
+      </label>
+      <div class="radios">
+        <div>Распродажа</div>
+        <label>
+          <span>Да</span>
+          <input type="radio" name="product_enm_sale" value="YES">
+        </label>
+        <label>
+          <span>Нет</span>
+          <input type="radio" name="product_enm_sale" value="NO">
+        </label>
+      </div>
+      <div class="checkboxes">
+        <div>Цвета</div>
+        <label>
+          <span>Белый</span>
+          <input type="checkbox" name="product_set_color" value="белый">
+        </label>
+        <label>
+          <span>Красный</span>
+          <input type="checkbox" name="product_set_color" value="красный">
+        </label>
+        <label>
+          <span>Чёрный</span>
+          <input type="checkbox" name="product_set_color" value="чёрный">
+        </label>
+      </div>
+      <button type="submit">Найти</button>
+    </form>
+    <div class="faze-filter-items">
 
-        </div>
     </div>
+  </div>
 
-    <section class="faze-drag" data-faze="drag">
-        <div class="faze-drag-item"><div class="faze-drag-handle"></div>ITEM 1</div>
-        <div class="faze-drag-item"><div class="faze-drag-handle"></div>ITEM 2</div>
-        <div class="faze-drag-item">ITEM 3</div>
-    </section>
+  <img src="https://via.placeholder.com/350x153" data-faze="zoombox" data-faze-zoombox-image="https://via.placeholder.com/1350x554">
+  <img src="https://via.placeholder.com/350x153" data-faze="zoombox" data-faze-zoombox-image="https://via.placeholder.com/350x153">
 
-    <a data-faze="modal" data-faze-modal-title="Заголовок" data-faze-modal-resizable="true" data-faze-modal-draggable="true" data-faze-modal-class="modal-test" data-faze-modal-url="https://doubletreemoscow.ru/list-4.html?show=226922&array=226922&mime=json">Модальное окно</a>
+  <section class="faze-drag" data-faze="drag">
+    <div class="faze-drag-item">
+      <div class="faze-drag-handle"></div>ITEM 1
+    </div>
+    <div class="faze-drag-item">
+      <div class="faze-drag-handle"></div>ITEM 2
+    </div>
+    <div class="faze-drag-item">ITEM 3</div>
+  </section>
 
-    <button data-faze-restapi-attr='[{"method":"get", "module":"285330", "response-text":"main .section"},
+  <a data-faze="modal" data-faze-modal-title="Заголовок" data-faze-modal-resizable="true"
+    data-faze-modal-draggable="true" data-faze-modal-class="modal-test"
+    data-faze-modal-url="https://doubletreemoscow.ru/list-4.html?show=226922&array=226922&mime=json">Модальное окно</a>
+
+  <button data-faze-restapi-attr='[{"method":"get", "module":"285330", "response-text":"main .section"},
 	{ "method": "GET",  "module": "286910", "response-html": "#cart-state-1"},
 	{ "method": "GET",  "module": "286904", "response-html": "#cart-state-2"},
 	{"function":"test"}]'>ajaxDataAttr</button>
 
-    <button class="slider-reinitialize">Переинициализировать слайдер</button>
+  <button class="slider-reinitialize">Переинициализировать слайдер</button>
 
-    <div class="js-slider" data-faze-slider-min="95" data-faze-slider-max="2736" data-faze-slider-points="0,100" data-faze-slider-points-in-percent="true"></div>
+  <div class="js-slider" data-faze-slider-min="95" data-faze-slider-max="2736" data-faze-slider-points="0,100"
+    data-faze-slider-points-in-percent="true"></div>
 
-    <h1 class="faze-copy-text">Скопировать в буфер обмена</h1>
+  <h1 class="faze-copy-text">Скопировать в буфер обмена</h1>
 
-    <div class="faze-steps" data-faze="steps">
-        <div class="faze-steps-headers">
-            <div class="faze-steps-header">1</div>
-            <div class="faze-steps-header">2</div>
-            <div class="faze-steps-header">3</div>
-        </div>
-        <div class="faze-steps-bodies">
-            <div class="faze-steps-body">
-                Вы хотите продолжить?<br>
-                <input type="text" required><br>
-                <input type="checkbox" name="test" required>
-                <button class="faze-steps-next">Да.</button>
-            </div>
-            <div class="faze-steps-body">
-                Точно?<br>
-                <button class="faze-steps-next">Да!</button>
-                <button class="faze-steps-back">Назад!</button>
-                <button class="faze-steps-finish">Завершить!</button>
-            </div>
-            <div class="faze-steps-body">
-                Точно точно?<br>
-                <button class="faze-steps-finish">Завершить.</button>
-            </div>
-            <div class="faze-steps-body faze-steps-body-finish">
-                Готово!
-            </div>
-        </div>
+  <div class="faze-steps" data-faze="steps">
+    <div class="faze-steps-headers">
+      <div class="faze-steps-header">1</div>
+      <div class="faze-steps-header">2</div>
+      <div class="faze-steps-header">3</div>
     </div>
-
-    <div class="faze-tabs">
-        <div class="faze-tabs-headers">
-            <div class="faze-tab-header" data-faze-tab-body="1">Таб 1</div>
-            <div class="faze-tab-header" data-faze-tab-body="2">Таб 2</div>
-        </div>
-        <div class="faze-tabs-bodies">
-            <div class="faze-tab-body" data-faze-tab-body="1">Тело 1</div>
-            <div class="faze-tab-body" data-faze-tab-body="2">Тело 2</div>
-        </div>
+    <div class="faze-steps-bodies">
+      <div class="faze-steps-body">
+        Вы хотите продолжить?<br>
+        <input type="text" required><br>
+        <input type="checkbox" name="test" required>
+        <button class="faze-steps-next">Да.</button>
+      </div>
+      <div class="faze-steps-body">
+        Точно?<br>
+        <button class="faze-steps-next">Да!</button>
+        <button class="faze-steps-back">Назад!</button>
+        <button class="faze-steps-finish">Завершить!</button>
+      </div>
+      <div class="faze-steps-body">
+        Точно точно?<br>
+        <button class="faze-steps-finish">Завершить.</button>
+      </div>
+      <div class="faze-steps-body faze-steps-body-finish">
+        Готово!
+      </div>
     </div>
+  </div>
 
-    <div class="faze-dropdown" data-faze="dropdown">
-        <div class="faze-title">Дропдаун через атрибуты</div>
-        <div class="faze-body">Тело дропдауна</div>
+  <div class="faze-tabs">
+    <div class="faze-tabs-headers">
+      <div class="faze-tab-header" data-faze-tab-body="1">Таб 1</div>
+      <div class="faze-tab-header" data-faze-tab-body="2">Таб 2</div>
     </div>
-
-    <div class="js-dropdown faze-dropdown">
-        <div class="faze-title">Дропдаун</div>
-        <div class="faze-body">Тело дропдауна</div>
+    <div class="faze-tabs-bodies">
+      <div class="faze-tab-body" data-faze-tab-body="1">Тело 1</div>
+      <div class="faze-tab-body" data-faze-tab-body="2">Тело 2</div>
     </div>
+  </div>
 
-    <div class="test-on" style="width:500px;text-align: right">Я ТЕСТ</div>
+  <div class="faze-dropdown" data-faze="dropdown">
+    <div class="faze-title">Дропдаун через атрибуты</div>
+    <div class="faze-body">Тело дропдауна</div>
+  </div>
 
-    <div class="faze-select" data-faze-select-name="test" data-faze-select-initial-value="Выбор 2">
-        <div class="faze-title">Выберите значение</div>
-        <div class="faze-body">
-            <div class="faze-option">Выбор 1</div>
-            <div class="faze-option">Выбор 2</div>
-            <div class="faze-option">Выбор 3</div>
-        </div>
+  <div class="js-dropdown faze-dropdown">
+    <div class="faze-title">Дропдаун</div>
+    <div class="faze-body">Тело дропдауна</div>
+  </div>
+
+  <div class="test-on" style="width:500px;text-align: right">Я ТЕСТ</div>
+
+  <div class="faze-select" data-faze-select-name="test" data-faze-select-initial-value="Выбор 2">
+    <div class="faze-title">Выберите значение</div>
+    <div class="faze-body">
+      <div class="faze-option">Выбор 1</div>
+      <div class="faze-option">Выбор 2</div>
+      <div class="faze-option">Выбор 3</div>
     </div>
+  </div>
 
-    <div class="js-select" data-faze="select" data-faze-select-name="test12" data-faze-select-default="false" data-faze-select-initial-value="val2">
-        <div class="faze-title">Выберите значение</div>
-        <div class="faze-body">
-            <div class="faze-option" data-faze-select-value="val1">Выбор 1</div>
-            <div class="faze-option" data-faze-select-value="val2">Выбор 2</div>
-            <div class="faze-option" data-faze-select-value="val3">Выбор 3</div>
-        </div>
+  <div class="js-select" data-faze="select" data-faze-select-name="test12" data-faze-select-default="false"
+    data-faze-select-initial-value="val2">
+    <div class="faze-title">Выберите значение</div>
+    <div class="faze-body">
+      <div class="faze-option" data-faze-select-value="val1">Выбор 1</div>
+      <div class="faze-option" data-faze-select-value="val2">Выбор 2</div>
+      <div class="faze-option" data-faze-select-value="val3">Выбор 3</div>
     </div>
+  </div>
 
-    <div class="spoiler-test">
-        <div class="title">Заголовок</div>
-        <div class="body">
-            Я тело спойлера
-        </div>
+  <div class="spoiler-test">
+    <div class="title">Заголовок</div>
+    <div class="body">
+      Я тело спойлера
     </div>
+  </div>
 
-    <div class="spoiler-test1" data-faze="spoiler">
-        <div class="title">Заголовок HTML инициализация</div>
-        <div class="body">
-            Я тело спойлера
-        </div>
+  <div class="spoiler-test1" data-faze="spoiler">
+    <div class="title">Заголовок HTML инициализация</div>
+    <div class="body">
+      Я тело спойлера
     </div>
+  </div>
 
-    <form data-faze-restapi-form='[{"method":"get", "module":"123", "response_text":".offer-items-container","function":"fazeModalClose"}]' action="http://alfa-suvenir.plarson.ru/">
-        <input type="hidden" name="show" value="295499">
-        <input type="hidden" name="mime" value="json">
-        <input type="hidden" name="order_action" value="send">
-        <input type="hidden" name="url" value="http://alfa-suvenir.plarson.ru/">
+  <form
+    data-faze-restapi-form='[{"method":"get", "module":"123", "response_text":".offer-items-container","function":"fazeModalClose"}]'
+    action="http://alfa-suvenir.plarson.ru/">
+    <input type="hidden" name="show" value="295499">
+    <input type="hidden" name="mime" value="json">
+    <input type="hidden" name="order_action" value="send">
+    <input type="hidden" name="url" value="http://alfa-suvenir.plarson.ru/">
 
-        <div class="wrapper-inputs">
-            <input type="text" name="Name" placeholder="Ваше имя">
-            <input type="text" name="Email" placeholder="Ваша почта">
-            <input type="tel" name="Phone" class="faze-mask-mobile" placeholder="Ваш телефон">
-            <textarea name="Text" placeholder="Текст сообщения"></textarea>
-            <button type="submit" class="btn btn-primary">
-                Задать вопрос
-            </button>
-        </div>
-        <div data-faze-restapi-notification="response_text"></div>
-    </form>
-
-    <form action="https://xdgifts.ru/_login.txt" data-faze-restapi-form
-          data-faze-restapi-json-merge='{"Phone":"798123123434","Sex":"Male","ids":["3123123","3423433"]}'
-    >
-
-        <!--<input type="hidden" name="show" value="296447">-->
-        <!--<input type="hidden" name="login" value="login">-->
-        <!--<input type="hidden" name="mime" value="json">-->
-        <!--<input type="hidden" name="status" value="true">-->
-
-        <!--<input data-faze-restapi-json-name="basket_txt_json.manager" name="Name1" id="name" type="text" placeholder="Name" value="Name1">-->
-        <!--<input data-faze-restapi-json-name="basket_txt_json.manager" name="Email1" id="email" type="text" placeholder="Email" value="Name2">-->
-
-        <!--<input data-faze-restapi-json-name="basket_txt_json2.offer.manager.name" name="Name2" id="name2" type="text" placeholder="Name" value="Name2Val">-->
-        <!--<input data-faze-restapi-json-name="basket_txt_json2.offer.manager.name" name="Email2" id="email2" type="text" placeholder="Email" value="Email2Val">-->
-
-        <!--<input data-faze-restapi-json-name="basket_txt_json" name="Phone" id="phone" type="text" placeholder="123" value="798123123434">-->
-
-        <!--<label>-->
-            <!--Мужчина-->
-            <!--<input data-faze-restapi-json-name="basket_txt_json" name="Sex" type="radio" value="Male" checked>-->
-        <!--</label>-->
-
-        <!--<label>-->
-            <!--Женщина-->
-            <!--<input data-faze-restapi-json-name="basket_txt_json" name="Sex" type="radio" value="Female">-->
-        <!--</label>-->
-
-
-        <!--<label>-->
-            <!--<input data-faze-restapi-json-array-group="1" data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[].id" type="checkbox" value="1" checked>-->
-            <!--<input data-faze-restapi-json-array-group="1" data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[].name" type="checkbox" value="Test1" checked>-->
-        <!--</label>-->
-
-        <!--<label>-->
-            <!--<input data-faze-restapi-json-array-group="2123" data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[].id" type="checkbox" value="2" checked>-->
-            <!--<input data-faze-restapi-json-array-group="2123" data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[].name" type="checkbox" value="Test2" checked>-->
-        <!--</label>-->
-
-        <!--<label>-->
-            <!--<input data-faze-restapi-json-array-group="1" data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest[].id" type="checkbox" value="23" checked>-->
-            <!--<input data-faze-restapi-json-array-group="1" data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest[].name" type="checkbox" value="Пока" checked>-->
-        <!--</label>-->
-
-        <!--<label>-->
-            <!--<input data-faze-restapi-json-array-group="dsf" data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest[].id" type="checkbox" value="24" checked>-->
-            <!--<input data-faze-restapi-json-array-group="dsf" data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest[].name" type="checkbox" value="Привет" checked>-->
-        <!--</label>-->
-
-        <label>
-            Тест3
-            <input data-faze-restapi-json-name="basket_txt_json" name="ids[]" type="checkbox" value="3123123" checked>
-            <input data-faze-restapi-json-name="basket_txt_json" name="ids[]" type="checkbox" value="3423433" checked>
-        </label>
-
-        <label>
-            On|Off 1
-            <input data-faze-restapi-json-name="basket_txt_json" name="testOO-1" type="checkbox" value="on" data-faze-restapi-disabled-value="off" checked>
-        </label>
-
-        <label>
-            On|Off 2
-            <input data-faze-restapi-json-name="basket_txt_json" name="testOO-2" type="checkbox" value="on" data-faze-restapi-disabled-value="off">
-        </label>
-
-        <!--<input data-faze-restapi-json-name="basket_txt_json.promotions[]." name="CheckboxTest" type="hidden" value="1">-->
-
-        <p><button type="submit">Отправить</button></p>
-
-
-        <!--<div data-faze-restapi-notification="response-text"></div>-->
-    </form>
-
-    <button class="js-notification">Информационное сообщение</button>
-
-    <div class="js-test-arrow-left">-</div>
-    <div class="js-test-arrow-right">+</div>
-    <div class="carousel-test">
-        <img src="https://via.placeholder.com/350x480" alt="">
-        <img src="https://via.placeholder.com/351x480" alt="">
-        <img src="https://via.placeholder.com/352x480" alt="">
-        <img src="https://via.placeholder.com/353x480" alt="">
-        <img src="https://via.placeholder.com/354x480" alt="">
+    <div class="wrapper-inputs">
+      <input type="text" name="Name" placeholder="Ваше имя">
+      <input type="text" name="Email" placeholder="Ваша почта">
+      <input type="tel" name="Phone" class="faze-mask-mobile" placeholder="Ваш телефон">
+      <textarea name="Text" placeholder="Текст сообщения"></textarea>
+      <button type="submit" class="btn btn-primary">
+        Задать вопрос
+      </button>
     </div>
-    <br>
-    <div class="carousel-test1" data-faze="carousel" data-faze-carousel-autoplay="true" data-faze-carousel-hover-on-stop="true" data-faze-carousel-arrows-outside="true" data-faze-carousel-animation-type="slide" data-faze-carousel-animation-time="5000">
-        <img src="https://via.placeholder.com/350x480" alt="">
-        <img src="https://via.placeholder.com/351x480" alt="">
-        <img src="https://via.placeholder.com/352x480" alt="">
-        <img src="https://via.placeholder.com/353x480" alt="">
-    </div>
-    <br>
-    <div style="width:20rem">
-        <img class="image" src="https://via.placeholder.com/200x200" data-faze-full-image="https://via.placeholder.com/2000x2000">
-    </div>
-    <div style="width:20rem">
-        <img data-faze="zoom" class="image" src="https://via.placeholder.com/200x200" data-faze-full-image="https://via.placeholder.com/2000x2000">
-    </div>
-    <br>
-    <div class="for-scroll">
-        sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-        sdfsdfhdfkjghdfkjgh<br>
-    </div>
-    <br>
-    <form class="form-order">
-        <input type="text" name="name" placeholder="ФИО">
-        <input type="email" name="email" placeholder="email">
-        <button type="submit">
-            Отправить
-        </button>
-    </form>
-    <br>
-    <div class="news">
-        <div class="items">
-            <div class="item">Новость 1</div>
-            <div class="item">Новость 2</div>
-            <div class="item">Новость 3</div>
-        </div>
-    </div>
+    <div data-faze-restapi-notification="response_text"></div>
+  </form>
 
-    <button onclick="addPhoto()" type="button">Add</button>
-    <div class="gallery">
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x151" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x151" data-faze-gallery-passive alt="">
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x152" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x152" alt="123" >
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x153" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x153" alt="123" >
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x151" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x151" data-faze-gallery-passive alt="">
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x152" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x152" alt="123" >
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x153" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x153" alt="123" >
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x151" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x151" data-faze-gallery-passive alt="">
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x152" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x152" alt="" >
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x153" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x153" alt="123" >
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x151" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x151" data-faze-gallery-passive alt="">
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x152" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x152" alt="" >
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x153" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x153" alt="123" >
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x151" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x151" data-faze-gallery-passive alt="">
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x152" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x152" alt="" >
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x153" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x153" alt="" >
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x151" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x151" data-faze-gallery-passive alt="">
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x152" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x153" alt="" >
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x153" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x153" alt="" >
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x154" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x154" data-faze-gallery-passive alt="">
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x155" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x155" alt="" >
-        <img data-faze-lazy_image-image="https://via.placeholder.com/350x156" data-faze-lazy_image-width="350" data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image" data-faze-gallery-image="https://via.placeholder.com/350x156" alt="" >
+  <form action="https://xdgifts.ru/_login.txt" data-faze-restapi-form
+    data-faze-restapi-json-merge='{"Phone":"798123123434","Sex":"Male","ids":["3123123","3423433"]}'>
 
-        <br><br><br>
-        <img src="https://via.placeholder.com/350x153" data-faze="gallery" data-faze-gallery-image="https://via.placeholder.com/350x154" data-faze-gallery-counter="true" data-faze-gallery-group="test1" alt="">
-        <img src="https://via.placeholder.com/350x153" data-faze="gallery" data-faze-gallery-image="https://via.placeholder.com/350x155" data-faze-gallery-group="test1" alt="">
-    </div>
+    <!--<input type="hidden" name="show" value="296447">-->
+    <!--<input type="hidden" name="login" value="login">-->
+    <!--<input type="hidden" name="mime" value="json">-->
+    <!--<input type="hidden" name="status" value="true">-->
 
-    <button style="margin-left: 500px; margin-top: 500px;" data-faze="tooltip" title="sdkfj" data-faze-tooltip-side="top">
-        Спойлер
+    <!--<input data-faze-restapi-json-name="basket_txt_json.manager" name="Name1" id="name" type="text" placeholder="Name" value="Name1">-->
+    <!--<input data-faze-restapi-json-name="basket_txt_json.manager" name="Email1" id="email" type="text" placeholder="Email" value="Name2">-->
+
+    <!--<input data-faze-restapi-json-name="basket_txt_json2.offer.manager.name" name="Name2" id="name2" type="text" placeholder="Name" value="Name2Val">-->
+    <!--<input data-faze-restapi-json-name="basket_txt_json2.offer.manager.name" name="Email2" id="email2" type="text" placeholder="Email" value="Email2Val">-->
+
+    <!--<input data-faze-restapi-json-name="basket_txt_json" name="Phone" id="phone" type="text" placeholder="123" value="798123123434">-->
+
+    <!--<label>-->
+    <!--Мужчина-->
+    <!--<input data-faze-restapi-json-name="basket_txt_json" name="Sex" type="radio" value="Male" checked>-->
+    <!--</label>-->
+
+    <!--<label>-->
+    <!--Женщина-->
+    <!--<input data-faze-restapi-json-name="basket_txt_json" name="Sex" type="radio" value="Female">-->
+    <!--</label>-->
+
+
+    <!--<label>-->
+    <!--<input data-faze-restapi-json-array-group="1" data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[].id" type="checkbox" value="1" checked>-->
+    <!--<input data-faze-restapi-json-array-group="1" data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[].name" type="checkbox" value="Test1" checked>-->
+    <!--</label>-->
+
+    <!--<label>-->
+    <!--<input data-faze-restapi-json-array-group="2123" data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[].id" type="checkbox" value="2" checked>-->
+    <!--<input data-faze-restapi-json-array-group="2123" data-faze-restapi-json-name="basket_txt_json.photos" name="CheckboxTest[].name" type="checkbox" value="Test2" checked>-->
+    <!--</label>-->
+
+    <!--<label>-->
+    <!--<input data-faze-restapi-json-array-group="1" data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest[].id" type="checkbox" value="23" checked>-->
+    <!--<input data-faze-restapi-json-array-group="1" data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest[].name" type="checkbox" value="Пока" checked>-->
+    <!--</label>-->
+
+    <!--<label>-->
+    <!--<input data-faze-restapi-json-array-group="dsf" data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest[].id" type="checkbox" value="24" checked>-->
+    <!--<input data-faze-restapi-json-array-group="dsf" data-faze-restapi-json-name="basket_txt_json" name="CheckboxTest[].name" type="checkbox" value="Привет" checked>-->
+    <!--</label>-->
+
+    <label>
+      Тест3
+      <input data-faze-restapi-json-name="basket_txt_json" name="ids[]" type="checkbox" value="3123123" checked>
+      <input data-faze-restapi-json-name="basket_txt_json" name="ids[]" type="checkbox" value="3423433" checked>
+    </label>
+
+    <label>
+      On|Off 1
+      <input data-faze-restapi-json-name="basket_txt_json" name="testOO-1" type="checkbox" value="on"
+        data-faze-restapi-disabled-value="off" checked>
+    </label>
+
+    <label>
+      On|Off 2
+      <input data-faze-restapi-json-name="basket_txt_json" name="testOO-2" type="checkbox" value="on"
+        data-faze-restapi-disabled-value="off">
+    </label>
+
+    <!--<input data-faze-restapi-json-name="basket_txt_json.promotions[]." name="CheckboxTest" type="hidden" value="1">-->
+
+    <p><button type="submit">Отправить</button></p>
+
+
+    <!--<div data-faze-restapi-notification="response-text"></div>-->
+  </form>
+
+  <button class="js-notification">Информационное сообщение</button>
+
+  <div class="js-test-arrow-left">-</div>
+  <div class="js-test-arrow-right">+</div>
+  <div class="carousel-test">
+    <img src="https://via.placeholder.com/350x480" alt="">
+    <img src="https://via.placeholder.com/351x480" alt="">
+    <img src="https://via.placeholder.com/352x480" alt="">
+    <img src="https://via.placeholder.com/353x480" alt="">
+    <img src="https://via.placeholder.com/354x480" alt="">
+  </div>
+  <br>
+  <div class="carousel-test1" data-faze="carousel" data-faze-carousel-autoplay="true"
+    data-faze-carousel-hover-on-stop="true" data-faze-carousel-arrows-outside="true"
+    data-faze-carousel-animation-type="slide" data-faze-carousel-animation-time="5000">
+    <img src="https://via.placeholder.com/350x480" alt="">
+    <img src="https://via.placeholder.com/351x480" alt="">
+    <img src="https://via.placeholder.com/352x480" alt="">
+    <img src="https://via.placeholder.com/353x480" alt="">
+  </div>
+  <br>
+  <div style="width:20rem">
+    <img class="image" src="https://via.placeholder.com/200x200"
+      data-faze-full-image="https://via.placeholder.com/2000x2000">
+  </div>
+  <div style="width:20rem">
+    <img data-faze="zoom" class="image" src="https://via.placeholder.com/200x200"
+      data-faze-full-image="https://via.placeholder.com/2000x2000">
+  </div>
+  <br>
+  <div class="for-scroll">
+    sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjghsdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+    sdfsdfhdfkjghdfkjgh<br>
+  </div>
+  <br>
+  <form class="form-order">
+    <input type="text" name="name" placeholder="ФИО">
+    <input type="email" name="email" placeholder="email">
+    <button type="submit">
+      Отправить
     </button>
+  </form>
+  <br>
+  <div class="news">
+    <div class="items">
+      <div class="item">Новость 1</div>
+      <div class="item">Новость 2</div>
+      <div class="item">Новость 3</div>
+    </div>
+  </div>
 
-    <button id="button" style="margin-left: 500px; margin-top: 500px;">
-        12312313123
-    </button>
+  <button onclick="addPhoto()" type="button">Add</button>
+  <div class="gallery">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x151" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x151" data-faze-gallery-passive alt="">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x152" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x152" alt="123">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x153" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x153" alt="123">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x151" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x151" data-faze-gallery-passive alt="">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x152" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x152" alt="123">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x153" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x153" alt="123">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x151" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x151" data-faze-gallery-passive alt="">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x152" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x152" alt="">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x153" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x153" alt="123">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x151" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x151" data-faze-gallery-passive alt="">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x152" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x152" alt="">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x153" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x153" alt="123">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x151" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x151" data-faze-gallery-passive alt="">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x152" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x152" alt="">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x153" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x153" alt="">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x151" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x151" data-faze-gallery-passive alt="">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x152" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x153" alt="">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x153" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x153" alt="">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x154" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x154" data-faze-gallery-passive alt="">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x155" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x155" alt="">
+    <img data-faze-lazy_image-image="https://via.placeholder.com/350x156" data-faze-lazy_image-width="350"
+      data-faze-lazy_image-height="150" data-faze-lazy_image-offset="-300" data-faze="gallery lazy_image"
+      data-faze-gallery-image="https://via.placeholder.com/350x156" alt="">
 
-    <button id="button_modal_attr" data-faze="modal" data-faze-modal-html=".form-order">
-        12312313123
-    </button>
+    <br><br><br>
+    <img src="https://via.placeholder.com/350x153" data-faze="gallery"
+      data-faze-gallery-image="https://via.placeholder.com/350x154" data-faze-gallery-counter="true"
+      data-faze-gallery-group="test1" alt="">
+    <img src="https://via.placeholder.com/350x153" data-faze="gallery"
+      data-faze-gallery-image="https://via.placeholder.com/350x155" data-faze-gallery-group="test1" alt="">
+  </div>
+
+  <button style="margin-left: 500px; margin-top: 500px;" data-faze="tooltip" title="sdkfj" data-faze-tooltip-side="top">
+    Спойлер
+  </button>
+
+  <button id="button" style="margin-left: 500px; margin-top: 500px;">
+    12312313123
+  </button>
+
+  <button id="button_modal_attr" data-faze="modal" data-faze-modal-html=".form-order">
+    12312313123
+  </button>
 </body>
+
 </html>

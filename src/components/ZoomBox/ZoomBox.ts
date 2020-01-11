@@ -79,8 +79,6 @@ class ZoomBox {
       height: document.documentElement.clientHeight,
     };
 
-    console.log(this.viewport);
-
     // Вызов стандартных методов плагина
     this.initialize();
   }

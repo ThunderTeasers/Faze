@@ -152,6 +152,7 @@ class Faze {
     // Зарезервированные имена
     const predefinedNames: string[] = [
       'Zoom',
+      'ZoomBox',
       'Tooltip',
       'Carousel',
       'Page',

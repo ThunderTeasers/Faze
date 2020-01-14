@@ -222,11 +222,14 @@ class Page {
       // Блокировка кнопки от повторного нажатия
       this.lockButton();
 
+      // Собираем URL для запроса на сервер
+      const basePath = this.node.dataset.fazePagePath || window.location.pathname;
+
       // Путь для запроса новых элементов
-      const url: string = `${this.node.dataset.fazePagePath || window.location.pathname}?${this.params.toString()}`;
+      const url: string = `${basePath}${basePath.includes('?') ? '&' : '?'}${this.params.toString()}`;
 
       // Получение новых элементов
-      fetch(url, {credentials: 'same-origin'})
+      fetch(url, { credentials: 'same-origin' })
         .then((response: Response) => response.text())
         .then((response: string) => {
           // Парсинг ответа

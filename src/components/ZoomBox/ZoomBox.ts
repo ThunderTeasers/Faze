@@ -22,6 +22,8 @@ import '../Core/Interfaces';
  *   callbacks
  *     beforeOpened - пользовательская функция, выполняющаяся до открытия
  *     afterOpened - пользовательская функция, выполняющаяся после открытия
+ *     beforeChanged - пользовательская функция, выполняющаяся до переключения
+ *     afterChanged - пользовательская функция, выполняющаяся после переключения
  */
 interface Config {
   group: string;
@@ -31,6 +33,8 @@ interface Config {
   callbacks: {
     beforeOpened?: () => void;
     afterOpened?: () => void;
+    beforeChanged?: () => void;
+    afterChanged?: () => void;
   };
 }
 
@@ -100,6 +104,8 @@ class ZoomBox {
       callbacks: {
         beforeOpened: undefined,
         afterOpened: undefined,
+        beforeChanged: undefined,
+        afterChanged: undefined,
       },
     };
 
@@ -125,7 +131,7 @@ class ZoomBox {
    */
   async initialize(): Promise<void> {
     // Загружаем полное изображение
-    const { imageNode, size } = await this.getFullImageSize(this.callerNode.dataset.fazeZoomboxImage || '');
+    const {imageNode, size} = await this.getFullImageSize(this.callerNode.dataset.fazeZoomboxImage || '');
 
     // Т.к. изображение уже получено, сразу добавляем его в общий объект с данными
     this.wrapperData.imageNode = imageNode;
@@ -176,6 +182,15 @@ class ZoomBox {
   private bindArrowsButtons(): void {
     // Следующая
     this.wrapperData.controlsNodes.arrows?.next?.addEventListener('click', () => {
+      // Вызываем пользовательскую функцию
+      if (typeof this.config.callbacks.beforeChanged === 'function') {
+        try {
+          this.config.callbacks.beforeChanged();
+        } catch (error) {
+          console.error('Ошибка исполнения пользовательского метода "beforeChanged":', error);
+        }
+      }
+
       // Инкрементируем индекс, и, если мы листаем последний слайд, то переключаемся на первый
       this.currentIndex += 1;
       if (this.currentIndex > this.callerNodes.length - 1) {
@@ -183,11 +198,30 @@ class ZoomBox {
       }
 
       // Изменяем текущую активную миниатюру, для возвращения в неё после закрытия
-      this.change(this.currentIndex);
+      this.change(this.currentIndex)
+        .then(() => {
+          // Вызываем пользовательскую функцию
+          if (typeof this.config.callbacks.afterChanged === 'function') {
+            try {
+              this.config.callbacks.afterChanged();
+            } catch (error) {
+              console.error('Ошибка исполнения пользовательского метода "afterChanged":', error);
+            }
+          }
+        });
     });
 
     // Предыдущая
     this.wrapperData.controlsNodes.arrows?.prev?.addEventListener('click', () => {
+      // Вызываем пользовательскую функцию
+      if (typeof this.config.callbacks.beforeChanged === 'function') {
+        try {
+          this.config.callbacks.beforeChanged();
+        } catch (error) {
+          console.error('Ошибка исполнения пользовательского метода "beforeChanged":', error);
+        }
+      }
+
       // Декрементируем индекс, и, если мы листаем первый слайд, то переключаем на последний
       this.currentIndex -= 1;
       if (this.currentIndex < 0) {
@@ -195,7 +229,17 @@ class ZoomBox {
       }
 
       // Изменяем текущую активную миниатюру, для возвращения в неё после закрытия
-      this.change(this.currentIndex);
+      this.change(this.currentIndex)
+        .then(() => {
+          // Вызываем пользовательскую функцию
+          if (typeof this.config.callbacks.afterChanged === 'function') {
+            try {
+              this.config.callbacks.afterChanged();
+            } catch (error) {
+              console.error('Ошибка исполнения пользовательского метода "afterChanged":', error);
+            }
+          }
+        });
     });
   }
 
@@ -208,7 +252,7 @@ class ZoomBox {
     this.changeActiveThumbnail(index);
 
     // Получаем новое изображение
-    const { imageNode, size } = await this.getFullImageSize(this.callerNode.dataset.fazeZoomboxImage || '');
+    const {imageNode, size} = await this.getFullImageSize(this.callerNode.dataset.fazeZoomboxImage || '');
 
     // Изменяем изображение
     if (this.wrapperData.imageNode) {
@@ -420,7 +464,7 @@ class ZoomBox {
     return new Promise((resolve, reject) => {
       const image = new Image();
       image.src = source;
-      image.onload = () => resolve({ imageNode: image, size: { width: image.width, height: image.height } });
+      image.onload = () => resolve({imageNode: image, size: {width: image.width, height: image.height}});
       image.onerror = reject;
     });
   }

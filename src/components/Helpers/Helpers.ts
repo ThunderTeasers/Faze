@@ -17,6 +17,27 @@ interface NotificationOptions {
 }
 
 /**
+ * Структура настроек метода для перетаскивания
+ *
+ * Содержит:
+ *   node - DOM элемент который перетаскиваем
+ *   absolute - позицианируется ли элемент через "absolute"
+ *   callbacks
+ *     beforeDrag - пользовательская функция, исполняющаяся до перетаскивания
+ *     drag - пользовательская функция, исполняющаяся во время перетаскивания
+ *     afterDrag - пользовательская функция, исполняющаяся после перетаскивания
+ *
+ */
+interface DragOptions {
+  node?: HTMLElement;
+  callbacks: {
+    beforeDrag?: () => void;
+    drag?: () => void;
+    afterDrag?: () => void;
+  };
+}
+
+/**
  * Структура показывающая на какую область DOM Элемента была наведена мышь, используется в методе "isMouseOver"
  *
  * Содержит
@@ -224,7 +245,7 @@ class Helpers {
    * @param options - настройки
    */
   static showNotification(message: string, options: NotificationOptions): void {
-    const { className = '', isNested = true, time = 3000, backgroundColor = '#00b938' } = options;
+    const {className = '', isNested = true, time = 3000, backgroundColor = '#00b938'} = options;
 
     // DOM элемент обертки для информационнах сообщений, она нужна для того, чтобы сообщения шли друг под другом, если их несколько
     let notificationWrapperNode: HTMLDivElement | null = document.querySelector('.faze-notification-wrapper');
@@ -284,7 +305,7 @@ class Helpers {
    * @param showMinutes  - показывать ли минуты, имеет приоритет выше, чем "showEmpty"
    * @param showSeconds  - показывать ли секунды, имеет приоритет выше, чем "showEmpty"
    */
-  static secondsToTime({ totalSeconds = 0, showEmpty = false, showHours = true, showMinutes = true, showSeconds = true } = {}): string {
+  static secondsToTime({totalSeconds = 0, showEmpty = false, showHours = true, showMinutes = true, showSeconds = true} = {}): string {
     let totalSecondsRaw: number = totalSeconds;
 
     // Время в человекопонимаемом формате
@@ -420,7 +441,7 @@ class Helpers {
         if (source.hasOwnProperty(key)) {
           if (Helpers.isObject(source[key])) {
             if (!target[key]) {
-              Object.assign(target, { [key]: {} });
+              Object.assign(target, {[key]: {}});
             }
 
             Helpers.mergeDeep(arraysReplace, target[key], source[key]);
@@ -446,7 +467,7 @@ class Helpers {
                   target[key].push(...source[key][0]);
                 } else {
                   // Если нашли, то объединяем объекты этого элемента с новым
-                  target[key][foundIndex] = { ...foundElement, ...source[key][0] };
+                  target[key][foundIndex] = {...foundElement, ...source[key][0]};
                 }
               } else {
                 // Если не содержит, то это просто элемент массива, значит пушим его
@@ -457,7 +478,7 @@ class Helpers {
                 }
               }
             } else {
-              Object.assign(target, { [key]: source[key] });
+              Object.assign(target, {[key]: source[key]});
             }
           }
         }
@@ -665,7 +686,7 @@ class Helpers {
    */
   static getElementPosition(node: HTMLElement): FazePosition {
     // Возвращаемый объект
-    const position = { x: node.offsetLeft, y: node.offsetTop };
+    const position = {x: node.offsetLeft, y: node.offsetTop};
 
     // DOM элемент с которым производим действия
     let calculatedNode: HTMLElement = node;
@@ -696,6 +717,104 @@ class Helpers {
       },
       position: this.getElementPosition(thumbnailNode),
     };
+  }
+
+  /**
+   * Навешивание событий и управление перетаскиванием
+   *
+   * @param options{DragOptions} - настройки перетаскивания
+   */
+  static bindDrag(options: DragOptions): void {
+    // Начальная позиция мыши
+    const startMousePosition = {
+      x: 0,
+      y: 0,
+    };
+
+    // КОнечная позиция мыши
+    const endMousePosition = {
+      x: 0,
+      y: 0,
+    };
+
+    /**
+     * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
+     *
+     * @param event - событие мыши
+     */
+    const dragMouseDown = (event: MouseEvent) => {
+      event.preventDefault();
+
+      // Получение позиции курсора при нажатии на элемент
+      startMousePosition.x = event.clientX;
+      startMousePosition.y = event.clientY;
+
+      // Вызываем пользовательскую функцию
+      if (typeof options.callbacks.beforeDrag === 'function') {
+        try {
+          options.callbacks.beforeDrag();
+        } catch (error) {
+          console.error('Ошибка исполнения пользовательского метода "beforeDrag":', error);
+        }
+      }
+
+      document.addEventListener('mouseup', endDragElement);
+      document.addEventListener('mousemove', elementDrag);
+    };
+
+    /**
+     * Функция перетаскивания модального окна.
+     * Тут идет расчет координат и они присваиваются окну через стили "top" и "left", окно в таком случае естественно должно иметь
+     * позиционирование "absolute"
+     *
+     * @param event - событие мыши
+     */
+    const elementDrag = (event: MouseEvent) => {
+      event.preventDefault();
+
+      // Рассчет новой позиции курсора
+      endMousePosition.x = startMousePosition.x - event.clientX;
+      endMousePosition.y = startMousePosition.y - event.clientY;
+      startMousePosition.x = event.clientX;
+      startMousePosition.y = event.clientY;
+
+      // Рассчет новой позиции
+      if (options.node) {
+        options.node.style.left = `${(parseInt(options.node.style.left, 10) - endMousePosition.x)}px`;
+        options.node.style.top = `${(parseInt(options.node.style.top, 10) - endMousePosition.y)}px`;
+      }
+
+      // Вызываем пользовательскую функцию
+      if (typeof options.callbacks.drag === 'function') {
+        try {
+          options.callbacks.drag();
+        } catch (error) {
+          console.error('Ошибка исполнения пользовательского метода "drag":', error);
+        }
+      }
+    };
+
+    /**
+     * Завершение перетаскивания(момент отпускания кнопки мыши), удаляем все слушатели, т.к. они создаются при каждом новом перетаскивании
+     */
+    const endDragElement = () => {
+      document.removeEventListener('mouseup', endDragElement);
+      document.removeEventListener('mousemove', elementDrag);
+
+      // Вызываем пользовательскую функцию
+      if (typeof options.callbacks.afterDrag === 'function') {
+        try {
+          options.callbacks.afterDrag();
+        } catch (error) {
+          console.error('Ошибка исполнения пользовательского метода "afterDrag":', error);
+        }
+      }
+    };
+
+    // Навешиваем событие перетаскивания на элемент
+    if (options.node) {
+      options.node.addEventListener('mousedown', dragMouseDown);
+    }
   }
 }
 

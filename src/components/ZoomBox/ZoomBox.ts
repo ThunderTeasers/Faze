@@ -163,6 +163,93 @@ class ZoomBox {
     if (this.config.showArrows && this.callerNodes.length > 1) {
       this.bindArrowsButtons();
     }
+
+    this.bindDrag();
+  }
+
+  /**
+   * Навешивание событий и управление перетаскиванием модального окна
+   */
+  private bindDrag(): void {
+    // Начальная позиция мыши
+    const startMousePosition = {
+      x: 0,
+      y: 0,
+    };
+
+    // КОнечная позиция мыши
+    const endMousePosition = {
+      x: 0,
+      y: 0,
+    };
+
+    /**
+     * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
+     *
+     * @param event - событие мыши
+     */
+    const dragMouseDown = (event: MouseEvent) => {
+      event.preventDefault();
+
+      // Получение позиции курсора при нажатии на элемент
+      startMousePosition.x = event.clientX;
+      startMousePosition.y = event.clientY;
+
+      // Убираем стили плавного смещения
+      if (this.wrapperData.node) {
+        this.wrapperData.node.style.transition = 'none';
+      }
+
+      document.addEventListener('mouseup', endDragElement);
+      document.addEventListener('mousemove', elementDrag);
+    };
+
+    /**
+     * Функция перетаскивания модального окна.
+     * Тут идет расчет координат и они присваиваются окну через стили "top" и "left", окно в таком случае естественно должно иметь
+     * позиционирование "absolute"
+     *
+     * @param event - событие мыши
+     */
+    const elementDrag = (event: MouseEvent) => {
+      event.preventDefault();
+
+      // Рассчет новой позиции курсора
+      endMousePosition.x = startMousePosition.x - event.clientX;
+      endMousePosition.y = startMousePosition.y - event.clientY;
+      startMousePosition.x = event.clientX;
+      startMousePosition.y = event.clientY;
+
+      // Рассчет новой позиции
+      if (this.wrapperData.node) {
+        this.wrapperData.node.style.left = `${(parseInt(this.wrapperData.node.style.left, 10) - endMousePosition.x)}px`;
+        this.wrapperData.node.style.top = `${(parseInt(this.wrapperData.node.style.top, 10) - endMousePosition.y)}px`;
+      }
+    };
+
+    /**
+     * Завершение перетаскивания(момент отпускания кнопки мыши), удаляем все слушатели, т.к. они создаются при каждом новом перетаскивании
+     */
+    const endDragElement = () => {
+      document.removeEventListener('mouseup', endDragElement);
+      document.removeEventListener('mousemove', elementDrag);
+
+      if (this.wrapperData.node) {
+        // Обновляем позицию
+        this.currentPositionAndSize.position = {
+          x: parseInt(this.wrapperData.node.style.left, 10),
+          y: parseInt(this.wrapperData.node.style.top, 10),
+        };
+
+        // Возвращаем стили плавного смещения назад
+        this.wrapperData.node.style.transition = 'width 0.5s, height 0.5s, left 0.5s, top 0.5s';
+      }
+    };
+
+    // Навешиваем событие перетаскивания окна по нажатию на его заголовок
+    if (this.wrapperData.node) {
+      this.wrapperData.node.addEventListener('mousedown', dragMouseDown);
+    }
   }
 
   /**

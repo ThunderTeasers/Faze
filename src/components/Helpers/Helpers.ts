@@ -816,6 +816,34 @@ class Helpers {
       options.node.addEventListener('mousedown', dragMouseDown);
     }
   }
+
+  /**
+   * Изменение изображение в DOM элементе после его фактической загрузки, при успешной загрузки возвращает размеры изображения
+   *
+   * @param source{string} - путь до нового изображения
+   * @param node{HTMLImageElement} - DOM элемент у которого изменяем изображение
+   *
+   * @return{Promise<FazeSize>} - промис, который выполнится в случае загрузки изображения или ошибки
+   */
+  static changeImage(source: string, node: HTMLImageElement): Promise<FazeSize> {
+    return new Promise<FazeSize>((resolve, reject) => {
+      // Создаём экземпляр новой картинки
+      const image = new Image();
+      image.src = source;
+
+      // При загрузке
+      image.onload = () => {
+        // Изменяем изображение у переданного элемента
+        node.src = source;
+
+        // Исполняем промис и возвращаем размеры изображения
+        resolve({width: image.width, height: image.height});
+      };
+
+      // При ошибке
+      image.onerror = (error: Event | string) => reject(error);
+    });
+  }
 }
 
 export default Helpers;

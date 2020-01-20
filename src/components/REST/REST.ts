@@ -2,7 +2,7 @@ import Faze from '../Core/Faze';
 import Helpers from '../Helpers/Helpers';
 
 class REST {
-  static request(method: string, type: string | null, url: string, data: any, callbackSuccess: ((response: any) => void) | null): void {
+  static request(method: string, type: string | null, url: string, data: any, callbackSuccess: ((response: any) => void) | null, node?: HTMLElement): void {
     let formData: FormData = new FormData();
     let dataType: string = '';
     let testedMethod: string = '';
@@ -61,6 +61,8 @@ class REST {
         return data;
       })
       .then((response: any) => {
+        // const responseNodeParent
+
         if (data['response_html'] && typeof data['response_html'] === 'string') {
           // Парсинг ответа
           const responseHTML = (new DOMParser()).parseFromString(response, 'text/html');
@@ -68,21 +70,13 @@ class REST {
           document.querySelectorAll(data['response_html']).forEach((el) => {
             el.innerHTML = responseHTML.querySelector(data['response_html']).innerHTML;
           });
-        }
-
-        if (data['response_text'] && typeof data['response_text'] === 'string') {
+        } else if (data['response_text'] && typeof data['response_text'] === 'string') {
           document.querySelectorAll(data['response_text']).forEach((el) => {
             el.innerHTML = response;
           });
-        }
-
-        if (data['response_callback'] && typeof data['response_callback'] === 'string'
-          && data['response_callback'] in window
-          && (window as any)[data['response_callback']] instanceof Function) {
+        } else if (data['response_callback'] && typeof data['response_callback'] === 'string' && data['response_callback'] in window && (window as any)[data['response_callback']] instanceof Function) {
           (window as any)[data['response_callback']](response);
-        }
-
-        if (data['response_json'] && typeof data['response_json'] === 'string') {
+        } else if (data['response_json'] && typeof data['response_json'] === 'string') {
           document.querySelectorAll(data['response_json']).forEach((el) => {
             el.innerHTML = response.message;
           });
@@ -263,10 +257,14 @@ class REST {
 
       // Если есть контейнер с [data-faze-restapi-notification="text/json"]
       if (notificationNode) {
-        if (notificationNode.dataset.fazeRestapiNotification === 'response_json') {
-          notificationNode.innerHTML = response.message;
+        if (notificationNode.dataset.fazeRestapiNotificationText) {
+          notificationNode.innerHTML = notificationNode.dataset.fazeRestapiNotificationText;
         } else {
-          notificationNode.innerHTML = response;
+          if (notificationNode.dataset.fazeRestapiNotification === 'response_json') {
+            notificationNode.innerHTML = response.message;
+          } else {
+            notificationNode.innerHTML = response;
+          }
         }
       }
     };
@@ -275,7 +273,7 @@ class REST {
     formData.append('from', window.location.href);
 
     // Выполняем запрос на сервер
-    REST.request('POST', typeForResponse, url, formData, callbackSuccess);
+    REST.request('POST', typeForResponse, url, formData, callbackSuccess, formNode);
   }
 
   static getElementValue(element: any): string {

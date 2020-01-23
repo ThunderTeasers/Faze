@@ -32,6 +32,7 @@ import Logger from '../Core/Logger';
  *   useSlideFullSize - учитывать ли при измерении размера слайда его margin
  *   stopOnHover - флаг остановки ли при наведении
  *   amountPerSlide - количества слайдов перелистываемых за один раз
+ *   mouseMove - можно ли двигать слайды курсором
  *   animation
  *     type     - тип анимации, может быть: 'slide', 'fade'
  *     time     - длительность анимации в миллисекундах
@@ -53,6 +54,7 @@ interface Config {
   useSlideFullSize: boolean;
   stopOnHover: boolean;
   amountPerSlide: number;
+  mouseMove: boolean;
   animation: {
     type: string;
     time: number;
@@ -202,6 +204,7 @@ class Carousel {
       infinite: true,
       useSlideFullSize: false,
       stopOnHover: false,
+      mouseMove: false,
       amountPerSlide: 1,
       animation: {
         type: 'fade',
@@ -437,20 +440,68 @@ class Carousel {
   }
 
   /**
-   * Навешивание событий для отслеживания жестов
+   * Навешивание событий для отслеживания жестов и мышки
    */
   bindGestures(): void {
-    this.itemsHolderNode.addEventListener('touchstart', (event: TouchEvent) => {
-      this.touchStart.x = event.changedTouches[0].screenX;
-      this.touchStart.y = event.changedTouches[0].screenY;
+    this.bindTouchGestures();
+
+    if (this.config.mouseMove) {
+      this.bindMouseGestures();
+    }
+  }
+
+  /**
+   * Навешивание событий для отслеживания жестов
+   */
+  private bindMouseGestures(): void {
+    this.itemsHolderNode.addEventListener('mousedown', (event: MouseEvent) => {
+      this.getMouseCoordinates(event);
     });
 
-    this.itemsHolderNode.addEventListener('touchmove', (event: TouchEvent) => {
-      this.touchEnd.x = event.changedTouches[0].screenX;
-      this.touchEnd.y = event.changedTouches[0].screenY;
+    this.itemsHolderNode.addEventListener('mousemove', (event: MouseEvent) => {
+      this.getMouseCoordinates(event);
 
       this.handleGestures();
     });
+  }
+
+  /**
+   * Навешивание событий для отслеживания жестов
+   */
+  private bindTouchGestures(): void {
+    this.itemsHolderNode.addEventListener('touchstart', (event: TouchEvent) => {
+      this.getTouchCoordinates(event);
+    });
+
+    this.itemsHolderNode.addEventListener('touchmove', (event: TouchEvent) => {
+      this.getTouchCoordinates(event);
+
+      this.handleGestures();
+    });
+  }
+
+  /**
+   * Получение координат положения мышки
+   *
+   * @param event{TouchEvent} - событие мыши
+   *
+   * @private
+   */
+  private getMouseCoordinates(event: MouseEvent): void {
+    this.touchEnd.x = event.clientX;
+    this.touchEnd.y = event.clientY;
+  }
+
+  /**
+   * Получение координат положения пальца
+   *
+   * @param event{TouchEvent} - событие пальца
+   *
+   * @private
+   */
+  private getTouchCoordinates(event: TouchEvent): void {
+    this.touchEnd.x = event.changedTouches[0].screenX;
+    this.touchEnd.y = event.changedTouches[0].screenY;
   }
 
   /**

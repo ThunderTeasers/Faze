@@ -94,6 +94,7 @@ Faze.add({
       arrowsOutside: true,
       counter: false,
       infinite: false,
+      mouseMove: true,
       amountPerSlide: 2,
       animation: {
         type: 'slide',

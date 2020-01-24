@@ -627,7 +627,7 @@ class Helpers {
    * @param node    - DOM элемент которому присваиваем
    * @param styles  - стили которые присваиваем
    */
-  static setElementStyle(node: HTMLElement, styles: { [key: string]: string }): void {
+  static setElementStyle(node: HTMLElement, styles: FazeObject): void {
     for (const style in styles) {
       if (styles.hasOwnProperty(style)) {
         node.style[style as any] = styles[style];
@@ -641,7 +641,7 @@ class Helpers {
    * @param node        - DOM элемент которому присваиваем
    * @param attributes  - атрибуты которые присваиваем
    */
-  static setElementAttributes(node: HTMLElement, attributes: { [key: string]: string }) {
+  static setElementAttributes(node: HTMLElement, attributes: FazeObject) {
     for (const attribute in attributes) {
       if (attributes.hasOwnProperty(attribute)) {
         node.setAttribute(attribute, attributes[attribute]);
@@ -657,7 +657,7 @@ class Helpers {
    * @param styles      - стили создаваемого DOM элемента
    * @param parent      - родитель создаваемого DOM элемента
    */
-  static createElement(tag: string, attributes?: { [key: string]: string }, styles?: { [key: string]: string }, parent?: HTMLElement): HTMLElement {
+  static createElement(tag: string, attributes?: FazeObject, styles?: FazeObject, parent?: HTMLElement): HTMLElement {
     // Создаем DOM элемент
     const node = document.createElement(tag);
 
@@ -853,6 +853,30 @@ class Helpers {
       // При ошибке
       image.onerror = (error: Event | string) => reject(error);
     });
+  }
+
+  /**
+   * Приведение объекта позиции и размера к виду {string: string} с соответствующими именами для обработки в стили
+   *
+   * @param positionAndSize{FazePositionAndSize} - объект позиции и размера
+   *
+   * @return{FazeObject} - объект с собранными CSS стилями
+   */
+  static fromPositionAndSizeToStyles(positionAndSize: FazePositionAndSize): FazeObject {
+    // Собираем стили в переменную
+    const result: FazeObject = {};
+
+    console.log(positionAndSize);
+
+    // Размеры
+    result.width = `${positionAndSize.size.width}px`;
+    result.height = `${positionAndSize.size.height}px`;
+
+    // Позиция
+    result.left = `${positionAndSize.position.x}px`;
+    result.top = `${positionAndSize.position.y}px`;
+
+    return result;
   }
 }
 

@@ -18,6 +18,7 @@ import './Faze.scss';
  */
 import Modal from '../Modal/Modal';
 import Helpers from '../Helpers/Helpers';
+import Animations from '../Animations/Animations';
 import Tooltip from '../Tooltip/Tooltip';
 import Tab from '../Tab/Tab';
 import Drag from '../Drag/Drag';
@@ -101,6 +102,7 @@ class Faze {
   static ZoomBox: any = ZoomBox;
   static Gallery: any = Gallery;
   static Helpers: any = Helpers;
+  static Animations: any = Animations;
   static Scroll: any = Scroll;
   static Spoiler: any = Spoiler;
   static Page: any = Page;

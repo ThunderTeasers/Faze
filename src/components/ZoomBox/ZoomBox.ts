@@ -290,12 +290,27 @@ class ZoomBox {
 
     // Включаем анимацию изменения
     if (this.wrapperData.node) {
-      this.currentPositionAndSize = Faze.Animations.animatePositionAndSize({
-        node: this.wrapperData.node,
-        from: this.currentPositionAndSize,
-        to: this.getFullImagePositionAndSize(size),
-        time: this.ANIMATION_TIME + 200,
-      });
+      Promise.all([
+        Faze.Animations.animatePosition({
+          node: this.wrapperData.node,
+          from: this.currentPositionAndSize.position,
+          to: this.getFullImagePositionAndSize(size).position,
+          time: this.ANIMATION_TIME + 200,
+        }),
+        Faze.Animations.animateSize({
+          node: this.wrapperData.imageNode as HTMLElement,
+          from: this.currentPositionAndSize.size,
+          to: this.getFullImagePositionAndSize(size).size,
+          time: this.ANIMATION_TIME + 200,
+        }),
+      ])
+        .then((data: (FazePosition | FazeSize)[]) => {
+          // Обновляем данные текущие данные
+          this.currentPositionAndSize = {
+            position: data[0] as FazePosition,
+            size: data[1] as FazeSize,
+          };
+        });
     }
   }
 
@@ -365,12 +380,27 @@ class ZoomBox {
     this.buildCaption();
 
     // Анимируем открытие
-    this.currentPositionAndSize = Faze.Animations.animatePositionAndSize({
-      node: this.wrapperData.node,
-      from: this.currentThumbnailPositionAndSize,
-      to: fullImagePositionAndSize,
-      time: this.ANIMATION_TIME + 200,
-    });
+    Promise.all([
+      Faze.Animations.animatePosition({
+        node: this.wrapperData.node,
+        from: this.currentThumbnailPositionAndSize.position,
+        to: fullImagePositionAndSize.position,
+        time: this.ANIMATION_TIME + 200,
+      }),
+      Faze.Animations.animateSize({
+        node: this.wrapperData.imageNode as HTMLElement,
+        from: this.currentThumbnailPositionAndSize.size,
+        to: fullImagePositionAndSize.size,
+        time: this.ANIMATION_TIME + 200,
+      }),
+    ])
+      .then((data: (FazePosition | FazeSize)[]) => {
+        // Обновляем данные текущие данные
+        this.currentPositionAndSize = {
+          position: data[0] as FazePosition,
+          size: data[1] as FazeSize,
+        };
+      });
   }
 
   /**
@@ -520,19 +550,33 @@ class ZoomBox {
    */
   private close(): void {
     if (this.wrapperData.node) {
-      this.currentPositionAndSize = Faze.Animations.animatePositionAndSize({
-        node: this.wrapperData.node,
-        from: this.currentPositionAndSize,
-        to: this.currentThumbnailPositionAndSize,
-        time: this.ANIMATION_TIME + 200,
-        afterAnimationCallback: () => {
+      Promise.all([
+        Faze.Animations.animatePosition({
+          node: this.wrapperData.node,
+          from: this.currentPositionAndSize.position,
+          to: this.currentThumbnailPositionAndSize.position,
+          time: this.ANIMATION_TIME + 200,
+        }),
+        Faze.Animations.animateSize({
+          node: this.wrapperData.imageNode as HTMLElement,
+          from: this.currentPositionAndSize.size,
+          to: this.currentThumbnailPositionAndSize.size,
+          time: this.ANIMATION_TIME + 200,
+        }),
+      ])
+        .then((data: (FazePosition | FazeSize)[]) => {
+          // Обновляем данные текущие данные
+          this.currentPositionAndSize = {
+            position: data[0] as FazePosition,
+            size: data[1] as FazeSize,
+          };
+
           // Очищаем данные врамера и удаляем его
           this.clearWrapperData();
 
           // Возвращаем видимость миниатюры
           this.callerNode.style.visibility = 'visible';
-        },
-      });
+        });
     }
   }
 

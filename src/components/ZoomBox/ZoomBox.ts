@@ -520,9 +520,9 @@ class ZoomBox {
    * @param node{HTMLElement} - DOM элемент который изменяем
    * @param from{FazePositionAndSize} - позиция и размеры с которых начинается анимация
    * @param to{FazePositionAndSize} - позиция и размеры до которых должна происходить анимация
-   * @param afterAnimationCollback{() => void | undefined} - коллбек вызываемый после анимации
+   * @param afterAnimationCallback{() => void | undefined} - коллбек вызываемый после анимации
    */
-  private animate(node: HTMLElement, from: FazePositionAndSize, to: FazePositionAndSize, afterAnimationCollback?: () => void): void {
+  private animate(node: HTMLElement, from: FazePositionAndSize, to: FazePositionAndSize, afterAnimationCallback?: () => void): void {
     // Задаём первичные данные от которых идет анимация
     Faze.Helpers.setElementStyle(node, {
       top: `${from.position.y}px`,
@@ -543,9 +543,9 @@ class ZoomBox {
     }, 100);
 
     // Если пользовательская функция существует, исполняем её, но с небольшой задержкой в 200 миллисекунд
-    if (typeof afterAnimationCollback === 'function') {
+    if (typeof afterAnimationCallback === 'function') {
       setTimeout(() => {
-        afterAnimationCollback();
+        afterAnimationCallback();
       }, this.ANIMATION_TIME + 200);
     }
 

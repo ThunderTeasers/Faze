@@ -866,8 +866,6 @@ class Helpers {
     // Собираем стили в переменную
     const result: FazeObject = {};
 
-    console.log(positionAndSize);
-
     // Размеры
     result.width = `${positionAndSize.size.width}px`;
     result.height = `${positionAndSize.size.height}px`;
@@ -875,6 +873,42 @@ class Helpers {
     // Позиция
     result.left = `${positionAndSize.position.x}px`;
     result.top = `${positionAndSize.position.y}px`;
+
+    return result;
+  }
+
+  /**
+   * Приведение объекта позиции к виду {string: string} с соответствующими именами для обработки в стили
+   *
+   * @param position{FazePosition} - объект позиции
+   *
+   * @return{FazeObject} - объект с собранными CSS стилями
+   */
+  static fromPositionToStyles(position: FazePosition): FazeObject {
+    // Собираем стили в переменную
+    const result: FazeObject = {};
+
+    // Позиция
+    result.left = `${position.x}px`;
+    result.top = `${position.y}px`;
+
+    return result;
+  }
+
+  /**
+   * Приведение объекта размеров к виду {string: string} с соответствующими именами для обработки в стили
+   *
+   * @param size{FazeSize} - объект позиции
+   *
+   * @return{FazeObject} - объект с собранными CSS стилями
+   */
+  static fromSizeToStyles(size: FazeSize): FazeObject {
+    // Собираем стили в переменную
+    const result: FazeObject = {};
+
+    // Размеры
+    result.width = `${size.width}px`;
+    result.height = `${size.height}px`;
 
     return result;
   }

@@ -16,6 +16,7 @@ import '../Core/Interfaces';
  *
  * Содержит:
  *   group - группа для разделения зумбоксов пользователем
+ *   align - выравнивание увеличенного изображение
  *   showClose - показывать ли крестик закрытия
  *   showCaption - показывать ли подпись
  *   showArrow - показывать ли стрелки переключения
@@ -27,6 +28,7 @@ import '../Core/Interfaces';
  */
 interface Config {
   group: string;
+  align: string;
   showClose: boolean;
   showCaption: boolean;
   showArrows: boolean;
@@ -98,6 +100,7 @@ class ZoomBox {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       group: 'default',
+      align: 'center',
       showClose: true,
       showArrows: true,
       showCaption: false,
@@ -360,11 +363,10 @@ class ZoomBox {
    * Определения позиции и размера изображения для нормального показа во вьюпорте
    *
    * @param size{FazeSize} - Исходный размер изображения
-   * @param align{string} - Выравнивание
    *
    * @return{FazePositionAndSize} - Позиция и размер изображения
    */
-  private getFullImagePositionAndSize(size: FazeSize, align: string = 'center'): FazePositionAndSize {
+  private getFullImagePositionAndSize(size: FazeSize): FazePositionAndSize {
     // Финальные размеры картинки
     const finalSize: FazeSize = {width: 0, height: 0};
 
@@ -399,7 +401,7 @@ class ZoomBox {
     };
 
     // Выбор нужной позиции относительно выбранного выравнивания
-    switch (align) {
+    switch (this.config.align) {
       case 'center':
         finalPosition.x = positionVariations.x.center;
         finalPosition.y = positionVariations.y.center;
@@ -579,11 +581,13 @@ class ZoomBox {
     });
 
     Faze.on('click', '[data-faze~="zoombox"]', (event: Event, callerNode: HTMLElement) => {
-      const group: string | undefined = callerNode.dataset.fazeZoomboxGroup;
+      const group: string = callerNode.dataset.fazeZoomboxGroup || 'default';
+      const align: string = callerNode.dataset.fazeZoomboxAlign || 'center';
       const callerNodes = document.querySelectorAll(`[data-faze-zoombox-group="${group}"]`);
 
       new Faze.ZoomBox(callerNode, callerNodes, {
         group,
+        align,
       });
     });
   }

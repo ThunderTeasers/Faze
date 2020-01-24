@@ -55,6 +55,7 @@ interface Config {
 interface WrapperData {
   node?: HTMLDivElement;
   imageNode?: HTMLImageElement;
+  captionNode?: HTMLDivElement;
   controlsNodes: {
     close?: HTMLDivElement;
     arrows?: {
@@ -289,7 +290,12 @@ class ZoomBox {
 
     // Включаем анимацию изменения
     if (this.wrapperData.node) {
-      this.animate(this.wrapperData.node, this.currentPositionAndSize, this.getFullImagePositionAndSize(size));
+      this.currentPositionAndSize = Faze.Animations.animatePositionAndSize({
+        node: this.wrapperData.node,
+        from: this.currentPositionAndSize,
+        to: this.getFullImagePositionAndSize(size),
+        time: this.ANIMATION_TIME + 200,
+      });
     }
   }
 
@@ -355,8 +361,26 @@ class ZoomBox {
     // Добавляем враппер на страницу
     document.body.appendChild(wrapperNode);
 
+    // Построение подписи
+    this.buildCaption();
+
     // Анимируем открытие
-    this.animate(this.wrapperData.node, this.currentThumbnailPositionAndSize, fullImagePositionAndSize);
+    this.currentPositionAndSize = Faze.Animations.animatePositionAndSize({
+      node: this.wrapperData.node,
+      from: this.currentThumbnailPositionAndSize,
+      to: fullImagePositionAndSize,
+      time: this.ANIMATION_TIME + 200,
+    });
+  }
+
+  /**
+   * Построение DOM для подписи
+   */
+  private buildCaption(): void {
+    this.wrapperData.captionNode = document.createElement('div');
+    this.wrapperData.captionNode.className = 'faze-zoombox-caption';
+    this.wrapperData.captionNode.innerHTML = this.callerNode.dataset.fazeZoomboxCaption || '';
+    this.wrapperData.node?.appendChild(this.wrapperData.captionNode);
   }
 
   /**
@@ -385,6 +409,7 @@ class ZoomBox {
       finalSize.width = finalSize.height * size.width / size.height;
     }
 
+    // Варианты конечной позиции увеличенного изображения, в зависимости от выравнивания используются соответствующие значения
     const positionVariations = {
       x: {
         center: this.viewport.width / 2 - finalSize.width / 2,
@@ -495,12 +520,18 @@ class ZoomBox {
    */
   private close(): void {
     if (this.wrapperData.node) {
-      this.animate(this.wrapperData.node, this.currentPositionAndSize, this.currentThumbnailPositionAndSize, () => {
-        // Очищаем данные врамера и удаляем его
-        this.clearWrapperData();
+      this.currentPositionAndSize = Faze.Animations.animatePositionAndSize({
+        node: this.wrapperData.node,
+        from: this.currentPositionAndSize,
+        to: this.currentThumbnailPositionAndSize,
+        time: this.ANIMATION_TIME + 200,
+        afterAnimationCallback: () => {
+          // Очищаем данные врамера и удаляем его
+          this.clearWrapperData();
 
-        // Возвращаем видимость миниатюры
-        this.callerNode.style.visibility = 'visible';
+          // Возвращаем видимость миниатюры
+          this.callerNode.style.visibility = 'visible';
+        },
       });
     }
   }
@@ -513,44 +544,6 @@ class ZoomBox {
     this.wrapperData = {
       controlsNodes: {},
     };
-  }
-
-  /**
-   * Анимация изменения позиции и размеров элемента, с возможность последующего вызова пользовательской функции
-   * @param node{HTMLElement} - DOM элемент который изменяем
-   * @param from{FazePositionAndSize} - позиция и размеры с которых начинается анимация
-   * @param to{FazePositionAndSize} - позиция и размеры до которых должна происходить анимация
-   * @param afterAnimationCallback{() => void | undefined} - коллбек вызываемый после анимации
-   */
-  private animate(node: HTMLElement, from: FazePositionAndSize, to: FazePositionAndSize, afterAnimationCallback?: () => void): void {
-    // Задаём первичные данные от которых идет анимация
-    Faze.Helpers.setElementStyle(node, {
-      top: `${from.position.y}px`,
-      left: `${from.position.x}px`,
-      width: `${from.size.width}px`,
-      height: `${from.size.height}px`,
-    });
-
-    // Ставим в стек увеличение враппера до номрального состояния
-    setTimeout(() => {
-      // Задаём первичные данные от которых идет анимация
-      Faze.Helpers.setElementStyle(node, {
-        top: `${to.position.y}px`,
-        left: `${to.position.x}px`,
-        width: `${to.size.width}px`,
-        height: `${to.size.height}px`,
-      });
-    }, 100);
-
-    // Если пользовательская функция существует, исполняем её, но с небольшой задержкой в 200 миллисекунд
-    if (typeof afterAnimationCallback === 'function') {
-      setTimeout(() => {
-        afterAnimationCallback();
-      }, this.ANIMATION_TIME + 200);
-    }
-
-    // Записываем текущую позицию враппера, как ту к которой должны прийти
-    this.currentPositionAndSize = to;
   }
 
   /**

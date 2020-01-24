@@ -343,49 +343,120 @@ class ZoomBox {
       wrapperNode.appendChild(this.wrapperData.imageNode);
     }
 
+    // Записываем текущее положение и размеры миниатюры
+    this.currentThumbnailPositionAndSize = Faze.Helpers.getElementPositionAndSize(this.callerNode);
+
     // Финальные размеры и позиция картинки
     const fullImagePositionAndSize = this.getFullImagePositionAndSize(size);
 
     // Добавляем враппер на страницу
     document.body.appendChild(wrapperNode);
 
-    // Записываем текущее положение и размеры миниатюры
-    this.currentThumbnailPositionAndSize = Faze.Helpers.getElementPositionAndSize(this.callerNode);
-
     // Анимируем открытие
     this.animate(this.wrapperData.node, this.currentThumbnailPositionAndSize, fullImagePositionAndSize);
   }
 
   /**
-   * Определения местоположения и размера изображения для нормального показа во вьюпорте
-   * @param size - Исходный размер изображения
+   * Определения позиции и размера изображения для нормального показа во вьюпорте
+   *
+   * @param size{FazeSize} - Исходный размер изображения
+   * @param align{string} - Выравнивание
+   *
+   * @return{FazePositionAndSize} - Позиция и размер изображения
    */
-  private getFullImagePositionAndSize(size: FazeSize): FazePositionAndSize {
+  private getFullImagePositionAndSize(size: FazeSize, align: string = 'center'): FazePositionAndSize {
     // Финальные размеры картинки
-    let finalWidth;
-    let finalHeight;
+    const finalSize: FazeSize = {width: 0, height: 0};
+
+    // Финальное положение картинки
+    const finalPosition: FazePosition = {x: 0, y: 0};
 
     // Картинка сплюснута по высоте относительно вьюпорта, т.е. картинка вытянута в длинну сильнее страницы значит ограничиваем ширину
     // картинки, высота точно влезет
     if (size.width / size.height > this.viewport.width / this.viewport.height) {
-      finalWidth = Math.min(this.viewport.width, size.width);
-      finalHeight = finalWidth * size.height / size.width;
+      finalSize.width = Math.min(this.viewport.width, size.width);
+      finalSize.height = finalSize.width * size.height / size.width;
     } else {
       // Картинка сплюснута по ширине относительно вьюпорта, т.е. страница вытянута в длину сильнее картинки значит ограничиваем высоту
       // картинки, ширина точно влезет
-      finalHeight = Math.min(this.viewport.height, size.height);
-      finalWidth = finalHeight * size.width / size.height;
+      finalSize.height = Math.min(this.viewport.height, size.height);
+      finalSize.width = finalSize.height * size.width / size.height;
+    }
+
+    const positionVariations = {
+      x: {
+        center: this.viewport.width / 2 - finalSize.width / 2,
+        self: this.currentThumbnailPositionAndSize.position.x - (finalSize.width - this.currentThumbnailPositionAndSize.size.width) / 2,
+        left: 0,
+        right: this.viewport.width - finalSize.width,
+      },
+      y: {
+        center: window.pageYOffset + this.viewport.height / 2 - finalSize.height / 2,
+        self: this.currentThumbnailPositionAndSize.position.y - (finalSize.height - this.currentThumbnailPositionAndSize.size.height) / 2,
+        top: window.pageYOffset,
+        bottom: window.pageYOffset + this.viewport.height - finalSize.height,
+      },
+    };
+
+    // Выбор нужной позиции относительно выбранного выравнивания
+    switch (align) {
+      case 'center':
+        finalPosition.x = positionVariations.x.center;
+        finalPosition.y = positionVariations.y.center;
+        break;
+      case 'left top':
+        finalPosition.x = positionVariations.x.left;
+        finalPosition.y = positionVariations.y.top;
+        break;
+      case 'center top':
+        finalPosition.x = positionVariations.x.center;
+        finalPosition.y = positionVariations.y.top;
+        break;
+      case 'right top':
+        finalPosition.x = positionVariations.x.right;
+        finalPosition.y = positionVariations.y.top;
+        break;
+      case 'right center':
+        finalPosition.x = positionVariations.x.right;
+        finalPosition.y = positionVariations.y.center;
+        break;
+      case 'right bottom':
+        finalPosition.x = positionVariations.x.right;
+        finalPosition.y = positionVariations.y.bottom;
+        break;
+      case 'center bottom':
+        finalPosition.x = positionVariations.x.center;
+        finalPosition.y = positionVariations.y.bottom;
+        break;
+      case 'left bottom':
+        finalPosition.x = positionVariations.x.left;
+        finalPosition.y = positionVariations.y.bottom;
+        break;
+      case 'left center':
+        finalPosition.x = positionVariations.x.left;
+        finalPosition.y = positionVariations.y.center;
+        break;
+      case 'self':
+      default:
+        finalPosition.x = positionVariations.x.self;
+        finalPosition.y = positionVariations.y.self;
+    }
+
+    // Коррекция значений, для предотвращения выхода за границы вьюпорта
+    if (finalPosition.x <= 0) {
+      finalPosition.x = positionVariations.x.left;
+    } else if (finalPosition.x > positionVariations.x.right) {
+      finalPosition.x = positionVariations.x.right;
+    }
+    if (finalPosition.y <= 0) {
+      finalPosition.y = positionVariations.y.top;
+    } else if (finalPosition.y > positionVariations.y.bottom) {
+      finalPosition.y = positionVariations.y.bottom;
     }
 
     return {
-      size: {
-        width: finalWidth,
-        height: finalHeight,
-      },
-      position: {
-        x: this.viewport.width / 2 - finalWidth / 2,
-        y: window.pageYOffset + this.viewport.height / 2 - finalHeight / 2,
-      },
+      size: finalSize,
+      position: finalPosition,
     };
   }
 

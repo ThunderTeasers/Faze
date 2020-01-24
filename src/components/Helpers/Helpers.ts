@@ -683,10 +683,13 @@ class Helpers {
    * Определение абсолютных координат DOM элемента на странице
    *
    * @param node - DOM элемент у которого вычисляем позицию
+   * @param offset - сдвиг относительно изначальной позиции
+   *
+   * @return{FazePosition} - позиция элемента
    */
-  static getElementPosition(node: HTMLElement): FazePosition {
+  static getElementPosition(node: HTMLElement, offset: FazePosition = {x: 0, y: 0}): FazePosition {
     // Возвращаемый объект
-    const position = {x: node.offsetLeft, y: node.offsetTop};
+    const position = {x: node.offsetLeft - offset.x, y: node.offsetTop - offset.y};
 
     // DOM элемент с которым производим действия
     let calculatedNode: HTMLElement = node;
@@ -706,16 +709,23 @@ class Helpers {
 
   /**
    * Определяет координаты и размер DOM элемента на странице
-   * @param thumbnailNode{HTMLElement} - DOM элемент
-   * @returns{FazePositionAndSize} - Координаты и размеры DOM элемента на странице
+   * @param node{HTMLElement} - DOM элемент
+   * @param sizeOffset{FazeSize} - сдвиг относительно изначального размера
+   * @param positionOffset{FazePosition} - сдвиг относительно изначальной позиции
+   *
+   * @return{FazePositionAndSize} - Координаты и размеры DOM элемента на странице
    */
-  static getElementPositionAndSize(thumbnailNode: HTMLElement): FazePositionAndSize {
+  static getElementPositionAndSize(
+    node: HTMLElement,
+    sizeOffset: FazeSize = {width: 0, height: 0},
+    positionOffset: FazePosition = {x: 0, y: 0},
+  ): FazePositionAndSize {
     return {
       size: {
-        width: thumbnailNode.getBoundingClientRect().width,
-        height: thumbnailNode.getBoundingClientRect().height,
+        width: node.getBoundingClientRect().width + sizeOffset.width,
+        height: node.getBoundingClientRect().height + sizeOffset.height,
       },
-      position: this.getElementPosition(thumbnailNode),
+      position: this.getElementPosition(node, positionOffset),
     };
   }
 

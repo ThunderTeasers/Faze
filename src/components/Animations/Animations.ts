@@ -8,7 +8,7 @@ import Faze from '../Core/Faze';
 /**
  * Тип для определения типа данных передаваемых в данные анимации
  */
-type FazeAnimationData = FazeObject | FazePositionAndSize;
+type FazeAnimationData = FazeObject | FazePositionAndSize | FazePosition | FazeSize;
 
 /**
  * Интерфейс описания анимации
@@ -22,7 +22,6 @@ type FazeAnimationData = FazeObject | FazePositionAndSize;
  *   transition{string} - CSS правило для анимации
  *   time{number} - время анимации в миллисекундах
  *   rewriteFromData{boolean} - перезаписывать ли переменную "from" данными из переменной "to"
- *   afterAnimationCallback{() => void | undefined} - пользовательская функция, исполняющаяся после анимации
  */
 interface FazeAnimation {
   readonly node: HTMLElement;
@@ -31,18 +30,10 @@ interface FazeAnimation {
   readonly rawTo?: FazeAnimationData;
   readonly transition?: string;
   readonly time: number;
-  readonly afterAnimationCallback?: () => void;
 }
 
 /**
- * Интерфейс описания анимации
- *
- * Содержит:
- *   node{HTMLElement} - DOM элемент который анимируем
- *   from{FazePositionAndSize} - объект содержащий начальные данные о позиции и размере
- *   from{FazePositionAndSize} - объект содержащий конечные данные о позиции и размере
- *   time{number} - время анимации в миллисекундах
- *   afterAnimationCallback{() => void | undefined} - пользовательская функция, исполняющаяся после анимации
+ * Интерфейс описания анимации позиции и размера
  */
 interface FazeAnimationPositionAndSize extends FazeAnimation {
   readonly from: FazePositionAndSize;
@@ -50,45 +41,63 @@ interface FazeAnimationPositionAndSize extends FazeAnimation {
   readonly rawTo?: FazeAnimationData;
 }
 
+/**
+ * Интерфейс описания анимации позиции
+ */
+interface FazeAnimationPosition extends FazeAnimation {
+  readonly from: FazePosition;
+  readonly to: FazePosition;
+  readonly rawTo?: FazePosition;
+}
+
+/**
+ * Интерфейс описания анимации размера
+ */
+interface FazeAnimationSize extends FazeAnimation {
+  readonly from: FazeSize;
+  readonly to: FazeSize;
+  readonly rawTo?: FazeSize;
+}
+
 class Animations {
   /**
    * Анимация изменения элемента
    *
    * @param animationData{FazeAnimation} - данные для анимации
+   *
+   * @return{FazeAnimationData} - данные конечной точки анимации
    */
-  static animate(animationData: FazeAnimation): FazeAnimationData {
-    // Проставляем правило для анимации элементо
-    animationData.node.style.transition = animationData.transition || 'all 2s';
+  static animate(animationData: FazeAnimation): Promise<FazeAnimationData> {
+    return new Promise<FazeAnimationData>((resolve) => {
+      // Проставляем правило для анимации элементо
+      animationData.node.style.transition = animationData.transition || 'all 2s';
 
-    // Проставляем все CSS правила для элемента
-    Faze.Helpers.setElementStyle(animationData.node, animationData.from as FazeObject);
+      // Проставляем все CSS правила для элемента
+      Faze.Helpers.setElementStyle(animationData.node, animationData.from as FazeObject);
 
-    // Ставим в стек увеличение враппера до номрального состояния
-    setTimeout(() => {
-      // Задаём первичные данные от которых идет анимация
-      Faze.Helpers.setElementStyle(animationData.node, animationData.to as FazeObject);
-    }, 100);
-
-    // Если пользовательская функция существует, исполняем её, но с небольшой задержкой в 200 миллисекунд
-    if (typeof animationData.afterAnimationCallback === 'function') {
+      // Ставим в стек увеличение враппера до номрального состояния
       setTimeout(() => {
-        if (animationData.afterAnimationCallback) {
-          animationData.afterAnimationCallback();
-        }
-      }, animationData.time);
-    }
+        // Задаём первичные данные от которых идет анимация
+        Faze.Helpers.setElementStyle(animationData.node, animationData.to as FazeObject);
+      }, 100);
 
-    // Возвращаем либо чистое значение, если оно есть(оно будет только в случае если мы вызываем данный метод из методом помощников,
-    // они ОБАЗАНЫ вернуть переменную "rawTo", т.к. изменяют исходную переменную "to"
-    return animationData.rawTo || animationData.to;
+      // Активируем промис после анимации
+      setTimeout(() => {
+        // Возвращаем либо чистое значение, если оно есть(оно будет только в случае если мы вызываем данный метод из методом помощников,
+        // они ОБАЗАНЫ вернуть переменную "rawTo", т.к. изменяют исходную переменную "to"
+        resolve(animationData.rawTo || animationData.to);
+      }, animationData.time);
+    });
   }
 
   /**
    * Анимация изменения только позиции и размера элемента
    *
    * @param animationData{FazeAnimation} - данные для анимации
+   *
+   * @return{FazeAnimationData} - данные конечной точки анимации
    */
-  static animatePositionAndSize(animationData: FazeAnimationPositionAndSize): FazePositionAndSize {
+  static animatePositionAndSize(animationData: FazeAnimationPositionAndSize): Promise<FazePositionAndSize> {
     return this.animate({
       node: animationData.node,
       from: Faze.Helpers.fromPositionAndSizeToStyles(animationData.from),
@@ -96,8 +105,43 @@ class Animations {
       rawTo: animationData.to,
       time: animationData.time,
       transition: 'width 0.5s, height 0.5s, left 0.5s, top 0.5s',
-      afterAnimationCallback: animationData.afterAnimationCallback,
-    }) as FazePositionAndSize;
+    }) as Promise<FazePositionAndSize>;
+  }
+
+  /**
+   * Анимация изменения только позиции и размера элемента
+   *
+   * @param animationData{FazeAnimationPosition} - данные для анимации
+   *
+   * @return{FazePosition} - данные конечной точки анимации
+   */
+  static animatePosition(animationData: FazeAnimationPosition): Promise<FazePosition> {
+    return this.animate({
+      node: animationData.node,
+      from: Faze.Helpers.fromPositionToStyles(animationData.from),
+      to: Faze.Helpers.fromPositionToStyles(animationData.to),
+      rawTo: animationData.to,
+      time: animationData.time,
+      transition: 'left 0.5s, top 0.5s',
+    }) as Promise<FazePosition>;
+  }
+
+  /**
+   * Анимация изменения только позиции и размера элемента
+   *
+   * @param animationData{FazeAnimationSize} - данные для анимации
+   *
+   * @return{FazeSize} - данные конечной точки анимации
+   */
+  static animateSize(animationData: FazeAnimationSize): Promise<FazeSize> {
+    return this.animate({
+      node: animationData.node,
+      from: Faze.Helpers.fromSizeToStyles(animationData.from),
+      to: Faze.Helpers.fromSizeToStyles(animationData.to),
+      rawTo: animationData.to,
+      time: animationData.time,
+      transition: 'width 0.5s, height 0.5s',
+    }) as Promise<FazeSize>;
   }
 }
 

@@ -118,7 +118,7 @@ class ZoomBox {
     this.wrapperData = {
       controlsNodes: {},
     };
-    this.ANIMATION_TIME = 500;
+    this.ANIMATION_TIME = 400;
     this.currentIndex = Array.from(this.callerNodes).indexOf(this.callerNode);
     this.viewport = {
       width: document.documentElement.clientWidth,
@@ -347,7 +347,7 @@ class ZoomBox {
     }
 
     // Записываем текущее положение и размеры миниатюры
-    this.currentThumbnailPositionAndSize = Faze.Helpers.getElementPositionAndSize(this.callerNode);
+    this.currentThumbnailPositionAndSize = Faze.Helpers.getElementPositionAndSize(this.callerNode, {width: 5, height: 5}, {x: 5, y: 5});
 
     // Финальные размеры и позиция картинки
     const fullImagePositionAndSize = this.getFullImagePositionAndSize(size);
@@ -362,9 +362,9 @@ class ZoomBox {
   /**
    * Определения позиции и размера изображения для нормального показа во вьюпорте
    *
-   * @param size{FazeSize} - Исходный размер изображения
+   * @param size{FazeSize} - исходный размер изображения
    *
-   * @return{FazePositionAndSize} - Позиция и размер изображения
+   * @return{FazePositionAndSize} - позиция и размер изображения
    */
   private getFullImagePositionAndSize(size: FazeSize): FazePositionAndSize {
     // Финальные размеры картинки

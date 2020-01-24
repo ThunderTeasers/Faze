@@ -18,6 +18,12 @@
 .faze-zoombox-wrapper {
   position: absolute;
 
+  padding: 0.5rem;
+
+  border: 0.1rem solid #666;
+  border-radius: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.7);
+
   transition: width 0.5s, height 0.5s, left 0.5s, top 0.5s;
 
   // Изображение
@@ -60,7 +66,7 @@
 
     // Следующая
     &.faze-zoombox-arrow-next {
-      right: 1rem;
+      right: 1.5rem;
 
       // Сама стрелка
       &:after {
@@ -70,7 +76,7 @@
 
     // Предыдущая
     &.faze-zoombox-arrow-prev {
-      left: 1rem;
+      left: 1.5rem;
 
       // Сама стрелка
       &:after {
@@ -87,8 +93,8 @@
   // Кнопка закрытия
   .faze-zoombox-close {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: 1.5rem;
+    right: 1.5rem;
 
     display: flex;
     flex-direction: row;

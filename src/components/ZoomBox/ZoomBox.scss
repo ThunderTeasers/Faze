@@ -25,10 +25,22 @@
   background-color: rgba(255, 255, 255, 0.7);
 
   // Изображение
-  img {
+  .faze-zoombox-image {
     display: flex;
     width: 100%;
     height: 100%;
+
+    // При наведении
+    &:hover {
+      cursor: zoom-out;
+    }
+  }
+
+  // Подпись
+  .faze-zoombox-caption {
+    &:not(:empty) {
+      margin-top: 0.5rem;
+    }
   }
 
   // Стрелки
@@ -128,6 +140,22 @@
 
     &:hover {
       cursor: pointer;
+    }
+  }
+
+  // Перетаскиваем
+  &.faze-drag-active {
+    // При наведении
+    &:hover {
+      cursor: move;
+    }
+
+    // Изображение
+    .faze-zoombox-image {
+      // При наведении
+      &:hover {
+        cursor: move;
+      }
     }
   }
 }

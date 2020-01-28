@@ -303,27 +303,15 @@ class ZoomBox {
 
     // Включаем анимацию изменения
     if (this.wrapperData.node) {
-      Promise.all([
-        Faze.Animations.animatePosition({
-          node: this.wrapperData.node,
-          from: this.currentPositionAndSize.position,
-          to: this.getFullImagePositionAndSize(size).position,
-          time: this.ANIMATION_TIME + 200,
-        }),
-        Faze.Animations.animateSize({
-          node: this.wrapperData.imageNode as HTMLElement,
-          from: this.currentPositionAndSize.size,
-          to: this.getFullImagePositionAndSize(size).size,
-          time: this.ANIMATION_TIME + 200,
-        }),
-      ])
-        .then((data: (FazePosition | FazeSize)[]) => {
-          // Обновляем данные текущие данные
-          this.currentPositionAndSize = {
-            position: data[0] as FazePosition,
-            size: data[1] as FazeSize,
-          };
-        });
+      Faze.Animations.animatePositionAndSize({
+        node: this.wrapperData.node,
+        from: this.currentPositionAndSize,
+        to: this.getFullImagePositionAndSize(size),
+        time: this.ANIMATION_TIME + 200,
+      }).then((positionAndSize: FazePositionAndSize) => {
+        // Обновляем текущие данные
+        this.currentPositionAndSize = positionAndSize;
+      });
     }
   }
 
@@ -380,40 +368,27 @@ class ZoomBox {
       wrapperNode.appendChild(this.wrapperData.imageNode);
     }
 
-    // Записываем текущее положение и размеры миниатюры
-    this.currentThumbnailPositionAndSize = Faze.Helpers.getElementPositionAndSize(this.callerNode, {width: 5, height: 5}, {x: 5, y: 5});
+    // Построение подписи
+    this.buildCaption();
 
-    // Финальные размеры и позиция картинки
-    const fullImagePositionAndSize = this.getFullImagePositionAndSize(size);
+    // Записываем текущее положение и размеры миниатюры
+    this.currentThumbnailPositionAndSize = Faze.Helpers.getElementPositionAndSize(this.callerNode, {width: 12, height: 12}, {x: 6, y: 6});
 
     // Добавляем враппер на страницу
     document.body.appendChild(wrapperNode);
 
-    // Построение подписи
-    this.buildCaption();
+    // Финальные размеры и позиция картинки
+    const fullImagePositionAndSize = this.getFullImagePositionAndSize(size);
 
-    // Анимируем открытие
-    Promise.all([
-      Faze.Animations.animatePosition({
-        node: this.wrapperData.node,
-        from: this.currentThumbnailPositionAndSize.position,
-        to: fullImagePositionAndSize.position,
-        time: this.ANIMATION_TIME + 200,
-      }),
-      Faze.Animations.animateSize({
-        node: this.wrapperData.imageNode as HTMLElement,
-        from: this.currentThumbnailPositionAndSize.size,
-        to: fullImagePositionAndSize.size,
-        time: this.ANIMATION_TIME + 200,
-      }),
-    ])
-      .then((data: (FazePosition | FazeSize)[]) => {
-        // Обновляем данные текущие данные
-        this.currentPositionAndSize = {
-          position: data[0] as FazePosition,
-          size: data[1] as FazeSize,
-        };
-      });
+    Faze.Animations.animatePositionAndSize({
+      node: this.wrapperData.node,
+      from: this.currentThumbnailPositionAndSize,
+      to: fullImagePositionAndSize,
+      time: this.ANIMATION_TIME + 200,
+    }).then((positionAndSize: FazePositionAndSize) => {
+      // Обновляем текущие данные
+      this.currentPositionAndSize = positionAndSize;
+    });
   }
 
   /**
@@ -443,20 +418,27 @@ class ZoomBox {
     }
 
     // Финальные размеры картинки
-    let finalSize: FazeSize = {width: 0, height: 0};
+    const finalSize: FazeSize = {width: 0, height: 0};
 
     // Финальное положение картинки
     const finalPosition: FazePosition = {x: 0, y: 0};
 
     // Отступы у body страницы
     const bodyPadding: FazeSize = {
-      width: parseInt(window.getComputedStyle(document.body, null).paddingLeft, 10),
-      height: parseInt(window.getComputedStyle(document.body, null).paddingRight, 10),
+      width: parseInt(window.getComputedStyle(document.body).paddingLeft, 10),
+      height: parseInt(window.getComputedStyle(document.body).paddingRight, 10),
     };
+
+    // Высота подписи
+    const captionHeight = this.getCaptionHeight();
+
+    // Проставляем паддинг снизу у враппера, чтобы подпись оказалась внутри
+    this.wrapperData.node.style.paddingBottom = `${parseInt(window.getComputedStyle(this.wrapperData.node).paddingBottom, 10) + captionHeight}px`;
 
     // Если пользователь указал размер, используем его, иначе делаем рассчёт
     if (this.config.size) {
-      finalSize = this.config.size;
+      finalSize.width = this.config.size.width;
+      finalSize.height = this.config.size.height;
     } else {
       // Картинка сплюснута по высоте относительно вьюпорта, т.е. картинка вытянута в длинну сильнее страницы значит ограничиваем ширину
       // картинки, высота точно влезет
@@ -474,14 +456,14 @@ class ZoomBox {
     // Варианты конечной позиции увеличенного изображения, в зависимости от выравнивания используются соответствующие значения
     const positionVariations = {
       x: {
-        center: bodyPadding.width + this.viewport.width / 2 - finalSize.width / 2 - this.OFFSET.width / 2,
-        self: this.currentThumbnailPositionAndSize.position.x - (finalSize.width - this.currentThumbnailPositionAndSize.size.width) / 2 - this.OFFSET.width / 2,
+        center: bodyPadding.width + this.viewport.width / 2 - finalSize.width / 2,
+        self: this.currentThumbnailPositionAndSize.position.x - (finalSize.width - this.currentThumbnailPositionAndSize.size.width) / 2,
         left: bodyPadding.width,
-        right: this.viewport.width - finalSize.width - this.OFFSET.width,
+        right: this.viewport.width - finalSize.width,
       },
       y: {
-        center: window.pageYOffset + this.viewport.height / 2 - finalSize.height / 2 - this.OFFSET.height / 2,
-        self: this.currentThumbnailPositionAndSize.position.y - (finalSize.height - this.currentThumbnailPositionAndSize.size.height) / 2 - this.OFFSET.height / 2,
+        center: window.pageYOffset + this.viewport.height / 2 - finalSize.height / 2,
+        self: this.currentThumbnailPositionAndSize.position.y - (finalSize.height - this.currentThumbnailPositionAndSize.size.height) / 2,
         top: window.pageYOffset,
         bottom: window.pageYOffset + this.viewport.height - finalSize.height,
       },
@@ -550,6 +532,23 @@ class ZoomBox {
   }
 
   /**
+   * Получение полной высоты DOM элемента подписи
+   */
+  private getCaptionHeight(): number {
+    // Изначально высота равна нулю, т.к. DOM Элемента может в принципе не существовать
+    let height = 0;
+
+    // Если есть DOM элемент подписи, вычисляем её полную высоту
+    if (this.wrapperData.captionNode) {
+      const calculatedStyles: CSSStyleDeclaration = window.getComputedStyle(this.wrapperData.captionNode);
+
+      height = parseInt(calculatedStyles.marginTop, 10) + parseInt(calculatedStyles.marginBottom, 10) + this.wrapperData.captionNode.offsetHeight;
+    }
+
+    return height;
+  }
+
+  /**
    * Создание стрелок переключения изображений
    */
   private buildArrows(): void {
@@ -582,33 +581,21 @@ class ZoomBox {
    */
   private close(): void {
     if (this.wrapperData.node) {
-      Promise.all([
-        Faze.Animations.animatePosition({
-          node: this.wrapperData.node,
-          from: this.currentPositionAndSize.position,
-          to: this.currentThumbnailPositionAndSize.position,
-          time: this.ANIMATION_TIME + 200,
-        }),
-        Faze.Animations.animateSize({
-          node: this.wrapperData.imageNode as HTMLElement,
-          from: this.currentPositionAndSize.size,
-          to: this.currentThumbnailPositionAndSize.size,
-          time: this.ANIMATION_TIME + 200,
-        }),
-      ])
-        .then((data: (FazePosition | FazeSize)[]) => {
-          // Обновляем данные текущие данные
-          this.currentPositionAndSize = {
-            position: data[0] as FazePosition,
-            size: data[1] as FazeSize,
-          };
+      Faze.Animations.animatePositionAndSize({
+        node: this.wrapperData.node,
+        from: this.currentPositionAndSize,
+        to: this.currentThumbnailPositionAndSize,
+        time: this.ANIMATION_TIME + 200,
+      }).then((positionAndSize: FazePositionAndSize) => {
+        // Обновляем данные текущие данные
+        this.currentPositionAndSize = positionAndSize;
 
-          // Очищаем данные врамера и удаляем его
-          this.clearWrapperData();
+        // Очищаем данные врамера и удаляем его
+        this.clearWrapperData();
 
-          // Возвращаем видимость миниатюры
-          this.callerNode.style.visibility = 'visible';
-        });
+        // Возвращаем видимость миниатюры
+        this.callerNode.style.visibility = 'visible';
+      });
     }
   }
 
@@ -644,14 +631,10 @@ class ZoomBox {
     // Задаем всем элементам без группы стандартную
     document.querySelectorAll<HTMLElement>('[data-faze~="zoombox"]').forEach((callerNode: HTMLElement) => {
       callerNode.classList.add('faze-zoombox-caller');
-
-      if (!callerNode.dataset.fazeZoomboxGroup) {
-        callerNode.dataset.fazeZoomboxGroup = 'default';
-      }
     });
 
     Faze.on('click', '[data-faze~="zoombox"]', (event: Event, callerNode: HTMLElement) => {
-      const group: string = callerNode.dataset.fazeZoomboxGroup || 'default';
+      const group: string | undefined = callerNode.dataset.fazeZoomboxGroup;
       const align: string = callerNode.dataset.fazeZoomboxAlign || 'self';
       let size: FazeSize | undefined = undefined;
       if (callerNode.dataset.fazeZoomboxWidth && callerNode.dataset.fazeZoomboxHeight) {
@@ -660,7 +643,9 @@ class ZoomBox {
           height: parseInt(callerNode.dataset.fazeZoomboxHeight || '0', 10),
         };
       }
-      const callerNodes = document.querySelectorAll(`[data-faze-zoombox-group="${group}"]`);
+
+      // DOM элементы той же группы
+      const callerNodes = group ? document.querySelectorAll(`[data-faze-zoombox-group="${group}"]`) : [];
 
       new Faze.ZoomBox(callerNode, callerNodes, {
         group,

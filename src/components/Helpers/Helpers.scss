@@ -85,3 +85,8 @@
     cursor: pointer;
   }
 }
+
+// Перетаскивание элементов
+.faze-drag-active {
+  cursor: move;
+}

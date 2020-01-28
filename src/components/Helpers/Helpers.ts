@@ -17,6 +17,19 @@ interface NotificationOptions {
 }
 
 /**
+ * Структура данных передаваемых в коллбеках драга
+ *
+ * Содержит:
+ *   startPosition - стартовая позиция элемента
+ *   event - событие
+ *
+ */
+interface DragCallbackData {
+  startPosition: FazePosition;
+  event: Event;
+}
+
+/**
  * Структура настроек метода для перетаскивания
  *
  * Содержит:
@@ -33,7 +46,7 @@ interface DragOptions {
   callbacks: {
     beforeDrag?: () => void;
     drag?: () => void;
-    afterDrag?: () => void;
+    afterDrag?: (data: DragCallbackData) => void;
   };
 }
 
@@ -735,6 +748,12 @@ class Helpers {
    * @param options{DragOptions} - настройки перетаскивания
    */
   static bindDrag(options: DragOptions): void {
+    // Начальное положение DOM элемента
+    let startPosition = {
+      x: 0,
+      y: 0,
+    };
+
     // Начальная позиция мыши
     const startMousePosition = {
       x: 0,
@@ -753,7 +772,21 @@ class Helpers {
      * @param event - событие мыши
      */
     const dragMouseDown = (event: MouseEvent) => {
+      if (!options.node) {
+        return;
+      }
+
       event.preventDefault();
+      event.stopPropagation();
+
+      // Получаем начальную позицию DOM элемента
+      startPosition = {
+        x: parseInt(options.node.style.left, 10),
+        y: parseInt(options.node.style.top, 10),
+      };
+
+      // Проставляем класс, что двигаем элемент
+      options.node.classList.add('faze-drag-active');
 
       // Получение позиции курсора при нажатии на элемент
       startMousePosition.x = event.clientX;
@@ -780,7 +813,12 @@ class Helpers {
      * @param event - событие мыши
      */
     const elementDrag = (event: MouseEvent) => {
+      if (!options.node) {
+        return;
+      }
+
       event.preventDefault();
+      event.stopPropagation();
 
       // Рассчет новой позиции курсора
       endMousePosition.x = startMousePosition.x - event.clientX;
@@ -789,10 +827,8 @@ class Helpers {
       startMousePosition.y = event.clientY;
 
       // Рассчет новой позиции
-      if (options.node) {
-        options.node.style.left = `${(parseInt(options.node.style.left, 10) - endMousePosition.x)}px`;
-        options.node.style.top = `${(parseInt(options.node.style.top, 10) - endMousePosition.y)}px`;
-      }
+      options.node.style.left = `${(parseInt(options.node.style.left, 10) - endMousePosition.x)}px`;
+      options.node.style.top = `${(parseInt(options.node.style.top, 10) - endMousePosition.y)}px`;
 
       // Вызываем пользовательскую функцию
       if (typeof options.callbacks.drag === 'function') {
@@ -807,14 +843,27 @@ class Helpers {
     /**
      * Завершение перетаскивания(момент отпускания кнопки мыши), удаляем все слушатели, т.к. они создаются при каждом новом перетаскивании
      */
-    const endDragElement = () => {
+    const endDragElement = (event: MouseEvent) => {
+      if (!options.node) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
       document.removeEventListener('mouseup', endDragElement);
       document.removeEventListener('mousemove', elementDrag);
+
+      // Удаляем класс, что двигаем элемент
+      options.node.classList.remove('faze-drag-active');
 
       // Вызываем пользовательскую функцию
       if (typeof options.callbacks.afterDrag === 'function') {
         try {
-          options.callbacks.afterDrag();
+          options.callbacks.afterDrag({
+            startPosition,
+            event,
+          });
         } catch (error) {
           console.error('Ошибка исполнения пользовательского метода "afterDrag":', error);
         }
@@ -822,9 +871,7 @@ class Helpers {
     };
 
     // Навешиваем событие перетаскивания на элемент
-    if (options.node) {
-      options.node.addEventListener('mousedown', dragMouseDown);
-    }
+    options.node?.addEventListener('mousedown', dragMouseDown);
   }
 
   /**

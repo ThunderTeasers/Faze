@@ -959,6 +959,30 @@ class Helpers {
 
     return result;
   }
+
+  /**
+   * Сравнение двух позиций
+   *
+   * @param position1{FazePosition} - позиция 1
+   * @param position2{FazePosition} - позиция 2
+   *
+   * @return{boolean} - истина, если позиции равны
+   */
+  static comparePositions(position1: FazePosition, position2: FazePosition): boolean {
+    return position1.x === position2.x && position1.y === position2.y;
+  }
+
+  /**
+   * Сравнение двух размеров
+   *
+   * @param size1{FazeSize} - размер 1
+   * @param size2{FazeSize} - размер 2
+   *
+   * @return{boolean} - истина, если размеры равны
+   */
+  static compareSizes(size1: FazeSize, size2: FazeSize): boolean {
+    return size1.width === size2.width && size1.height === size2.height;
+  }
 }
 
 export default Helpers;

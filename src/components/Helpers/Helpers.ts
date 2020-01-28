@@ -742,6 +742,35 @@ class Helpers {
     };
   }
 
+  static getElementRealSize(node: HTMLElement, childSelector?: string): FazeSize {
+    const cloneNode: HTMLElement = node.cloneNode(true) as HTMLElement;
+    cloneNode.style.cssText = 'position:fixed; top:-9999px; opacity:0;';
+    document.body.appendChild(cloneNode);
+
+    const size: FazeSize = {
+      width: 0,
+      height: 0,
+    };
+
+    // Если указан CSS селектор дочернего элемента, берём его размер
+    if (childSelector) {
+      const childNode: HTMLElement | null = cloneNode.querySelector(childSelector);
+      if (childNode) {
+        size.width = childNode.clientWidth;
+        size.height = childNode.clientHeight;
+      }
+    } else {
+      // Иначе берем данные главного DOM элемента
+      size.width = cloneNode.clientWidth;
+      size.height = cloneNode.clientHeight;
+    }
+
+    // Удаляем DOM элемент
+    cloneNode.parentNode?.removeChild(cloneNode);
+
+    return size;
+  }
+
   /**
    * Навешивание событий и управление перетаскиванием
    *

@@ -16,28 +16,28 @@ import './Faze.scss';
 /**
  * Импорты всех плагинов
  */
-import Modal from '../Plugins/Modal/Modal';
+import Modal from '../Modules/Modal/Modal';
 import Helpers from '../Helpers/Helpers';
 import Animations from '../Animations/Animations';
-import Tooltip from '../Plugins/Tooltip/Tooltip';
-import Tab from '../Plugins/Tab/Tab';
-import Drag from '../Plugins/Drag/Drag';
-import Dropdown from '../Plugins/Dropdown/Dropdown';
-import Select from '../Plugins/Select/Select';
-import Carousel from '../Plugins/Carousel/Carousel';
-import Zoom from '../Plugins/Zoom/Zoom';
-import ZoomBox from '../Plugins/ZoomBox/ZoomBox';
-import Scroll from '../Plugins/Scroll/Scroll';
-import Form from '../Plugins/Form/Form';
-import Page from '../Plugins/Page/Page';
-import Filter from '../Plugins/Filter/Filter';
-import Spoiler from '../Plugins/Spoiler/Spoiler';
-import Gallery from '../Plugins/Gallery/Gallery';
-import Slider from '../Plugins/Slider/Slider';
-import Steps from '../Plugins/Steps/Steps';
-import LazyImage from '../Plugins/LazyImage/LazyImage';
-import LazyImageController from '../Plugins/LazyImage/LazyImageController';
-import REST from '../Plugins/REST/REST';
+import Tooltip from '../Modules/Tooltip/Tooltip';
+import Tab from '../Modules/Tab/Tab';
+import Drag from '../Modules/Drag/Drag';
+import Dropdown from '../Modules/Dropdown/Dropdown';
+import Select from '../Modules/Select/Select';
+import Carousel from '../Modules/Carousel/Carousel';
+import Zoom from '../Modules/Zoom/Zoom';
+import ZoomBox from '../Modules/ZoomBox/ZoomBox';
+import Scroll from '../Modules/Scroll/Scroll';
+import Form from '../Modules/Form/Form';
+import Page from '../Modules/Page/Page';
+import Filter from '../Modules/Filter/Filter';
+import Spoiler from '../Modules/Spoiler/Spoiler';
+import Gallery from '../Modules/Gallery/Gallery';
+import Slider from '../Modules/Slider/Slider';
+import Steps from '../Modules/Steps/Steps';
+import LazyImage from '../Modules/LazyImage/LazyImage';
+import LazyImageController from '../Modules/LazyImage/LazyImageController';
+import REST from '../Modules/REST/REST';
 import Observer from './Observer';
 
 /**
@@ -118,6 +118,9 @@ class Faze {
   static Observer: any = new Observer();
   static REST: any = REST;
 
+  constructor() {
+  }
+
   /**
    * Навешивание общих событий
    */
@@ -153,6 +156,8 @@ class Faze {
 
     // Зарезервированные имена
     const predefinedNames: string[] = [
+      'Plugin',
+      'Module',
       'Zoom',
       'ZoomBox',
       'Tooltip',

@@ -16,28 +16,28 @@ import './Faze.scss';
 /**
  * Импорты всех плагинов
  */
-import Modal from '../Modal/Modal';
+import Modal from '../Plugins/Modal/Modal';
 import Helpers from '../Helpers/Helpers';
 import Animations from '../Animations/Animations';
-import Tooltip from '../Tooltip/Tooltip';
-import Tab from '../Tab/Tab';
-import Drag from '../Drag/Drag';
-import Dropdown from '../Dropdown/Dropdown';
-import Select from '../Select/Select';
-import Carousel from '../Carousel/Carousel';
-import Zoom from '../Zoom/Zoom';
-import ZoomBox from '../ZoomBox/ZoomBox';
-import Scroll from '../Scroll/Scroll';
-import Form from '../Form/Form';
-import Page from '../Page/Page';
-import Filter from '../Filter/Filter';
-import Spoiler from '../Spoiler/Spoiler';
-import Gallery from '../Gallery/Gallery';
-import Slider from '../Slider/Slider';
-import Steps from '../Steps/Steps';
-import LazyImage from '../LazyImage/LazyImage';
-import LazyImageController from '../LazyImage/LazyImageController';
-import REST from '../REST/REST';
+import Tooltip from '../Plugins/Tooltip/Tooltip';
+import Tab from '../Plugins/Tab/Tab';
+import Drag from '../Plugins/Drag/Drag';
+import Dropdown from '../Plugins/Dropdown/Dropdown';
+import Select from '../Plugins/Select/Select';
+import Carousel from '../Plugins/Carousel/Carousel';
+import Zoom from '../Plugins/Zoom/Zoom';
+import ZoomBox from '../Plugins/ZoomBox/ZoomBox';
+import Scroll from '../Plugins/Scroll/Scroll';
+import Form from '../Plugins/Form/Form';
+import Page from '../Plugins/Page/Page';
+import Filter from '../Plugins/Filter/Filter';
+import Spoiler from '../Plugins/Spoiler/Spoiler';
+import Gallery from '../Plugins/Gallery/Gallery';
+import Slider from '../Plugins/Slider/Slider';
+import Steps from '../Plugins/Steps/Steps';
+import LazyImage from '../Plugins/LazyImage/LazyImage';
+import LazyImageController from '../Plugins/LazyImage/LazyImageController';
+import REST from '../Plugins/REST/REST';
 import Observer from './Observer';
 
 /**

@@ -188,7 +188,7 @@ class Tooltip {
   static initializeByDataAttributes(tooltipNode: HTMLElement) {
     new Faze.Tooltip(tooltipNode, {
       text: tooltipNode.dataset.fazeTooltipText || '',
-      side: tooltipNode.dataset.fazeTooltipSide || 'bottom',
+      side: tooltipNode.dataset.fazeTooltipSide || tooltipNode.dataset.fazeTooltipAlign || 'bottom',
       class: tooltipNode.dataset.fazeTooltipClass || '',
     });
   }

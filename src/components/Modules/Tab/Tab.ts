@@ -11,6 +11,7 @@
 
 import './Tab.scss';
 import Module from '../../Core/Module';
+import Faze from '../../Core/Faze';
 
 /**
  * Структура конфига табов
@@ -32,10 +33,10 @@ interface Config {
  */
 class Tab extends Module {
   // DOM элементы заголовков табов
-  headersNodes: NodeListOf<HTMLElement>;
+  headersNodes: HTMLElement[];
 
   // DOM элементы тел табов
-  bodiesNodes: NodeListOf<HTMLElement>;
+  bodiesNodes: HTMLElement[];
 
   constructor(node?: HTMLElement, config?: Partial<Config>) {
     // Конфиг по умолчанию
@@ -99,23 +100,25 @@ class Tab extends Module {
    */
   private initializeTabs(): void {
     // Получаем шапки
-    this.headersNodes = this.node.querySelectorAll('.faze-tab-header');
+    const headersNode = Array.from(this.node.children).find(node => node.classList.contains('faze-tabs-headers'));
+    if (headersNode) {
+      this.headersNodes = Array.from(headersNode.children).filter(node => node.classList.contains('faze-tab-header')) as HTMLElement[];
+    }
 
     // Проставляем группу, если её нет
     this.headersNodes.forEach((headerNode: HTMLElement) => {
-      if (!headerNode.dataset.fazeTabGroup) {
-        headerNode.dataset.fazeTabGroup = 'default';
-      }
+      headerNode.dataset.fazeTabGroup = this.config.group;
     });
 
     // Получаем тела
-    this.bodiesNodes = this.node.querySelectorAll('.faze-tabs-bodies [data-faze-tab-body]');
+    const bodiesNode = Array.from(this.node.children).find(node => node.classList.contains('faze-tabs-bodies'));
+    if (bodiesNode) {
+      this.bodiesNodes = Array.from(bodiesNode.children).filter(node => node.classList.contains('faze-tab-body')) as HTMLElement[];
+    }
 
     // Проставляем группу, если её нет
     this.bodiesNodes.forEach((bodyNode: HTMLElement) => {
-      if (!bodyNode.dataset.fazeTabGroup) {
-        bodyNode.dataset.fazeTabGroup = 'default';
-      }
+      bodyNode.dataset.fazeTabGroup = this.config.group;
     });
   }
 
@@ -156,10 +159,23 @@ class Tab extends Module {
    * @param node - DOM элемент на который нужно инициализировать плагин
    */
   static initializeByDataAttributes(node: HTMLElement): void {
-    super.initializeByDataAttributes(node);
-
     new Tab(node, {
       group: node.dataset.fazeTabGroup || 'default',
+    });
+  }
+
+  /**
+   * "Горячая" инициализация модуля через "observer"
+   */
+  static hotInitialize(): void {
+    // Инициализация через "observer"
+    Faze.Observer.watch('[data-faze~="tab"]', (node: HTMLElement) => {
+      this.initializeByDataAttributes(node);
+    });
+
+    // Стандартная инициализация по data атрибутам
+    document.querySelectorAll<HTMLElement>('[data-faze~="tab"]').forEach((node: HTMLElement) => {
+      this.initializeByDataAttributes(node);
     });
   }
 }

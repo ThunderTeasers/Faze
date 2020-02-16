@@ -10,8 +10,14 @@
 
   // Элемент который перетаскиваем
   .faze-drag-item {
+    position: relative;
+
     // Ручка для перетаскивания элемента
     .faze-drag-handle {
+      position: absolute;
+      top: 0;
+      left: 0;
+
       width: 1.5rem;
       height: 1.5rem;
 

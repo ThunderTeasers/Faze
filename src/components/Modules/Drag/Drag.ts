@@ -102,6 +102,11 @@ class Drag {
    * Инициализация
    */
   initialize(): void {
+    // Простановка стандартных классов
+    this.node.classList.add('faze-drag');
+    this.node.classList.add('faze-drag-initialized');
+
+    // Вычисление индексов
     this.initializeItemsIndexes();
 
     // Исполняем пользовательский метод после инициализации

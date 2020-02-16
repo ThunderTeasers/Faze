@@ -18,7 +18,7 @@ module.exports = merge(common, {
           ecma: 6,
           mangle: true,
         },
-        sourceMap: true,
+        sourceMap: false,
       }),
       new OptimizeCSSAssetsPlugin({}),
     ],

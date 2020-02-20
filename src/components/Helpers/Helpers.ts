@@ -1,4 +1,5 @@
 import './Helpers.scss';
+import Faze from '../Core/Faze';
 
 /**
  * Структура настроек информационного сообщения
@@ -93,41 +94,37 @@ class Helpers {
    * Копирование текста(textContent) при нажатии на DOM элемент с классом "faze-copy-text"
    */
   static bindCopyText(): void {
-    // Проходимся по всем элементам
-    document.querySelectorAll<HTMLElement>('.faze-copy-text').forEach((textNode: HTMLElement) => {
-      // Копируем при нажатии
-      textNode.addEventListener('click', (event: MouseEvent) => {
-        // Если есть что копировать
-        if (textNode.textContent) {
-          // Создаем инпут с этим текстом и позицианированием "absolute" чтобы вьюпорт не прыгал вниз
-          const inputNode = document.createElement('input');
-          inputNode.value = textNode.dataset.fazeCopyTextValue || textNode.textContent || '';
-          inputNode.style.position = 'fixed';
-          inputNode.style.top = `${event.clientY}px`;
-          inputNode.style.left = `${event.clientX}px`;
-          inputNode.style.opacity = '0';
-          document.body.appendChild(inputNode);
+    Faze.on('click', '.faze-copy-text', (event: Event, textNode: HTMLElement) => {
+      // Если есть что копировать
+      if (textNode.textContent) {
+        // Создаем инпут с этим текстом и позицианированием "absolute" чтобы вьюпорт не прыгал вниз
+        const inputNode = document.createElement('input');
+        inputNode.value = textNode.dataset.fazeCopyTextValue || textNode.textContent || '';
+        inputNode.style.position = 'fixed';
+        inputNode.style.top = `${(event as MouseEvent).clientY}px`;
+        inputNode.style.left = `${(event as MouseEvent).clientX}px`;
+        inputNode.style.opacity = '0';
+        document.body.appendChild(inputNode);
 
-          // Выделяем и копируем текст
-          inputNode.focus();
-          inputNode.select();
-          document.execCommand('copy');
+        // Выделяем и копируем текст
+        inputNode.focus();
+        inputNode.select();
+        document.execCommand('copy');
 
-          // Обязательно удаляем инпут, он больше не нужен
-          inputNode.remove();
+        // Обязательно удаляем инпут, он больше не нужен
+        inputNode.remove();
 
-          // Создаем элемент для информационного сообщения
-          const notificationNode = document.createElement('div');
-          notificationNode.className = 'faze-notification';
-          notificationNode.textContent = 'Скопировано!';
-          textNode.appendChild(notificationNode);
+        // Создаем элемент для информационного сообщения
+        const notificationNode = document.createElement('div');
+        notificationNode.className = 'faze-notification';
+        notificationNode.textContent = 'Скопировано!';
+        textNode.appendChild(notificationNode);
 
-          // Через время удаляем
-          setTimeout(() => {
-            notificationNode.remove();
-          }, 3000);
-        }
-      });
+        // Через время удаляем
+        setTimeout(() => {
+          notificationNode.remove();
+        }, 3000);
+      }
     });
   }
 

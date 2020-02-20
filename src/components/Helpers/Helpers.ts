@@ -102,7 +102,7 @@ class Helpers {
           // Создаем инпут с этим текстом и позицианированием "absolute" чтобы вьюпорт не прыгал вниз
           const inputNode = document.createElement('input');
           inputNode.value = textNode.dataset.fazeCopyTextValue || textNode.textContent || '';
-          inputNode.style.position = 'absolute';
+          inputNode.style.position = 'fixed';
           inputNode.style.top = `${event.clientY}px`;
           inputNode.style.left = `${event.clientX}px`;
           inputNode.style.opacity = '0';

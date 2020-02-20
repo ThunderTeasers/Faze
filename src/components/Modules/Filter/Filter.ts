@@ -420,7 +420,7 @@ class Filter {
     if (this.formNode) {
       const inputFields = ['text', 'number', 'date', 'phone', 'email', 'datetime', 'textarea'];
 
-      this.formNode.querySelectorAll<HTMLInputElement>(`input[type="${type}"]`).forEach((foundNode: HTMLInputElement) => {
+      this.formNode.querySelectorAll<HTMLInputElement>(`input[type="${type}"], select`).forEach((foundNode: HTMLInputElement) => {
         const foundNodeName = foundNode.name;
         const foundNodeValue = foundNode.value;
 

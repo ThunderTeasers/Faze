@@ -120,9 +120,15 @@ class Helpers {
         notificationNode.textContent = 'Скопировано!';
         textNode.appendChild(notificationNode);
 
+        // Проставляем класс, что происходит действие
+        textNode.classList.add('faze-active');
+
         // Через время удаляем
         setTimeout(() => {
           notificationNode.remove();
+
+          // Удалем класс
+          textNode.classList.remove('faze-active');
         }, 3000);
       }
     });

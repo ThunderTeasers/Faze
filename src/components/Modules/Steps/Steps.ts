@@ -207,12 +207,24 @@ class Steps {
         buttonNextNode.addEventListener('click', (event) => {
           event.preventDefault();
 
-          this.currentStepIndex += 1;
-          if (this.currentStepIndex > this.bodiesNodes.length) {
-            this.currentStepIndex = this.bodiesNodes.length;
-          }
+          // Валиден ли шаг
+          let isValid = true;
 
-          this.activateStep(this.currentStepIndex);
+          // Проверка на валидность инпутов на шаге
+          bodyNode.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('input:not([type="checkbox"]):not([type="radio"]), textarea, select')
+            .forEach((inputNode: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => {
+              isValid = inputNode.reportValidity();
+            });
+
+          // Если шаг валиден, идем дальше
+          if (isValid) {
+            this.currentStepIndex += 1;
+            if (this.currentStepIndex > this.bodiesNodes.length) {
+              this.currentStepIndex = this.bodiesNodes.length;
+            }
+
+            this.activateStep(this.currentStepIndex);
+          }
         });
       });
     });

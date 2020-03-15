@@ -1015,6 +1015,49 @@ class Helpers {
   static compareSizes(size1: FazeSize, size2: FazeSize): boolean {
     return size1.width === size2.width && size1.height === size2.height;
   }
+
+  /**
+   * Проверка, находится ли элемент во вьюпорте
+   *
+   * @param node{HTMLElement} - DOM элемент который проверяем
+   * @param offset{number} - дополнительный запас
+   * @param enableWhenOnTop{boolean} - возвращаеть "true" если элемент выше вьюпорта
+   *
+   * @return{boolean} - true если элемент находится во вьюпорте
+   */
+  static isElementInViewport(node: HTMLElement, offset: number = 0, enableWhenOnTop: boolean = false): boolean {
+    const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
+    const windowWidth = (window.innerWidth || document.documentElement.clientWidth);
+    const rect = node.getBoundingClientRect();
+
+    const vertInView = (rect.top - offset <= windowHeight) && (enableWhenOnTop ? true : ((rect.top + rect.height) >= 0));
+    const horInView = (rect.left - offset <= windowWidth) && (enableWhenOnTop ? true : ((rect.left + rect.width) >= 0));
+
+    return (vertInView && horInView);
+  }
+
+  /**
+   * Проверка, находится ли элементы во вьюпорте
+   *
+   * @param nodes{HTMLElement[]} - DOM элементы которые проверяем
+   * @param offset{number} - дополнительный запас
+   * @param enableWhenOnTop{boolean} - возвращаеть "true" если элемент выше вьюпорта
+   *
+   * @return{HTMLElement[]} - список DOM элементов которые находятся во вьюпорте
+   */
+  static isElementsInViewport(nodes: HTMLElement[], offset: number = 0, enableWhenOnTop: boolean = false): HTMLElement[] {
+    const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
+    const windowWidth = (window.innerWidth || document.documentElement.clientWidth);
+
+    return Array.from(nodes).filter((node) => {
+      const rect = node.getBoundingClientRect();
+
+      const vertInView = (rect.top - offset <= windowHeight) && (enableWhenOnTop ? true : ((rect.top + rect.height) >= 0));
+      const horInView = (rect.left - offset <= windowWidth) && (enableWhenOnTop ? true : ((rect.left + rect.width) >= 0));
+
+      return (vertInView && horInView);
+    });
+  }
 }
 
 export default Helpers;

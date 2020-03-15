@@ -16,6 +16,11 @@ window.Faze = Faze;
 Faze.Helpers.setElementStyle(document.querySelector('[name="product_chr_search"]'), {width: '123px'});
 Faze.Helpers.setElementAttributes(document.querySelector('[name="product_chr_search"]'), {width: '123px'});
 
+const nodes = document.querySelectorAll('.js-viewport-test');
+window.addEventListener('scroll', () => {
+  console.log(Faze.Helpers.isElementsInViewport(nodes, 100, true));
+});
+
 new Faze.Modal(document.querySelector('#button'), {
   title: 'Тестирование модального окна',
   url: 'https://jsonplaceholder.typicode.com/todos/1',

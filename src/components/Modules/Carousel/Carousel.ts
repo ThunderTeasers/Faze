@@ -508,10 +508,6 @@ class Carousel {
       this.touchStart.y = event.changedTouches[0].screenY;
 
       this.handleGesturesStart();
-
-      if (Faze.Helpers.isTouchOver(event, this.node).contains) {
-        console.log(123);
-      }
     });
 
     this.itemsHolderNode.addEventListener('touchmove', (event: TouchEvent) => {
@@ -823,11 +819,19 @@ class Carousel {
       return;
     }
 
+    // Рассчёт на сколько слайдов нужно сдвинуть карусель
+    let amount;
+    if (index > this.index) {
+      amount = index - this.index;
+    } else {
+      amount = Math.abs(this.index - index);
+    }
+
     // Присваиваем текущий индекс
     this.index = index;
 
     // Применяем изменения
-    this.changeSlide(direction, 1);
+    this.changeSlide(direction, amount);
   }
 
   /**

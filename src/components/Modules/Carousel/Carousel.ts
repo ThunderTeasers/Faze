@@ -458,12 +458,11 @@ class Carousel {
         // Проставляем флаг что есть нажатие
         isDown = true;
 
-        // Убираем время анимации слайдов для чёткого перетаскивания мышкой
-        this.itemsHolderNode.style.transitionDuration = '';
-
         // Получаем координаты мыши
         this.touchStart.x = event.clientX;
         this.touchStart.y = event.clientY;
+
+        this.handleGesturesStart();
       }
     });
 
@@ -481,7 +480,7 @@ class Carousel {
         });
 
         // Производим работу с перетаскиванием
-        this.handleGestures();
+        this.handleGesturesMove();
       }
     });
 
@@ -489,8 +488,14 @@ class Carousel {
     document.body.addEventListener('mouseup', (event: MouseEvent) => {
       isDown = false;
 
-      // Возвращаем время анимации слайдов назад
-      this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
+      // Получаем координаты мыши
+      this.touchEnd.x = event.clientX;
+      this.touchEnd.y = event.clientY;
+
+      // Производим работу с окончанием перетаскивания
+      if (Faze.Helpers.isMouseOver(event, this.node).contains) {
+        this.handleGesturesStop();
+      }
     });
   }
 
@@ -513,7 +518,7 @@ class Carousel {
         y: this.touchStart.y - this.touchEnd.y,
       });
 
-      this.handleGestures();
+      this.handleGesturesMove();
     });
   }
 
@@ -530,20 +535,80 @@ class Carousel {
     }
   }
 
+  private handleGesturesStart() {
+    // Убираем время анимации слайдов для чёткого перетаскивания мышкой
+    this.itemsHolderNode.style.transitionDuration = '';
+
+    // Вставляем слайд перед текущим, чтобы можно было сдвигать карусель вправо
+    this.insertSlideBefore();
+
+    this.itemsHolderNode.style.left = `${-this.slideWidth}px`;
+  }
+
   /**
    * Отслеживание жестов и выполнение действий при них
    */
-  handleGestures(): void {
-    if (this.touchEnd.x <= this.touchStart.x) {
+  handleGesturesMove(): void {
+    // Вычисляем сдвиг и двигаем весь враппер на это число вбок
+    const offset = -(this.touchStart.x - this.touchEnd.x);
+    this.itemsHolderNode.style.left = `${offset - this.slideWidth}px`;
+  }
+
+  handleGesturesStop() {
+    // Вычисляем сдвиг
+    const offset = -(this.touchStart.x - this.touchEnd.x);
+
+    // Если сдвинуто влево больше чем на пол слайда, то активируем следующий слайд
+    if (offset < -(this.slideWidth / 2)) {
+      this.insertSlideAfter();
+      this.itemsHolderNode.style.left = `${parseInt(this.itemsHolderNode.style.left, 10) + this.slideWidth}px`;
       this.next();
-    } else if (this.touchEnd.x >= this.touchStart.x) {
-      this.prev();
+    } else if (offset > this.slideWidth / 2) {
+      // Если тоже самое вправо, то предыдущий
+      this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
+      this.itemsHolderNode.style.left = '0';
+      this.prev(false);
+    } else {
+      // Передвигаем первый слайд в конец
+      this.insertSlideAfter();
+
+      // Если мышка была отпущена, но передвинули слайд недостаточно, то позвращаем на место
+      this.itemsHolderNode.style.left = '0';
     }
 
-    // console.log(this.touchStart.x, this.touchEnd.x, this.touchStart.x - this.touchEnd.x);
-
-    // this.itemsHolderNode.style.left = `${-(this.touchStart.x - this.touchEnd.x)}px`;
+    setTimeout(() => {
+      this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
+    }, 0);
   }
+
+  /**
+   * Перемещение последнего слайда вперед
+   */
+  private insertSlideBefore(): void {
+    this.slidesNodes = <HTMLElement[]>Array.from(this.itemsHolderNode.children);
+
+    // Берем последний слайд и перемещаем его в начало
+    this.itemsHolderNode.insertBefore(this.slidesNodes[this.slidesNodes.length - 1], this.slidesNodes[0]);
+  }
+
+  /**
+   * Перемещение первого слайда в конец
+   */
+  private insertSlideAfter(): void {
+    this.slidesNodes = <HTMLElement[]>Array.from(this.itemsHolderNode.children);
+
+    // Берем первый слайд и перемещаем его в конец
+    this.itemsHolderNode.appendChild(this.slidesNodes[0]);
+  }
+
+  // private changeHorizontalOffset(offset: number): void {
+  //   this.itemsHolderNode.style.transitionDuration = '';
+  //   this.itemsHolderNode.style.left = `${offset}px`;
+  //
+  //   setTimeout(() => {
+  //     this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
+  //   }, 0);
+  // }
 
   /**
    * Создание слайдов
@@ -686,8 +751,10 @@ class Carousel {
 
   /**
    * Переключение карусели вперед
+   *
+   * @param needToChange - нужно ли вставлять DOM элемент следующего слайда
    */
-  next(): void {
+  next(needToChange: boolean = true): void {
     if (this.isIdle) {
       this.index += 1;
       if (this.index >= this.totalSlides) {
@@ -695,13 +762,20 @@ class Carousel {
       }
     }
 
-    this.changeSlide('next', 1);
+    if (needToChange) {
+      this.changeSlide('next', 1);
+    } else {
+      // Инменяем индикаторы
+      this.changeControls();
+    }
   }
 
   /**
    * Переключение карусели назад
+   *
+   * @param needToChange - нужно ли вставлять DOM элемент следующего слайда
    */
-  prev(): void {
+  prev(needToChange: boolean = true): void {
     if (this.isIdle) {
       this.index -= 1;
       if (this.index < 0) {
@@ -709,7 +783,12 @@ class Carousel {
       }
     }
 
-    this.changeSlide('prev', 1);
+    if (needToChange) {
+      this.changeSlide('prev', 1);
+    } else {
+      // Инменяем индикаторы
+      this.changeControls();
+    }
   }
 
   /**
@@ -780,7 +859,7 @@ class Carousel {
    * @private
    */
   private changeSlide(direction?: string, amount: number = 1): void {
-    // Проверка на границы
+    // Проверка на границы, если не бесконечная прокрутка
     if (!this.config.infinite) {
       this.checkBounds();
     }

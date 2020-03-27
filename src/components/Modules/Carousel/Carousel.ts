@@ -506,6 +506,12 @@ class Carousel {
     this.itemsHolderNode.addEventListener('touchstart', (event: TouchEvent) => {
       this.touchStart.x = event.changedTouches[0].screenX;
       this.touchStart.y = event.changedTouches[0].screenY;
+
+      this.handleGesturesStart();
+
+      if (Faze.Helpers.isTouchOver(event, this.node).contains) {
+        console.log(123);
+      }
     });
 
     this.itemsHolderNode.addEventListener('touchmove', (event: TouchEvent) => {
@@ -519,6 +525,13 @@ class Carousel {
       });
 
       this.handleGesturesMove();
+    });
+
+    this.itemsHolderNode.addEventListener('touchend', (event: TouchEvent) => {
+      this.handleGesturesStop();
+
+      this.touchEnd.x = event.changedTouches[0].screenX;
+      this.touchEnd.y = event.changedTouches[0].screenY;
     });
   }
 
@@ -548,13 +561,13 @@ class Carousel {
   /**
    * Отслеживание жестов и выполнение действий при них
    */
-  handleGesturesMove(): void {
+  private handleGesturesMove(): void {
     // Вычисляем сдвиг и двигаем весь враппер на это число вбок
     const offset = -(this.touchStart.x - this.touchEnd.x);
     this.itemsHolderNode.style.left = `${offset - this.slideWidth}px`;
   }
 
-  handleGesturesStop() {
+  private handleGesturesStop() {
     // Вычисляем сдвиг
     const offset = -(this.touchStart.x - this.touchEnd.x);
 

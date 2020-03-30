@@ -99,7 +99,7 @@ Faze.add({
       arrowsOutside: true,
       counter: false,
       infinite: false,
-      mouseMove: true,
+      mouseMove: false,
       // amountPerSlide: 2,
       animation: {
         type: 'slide',
@@ -114,8 +114,8 @@ Faze.add({
         created: (data: any) => {
           console.log(data);
         },
-        changed: ({direction}: { direction?: string }) => {
-          console.log(direction);
+        changed: ({currentSlideNode}: { currentSlideNode?: any }) => {
+          console.log(currentSlideNode);
         },
       },
     });

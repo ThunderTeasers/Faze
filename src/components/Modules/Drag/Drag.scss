@@ -5,13 +5,20 @@
  * Дата: 19.12.2019
  */
 
+// Базовые стили для работы
 .faze-drag {
   position: relative;
 
   // Элемент который перетаскиваем
   .faze-drag-item {
     position: relative;
+  }
+}
 
+// Стили для визуала
+.faze-drag:not([data-faze-styles="false"]) {
+  // Элемент который перетаскиваем
+  .faze-drag-item {
     // Ручка для перетаскивания элемента
     .faze-drag-handle {
       position: absolute;

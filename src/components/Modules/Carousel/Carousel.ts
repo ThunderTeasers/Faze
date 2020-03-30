@@ -42,6 +42,7 @@ import Logger from '../../Core/Logger';
  *     arrowRight  - CSS селектор кнопки пролистывания вправо
  *   callbacks
  *     created  - пользовательская функция, исполняющаяся при создании карусели
+ *     beforeChanged - пользовательская функция, исполняющаяся перед началом изменения слайда
  *     changed  - пользовательская функция, исполняющаяся при изменении слайда
  */
 interface Config {
@@ -66,6 +67,7 @@ interface Config {
   };
   callbacks: {
     created?: (data: CallbackData) => void;
+    beforeChanged?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
   };
 }
@@ -209,6 +211,7 @@ class Carousel {
       },
       callbacks: {
         created: undefined,
+        beforeChanged: undefined,
         changed: undefined,
       },
     };
@@ -881,6 +884,9 @@ class Carousel {
    * @private
    */
   private changeSlide(direction?: string, amount: number = 1): void {
+    // Вызываем пользовательскую функцию "beforeChanged"
+    this.beforeChangeCallbackCall(direction);
+
     // Проверка на границы, если не бесконечная прокрутка
     if (!this.config.infinite) {
       this.checkBounds();
@@ -1030,12 +1036,12 @@ class Carousel {
   }
 
   /**
-   * Выполнение пользовательской функции
+   * Выполнение пользовательской функции "changed"
    *
    * @param currentSlide - DOM элемент текущего слайда
    * @param direction - направление карусели
    */
-  changeCallbackCall(currentSlide: HTMLElement | null, direction?: string): void {
+  private changeCallbackCall(currentSlide: HTMLElement | null, direction?: string): void {
     if (typeof this.config.callbacks.changed === 'function') {
       try {
         this.config.callbacks.changed({
@@ -1046,6 +1052,37 @@ class Carousel {
           totalSlides: this.totalSlides,
           index: this.index,
           currentSlideNode: currentSlide,
+          controlsNode: this.controlsNode,
+          counterNode: this.counterNode,
+          arrowsNode: this.arrowsNode,
+          arrowsNodes: this.arrowsNodes,
+          pagesNode: this.pagesNode,
+        });
+      } catch (error) {
+        this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+      }
+    }
+  }
+
+  /**
+   * Выполнение пользовательской функции "beforeChanged"
+   *
+   * @param direction - направление карусели
+   */
+  private beforeChangeCallbackCall(direction?: string): void {
+    if (typeof this.config.callbacks.beforeChanged === 'function') {
+      // Текущий слайд(по факту он следующий, т.к. изменение уже началось)
+      const currentSlideNode = this.slidesNodes.find(tmpSlideNode => parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index) || this.slidesNodes[0];
+
+      try {
+        this.config.callbacks.beforeChanged({
+          direction,
+          currentSlideNode,
+          holderNode: this.itemsHolderNode,
+          carouselNode: this.node,
+          slidesNodes: this.slidesNodes,
+          totalSlides: this.totalSlides,
+          index: this.index,
           controlsNode: this.controlsNode,
           counterNode: this.counterNode,
           arrowsNode: this.arrowsNode,

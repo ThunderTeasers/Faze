@@ -965,7 +965,7 @@ class Carousel {
               }
 
               // Присваиваем текущий слайд
-              currentSlide = this.slidesNodes[this.index];
+              currentSlide = this.slidesNodes.find(tmpSlideNode => parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index) || this.slidesNodes[0];
 
               // Выставление флага, что карусель в простое и готова к новой анимации
               this.isIdle = true;
@@ -1005,7 +1005,7 @@ class Carousel {
 
             // И после выполнения анимации, ставится флаг, что карусель свободна
             setTimeout(() => {
-              currentSlide = this.slidesNodes[this.index];
+              currentSlide = this.slidesNodes.find(tmpSlideNode => parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index) || this.slidesNodes[0];
 
               // Удаляем класс с "предыдущего" слайда, т.к. он уже стал текущим
               if (prevSlide) {

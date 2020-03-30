@@ -37,12 +37,15 @@ interface CallbackData {
  * Структура конфига
  *
  * Содержит:
+ *   sideDirection - в какую сторону перетаскиваем
+ *   needPhantomElement - нужен ли фантомный элемент при перетаскивании
  *   callbacks
  *     created  - пользовательский метод, исполняющийся при успешном создании дропдауна
  *     opened   - пользовательский метод, исполняющийся при открытии дропдауна
  */
 interface Config {
   sideDirection: SideDirection;
+  needPhantomElement: boolean;
   callbacks: {
     created?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
@@ -82,6 +85,7 @@ class Drag {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       sideDirection: SideDirection.vertical,
+      needPhantomElement: true,
       callbacks: {
         created: undefined,
         changed: undefined,
@@ -197,10 +201,12 @@ class Drag {
 
     // Создаем фантомный элемент для замены "взятого", т.к. он станет абсолютом при драге
     const phantomNode = document.createElement('div');
-    phantomNode.className = 'faze-drag-item-phantom';
-    phantomNode.style.width = `${width}px`;
-    phantomNode.style.height = `${height}px`;
-    phantomNode.style.margin = computedStyles.margin;
+    if (this.config.needPhantomElement) {
+      phantomNode.className = 'faze-drag-item-phantom';
+      phantomNode.style.width = `${width}px`;
+      phantomNode.style.height = `${height}px`;
+      phantomNode.style.margin = computedStyles.margin;
+    }
 
     /**
      * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
@@ -225,7 +231,7 @@ class Drag {
       draggedItemNode.classList.add('faze-drag-item-moving');
 
       // Вставляем фантомный элемент под текущим
-      if (draggedItemNode.parentNode) {
+      if (draggedItemNode.parentNode && this.config.needPhantomElement) {
         draggedItemNode.parentNode.insertBefore(phantomNode, draggedItemNode.nextSibling);
       }
 
@@ -264,7 +270,7 @@ class Drag {
           // Получаем результаты наведения на элемент мышкой
           const mouseOverResult = Faze.Helpers.isMouseOver(event, itemNode, {horizontal: true, vertical: true});
 
-          if (itemNode.parentNode) {
+          if (itemNode.parentNode && this.config.needPhantomElement) {
             if (this.config.sideDirection === SideDirection.horizontal) {
               // Если навели на нижнюю часть блока, то вставляем снизу
               if (mouseOverResult.sides.right) {
@@ -291,7 +297,7 @@ class Drag {
      */
     const endDragElement = () => {
       // Перемещаем элемент после фантомного
-      if (phantomNode.parentNode) {
+      if (phantomNode.parentNode && this.config.needPhantomElement) {
         phantomNode.parentNode.insertBefore(draggedItemNode, phantomNode.nextSibling);
       }
 
@@ -306,7 +312,9 @@ class Drag {
       draggedItemNode.style.left = initialDraggedItemStyles.left;
 
       // Удаляем фантомный элемент
-      phantomNode.remove();
+      if (this.config.needPhantomElement) {
+        phantomNode.remove();
+      }
 
       // Переинициализируем индексы элементов, т.к. порядок может быть нарушен перетаскиванием
       this.initializeItemsIndexes();
@@ -343,6 +351,7 @@ class Drag {
   static initializeByDataAttributes(dragNode: HTMLElement): void {
     new Faze.Drag(dragNode, {
       sideDirection: dragNode.dataset.fazeDragSideDirection === 'horizontal' ? SideDirection.horizontal : SideDirection.vertical,
+      needPhantomElement: dragNode.dataset.fazeDragPhantom === 'true',
     });
   }
 

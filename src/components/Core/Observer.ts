@@ -47,8 +47,8 @@ class Observer {
   /**
    * Добавление слушателя к общему списку
    *
-   * @param selector - CSS селектор DOM элемента для отслеживания
-   * @param callback - пользовательский метод, исполняющийся после добавления нужного DOM элемента
+   * @param selector{string} - CSS селектор DOM элемента для отслеживания
+   * @param callback{HTMLElement} - пользовательский метод, исполняющийся после добавления нужного DOM элемента
    */
   watch(selector: string, callback: (addedNode: HTMLElement) => void) {
     this.listeners.push({

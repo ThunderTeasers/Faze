@@ -188,6 +188,9 @@ class Drag {
       left: draggedItemNode.style.left,
     };
 
+    // Получаем стили
+    const computedStyles = window.getComputedStyle(draggedItemNode);
+
     // Стартовые размеры элемента
     const width = draggedItemNode.getBoundingClientRect().width;
     const height = draggedItemNode.getBoundingClientRect().height;
@@ -197,6 +200,7 @@ class Drag {
     phantomNode.className = 'faze-drag-item-phantom';
     phantomNode.style.width = `${width}px`;
     phantomNode.style.height = `${height}px`;
+    phantomNode.style.margin = computedStyles.margin;
 
     /**
      * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия

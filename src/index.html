@@ -58,8 +58,15 @@
       height: 2rem !important;
     }
 
+    .faze-drag {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
     .faze-drag .faze-drag-item {
       padding: 1rem;
+      margin: 1rem;
 
       background-color: #fff;
       border: 0.1rem solid gray;
@@ -145,7 +152,7 @@
   <img src="https://via.placeholder.com/350x153" data-faze="zoombox" data-faze-zoombox-width="500" data-faze-zoombox-height="500" data-faze-zoombox-image="https://via.placeholder.com/1550x2253" data-faze-zoombox-align="left center">
   <img src="https://via.placeholder.com/350x153" data-faze="zoombox" data-faze-zoombox-image="https://via.placeholder.com/350x153" data-faze-zoombox-align="self">
 
-  <section class="faze-drag" data-faze="drag">
+  <section class="faze-drag" data-faze="drag" data-faze-drag-side-direction="horizontal">
     <div class="faze-drag-item">
       <div class="faze-drag-handle"></div>ITEM 1
     </div>

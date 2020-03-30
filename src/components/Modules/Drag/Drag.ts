@@ -106,8 +106,9 @@ class Drag {
     this.node.classList.add('faze-drag');
     this.node.classList.add('faze-drag-initialized');
 
-    // Вычисление индексов
+    // Инициализация элементов
     this.initializeItemsIndexes();
+    this.initializeItemsPositions();
 
     // Исполняем пользовательский метод после инициализации
     if (typeof this.config.callbacks.created === 'function') {
@@ -130,6 +131,20 @@ class Drag {
   private initializeItemsIndexes(): void {
     this.itemsNodes.forEach((itemNode: HTMLElement, itemIndex: number) => {
       itemNode.dataset.fazeDragIndex = itemIndex.toString();
+    });
+  }
+
+  /**
+   * Простановка позиций для элементов
+   *
+   * @private
+   */
+  private initializeItemsPositions(): void {
+    this.itemsNodes.forEach((itemNode: HTMLElement) => {
+      const computedStyles = window.getComputedStyle(itemNode);
+
+      itemNode.dataset.fazeDragItemPositionX = (itemNode.offsetLeft - parseInt(computedStyles.marginLeft, 10)).toString();
+      itemNode.dataset.fazeDragItemPositionY = (itemNode.offsetTop - parseInt(computedStyles.marginTop, 10)).toString();
     });
   }
 
@@ -199,6 +214,8 @@ class Drag {
       draggedItemNode.style.position = 'absolute';
       draggedItemNode.style.width = `${width}px`;
       draggedItemNode.style.height = `${height}px`;
+      draggedItemNode.style.left = `${draggedItemNode.dataset.fazeDragItemPositionX}px`;
+      draggedItemNode.style.top = `${draggedItemNode.dataset.fazeDragItemPositionY}px`;
 
       // Ставим класс, показывающий, что это движемый элемент
       draggedItemNode.classList.add('faze-drag-item-moving');
@@ -228,9 +245,14 @@ class Drag {
       startMousePosition.x = event.clientX;
       startMousePosition.y = event.clientY;
 
-      // Рассчет новой позиции окна
-      draggedItemNode.style.left = `${(draggedItemNode.offsetLeft - endMousePosition.x)}px`;
-      draggedItemNode.style.top = `${(draggedItemNode.offsetTop - endMousePosition.y)}px`;
+      // Рассчет новой позиции элемента
+      const x = parseInt(draggedItemNode.dataset.fazeDragItemPositionX || '0', 10) - endMousePosition.x;
+      draggedItemNode.style.left = `${x}px`;
+      draggedItemNode.dataset.fazeDragItemPositionX = x.toString();
+
+      const y = parseInt(draggedItemNode.dataset.fazeDragItemPositionY || '0', 10) - endMousePosition.y;
+      draggedItemNode.style.top = `${y}px`;
+      draggedItemNode.dataset.fazeDragItemPositionY = y.toString();
 
       Array.from(this.itemsNodes)
         .filter(itemNode => !itemNode.classList.contains('faze-drag-item-moving'))
@@ -284,6 +306,9 @@ class Drag {
 
       // Переинициализируем индексы элементов, т.к. порядок может быть нарушен перетаскиванием
       this.initializeItemsIndexes();
+
+      // Так же переинициализируем позиции элементов, т.к. если изменение произошло, то позиции сдвинулись
+      this.initializeItemsPositions();
 
       // Удаляем все связанные события
       document.removeEventListener('mouseup', endDragElement);

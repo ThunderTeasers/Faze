@@ -503,31 +503,45 @@ class Carousel {
    * Навешивание событий для отслеживания жестов пальцем
    */
   private bindTouchGestures(): void {
-    this.itemsHolderNode.addEventListener('touchstart', (event: TouchEvent) => {
-      this.touchStart.x = event.changedTouches[0].screenX;
-      this.touchStart.y = event.changedTouches[0].screenY;
+    // Флаг показывающий нажатие, для отслеживания движения внутри
+    let isDown = false;
 
-      this.handleGesturesStart();
+    this.itemsHolderNode.addEventListener('touchstart', (event: TouchEvent) => {
+      if (!isDown) {
+        this.touchStart.x = event.changedTouches[0].screenX;
+        this.touchStart.y = event.changedTouches[0].screenY;
+
+        this.handleGesturesStart();
+      }
+
+      // Проставляем флаг что есть нажатие
+      isDown = true;
     });
 
     this.itemsHolderNode.addEventListener('touchmove', (event: TouchEvent) => {
-      this.touchEnd.x = event.changedTouches[0].screenX;
-      this.touchEnd.y = event.changedTouches[0].screenY;
+      if (isDown && event.changedTouches.length === 0) {
+        this.touchEnd.x = event.changedTouches[0].screenX;
+        this.touchEnd.y = event.changedTouches[0].screenY;
 
-      // Проверка на выход за границы
-      this.checkMoveBounds({
-        x: this.touchStart.x - this.touchEnd.x,
-        y: this.touchStart.y - this.touchEnd.y,
-      });
+        // Проверка на выход за границы
+        this.checkMoveBounds({
+          x: this.touchStart.x - this.touchEnd.x,
+          y: this.touchStart.y - this.touchEnd.y,
+        });
 
-      this.handleGesturesMove();
+        this.handleGesturesMove();
+      }
     });
 
     this.itemsHolderNode.addEventListener('touchend', (event: TouchEvent) => {
-      this.handleGesturesStop();
+      if (isDown) {
+        this.touchEnd.x = event.changedTouches[0].screenX;
+        this.touchEnd.y = event.changedTouches[0].screenY;
 
-      this.touchEnd.x = event.changedTouches[0].screenX;
-      this.touchEnd.y = event.changedTouches[0].screenY;
+        this.handleGesturesStop();
+      }
+
+      isDown = false;
     });
   }
 
@@ -587,7 +601,7 @@ class Carousel {
 
     setTimeout(() => {
       this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
-    }, 0);
+    }, 100);
   }
 
   /**
@@ -609,15 +623,6 @@ class Carousel {
     // Берем первый слайд и перемещаем его в конец
     this.itemsHolderNode.appendChild(this.slidesNodes[0]);
   }
-
-  // private changeHorizontalOffset(offset: number): void {
-  //   this.itemsHolderNode.style.transitionDuration = '';
-  //   this.itemsHolderNode.style.left = `${offset}px`;
-  //
-  //   setTimeout(() => {
-  //     this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
-  //   }, 0);
-  // }
 
   /**
    * Создание слайдов

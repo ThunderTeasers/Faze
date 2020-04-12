@@ -10,17 +10,30 @@
   position: relative;
 
   // Элемент который перетаскиваем
-  .faze-drag-item {
+  .faze-drag-item, [data-faze-drag="item"] {
     position: relative;
+
+    // Когда двигаем элемент, делаем его максимально "первым" по z оси
+    &.faze-drag-item-moving {
+      z-index: 999999;
+    }
+
+    // Ручка для перетаскивания
+    .faze-drag-handle, [data-faze-drag="handle"] {
+      // При наведении
+      &:hover {
+        cursor: move;
+      }
+    }
   }
 }
 
 // Стили для визуала
 .faze-drag:not([data-faze-styles="false"]) {
   // Элемент который перетаскиваем
-  .faze-drag-item {
-    // Ручка для перетаскивания элемента
-    .faze-drag-handle {
+  .faze-drag-item, [data-faze-drag="item"] {
+    // Ручка для перетаскивания
+    .faze-drag-handle, [data-faze-drag="handle"] {
       position: absolute;
       top: 0;
       left: 0;

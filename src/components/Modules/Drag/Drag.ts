@@ -95,7 +95,7 @@ class Drag {
     // Инициализация переменных
     this.config = Object.assign(defaultConfig, config);
     this.node = node;
-    this.itemsNodes = this.node.querySelectorAll('.faze-drag-item');
+    this.itemsNodes = this.node.querySelectorAll('.faze-drag-item, [data-faze-drag="item"]');
     this.dragItemNode = undefined;
 
     this.initialize();
@@ -158,7 +158,7 @@ class Drag {
   bind(): void {
     this.itemsNodes.forEach((itemNode: HTMLElement) => {
       // DOM элемент ручки для перетаскивания, если её нет, то считаем весь элемент ею
-      const handleNode: HTMLElement = itemNode.querySelector('.faze-drag-handle') || itemNode;
+      const handleNode: HTMLElement = itemNode.querySelector('.faze-drag-handle, [data-faze-drag="handle"]') || itemNode;
 
       // Навешиваем события перетаскивания
       this.bindDrag(handleNode, itemNode);

@@ -12,6 +12,7 @@ import Faze from '../../Core/Faze';
  *   event      - событие по которому происходит инициализация галереи
  *   evented    - инициализировать по событию или сразу
  *   counter    - отображать ли счетчик
+ *   disableResolution - разрешение ниже которого не показывать галерею
  */
 interface Config {
   thumbnailsPosition?: string;
@@ -20,6 +21,7 @@ interface Config {
   event: string;
   evented: boolean;
   counter: boolean;
+  disableResolution: number;
 }
 
 class Gallery {
@@ -72,10 +74,16 @@ class Gallery {
       group: 'default',
       evented: true,
       counter: false,
+      disableResolution: 0,
     };
 
     this.config = Object.assign(defaultConfig, config);
     this.callerNodes = nodes;
+
+    // Если достигли разрешения при котором не показывать галерею, то сразу выходим из модуля
+    if (this.config.disableResolution < window.innerWidth) {
+      return;
+    }
 
     // Проверка конфига
     this.checkConfig();
@@ -356,6 +364,7 @@ class Gallery {
         evented: false,
         index: Array.from(callerNodes).indexOf(callerNode),
         counter: (callerNode.dataset.fazeGalleryCounter || 'false') === 'true',
+        disableResolution: callerNode.dataset.fazeGalleryDisableResolution || 0,
       });
     });
   }

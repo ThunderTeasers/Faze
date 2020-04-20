@@ -81,7 +81,7 @@ class Gallery {
     this.callerNodes = nodes;
 
     // Если достигли разрешения при котором не показывать галерею, то сразу выходим из модуля
-    if (this.config.disableResolution < window.innerWidth) {
+    if (this.config.disableResolution > window.innerWidth) {
       return;
     }
 
@@ -359,13 +359,14 @@ class Gallery {
       const group: string | undefined = callerNode.dataset.fazeGalleryGroup;
       const callerNodes = document.querySelectorAll(`[data-faze-gallery-group="${group}"]`);
 
-      new Faze.Gallery(callerNodes, {
-        group,
-        evented: false,
-        index: Array.from(callerNodes).indexOf(callerNode),
-        counter: (callerNode.dataset.fazeGalleryCounter || 'false') === 'true',
-        disableResolution: callerNode.dataset.fazeGalleryDisableResolution || 0,
-      });
+      if (parseInt(callerNode.dataset.fazeGalleryDisableResolution || '0', 10) > window.innerWidth) {
+        new Faze.Gallery(callerNodes, {
+          group,
+          evented: false,
+          index: Array.from(callerNodes).indexOf(callerNode),
+          counter: (callerNode.dataset.fazeGalleryCounter || 'false') === 'true',
+        });
+      }
     });
   }
 }

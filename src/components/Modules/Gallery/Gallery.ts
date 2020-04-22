@@ -359,7 +359,7 @@ class Gallery {
       const group: string | undefined = callerNode.dataset.fazeGalleryGroup;
       const callerNodes = document.querySelectorAll(`[data-faze-gallery-group="${group}"]`);
 
-      if (parseInt(callerNode.dataset.fazeGalleryDisableResolution || '0', 10) > window.innerWidth) {
+      if (parseInt(callerNode.dataset.fazeGalleryDisableResolution || '0', 10) < window.innerWidth) {
         new Faze.Gallery(callerNodes, {
           group,
           evented: false,

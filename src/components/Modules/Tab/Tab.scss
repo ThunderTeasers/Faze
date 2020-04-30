@@ -5,7 +5,22 @@
  * Дата: 26.09.2018
  */
 
-.faze-tabs {
+// Базовые стили для работы
+.faze-tabs, .faze-tab, [data-faze~="tab"] {
+  // Тела табов
+  .faze-tab-body, [data-faze-tab="body"] {
+    display: none;
+
+    padding-top: 1rem;
+
+    &:first-of-type {
+      display: block;
+    }
+  }
+}
+
+// Стили для визуала
+.faze-tabs[data-faze-styles="true"], .faze-tab[data-faze-styles="true"] {
   // Заголовки табов
   .faze-tabs-headers {
     display: flex;
@@ -13,39 +28,26 @@
     align-items: center;
 
     border-bottom: 0.1rem solid #000;
-
-    .faze-tab-header {
-      padding: 1rem;
-
-      border: 0.1rem solid #000;
-      border-bottom: none;
-
-      user-select: none;
-
-      &:not(:first-child) {
-        border-left: none;
-      }
-
-      &.faze-active {
-        background-color: #efefef;
-      }
-
-      &:hover {
-        cursor: pointer;
-      }
-    }
   }
 
-  // Тела табов
-  .faze-tabs-bodies {
-    .faze-tab-body {
-      display: none;
+  .faze-tab-header, [data-faze-tab="header"] {
+    padding: 1rem;
 
-      padding-top: 1rem;
+    border: 0.1rem solid #000;
+    border-bottom: none;
 
-      &:first-child {
-        display: block;
-      }
+    user-select: none;
+
+    &:not(:first-child) {
+      border-left: none;
+    }
+
+    &.faze-active {
+      background-color: #efefef;
+    }
+
+    &:hover {
+      cursor: pointer;
     }
   }
 }

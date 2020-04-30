@@ -29,8 +29,8 @@ enum SideDirection {
  *   body   - тело дропдауна
  */
 interface CallbackData {
-  containerNode: HTMLElement;
-  itemsNodes: NodeListOf<HTMLElement>;
+  containerNodes: HTMLElement[];
+  itemsNodes: HTMLElement[];
 }
 
 /**
@@ -54,7 +54,7 @@ interface Config {
 
 class Drag {
   // DOM элемент дропдауна
-  readonly node: HTMLElement;
+  readonly nodes: HTMLElement[];
 
   // Помощник для логирования
   readonly logger: Logger;
@@ -63,13 +63,13 @@ class Drag {
   readonly config: Config;
 
   // DOM элементы которые перетягиваем
-  readonly itemsNodes: NodeListOf<HTMLElement>;
+  readonly itemsNodes: HTMLElement[];
 
   // DOM элемент переносимого элемента
   dragItemNode?: HTMLElement;
 
-  constructor(node: HTMLElement | null, config: Partial<Config>) {
-    if (!node) {
+  constructor(nodes: HTMLElement[] | null, config: Partial<Config>) {
+    if (!nodes) {
       return this.logger.error('Не задан объект контейнера элементов для перетаскивания');
     }
 
@@ -77,8 +77,11 @@ class Drag {
     this.logger = new Logger('Модуль Faze.Drag:');
 
     // Проверка на двойную инициализацию
-    if (node.classList.contains('faze-drag-initialized')) {
-      this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
+    const foundNode = nodes.find(node => node.classList.contains('faze-drag-initialized'));
+    if (foundNode) {
+      if (!foundNode.dataset.fazeDragGroup) {
+        this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', foundNode);
+      }
       return;
     }
 
@@ -94,8 +97,11 @@ class Drag {
 
     // Инициализация переменных
     this.config = Object.assign(defaultConfig, config);
-    this.node = node;
-    this.itemsNodes = this.node.querySelectorAll('.faze-drag-item, [data-faze-drag="item"]');
+    this.nodes = nodes;
+    this.itemsNodes = [];
+    this.nodes.forEach((node: HTMLElement) => {
+      this.itemsNodes.push(...Array.from(node.querySelectorAll<HTMLElement>('.faze-drag-item, [data-faze-drag="item"]')));
+    });
     this.dragItemNode = undefined;
 
     this.initialize();
@@ -107,8 +113,10 @@ class Drag {
    */
   initialize(): void {
     // Простановка стандартных классов
-    this.node.classList.add('faze-drag');
-    this.node.classList.add('faze-drag-initialized');
+    this.nodes.forEach((node: HTMLElement) => {
+      node.classList.add('faze-drag');
+      node.classList.add('faze-drag-initialized');
+    });
 
     // Инициализация элементов
     this.initializeItemsIndexes();
@@ -118,7 +126,7 @@ class Drag {
     if (typeof this.config.callbacks.created === 'function') {
       try {
         this.config.callbacks.created({
-          containerNode: this.node,
+          containerNodes: this.nodes,
           itemsNodes: this.itemsNodes,
         });
       } catch (error) {
@@ -193,7 +201,7 @@ class Drag {
     };
 
     // Получаем стили
-    const computedStyles = window.getComputedStyle(draggedItemNode);
+    const computedStyles = window.getComputedStyle(draggedItemNode, null);
 
     // Стартовые размеры элемента
     const width = draggedItemNode.getBoundingClientRect().width;
@@ -204,7 +212,10 @@ class Drag {
     phantomNode.className = 'faze-drag-item-phantom';
     phantomNode.style.width = `${width}px`;
     phantomNode.style.height = `${height}px`;
-    phantomNode.style.margin = computedStyles.margin;
+    phantomNode.style.marginTop = computedStyles.marginTop;
+    phantomNode.style.marginBottom = computedStyles.marginBottom;
+    phantomNode.style.marginLeft = computedStyles.marginLeft;
+    phantomNode.style.marginRight = computedStyles.marginRight;
 
     /**
      * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
@@ -326,7 +337,7 @@ class Drag {
       if (typeof this.config.callbacks.changed === 'function') {
         try {
           this.config.callbacks.changed({
-            containerNode: this.node,
+            containerNodes: this.nodes,
             itemsNodes: this.itemsNodes,
           });
         } catch (error) {
@@ -345,7 +356,10 @@ class Drag {
    * @param dragNode - DOM элемент на который нужно инициализировать плагин
    */
   static initializeByDataAttributes(dragNode: HTMLElement): void {
-    new Faze.Drag(dragNode, {
+    const group: string | undefined = dragNode.dataset.fazeDragGroup;
+
+    const dragContainerNodes = group ? Array.from(document.querySelectorAll(`[data-faze~="drag"][data-faze-drag-group=${group}]`)) : [dragNode];
+    new Faze.Drag(dragContainerNodes, {
       direction: dragNode.dataset.fazeDragDirection === 'horizontal' ? SideDirection.horizontal : SideDirection.vertical,
       phantomElementTag: dragNode.dataset.fazeDragPhantomElementTag || 'div',
     });

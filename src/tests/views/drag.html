@@ -17,7 +17,6 @@
     body {
       display: grid;
       grid-template-columns: 20rem 1fr;
-      grid-gap: 2rem;
     }
 
     aside.sidebar {
@@ -26,7 +25,11 @@
       border-right: 1px solid #000000;
     }
 
-    aside.sidebar .drag-component {
+    aside.content {
+      padding: 10px;
+    }
+
+    aside .drag-component {
       width: 100%;
 
       padding: 5px;
@@ -35,24 +38,42 @@
       background-color: #ffffff;
     }
 
-    aside.sidebar .drag-component:not(:last-child) {
+    aside .drag-component:not(:last-child) {
       margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-<aside class="sidebar" data-faze="drag" data-faze-styles="false" data-faze-drag-direction="vertical">
-  <div class="drag-component" data-faze-drag="item">
-    <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-    ITEM 1
+<aside class="sidebar">
+  <div data-faze="drag" data-faze-drag-group="components" data-faze-styles="false" data-faze-drag-direction="vertical">
+    <div class="drag-component" data-faze-drag="item">
+      <div class="drag-component-handle">Handle</div>
+      ITEM 1
+    </div>
+    <div class="drag-component" data-faze-drag="item">
+      <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
+      ITEM 2
+    </div>
+    <div class="drag-component" data-faze-drag="item">
+      <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
+      ITEM 3
+    </div>
   </div>
-  <div class="drag-component" data-faze-drag="item">
-    <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-    ITEM 2
-  </div>
-  <div class="drag-component" data-faze-drag="item">
-    <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-    ITEM 3
+</aside>
+<aside class="content">
+  <div data-faze="drag" data-faze-drag-group="components" data-faze-styles="false" data-faze-drag-direction="vertical">
+    <div class="drag-component" data-faze-drag="item">
+      <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
+      ITEM 1
+    </div>
+    <div class="drag-component" data-faze-drag="item">
+      <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
+      ITEM 2
+    </div>
+    <div class="drag-component" data-faze-drag="item">
+      <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
+      ITEM 3
+    </div>
   </div>
 </aside>
 <script>

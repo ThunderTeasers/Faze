@@ -32,6 +32,10 @@ module.exports = merge(common, {
       template: './src/tests/views/drag.html',
     }),
     new HtmlWebpackPlugin({
+      filename: 'tab.html',
+      template: './src/tests/views/tab.html',
+    }),
+    new HtmlWebpackPlugin({
       template: './src/index.html',
     }),
     new webpack.HotModuleReplacementPlugin(),

@@ -100,10 +100,12 @@ class Tab extends Module {
    */
   private initializeTabs(): void {
     // Получаем шапки
-    const headersNode = Array.from(this.node.children).find(node => node.classList.contains('faze-tabs-headers'));
-    if (headersNode) {
-      this.headersNodes = Array.from(headersNode.children).filter(node => node.classList.contains('faze-tab-header')) as HTMLElement[];
-    }
+    // const headersNode = Array.from(this.node.children).find(node => node.classList.contains('faze-tabs-headers'));
+    // if (headersNode) {
+    //   this.headersNodes = Array.from(headersNode.children).filter(node => node.classList.contains('faze-tab-header')) as HTMLElement[];
+    // }
+
+    this.headersNodes = Array.from(this.node.querySelectorAll('.faze-tab-header, [data-faze-tab="header"]'));
 
     // Проставляем группу, если её нет
     this.headersNodes.forEach((headerNode: HTMLElement) => {
@@ -111,10 +113,12 @@ class Tab extends Module {
     });
 
     // Получаем тела
-    const bodiesNode = Array.from(this.node.children).find(node => node.classList.contains('faze-tabs-bodies'));
-    if (bodiesNode) {
-      this.bodiesNodes = Array.from(bodiesNode.children).filter(node => node.classList.contains('faze-tab-body')) as HTMLElement[];
-    }
+    // const bodiesNode = Array.from(this.node.children).find(node => node.classList.contains('faze-tabs-bodies'));
+    // if (bodiesNode) {
+    //   this.bodiesNodes = Array.from(bodiesNode.children).filter(node => node.classList.contains('faze-tab-body')) as HTMLElement[];
+    // }
+
+    this.bodiesNodes = Array.from(this.node.querySelectorAll('.faze-tab-body, [data-faze-tab="body"]'));
 
     // Проставляем группу, если её нет
     this.bodiesNodes.forEach((bodyNode: HTMLElement) => {

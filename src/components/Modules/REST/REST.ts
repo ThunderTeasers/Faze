@@ -249,8 +249,8 @@ class REST {
 
     // Футкция, которая исполнится при получении ответа от сервера
     const callbackSuccess = (response: any) => {
-      if (formNode.dataset.fazeRestapiForm) {
-        REST.chain(formNode.dataset.fazeRestapiForm, callback, response);
+      if (formNode.hasAttribute('data-faze-restapi-form')) {
+        REST.chain(formNode.dataset.fazeRestapiForm || null, callback, response);
       }
 
       // Проставляем класс, сигнализирующий о том, что запрос выполнился и ответ пришел

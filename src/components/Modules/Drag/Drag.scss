@@ -6,7 +6,7 @@
  */
 
 // Базовые стили для работы
-.faze-drag {
+.faze-drag, [data-faze~="drag"] {
   position: relative;
 
   // Элемент который перетаскиваем

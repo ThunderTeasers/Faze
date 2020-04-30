@@ -29,7 +29,7 @@
 }
 
 // Стили для визуала
-.faze-drag:not([data-faze-styles="false"]) {
+.faze-drag[data-faze-styles="true"] {
   // Элемент который перетаскиваем
   .faze-drag-item, [data-faze-drag="item"] {
     // Ручка для перетаскивания

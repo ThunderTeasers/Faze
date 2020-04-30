@@ -17,12 +17,10 @@ import Faze from '../../Core/Faze';
  * Структура конфига табов
  *
  * Содержит:
- *   group - группа табов
  *   callbacks
  *     changed - пользовательская функция, исполняющаяся после изменения таба
  */
 interface Config {
-  group: string;
   callbacks: {
     changed?: () => void;
   };
@@ -41,7 +39,6 @@ class Tab extends Module {
   constructor(node?: HTMLElement, config?: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
-      group: 'default',
       callbacks: {
         changed: undefined,
       },
@@ -66,18 +63,15 @@ class Tab extends Module {
     this.initializeTabs();
 
     let key: string;
-    let group: string;
     const alreadyActiveTabNode: HTMLElement | undefined = Array.from(this.headersNodes).find(headerNode => headerNode.classList.contains('faze-active'));
     if (alreadyActiveTabNode) {
       key = alreadyActiveTabNode.dataset.fazeTabBody || '';
-      group = alreadyActiveTabNode.dataset.fazeTabGroup || 'default';
     } else {
       key = this.headersNodes[0].dataset.fazeTabBody || '';
-      group = this.headersNodes[0].dataset.fazeTabGroup || 'default';
     }
 
     // Активация первой вкладки по умолчанию
-    this.activateTab(key, group);
+    this.activateTab(key);
   }
 
   /**
@@ -90,7 +84,7 @@ class Tab extends Module {
       header.addEventListener('click', (event: MouseEvent) => {
         event.preventDefault();
 
-        this.activateTab(header.dataset.fazeTabBody || '', header.dataset.fazeTabGroup || 'default');
+        this.activateTab(header.dataset.fazeTabBody || '');
       });
     });
   }
@@ -100,42 +94,23 @@ class Tab extends Module {
    */
   private initializeTabs(): void {
     // Получаем шапки
-    // const headersNode = Array.from(this.node.children).find(node => node.classList.contains('faze-tabs-headers'));
-    // if (headersNode) {
-    //   this.headersNodes = Array.from(headersNode.children).filter(node => node.classList.contains('faze-tab-header')) as HTMLElement[];
-    // }
-
-    this.headersNodes = Array.from(this.node.querySelectorAll('.faze-tab-header, [data-faze-tab="header"]'));
-
-    // Проставляем группу, если её нет
-    this.headersNodes.forEach((headerNode: HTMLElement) => {
-      headerNode.dataset.fazeTabGroup = this.config.group;
-    });
+    this.headersNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-header, [data-faze-tab="header"]'))
+      .filter((headerNode: HTMLElement) => headerNode.closest('[data-faze~="tab"]') === this.node);
 
     // Получаем тела
-    // const bodiesNode = Array.from(this.node.children).find(node => node.classList.contains('faze-tabs-bodies'));
-    // if (bodiesNode) {
-    //   this.bodiesNodes = Array.from(bodiesNode.children).filter(node => node.classList.contains('faze-tab-body')) as HTMLElement[];
-    // }
-
-    this.bodiesNodes = Array.from(this.node.querySelectorAll('.faze-tab-body, [data-faze-tab="body"]'));
-
-    // Проставляем группу, если её нет
-    this.bodiesNodes.forEach((bodyNode: HTMLElement) => {
-      bodyNode.dataset.fazeTabGroup = this.config.group;
-    });
+    this.bodiesNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-body, [data-faze-tab="body"]'))
+      .filter((bodyNode: HTMLElement) => bodyNode.closest('[data-faze~="tab"]') === this.node);
   }
 
   /**
    * Активация таба, посредством проставления активному телу и шапке класс 'active' и убирая его у всех остальных
    *
    * @param key{string} - ключ в data атрибутах по которому ищем шапку и тело
-   * @param group{string} - группа вкладок
    */
-  activateTab(key: string, group: string): void {
+  activateTab(key: string): void {
     // Активируем шапку
     this.headersNodes.forEach((headerNode: HTMLElement) => {
-      headerNode.classList.toggle('faze-active', key === headerNode.dataset.fazeTabBody && headerNode.dataset.fazeTabGroup === group);
+      headerNode.classList.toggle('faze-active', key === headerNode.dataset.fazeTabBody);
     });
 
     // Получаем все ключи для выбора нужных тел, т.к. их может быть несколько через пробел
@@ -144,7 +119,7 @@ class Tab extends Module {
     // Активируем тела
     this.bodiesNodes.forEach((bodyNode: HTMLElement) => {
       bodyNode.style.display = keys.includes(bodyNode.dataset.fazeTabBody || '') ? 'block' : 'none';
-      bodyNode.classList.toggle('faze-active', keys.includes(bodyNode.dataset.fazeTabBody || '') && bodyNode.dataset.fazeTabGroup === group);
+      bodyNode.classList.toggle('faze-active', keys.includes(bodyNode.dataset.fazeTabBody || ''));
     });
 
     // Вызываем пользовательский метод
@@ -163,9 +138,7 @@ class Tab extends Module {
    * @param node - DOM элемент на который нужно инициализировать плагин
    */
   static initializeByDataAttributes(node: HTMLElement): void {
-    new Tab(node, {
-      group: node.dataset.fazeTabGroup || 'default',
-    });
+    new Tab(node);
   }
 
   /**

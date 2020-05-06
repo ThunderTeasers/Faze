@@ -69,7 +69,8 @@ class REST {
           const responseHTML = (new DOMParser()).parseFromString(response, 'text/html');
 
           document.querySelectorAll(data['response_html']).forEach((el) => {
-            el.innerHTML = responseHTML.querySelector(data['response_html']).innerHTML;
+            const responseNode = responseHTML.querySelector(data['response_html']);
+            el.innerHTML = responseNode ? responseNode.innerHTML : '';
           });
         } else if (data['response_text'] && typeof data['response_text'] === 'string') {
           document.querySelectorAll(data['response_text']).forEach((el) => {
@@ -251,6 +252,9 @@ class REST {
     const callbackSuccess = (response: any) => {
       if (formNode.hasAttribute('data-faze-restapi-form')) {
         REST.chain(formNode.dataset.fazeRestapiForm || null, callback, response);
+      }else if (typeof callback === 'function') {
+        console.log('Нет атрибутов data-faze-restapi-form, но callback задан, исполняем его');
+        callback(response);
       }
 
       // Проставляем класс, сигнализирующий о том, что запрос выполнился и ответ пришел

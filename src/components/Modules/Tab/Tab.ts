@@ -95,11 +95,11 @@ class Tab extends Module {
   private initializeTabs(): void {
     // Получаем шапки
     this.headersNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-header, [data-faze-tab="header"]'))
-      .filter((headerNode: HTMLElement) => headerNode.closest('[data-faze~="tab"]') === this.node);
+      .filter((headerNode: HTMLElement) => headerNode.closest('.faze-tabs, [data-faze~="tab"]') === this.node);
 
     // Получаем тела
     this.bodiesNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-body, [data-faze-tab="body"]'))
-      .filter((bodyNode: HTMLElement) => bodyNode.closest('[data-faze~="tab"]') === this.node);
+      .filter((bodyNode: HTMLElement) => bodyNode.closest('.faze-tabs, [data-faze~="tab"]') === this.node);
   }
 
   /**

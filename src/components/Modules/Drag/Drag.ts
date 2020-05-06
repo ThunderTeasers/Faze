@@ -70,14 +70,17 @@ class Drag {
 
   constructor(nodes: HTMLElement[] | null, config: Partial<Config>) {
     if (!nodes) {
-      return this.logger.error('Не задан объект контейнера элементов для перетаскивания');
+      return this.logger.error('Не заданы объекты контейнеров элементов для перетаскивания');
     }
+
+    // Конвертируем в нужный формат переданные объекты
+    this.nodes = [...Array.from(nodes)];
 
     // Инициализация логгера
     this.logger = new Logger('Модуль Faze.Drag:');
 
     // Проверка на двойную инициализацию
-    const foundNode = nodes.find(node => node.classList.contains('faze-drag-initialized'));
+    const foundNode = this.nodes.find(node => node.classList.contains('faze-drag-initialized'));
     if (foundNode) {
       if (!foundNode.dataset.fazeDragGroup) {
         this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', foundNode);
@@ -97,7 +100,6 @@ class Drag {
 
     // Инициализация переменных
     this.config = Object.assign(defaultConfig, config);
-    this.nodes = nodes;
     this.itemsNodes = [];
     this.nodes.forEach((node: HTMLElement) => {
       this.itemsNodes.push(...Array.from(node.querySelectorAll<HTMLElement>('.faze-drag-item, [data-faze-drag="item"]')));

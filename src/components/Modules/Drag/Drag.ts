@@ -74,7 +74,11 @@ class Drag {
     }
 
     // Конвертируем в нужный формат переданные объекты
-    this.nodes = [...Array.from(nodes)];
+    if (nodes instanceof HTMLElement) {
+      this.nodes = [nodes];
+    } else {
+      this.nodes = [...Array.from(nodes)];
+    }
 
     // Инициализация логгера
     this.logger = new Logger('Модуль Faze.Drag:');

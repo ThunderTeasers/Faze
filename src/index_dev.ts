@@ -230,3 +230,27 @@ Faze.add({
     // console.log(testObject);
   },
 });
+
+// Тест Faze.Drag
+Faze.add({
+  pluginName: 'Faze.Drag Test',
+  condition: document.documentElement.classList.contains('js-drag'),
+  callback: () => {
+    new Faze.Drag(document.querySelectorAll('.js-drag-test'), {
+      callbacks: {
+        created: () => {
+          console.log('Создание прошло успешно');
+        },
+        beforeDrag: () => {
+          console.log('Начинаем перетаскивание');
+        },
+        drag: () => {
+          console.log('Перетаскиваем');
+        },
+        afterDrag: () => {
+          console.log('Заканчиваем перетаскивание');
+        },
+      },
+    });
+  },
+});

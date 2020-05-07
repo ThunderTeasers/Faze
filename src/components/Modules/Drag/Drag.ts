@@ -41,20 +41,20 @@ interface CallbackData {
  *   phantomElementTag - тег фантомного элемента
  *   callbacks
  *     created - пользовательская функция, исполняющийся при успешном создании дропдауна
- *     beforeDragged - пользовательская функция, исполняющаяся до фактического перетаскивания, то есть при нажатии
+ *     beforeDrag- пользовательская функция, исполняющаяся до фактического перетаскивания, то есть при нажатии
  *     drag - пользовательская функция, исполняющаяся в момент перетаскивания
  *     changed - пользовательская функция, исполняющийся при открытии дропдауна
- *     afterDragged - пользовательская функция, исполняющаяся после фактического перетаскивания, то есть когда отпускаем кнопку мыши(аналог "changed")
+ *     afterDrag - пользовательская функция, исполняющаяся после фактического перетаскивания, то есть когда отпускаем кнопку мыши(аналог "changed")
  */
 interface Config {
   direction: SideDirection;
   phantomElementTag: string;
   callbacks: {
     created?: (data: CallbackData) => void;
-    beforeDragged?: (data: CallbackData) => void;
+    beforeDrag?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
     drag?: (data: CallbackData) => void;
-    afterDragged?: (data: CallbackData) => void;
+    afterDrag?: (data: CallbackData) => void;
   };
 }
 
@@ -260,9 +260,9 @@ class Drag {
       document.addEventListener('mousemove', elementDrag);
 
       // Исполняем пользовательский метод после инициализации
-      if (typeof this.config.callbacks.beforeDragged === 'function') {
+      if (typeof this.config.callbacks.beforeDrag === 'function') {
         try {
-          this.config.callbacks.beforeDragged({
+          this.config.callbacks.beforeDrag({
             containerNodes: this.nodes,
             itemsNodes: this.itemsNodes,
           });
@@ -382,9 +382,9 @@ class Drag {
       }
 
       // Исполняем пользовательский метод после инициализации
-      if (typeof this.config.callbacks.afterDragged === 'function') {
+      if (typeof this.config.callbacks.afterDrag === 'function') {
         try {
-          this.config.callbacks.afterDragged({
+          this.config.callbacks.afterDrag({
             containerNodes: this.nodes,
             itemsNodes: this.itemsNodes,
           });

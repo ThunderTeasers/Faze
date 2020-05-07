@@ -40,15 +40,21 @@ interface CallbackData {
  *   direction - в какую сторону перетаскиваем
  *   phantomElementTag - тег фантомного элемента
  *   callbacks
- *     created  - пользовательский метод, исполняющийся при успешном создании дропдауна
- *     opened   - пользовательский метод, исполняющийся при открытии дропдауна
+ *     created - пользовательская функция, исполняющийся при успешном создании дропдауна
+ *     beforeDragged - пользовательская функция, исполняющаяся до фактического перетаскивания, то есть при нажатии
+ *     drag - пользовательская функция, исполняющаяся в момент перетаскивания
+ *     changed - пользовательская функция, исполняющийся при открытии дропдауна
+ *     afterDragged - пользовательская функция, исполняющаяся после фактического перетаскивания, то есть когда отпускаем кнопку мыши(аналог "changed")
  */
 interface Config {
   direction: SideDirection;
   phantomElementTag: string;
   callbacks: {
     created?: (data: CallbackData) => void;
+    beforeDragged?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
+    drag?: (data: CallbackData) => void;
+    afterDragged?: (data: CallbackData) => void;
   };
 }
 
@@ -252,6 +258,18 @@ class Drag {
 
       document.addEventListener('mouseup', endDragElement);
       document.addEventListener('mousemove', elementDrag);
+
+      // Исполняем пользовательский метод после инициализации
+      if (typeof this.config.callbacks.beforeDragged === 'function') {
+        try {
+          this.config.callbacks.beforeDragged({
+            containerNodes: this.nodes,
+            itemsNodes: this.itemsNodes,
+          });
+        } catch (error) {
+          this.logger.error(`Ошибка исполнения пользовательского метода "beforeDragged": ${error}`);
+        }
+      }
     };
 
     /**
@@ -305,6 +323,18 @@ class Drag {
             }
           }
         });
+
+      // Исполняем пользовательский метод после инициализации
+      if (typeof this.config.callbacks.drag === 'function') {
+        try {
+          this.config.callbacks.drag({
+            containerNodes: this.nodes,
+            itemsNodes: this.itemsNodes,
+          });
+        } catch (error) {
+          this.logger.error(`Ошибка исполнения пользовательского метода "drag": ${error}`);
+        }
+      }
     };
 
     /**
@@ -348,6 +378,18 @@ class Drag {
           });
         } catch (error) {
           this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+        }
+      }
+
+      // Исполняем пользовательский метод после инициализации
+      if (typeof this.config.callbacks.afterDragged === 'function') {
+        try {
+          this.config.callbacks.afterDragged({
+            containerNodes: this.nodes,
+            itemsNodes: this.itemsNodes,
+          });
+        } catch (error) {
+          this.logger.error(`Ошибка исполнения пользовательского метода "beforeDragged": ${error}`);
         }
       }
     };

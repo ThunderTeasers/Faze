@@ -8,10 +8,8 @@
 // Базовые стили для работы
 .faze-tabs, .faze-tab, [data-faze~="tab"] {
   // Тела табов
-  .faze-tab-body, [data-faze-tab="body"] {
+  .faze-tab-body, [data-faze-tab="body"], [data-faze-tab-body]:not([data-faze-tab="header"]):not(.faze-tab-header) {
     display: none;
-
-    padding-top: 1rem;
 
     &:first-of-type {
       display: block;
@@ -30,7 +28,8 @@
     border-bottom: 0.1rem solid #000;
   }
 
-  .faze-tab-header, [data-faze-tab="header"] {
+  // Заголовок
+  .faze-tab-header, [data-faze-tab="header"], [data-faze-tab-head] {
     padding: 1rem;
 
     border: 0.1rem solid #000;
@@ -49,5 +48,10 @@
     &:hover {
       cursor: pointer;
     }
+  }
+
+  // Тела табов
+  .faze-tab-body, [data-faze-tab="body"], [data-faze-tab-body] {
+    padding-top: 1rem;
   }
 }

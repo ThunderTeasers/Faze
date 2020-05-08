@@ -65,9 +65,9 @@ class Tab extends Module {
     let key: string;
     const alreadyActiveTabNode: HTMLElement | undefined = Array.from(this.headersNodes).find(headerNode => headerNode.classList.contains('faze-active'));
     if (alreadyActiveTabNode) {
-      key = alreadyActiveTabNode.dataset.fazeTabBody || '';
+      key = alreadyActiveTabNode.dataset.fazeTabHead || alreadyActiveTabNode.dataset.fazeTabBody || '';
     } else {
-      key = this.headersNodes[0].dataset.fazeTabBody || '';
+      key = this.headersNodes[0].dataset.fazeTabHead || this.headersNodes[0].dataset.fazeTabBody || '';
     }
 
     // Активация первой вкладки по умолчанию
@@ -84,7 +84,7 @@ class Tab extends Module {
       header.addEventListener('click', (event: MouseEvent) => {
         event.preventDefault();
 
-        this.activateTab(header.dataset.fazeTabBody || '');
+        this.activateTab(header.dataset.fazeTabHead || header.dataset.fazeTabBody || '');
       });
     });
   }
@@ -94,11 +94,11 @@ class Tab extends Module {
    */
   private initializeTabs(): void {
     // Получаем шапки
-    this.headersNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-header, [data-faze-tab="header"]'))
+    this.headersNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-header, [data-faze-tab="header"], [data-faze-tab-head]'))
       .filter((headerNode: HTMLElement) => headerNode.closest('.faze-tabs, [data-faze~="tab"]') === this.node);
 
     // Получаем тела
-    this.bodiesNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-body, [data-faze-tab="body"]'))
+    this.bodiesNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-body, [data-faze-tab="body"], [data-faze-tab-body]:not([data-faze-tab="header"]):not(.faze-tab-header)'))
       .filter((bodyNode: HTMLElement) => bodyNode.closest('.faze-tabs, [data-faze~="tab"]') === this.node);
   }
 
@@ -110,7 +110,7 @@ class Tab extends Module {
   activateTab(key: string): void {
     // Активируем шапку
     this.headersNodes.forEach((headerNode: HTMLElement) => {
-      headerNode.classList.toggle('faze-active', key === headerNode.dataset.fazeTabBody);
+      headerNode.classList.toggle('faze-active', key === headerNode.dataset.fazeTabBody || key === headerNode.dataset.fazeTabHead);
     });
 
     // Получаем все ключи для выбора нужных тел, т.к. их может быть несколько через пробел

@@ -483,6 +483,9 @@ class REST {
           data['mime'] = 'txt';
         }
 
+        // Получаем полный адрес если необходимо
+        url = data['url'] || url;
+
         // Получаем пользовательскую функцию
         const callback = data['callback'];
 
@@ -491,6 +494,7 @@ class REST {
         delete data['module'];
         delete data['page'];
         delete data['callback'];
+        delete data['url'];
 
         dataType = data['mime'] === 'json' ? 'json' : 'html';
 

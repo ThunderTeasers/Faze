@@ -480,7 +480,7 @@ class Helpers {
 
                 // Если элемент в массиве не нашли, то необходимо добавить новый элемент в массив
                 if (foundIndex === -1) {
-                  target[key].push(...source[key][0]);
+                  target[key].push(source[key][0]);
                 } else {
                   // Если нашли, то объединяем объекты этого элемента с новым
                   target[key][foundIndex] = {...foundElement, ...source[key][0]};

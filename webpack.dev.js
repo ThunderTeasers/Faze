@@ -36,6 +36,10 @@ module.exports = merge(common, {
       template: './src/tests/views/tab.html',
     }),
     new HtmlWebpackPlugin({
+      filename: 'tooltip.html',
+      template: './src/tests/views/tooltip.html',
+    }),
+    new HtmlWebpackPlugin({
       template: './src/index.html',
     }),
     new webpack.HotModuleReplacementPlugin(),

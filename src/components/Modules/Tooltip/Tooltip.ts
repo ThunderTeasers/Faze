@@ -20,6 +20,7 @@ import Logger from '../../Core/Logger';
  *   side   - сторона с которой должена появляться подсказка
  *   margin - отступ от выбранной стороны(side) в пикселях
  *   class  - кастомный класс
+ *   event - событие вызова тултипа
  *   callbacks
  *     opened  - пользовательская функция, срабатывающая при показе тултипа
  */
@@ -28,6 +29,7 @@ interface Config {
   side: string;
   margin: number;
   class: string;
+  event: string;
   callbacks: {
     opened?: () => void;
   };
@@ -69,6 +71,7 @@ class Tooltip {
       side: 'bottom',
       margin: 10,
       class: '',
+      event: 'mouseenter',
       callbacks: {
         opened: undefined,
       },
@@ -102,36 +105,66 @@ class Tooltip {
    * Навешивание событий
    */
   bind(): void {
-    this.node.addEventListener('mouseenter', () => {
-      // Если не нужно показывать тултип, то выходим из метода
-      if (this.node.dataset.fazeTooltipDisabled === 'true') {
-        return;
+    if (this.config.event === 'mouseenter') {
+      this.node.addEventListener('mouseenter', () => {
+        this.show();
+      });
+
+      // Удаление тултипа при выводе мышки за пределы DOM элемента который вызывает тултип
+      this.node.addEventListener('mouseleave', () => {
+        this.hide();
+      });
+    } else if (this.config.event === 'click') {
+      this.node.addEventListener('click', () => {
+        this.toggle();
+        // this.show();
+      });
+    }
+  }
+
+  /**
+   * Показ тултипа
+   */
+  private show(): void {
+    // Если не нужно показывать тултип, то выходим из метода
+    if (this.node.dataset.fazeTooltipDisabled === 'true') {
+      return;
+    }
+
+    // Для начала скрываем тултип для первичного рассчета его данных
+    this.tooltip.style.visibility = 'hidden';
+    document.body.appendChild(this.tooltip);
+
+    // Рассчет позиционирования и размеров
+    this.calculatePositionAndSize();
+
+    // Показываем тултип
+    this.tooltip.style.visibility = 'visible';
+
+    // Вызываем пользовательский метод
+    if (typeof this.config.callbacks.opened === 'function') {
+      try {
+        this.config.callbacks.opened();
+      } catch (error) {
+        this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
       }
+    }
+  }
 
-      // Для начала скрываем тултип для первичного рассчета его данных
-      this.tooltip.style.visibility = 'hidden';
-      document.body.appendChild(this.tooltip);
+  /**
+   * Скрытие тултипа
+   */
+  private hide(): void {
+    this.tooltip.style.visibility = 'hidden';
 
-      // Рассчет позиционирования и размеров
-      this.calculatePositionAndSize();
+    this.tooltip.remove();
+  }
 
-      // Показываем тултип
-      this.tooltip.style.visibility = 'visible';
-
-      // Вызываем пользовательский метод
-      if (typeof this.config.callbacks.opened === 'function') {
-        try {
-          this.config.callbacks.opened();
-        } catch (error) {
-          this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
-        }
-      }
-    });
-
-    // Удаление тултипа при выводе мышки за пределы DOM элемента который вызывает тултип
-    this.node.addEventListener('mouseleave', () => {
-      this.tooltip.remove();
-    });
+  /**
+   * Переключение видимости тултипа
+   */
+  private toggle(): void {
+    this.tooltip.style.visibility === 'visible' ? this.hide() : this.show();
   }
 
   /**
@@ -190,6 +223,7 @@ class Tooltip {
       text: tooltipNode.dataset.fazeTooltipText || '',
       side: tooltipNode.dataset.fazeTooltipSide || tooltipNode.dataset.fazeTooltipAlign || 'bottom',
       class: tooltipNode.dataset.fazeTooltipClass || '',
+      event: tooltipNode.dataset.fazeTooltipEvent || 'mouseenter',
     });
   }
 

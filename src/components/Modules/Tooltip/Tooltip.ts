@@ -21,6 +21,7 @@ import Logger from '../../Core/Logger';
  *   margin - отступ от выбранной стороны(side) в пикселях
  *   class  - кастомный класс
  *   event - событие вызова тултипа
+ *   dynamicUpdate - нужно ли динамическое обновление текста тултипа, если оно изменится в data атрибутах
  *   callbacks
  *     opened  - пользовательская функция, срабатывающая при показе тултипа
  */
@@ -30,6 +31,7 @@ interface Config {
   margin: number;
   class: string;
   event: string;
+  dynamicUpdate: boolean;
   callbacks: {
     opened?: () => void;
   };
@@ -72,6 +74,7 @@ class Tooltip {
       margin: 10,
       class: '',
       event: 'mouseenter',
+      dynamicUpdate: false,
       callbacks: {
         opened: undefined,
       },
@@ -142,6 +145,11 @@ class Tooltip {
       return;
     }
 
+    // Обновление текста
+    if (this.config.dynamicUpdate) {
+      this.updateText();
+    }
+
     // Для начала скрываем тултип для первичного рассчета его данных
     this.tooltipNode.style.visibility = 'hidden';
     document.body.appendChild(this.tooltipNode);
@@ -179,9 +187,16 @@ class Tooltip {
   }
 
   /**
+   * Обновление текста тултипа
+   */
+  private updateText(): void {
+    this.tooltipNode.innerHTML = this.node.dataset.fazeTooltipText || this.node.title || '';
+  }
+
+  /**
    * Рассчет позиции и размеров тултипа
    */
-  calculatePositionAndSize(): void {
+  private calculatePositionAndSize(): void {
     // Кэшируем данные для рассчета
     const callerRect = this.node.getBoundingClientRect();
     const tooltipRect = this.tooltipNode.getBoundingClientRect();
@@ -235,6 +250,7 @@ class Tooltip {
       side: tooltipNode.dataset.fazeTooltipSide || tooltipNode.dataset.fazeTooltipAlign || 'bottom',
       class: tooltipNode.dataset.fazeTooltipClass || '',
       event: tooltipNode.dataset.fazeTooltipEvent || 'mouseenter',
+      dynamicUpdate: tooltipNode.dataset.fazeTooltipDynamicUpdate === 'true',
     });
   }
 

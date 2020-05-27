@@ -233,6 +233,10 @@ class REST {
 
     // Определение, какой тип ответа запрашивать
     let typeForResponse: string = 'text';
+    if (formNode.elements[<any>'mime'] && (<any>formNode.elements[<any>'mime']).value) {
+      typeForResponse = (<any>formNode.elements[<any>'mime']).value;
+    }
+
     let notificationNode: HTMLElement | null = null;
 
     // Ищем DOM элемент для вывода информационного сообщения

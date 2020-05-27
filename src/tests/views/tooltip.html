@@ -5,34 +5,22 @@
   <title>Title</title>
 </head>
 <body>
-<button style="margin-left: 500px; margin-top: 500px;" data-faze="tooltip" data-faze-tooltip-text="Test" data-faze-tooltip-side="bottom" data-faze-tooltip-event="click">
-  Спойлер
+<button class="js-tooltip-change">Изменить текст тултипа 1</button>
+<button class="js-tooltip1" style="margin-left: 200px; margin-top: 200px;"
+        data-faze="tooltip"
+        data-faze-tooltip-dynamic-update="true"
+        data-faze-tooltip-text="Test"
+        data-faze-tooltip-side="bottom">
+  Тултип 1
 </button>
 
-<button style="margin-left: 500px; margin-top: 500px;" data-faze="tooltip" data-faze-tooltip-text="Test" data-faze-tooltip-side="bottom" data-faze-tooltip-event="click">
-  Спойлер
+<button data-faze="tooltip" data-faze-tooltip-text="Test" data-faze-tooltip-side="bottom" data-faze-tooltip-event="click">
+  Тултип 2
 </button>
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-<div style="display:flex;flex-direction: column;align-items: flex-start">
-  <input type="text" placeholder="Стандартный инпут"><br>
-  <textarea name="" id="" cols="30" rows="10" placeholder="Поле ввода текста"></textarea><br>
-  <button>Кнопка</button>
-  <br>
-  <div style="display:flex;">
-    <label><input type="checkbox"> Стандарт</label>&nbsp;&nbsp;&nbsp;&nbsp;
-    <label><input type="checkbox" checked> Выбран</label>
-  </div>
-  <br>
-  <div style="display:flex;">
-    <label><input type="radio"> Стандарт</label>&nbsp;&nbsp;&nbsp;&nbsp;
-    <label><input type="radio" checked> Выбран</label>
-  </div>
-  <br>
-  <select name="" id="">
-    <option value="">Выпадающий список</option>
-  </select>
-  <br>
-  <input type="file">
-</div>
+<script>
+  document.querySelector('.js-tooltip1').addEventListener('click', () => {
+    document.querySelector('.js-tooltip1').dataset.fazeTooltipText = '123';
+  });
+</script>
 </body>
 </html>

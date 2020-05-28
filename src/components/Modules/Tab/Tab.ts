@@ -17,10 +17,12 @@ import Faze from '../../Core/Faze';
  * Структура конфига табов
  *
  * Содержит:
+ *   headerActiveClass - CSS класс активного таба
  *   callbacks
  *     changed - пользовательская функция, исполняющаяся после изменения таба
  */
 interface Config {
+  headerActiveClass?: string;
   callbacks: {
     changed?: () => void;
   };
@@ -39,6 +41,7 @@ class Tab extends Module {
   constructor(node?: HTMLElement, config?: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
+      headerActiveClass: undefined,
       callbacks: {
         changed: undefined,
       },
@@ -110,7 +113,16 @@ class Tab extends Module {
   activateTab(key: string): void {
     // Активируем шапку
     this.headersNodes.forEach((headerNode: HTMLElement) => {
-      headerNode.classList.toggle('faze-active', key === headerNode.dataset.fazeTabBody || key === headerNode.dataset.fazeTabHead);
+      // Является ли заголовок активным
+      const isActive = key === headerNode.dataset.fazeTabBody || key === headerNode.dataset.fazeTabHead;
+
+      // Проставляем стандартный класс активности
+      headerNode.classList.toggle('faze-active', isActive);
+
+      // Проставляем пользовательский класс
+      if (this.config.headerActiveClass) {
+        headerNode.classList.toggle(this.config.headerActiveClass, isActive);
+      }
     });
 
     // Получаем все ключи для выбора нужных тел, т.к. их может быть несколько через пробел
@@ -138,7 +150,9 @@ class Tab extends Module {
    * @param node - DOM элемент на который нужно инициализировать плагин
    */
   static initializeByDataAttributes(node: HTMLElement): void {
-    new Tab(node);
+    new Tab(node, {
+      headerActiveClass: node.dataset.fazeTabHeaderActiveClass,
+    });
   }
 
   /**

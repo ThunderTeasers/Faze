@@ -31,7 +31,15 @@ class REST {
       formData = new FormData(data);
     } else if (data) {
       for (const key of Object.keys(data)) {
-        formData.append(key, data[key]);
+        // Проверяем массив ли это, если да, то добавляем все его элементы в FormData в цикле
+        if (data[key] instanceof Array) {
+          for (const value of data[key]) {
+            formData.append(key, value);
+          }
+        } else {
+          // Если нет, просто добавляем
+          formData.append(key, data[key]);
+        }
       }
     } else {
       throw new Error('Параметр "data" функции ajaxRequest не является объектом');
@@ -256,7 +264,7 @@ class REST {
     const callbackSuccess = (response: any) => {
       if (formNode.hasAttribute('data-faze-restapi-form')) {
         REST.chain(formNode.dataset.fazeRestapiForm || null, callback, response);
-      }else if (typeof callback === 'function') {
+      } else if (typeof callback === 'function') {
         console.log('Нет атрибутов data-faze-restapi-form, но callback задан, исполняем его');
         callback(response);
       }

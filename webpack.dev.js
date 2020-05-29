@@ -40,6 +40,10 @@ module.exports = merge(common, {
       template: './src/tests/views/tooltip.html',
     }),
     new HtmlWebpackPlugin({
+      filename: 'dropdown.html',
+      template: './src/tests/views/dropdown.html',
+    }),
+    new HtmlWebpackPlugin({
       template: './src/index.html',
     }),
     new webpack.HotModuleReplacementPlugin(),

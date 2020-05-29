@@ -103,8 +103,8 @@ class Dropdown {
     this.node.classList.add('faze-dropdown-initialized');
 
     // Поиск основных элементов и проверка на то что они найдены
-    this.title = this.node.querySelector('.faze-title');
-    this.body = this.node.querySelector('.faze-body');
+    this.title = this.node.querySelector('.faze-title, [data-faze-dropdown="title"]');
+    this.body = this.node.querySelector('.faze-body, [data-faze-dropdown="body"]');
 
     if (!this.title || !this.body) {
       return this.logger.error('Для дропдауна не найдены шапка и тело');

@@ -5,7 +5,7 @@
  * Дата: 17.10.2018
  */
 
-.faze-spoiler {
+.faze-spoiler, [data-faze="spoiler"] {
   & > .faze-title, & > [data-faze-spoiler="title"] {
     user-select: none;
 

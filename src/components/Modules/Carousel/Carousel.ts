@@ -1114,13 +1114,7 @@ class Carousel {
    * Изменение активной точки в пагинации
    */
   changePagination(): void {
-    this.pagesNodes.forEach((pageNode: HTMLElement, pageIndex: number) => {
-      if (this.index === pageIndex) {
-        pageNode.classList.add('faze-active');
-      } else {
-        pageNode.classList.remove('faze-active');
-      }
-    });
+    Faze.Helpers.activateItem(Array.from(this.pagesNodes), this.index, 'faze-active');
   }
 
   /**

@@ -1141,6 +1141,25 @@ class Helpers {
       return dictionary[char] || char;
     }).join('');
   }
+
+
+  /**
+   * Парсинг JSON с отловом ошибок
+   *
+   * @param text{string} Текст нераспаршенного JSONа
+   *
+   * @return{object} Готовый JS объект
+   */
+  static parseJSON(text: string): object {
+    let data: object = {};
+    try {
+      data = JSON.parse(text);
+    } catch (error) {
+      console.error(error);
+    }
+
+    return data;
+  }
 }
 
 export default Helpers;

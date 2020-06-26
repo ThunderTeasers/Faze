@@ -1128,15 +1128,11 @@ class Carousel {
 
       this.slideWidth = slideNode.offsetWidth +
         parseFloat(style.marginLeft || '0') +
-        parseFloat(style.marginRight || '0') +
-        parseFloat(style.paddingLeft || '0') +
-        parseFloat(style.paddingRight || '0');
+        parseFloat(style.marginRight || '0');
 
       this.slideHeight = slideNode.offsetHeight +
         parseFloat(style.marginTop || '0') +
-        parseFloat(style.marginBottom || '0') +
-        parseFloat(style.paddingTop || '0') +
-        parseFloat(style.paddingBottom || '0');
+        parseFloat(style.marginBottom || '0');
     } else {
       this.slideWidth = slideNode.offsetWidth;
       this.slideHeight = slideNode.offsetHeight;

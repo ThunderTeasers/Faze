@@ -1,27 +1,29 @@
 const path = require('path');
 
-module.exports = {
-  output: {
-    filename: 'faze.min.js',
-    path: path.resolve(__dirname, 'dist'),
-    publicPath: '/',
-  },
-  resolve: {
-    extensions: ['.ts', '.js', '.scss', '.css'],
-  },
-  module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
-      },
-      {
-        test: /\.(png|svg|jpg|gif)$/,
-        use: [
-          'file-loader',
-        ],
-      },
-    ],
-  },
+module.exports = env => {
+  return {
+    output: {
+      filename: env === 'production' ? 'faze.min.js' : 'faze.js',
+      path: path.resolve(__dirname, 'dist'),
+      publicPath: '/',
+    },
+    resolve: {
+      extensions: ['.ts', '.js', '.scss', '.css'],
+    },
+    module: {
+      rules: [
+        {
+          test: /\.ts$/,
+          use: 'ts-loader',
+          exclude: /node_modules/,
+        },
+        {
+          test: /\.(png|svg|jpg|gif)$/,
+          use: [
+            'file-loader',
+          ],
+        },
+      ],
+    },
+  }
 };

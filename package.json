@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "start": "webpack-dev-server --open --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js"
+    "prod": "webpack --env=production --config webpack.prod.js",
+    "dev": "webpack --env=development --config webpack.prod.js"
   },
   "author": "Erokhin Maxim",
   "license": "ISC",

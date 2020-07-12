@@ -44,6 +44,10 @@ module.exports = merge(common, {
       template: './src/tests/views/dropdown.html',
     }),
     new HtmlWebpackPlugin({
+      filename: 'carousel.html',
+      template: './src/tests/views/carousel.html',
+    }),
+    new HtmlWebpackPlugin({
       template: './src/index.html',
     }),
     new webpack.HotModuleReplacementPlugin(),

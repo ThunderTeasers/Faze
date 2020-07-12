@@ -87,3 +87,11 @@
     }
   }
 }
+
+// Если появляться по клику, то при наведении показываем указатель
+[data-faze~="tooltip"][data-faze-tooltip-event="click"] {
+  // При наведении
+  &:hover {
+    cursor: pointer;
+  }
+}

@@ -5,15 +5,35 @@
  * Дата: 19.12.2019
  */
 
-.faze-drag {
+// Базовые стили для работы
+.faze-drag, [data-faze~="drag"] {
   position: relative;
 
   // Элемент который перетаскиваем
-  .faze-drag-item {
+  .faze-drag-item, [data-faze-drag="item"] {
     position: relative;
 
-    // Ручка для перетаскивания элемента
-    .faze-drag-handle {
+    // Когда двигаем элемент, делаем его максимально "первым" по z оси
+    &.faze-drag-item-moving {
+      z-index: 999999;
+    }
+
+    // Ручка для перетаскивания
+    .faze-drag-handle, [data-faze-drag="handle"] {
+      // При наведении
+      &:hover {
+        cursor: move;
+      }
+    }
+  }
+}
+
+// Стили для визуала
+.faze-drag[data-faze-styles="true"] {
+  // Элемент который перетаскиваем
+  .faze-drag-item, [data-faze-drag="item"] {
+    // Ручка для перетаскивания
+    .faze-drag-handle, [data-faze-drag="handle"] {
       position: absolute;
       top: 0;
       left: 0;

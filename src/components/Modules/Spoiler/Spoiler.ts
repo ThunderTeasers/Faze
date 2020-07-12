@@ -88,8 +88,8 @@ class Spoiler {
     // Инициализация переменных
     this.node = node;
 
-    this.titleNode = node.querySelector('.title');
-    this.bodyNode = node.querySelector('.body');
+    this.titleNode = node.querySelector('.title, [data-faze-spoiler="title"]');
+    this.bodyNode = node.querySelector('.body, [data-faze-spoiler="body"]');
 
     this.initialize();
     this.bind();

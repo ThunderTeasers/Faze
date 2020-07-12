@@ -5,23 +5,46 @@
  * Дата: 26.09.2018
  */
 
+// Базовые стили для работы
+.faze-dropdown, [data-faze="dropdown"] {
+  // Шапка
+  .faze-title, [data-faze-dropdown="title"] {
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  // Тело
+  .faze-body, [data-faze-dropdown="body"] {
+    position: absolute;
+
+    display: none;
+
+    z-index: 3;
+  }
+
+  // Активный элемент
+  &.faze-active {
+    // Тело
+    .faze-body, [data-faze-dropdown="body"] {
+      display: block;
+    }
+  }
+}
+
+// Стили для визуала
 .faze-dropdown {
   position: relative;
 
   & > .faze-title {
     display: inline-flex;
-
     padding: 0.5rem 1rem;
 
     border: 0.1rem solid #000;
 
     line-height: 1;
 
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
-
     z-index: 2;
 
     &:hover {

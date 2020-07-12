@@ -3,7 +3,6 @@
  */
 
 import Logger from './Logger';
-import Faze from './Faze';
 
 /**
  * Структура конфига плагина
@@ -55,7 +54,6 @@ class Module {
 
     // Инициализируем переменные
     this.node = data.node;
-    console.log(data.defaultConfig, data.config);
     this.config = Object.assign(data.defaultConfig, data.config);
 
     // Вызываем стандартные методы
@@ -77,27 +75,27 @@ class Module {
    */
   public bind(): void {}
 
-  /**
-   * Инициализация модуля по data атрибутам
-   *
-   * @param node - DOM элемент на который нужно инициализировать плагин
-   */
-  static initializeByDataAttributes(node: HTMLElement): void {}
-
-  /**
-   * "Горячая" инициализация модуля через "observer"
-   */
-  static hotInitialize(): void {
-    // Инициализация через "observer"
-    Faze.Observer.watch(`[data-faze~="${this.name.toLowerCase()}"]`, (node: HTMLElement) => {
-      this.initializeByDataAttributes(node);
-    });
-
-    // Стандартная инициализация по data атрибутам
-    document.querySelectorAll<HTMLElement>(`[data-faze~="${this.name.toLowerCase()}"]`).forEach((node: HTMLElement) => {
-      this.initializeByDataAttributes(node);
-    });
-  }
+  // /**
+  //  * Инициализация модуля по data атрибутам
+  //  *
+  //  * @param node - DOM элемент на который нужно инициализировать плагин
+  //  */
+  // static initializeByDataAttributes(node: HTMLElement): void {}
+  //
+  // /**
+  //  * "Горячая" инициализация модуля через "observer"
+  //  */
+  // static hotInitialize(): void {
+  //   // Инициализация через "observer"
+  //   Faze.Observer.watch(`[data-faze~="${this.name.toLowerCase()}"]`, (node: HTMLElement) => {
+  //     this.initializeByDataAttributes(node);
+  //   });
+  //
+  //   // Стандартная инициализация по data атрибутам
+  //   document.querySelectorAll<HTMLElement>(`[data-faze~="${this.name.toLowerCase()}"]`).forEach((node: HTMLElement) => {
+  //     this.initializeByDataAttributes(node);
+  //   });
+  // }
 }
 
 export default Module;

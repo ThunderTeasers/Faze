@@ -31,7 +31,15 @@ class REST {
       formData = new FormData(data);
     } else if (data) {
       for (const key of Object.keys(data)) {
-        formData.append(key, data[key]);
+        // Проверяем массив ли это, если да, то добавляем все его элементы в FormData в цикле
+        if (data[key] instanceof Array) {
+          for (const value of data[key]) {
+            formData.append(key, value);
+          }
+        } else {
+          // Если нет, просто добавляем
+          formData.append(key, data[key]);
+        }
       }
     } else {
       throw new Error('Параметр "data" функции ajaxRequest не является объектом');
@@ -44,7 +52,8 @@ class REST {
 
     // Если это GET запрос, подставляем параметры
     if (method.toLowerCase() === 'get') {
-      currentURL += `?${(new URLSearchParams(<any>formData)).toString()}`;
+      const formDataQuery: string = [...formData.entries()].map(entry => `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(<any>entry[1])}`).join('&');
+      currentURL += `?${(new URLSearchParams(formDataQuery)).toString()}`;
     }
 
     fetch(`${currentURL}`, fetchOptions)
@@ -68,7 +77,8 @@ class REST {
           const responseHTML = (new DOMParser()).parseFromString(response, 'text/html');
 
           document.querySelectorAll(data['response_html']).forEach((el) => {
-            el.innerHTML = responseHTML.querySelector(data['response_html']).innerHTML;
+            const responseNode = responseHTML.querySelector(data['response_html']);
+            el.innerHTML = responseNode ? responseNode.innerHTML : '';
           });
         } else if (data['response_text'] && typeof data['response_text'] === 'string') {
           document.querySelectorAll(data['response_text']).forEach((el) => {
@@ -231,6 +241,10 @@ class REST {
 
     // Определение, какой тип ответа запрашивать
     let typeForResponse: string = 'text';
+    if (formNode.elements[<any>'mime'] && (<any>formNode.elements[<any>'mime']).value) {
+      typeForResponse = (<any>formNode.elements[<any>'mime']).value;
+    }
+
     let notificationNode: HTMLElement | null = null;
 
     // Ищем DOM элемент для вывода информационного сообщения
@@ -248,8 +262,11 @@ class REST {
 
     // Футкция, которая исполнится при получении ответа от сервера
     const callbackSuccess = (response: any) => {
-      if (formNode.dataset.fazeRestapiForm) {
-        REST.chain(formNode.dataset.fazeRestapiForm, callback, response);
+      if (formNode.hasAttribute('data-faze-restapi-form')) {
+        REST.chain(formNode.dataset.fazeRestapiForm || null, callback, response);
+      } else if (typeof callback === 'function') {
+        console.log('Нет атрибутов data-faze-restapi-form, но callback задан, исполняем его');
+        callback(response);
       }
 
       // Проставляем класс, сигнализирующий о том, что запрос выполнился и ответ пришел
@@ -478,6 +495,9 @@ class REST {
           data['mime'] = 'txt';
         }
 
+        // Получаем полный адрес если необходимо
+        url = data['url'] || url;
+
         // Получаем пользовательскую функцию
         const callback = data['callback'];
 
@@ -486,6 +506,7 @@ class REST {
         delete data['module'];
         delete data['page'];
         delete data['callback'];
+        delete data['url'];
 
         dataType = data['mime'] === 'json' ? 'json' : 'html';
 

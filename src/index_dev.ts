@@ -13,24 +13,29 @@ Helpers.initialize();
 // @ts-ignore
 window.Faze = Faze;
 
-Faze.Helpers.setElementStyle(document.querySelector('[name="product_chr_search"]'), {width: '123px'});
-Faze.Helpers.setElementAttributes(document.querySelector('[name="product_chr_search"]'), {width: '123px'});
+// Faze.Helpers.setElementStyle(document.querySelector('[name="product_chr_search"]'), {width: '123px'});
+// Faze.Helpers.setElementAttributes(document.querySelector('[name="product_chr_search"]'), {width: '123px'});
 
-new Faze.Modal(document.querySelector('#button'), {
-  title: 'Тестирование модального окна',
-  url: 'https://jsonplaceholder.typicode.com/todos/1',
-  // html: '<p>Hello!</p>',
-  draggable: true,
-  buttons: [
-    {
-      caption: 'Закрыть',
-      class: 'btn btn-close',
-      callback: (parts: any) => {
-        parts.closeButton.click();
-      },
-    },
-  ],
-});
+// const nodes = document.querySelectorAll('.js-viewport-test');
+// window.addEventListener('scroll', () => {
+//   console.log(Faze.Helpers.isElementsInViewport(nodes, 100, true));
+// });
+
+// new Faze.Modal(document.querySelector('#button'), {
+//   title: 'Тестирование модального окна',
+//   url: 'https://jsonplaceholder.typicode.com/todos/1',
+//   // html: '<p>Hello!</p>',
+//   draggable: true,
+//   buttons: [
+//     {
+//       caption: 'Закрыть',
+//       class: 'btn btn-close',
+//       callback: (parts: any) => {
+//         parts.closeButton.click();
+//       },
+//     },
+//   ],
+// });
 
 // Тесты
 Faze.add({
@@ -94,7 +99,7 @@ Faze.add({
       arrowsOutside: true,
       counter: false,
       infinite: false,
-      mouseMove: true,
+      mouseMove: false,
       // amountPerSlide: 2,
       animation: {
         type: 'slide',
@@ -109,8 +114,8 @@ Faze.add({
         created: (data: any) => {
           console.log(data);
         },
-        changed: ({direction}: { direction?: string }) => {
-          console.log(direction);
+        changed: ({currentSlideNode}: { currentSlideNode?: any }) => {
+          console.log(currentSlideNode);
         },
       },
     });
@@ -223,5 +228,29 @@ Faze.add({
     // testObject = Faze.Helpers.objectFromString(testObject, 'house.address', 'name', 'max');
     //
     // console.log(testObject);
+  },
+});
+
+// Тест Faze.Drag
+Faze.add({
+  pluginName: 'Faze.Drag Test',
+  condition: document.documentElement.classList.contains('js-drag'),
+  callback: () => {
+    new Faze.Drag(document.querySelectorAll('.js-drag-test'), {
+      callbacks: {
+        created: () => {
+          console.log('Создание прошло успешно');
+        },
+        beforeDrag: () => {
+          console.log('Начинаем перетаскивание');
+        },
+        drag: () => {
+          console.log('Перетаскиваем');
+        },
+        afterDrag: () => {
+          console.log('Заканчиваем перетаскивание');
+        },
+      },
+    });
   },
 });

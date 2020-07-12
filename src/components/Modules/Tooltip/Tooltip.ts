@@ -20,6 +20,8 @@ import Logger from '../../Core/Logger';
  *   side   - сторона с которой должена появляться подсказка
  *   margin - отступ от выбранной стороны(side) в пикселях
  *   class  - кастомный класс
+ *   event - событие вызова тултипа
+ *   dynamicUpdate - нужно ли динамическое обновление текста тултипа, если оно изменится в data атрибутах
  *   callbacks
  *     opened  - пользовательская функция, срабатывающая при показе тултипа
  */
@@ -28,6 +30,8 @@ interface Config {
   side: string;
   margin: number;
   class: string;
+  event: string;
+  dynamicUpdate: boolean;
   callbacks: {
     opened?: () => void;
   };
@@ -47,7 +51,7 @@ class Tooltip {
   readonly config: Config;
 
   // DOM элемент для отрисовки тултипа
-  readonly tooltip: HTMLDivElement;
+  readonly tooltipNode: HTMLDivElement;
 
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
@@ -69,6 +73,8 @@ class Tooltip {
       side: 'bottom',
       margin: 10,
       class: '',
+      event: 'mouseenter',
+      dynamicUpdate: false,
       callbacks: {
         opened: undefined,
       },
@@ -83,7 +89,7 @@ class Tooltip {
 
     // Инициализация переменных
     this.node = node;
-    this.tooltip = document.createElement('div');
+    this.tooltipNode = document.createElement('div');
 
     this.initialize();
     this.bind();
@@ -93,54 +99,107 @@ class Tooltip {
    * Инициализация
    */
   initialize(): void {
-    this.tooltip.className = `faze-tooltip faze-tooltip-initialized faze-tooltip-${this.config.side} ${this.config.class}`;
-    this.tooltip.style.visibility = 'hidden';
-    this.tooltip.innerHTML = this.config.text || this.node.dataset.fazeTooltipText || this.node.title || '';
+    this.tooltipNode.className = `faze-tooltip faze-tooltip-initialized faze-tooltip-${this.config.side} ${this.config.class}`;
+    this.tooltipNode.style.visibility = 'hidden';
+    this.tooltipNode.innerHTML = this.config.text || this.node.dataset.fazeTooltipText || this.node.title || '';
   }
 
   /**
    * Навешивание событий
    */
   bind(): void {
-    this.node.addEventListener('mouseenter', () => {
-      // Если не нужно показывать тултип, то выходим из метода
-      if (this.node.dataset.fazeTooltipDisabled === 'true') {
-        return;
-      }
-
-      // Для начала скрываем тултип для первичного рассчета его данных
-      this.tooltip.style.visibility = 'hidden';
-      document.body.appendChild(this.tooltip);
-
-      // Рассчет позиционирования и размеров
-      this.calculatePositionAndSize();
-
-      // Показываем тултип
-      this.tooltip.style.visibility = 'visible';
-
-      // Вызываем пользовательский метод
-      if (typeof this.config.callbacks.opened === 'function') {
-        try {
-          this.config.callbacks.opened();
-        } catch (error) {
-          this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
+    // Проверка на нажатие за пределами тултипа
+    document.addEventListener('click', (event: MouseEvent) => {
+      const path = (event as any).path || (event.composedPath && event.composedPath());
+      if (path) {
+        if (!path.find((element: HTMLElement) => element === this.tooltipNode || element === this.node)) {
+          this.hide();
         }
       }
     });
 
-    // Удаление тултипа при выводе мышки за пределы DOM элемента который вызывает тултип
-    this.node.addEventListener('mouseleave', () => {
-      this.tooltip.remove();
-    });
+    // При наведении
+    if (this.config.event === 'mouseenter') {
+      this.node.addEventListener('mouseenter', () => {
+        this.show();
+      });
+
+      // Удаление тултипа при выводе мышки за пределы DOM элемента который вызывает тултип
+      this.node.addEventListener('mouseleave', () => {
+        this.hide();
+      });
+    } else if (this.config.event === 'click') {
+      // При клике
+      this.node.addEventListener('click', () => {
+        this.toggle();
+      });
+    }
+  }
+
+  /**
+   * Показ тултипа
+   */
+  private show(): void {
+    // Если не нужно показывать тултип, то выходим из метода
+    if (this.node.dataset.fazeTooltipDisabled === 'true') {
+      return;
+    }
+
+    // Обновление текста
+    if (this.config.dynamicUpdate) {
+      this.updateText();
+    }
+
+    // Для начала скрываем тултип для первичного рассчета его данных
+    this.tooltipNode.style.visibility = 'hidden';
+    document.body.appendChild(this.tooltipNode);
+
+    // Рассчет позиционирования и размеров
+    this.calculatePositionAndSize();
+
+    // Показываем тултип
+    this.tooltipNode.style.visibility = 'visible';
+
+    // Вызываем пользовательский метод
+    if (typeof this.config.callbacks.opened === 'function') {
+      try {
+        this.config.callbacks.opened();
+      } catch (error) {
+        this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
+      }
+    }
+  }
+
+  /**
+   * Скрытие тултипа
+   */
+  private hide(): void {
+    this.tooltipNode.style.visibility = 'hidden';
+
+    this.tooltipNode.remove();
+  }
+
+  /**
+   * Переключение видимости тултипа
+   */
+  private toggle(): void {
+    this.tooltipNode.style.visibility === 'visible' ? this.hide() : this.show();
+  }
+
+  /**
+   * Обновление текста тултипа
+   */
+  private updateText(): void {
+    this.tooltipNode.innerHTML = this.node.dataset.fazeTooltipText || this.node.title || '';
   }
 
   /**
    * Рассчет позиции и размеров тултипа
    */
-  calculatePositionAndSize(): void {
+  private calculatePositionAndSize(): void {
     // Кэшируем данные для рассчета
     const callerRect = this.node.getBoundingClientRect();
-    const tooltipRect = this.tooltip.getBoundingClientRect();
+    const tooltipRect = this.tooltipNode.getBoundingClientRect();
 
     // Рассчет отступов
     const offsetHorizontal = callerRect.width / 2 + tooltipRect.width / 2 + this.config.margin;
@@ -176,8 +235,8 @@ class Tooltip {
     }
 
     // Применение данных на тултип
-    this.tooltip.style.top = `${centerY}px`;
-    this.tooltip.style.left = `${centerX}px`;
+    this.tooltipNode.style.top = `${centerY}px`;
+    this.tooltipNode.style.left = `${centerX}px`;
   }
 
   /**
@@ -190,6 +249,8 @@ class Tooltip {
       text: tooltipNode.dataset.fazeTooltipText || '',
       side: tooltipNode.dataset.fazeTooltipSide || tooltipNode.dataset.fazeTooltipAlign || 'bottom',
       class: tooltipNode.dataset.fazeTooltipClass || '',
+      event: tooltipNode.dataset.fazeTooltipEvent || 'mouseenter',
+      dynamicUpdate: tooltipNode.dataset.fazeTooltipDynamicUpdate === 'true',
     });
   }
 

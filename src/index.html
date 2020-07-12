@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <title>Title</title>
@@ -59,8 +58,15 @@
       height: 2rem !important;
     }
 
+    .faze-drag {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
     .faze-drag .faze-drag-item {
       padding: 1rem;
+      margin: 1rem;
 
       background-color: #fff;
       border: 0.1rem solid gray;
@@ -146,12 +152,12 @@
   <img src="https://via.placeholder.com/350x153" data-faze="zoombox" data-faze-zoombox-width="500" data-faze-zoombox-height="500" data-faze-zoombox-image="https://via.placeholder.com/1550x2253" data-faze-zoombox-align="left center">
   <img src="https://via.placeholder.com/350x153" data-faze="zoombox" data-faze-zoombox-image="https://via.placeholder.com/350x153" data-faze-zoombox-align="self">
 
-  <section class="faze-drag" data-faze="drag">
+  <section class="faze-drag" data-faze="drag" data-faze-styles="false" data-faze-drag-direction="horizontal">
     <div class="faze-drag-item">
-      <div class="faze-drag-handle"></div>ITEM 1
+      <div class="faze-drag-handle">Handle</div>ITEM 1
     </div>
     <div class="faze-drag-item">
-      <div class="faze-drag-handle"></div>ITEM 2
+      <div class="faze-drag-handle">Handle</div>ITEM 2
     </div>
     <div class="faze-drag-item">ITEM 3</div>
   </section>
@@ -381,14 +387,14 @@
     <img src="https://via.placeholder.com/354x480" alt="">
   </div>
   <br>
-  <div class="carousel-test1" data-faze="carousel" data-faze-carousel-autoplay="true"
+  <!--<div class="carousel-test1" data-faze="carousel" data-faze-carousel-autoplay="true"
     data-faze-carousel-hover-on-stop="true" data-faze-carousel-arrows-outside="true"
     data-faze-carousel-animation-type="slide" data-faze-carousel-animation-time="5000">
     <img src="https://via.placeholder.com/350x480" alt="">
     <img src="https://via.placeholder.com/351x480" alt="">
     <img src="https://via.placeholder.com/352x480" alt="">
     <img src="https://via.placeholder.com/353x480" alt="">
-  </div>
+  </div>-->
   <br>
   <div style="width:20rem">
     <img class="image" src="https://via.placeholder.com/200x200"
@@ -456,9 +462,9 @@
   <br>
   <div class="news">
     <div class="items">
-      <div class="item">Новость 1</div>
-      <div class="item">Новость 2</div>
-      <div class="item">Новость 3</div>
+      <div class="item js-viewport-test">Новость 1</div>
+      <div class="item js-viewport-test">Новость 2</div>
+      <div class="item js-viewport-test">Новость 3</div>
     </div>
   </div>
 

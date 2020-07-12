@@ -480,7 +480,7 @@ class Helpers {
 
                 // Если элемент в массиве не нашли, то необходимо добавить новый элемент в массив
                 if (foundIndex === -1) {
-                  target[key].push(...source[key][0]);
+                  target[key].push(source[key][0]);
                 } else {
                   // Если нашли, то объединяем объекты этого элемента с новым
                   target[key][foundIndex] = {...foundElement, ...source[key][0]};
@@ -1014,6 +1014,151 @@ class Helpers {
    */
   static compareSizes(size1: FazeSize, size2: FazeSize): boolean {
     return size1.width === size2.width && size1.height === size2.height;
+  }
+
+  /**
+   * Проверка, находится ли элемент во вьюпорте
+   *
+   * @param node{HTMLElement} - DOM элемент который проверяем
+   * @param offset{number} - дополнительный запас
+   * @param enableWhenOnTop{boolean} - возвращаеть "true" если элемент выше вьюпорта
+   *
+   * @return{boolean} - true если элемент находится во вьюпорте
+   */
+  static isElementInViewport(node: HTMLElement, offset: number = 0, enableWhenOnTop: boolean = false): boolean {
+    const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
+    const windowWidth = (window.innerWidth || document.documentElement.clientWidth);
+    const rect = node.getBoundingClientRect();
+
+    const vertInView = (rect.top - offset <= windowHeight) && (enableWhenOnTop ? true : ((rect.top + rect.height) >= 0));
+    const horInView = (rect.left - offset <= windowWidth) && (enableWhenOnTop ? true : ((rect.left + rect.width) >= 0));
+
+    return (vertInView && horInView);
+  }
+
+  /**
+   * Проверка, находится ли элементы во вьюпорте
+   *
+   * @param nodes{HTMLElement[]} - DOM элементы которые проверяем
+   * @param offset{number} - дополнительный запас
+   * @param enableWhenOnTop{boolean} - возвращаеть "true" если элемент выше вьюпорта
+   *
+   * @return{HTMLElement[]} - список DOM элементов которые находятся во вьюпорте
+   */
+  static isElementsInViewport(nodes: HTMLElement[], offset: number = 0, enableWhenOnTop: boolean = false): HTMLElement[] {
+    const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
+    const windowWidth = (window.innerWidth || document.documentElement.clientWidth);
+
+    return Array.from(nodes).filter((node) => {
+      const rect = node.getBoundingClientRect();
+
+      const vertInView = (rect.top - offset <= windowHeight) && (enableWhenOnTop ? true : ((rect.top + rect.height) >= 0));
+      const horInView = (rect.left - offset <= windowWidth) && (enableWhenOnTop ? true : ((rect.left + rect.width) >= 0));
+
+      return (vertInView && horInView);
+    });
+  }
+
+  /**
+   * Транслитерация текста
+   *
+   * @param text{string} Текст для транслитерации
+   *
+   * @return{string} Текст после транслитерации
+   */
+  static transliterate(text: string): string {
+    // Словарь букв и их транслитерации
+    const dictionary: { [key: string]: string } = {
+      "Ё": "YO",
+      "Й": "I",
+      "Ц": "TS",
+      "У": "U",
+      "К": "K",
+      "Е": "E",
+      "Н": "N",
+      "Г": "G",
+      "Ш": "SH",
+      "Щ": "SCH",
+      "З": "Z",
+      "Х": "H",
+      "Ъ": "'",
+      "ё": "yo",
+      "й": "i",
+      "ц": "ts",
+      "у": "u",
+      "к": "k",
+      "е": "e",
+      "н": "n",
+      "г": "g",
+      "ш": "sh",
+      "щ": "sch",
+      "з": "z",
+      "х": "h",
+      "ъ": "'",
+      "Ф": "F",
+      "Ы": "I",
+      "В": "V",
+      "А": "a",
+      "П": "P",
+      "Р": "R",
+      "О": "O",
+      "Л": "L",
+      "Д": "D",
+      "Ж": "ZH",
+      "Э": "E",
+      "ф": "f",
+      "ы": "i",
+      "в": "v",
+      "а": "a",
+      "п": "p",
+      "р": "r",
+      "о": "o",
+      "л": "l",
+      "д": "d",
+      "ж": "zh",
+      "э": "e",
+      "Я": "Ya",
+      "Ч": "CH",
+      "С": "S",
+      "М": "M",
+      "И": "I",
+      "Т": "T",
+      "Ь": "'",
+      "Б": "B",
+      "Ю": "YU",
+      "я": "ya",
+      "ч": "ch",
+      "с": "s",
+      "м": "m",
+      "и": "i",
+      "т": "t",
+      "ь": "'",
+      "б": "b",
+      "ю": "yu"
+    };
+
+    return text.split('').map(function (char: string) {
+      return dictionary[char] || char;
+    }).join('');
+  }
+
+
+  /**
+   * Парсинг JSON с отловом ошибок
+   *
+   * @param text{string} Текст нераспаршенного JSONа
+   *
+   * @return{object} Готовый JS объект
+   */
+  static parseJSON(text: string): object {
+    let data: object = {};
+    try {
+      data = JSON.parse(text);
+    } catch (error) {
+      console.error(error);
+    }
+
+    return data;
   }
 }
 

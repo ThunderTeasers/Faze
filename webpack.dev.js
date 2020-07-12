@@ -28,6 +28,22 @@ module.exports = merge(common, {
   plugins: [
     new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({
+      filename: 'drag.html',
+      template: './src/tests/views/drag.html',
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'tab.html',
+      template: './src/tests/views/tab.html',
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'tooltip.html',
+      template: './src/tests/views/tooltip.html',
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'dropdown.html',
+      template: './src/tests/views/dropdown.html',
+    }),
+    new HtmlWebpackPlugin({
       template: './src/index.html',
     }),
     new webpack.HotModuleReplacementPlugin(),

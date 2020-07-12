@@ -42,6 +42,7 @@ import Logger from '../../Core/Logger';
  *     arrowRight  - CSS селектор кнопки пролистывания вправо
  *   callbacks
  *     created  - пользовательская функция, исполняющаяся при создании карусели
+ *     beforeChanged - пользовательская функция, исполняющаяся перед началом изменения слайда
  *     changed  - пользовательская функция, исполняющаяся при изменении слайда
  */
 interface Config {
@@ -66,6 +67,7 @@ interface Config {
   };
   callbacks: {
     created?: (data: CallbackData) => void;
+    beforeChanged?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
   };
 }
@@ -209,6 +211,7 @@ class Carousel {
       },
       callbacks: {
         created: undefined,
+        beforeChanged: undefined,
         changed: undefined,
       },
     };
@@ -458,12 +461,11 @@ class Carousel {
         // Проставляем флаг что есть нажатие
         isDown = true;
 
-        // Убираем время анимации слайдов для чёткого перетаскивания мышкой
-        this.itemsHolderNode.style.transitionDuration = '';
-
         // Получаем координаты мыши
         this.touchStart.x = event.clientX;
         this.touchStart.y = event.clientY;
+
+        this.handleGesturesStart();
       }
     });
 
@@ -481,7 +483,7 @@ class Carousel {
         });
 
         // Производим работу с перетаскиванием
-        this.handleGestures();
+        this.handleGesturesMove();
       }
     });
 
@@ -489,8 +491,14 @@ class Carousel {
     document.body.addEventListener('mouseup', (event: MouseEvent) => {
       isDown = false;
 
-      // Возвращаем время анимации слайдов назад
-      this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
+      // Получаем координаты мыши
+      this.touchEnd.x = event.clientX;
+      this.touchEnd.y = event.clientY;
+
+      // Производим работу с окончанием перетаскивания
+      if (Faze.Helpers.isMouseOver(event, this.node).contains) {
+        this.handleGesturesStop();
+      }
     });
   }
 
@@ -498,22 +506,45 @@ class Carousel {
    * Навешивание событий для отслеживания жестов пальцем
    */
   private bindTouchGestures(): void {
+    // Флаг показывающий нажатие, для отслеживания движения внутри
+    let isDown = false;
+
     this.itemsHolderNode.addEventListener('touchstart', (event: TouchEvent) => {
-      this.touchStart.x = event.changedTouches[0].screenX;
-      this.touchStart.y = event.changedTouches[0].screenY;
+      if (!isDown) {
+        this.touchStart.x = event.changedTouches[0].screenX;
+        this.touchStart.y = event.changedTouches[0].screenY;
+
+        this.handleGesturesStart();
+      }
+
+      // Проставляем флаг что есть нажатие
+      isDown = true;
     });
 
     this.itemsHolderNode.addEventListener('touchmove', (event: TouchEvent) => {
-      this.touchEnd.x = event.changedTouches[0].screenX;
-      this.touchEnd.y = event.changedTouches[0].screenY;
+      if (isDown && event.changedTouches.length === 0) {
+        this.touchEnd.x = event.changedTouches[0].screenX;
+        this.touchEnd.y = event.changedTouches[0].screenY;
 
-      // Проверка на выход за границы
-      this.checkMoveBounds({
-        x: this.touchStart.x - this.touchEnd.x,
-        y: this.touchStart.y - this.touchEnd.y,
-      });
+        // Проверка на выход за границы
+        this.checkMoveBounds({
+          x: this.touchStart.x - this.touchEnd.x,
+          y: this.touchStart.y - this.touchEnd.y,
+        });
 
-      this.handleGestures();
+        this.handleGesturesMove();
+      }
+    });
+
+    this.itemsHolderNode.addEventListener('touchend', (event: TouchEvent) => {
+      if (isDown) {
+        this.touchEnd.x = event.changedTouches[0].screenX;
+        this.touchEnd.y = event.changedTouches[0].screenY;
+
+        this.handleGesturesStop();
+      }
+
+      isDown = false;
     });
   }
 
@@ -530,19 +561,70 @@ class Carousel {
     }
   }
 
+  private handleGesturesStart() {
+    // Убираем время анимации слайдов для чёткого перетаскивания мышкой
+    this.itemsHolderNode.style.transitionDuration = '';
+
+    // Вставляем слайд перед текущим, чтобы можно было сдвигать карусель вправо
+    this.insertSlideBefore();
+
+    this.itemsHolderNode.style.left = `${-this.slideWidth}px`;
+  }
+
   /**
    * Отслеживание жестов и выполнение действий при них
    */
-  handleGestures(): void {
-    if (this.touchEnd.x <= this.touchStart.x) {
+  private handleGesturesMove(): void {
+    // Вычисляем сдвиг и двигаем весь враппер на это число вбок
+    const offset = -(this.touchStart.x - this.touchEnd.x);
+    this.itemsHolderNode.style.left = `${offset - this.slideWidth}px`;
+  }
+
+  private handleGesturesStop() {
+    // Вычисляем сдвиг
+    const offset = -(this.touchStart.x - this.touchEnd.x);
+
+    // Если сдвинуто влево больше чем на пол слайда, то активируем следующий слайд
+    if (offset < -(this.slideWidth / 2)) {
+      this.insertSlideAfter();
+      this.itemsHolderNode.style.left = `${parseInt(this.itemsHolderNode.style.left, 10) + this.slideWidth}px`;
       this.next();
-    } else if (this.touchEnd.x >= this.touchStart.x) {
-      this.prev();
+    } else if (offset > this.slideWidth / 2) {
+      // Если тоже самое вправо, то предыдущий
+      this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
+      this.itemsHolderNode.style.left = '0';
+      this.prev(false);
+    } else {
+      // Передвигаем первый слайд в конец
+      this.insertSlideAfter();
+
+      // Если мышка была отпущена, но передвинули слайд недостаточно, то позвращаем на место
+      this.itemsHolderNode.style.left = '0';
     }
 
-    // console.log(this.touchStart.x, this.touchEnd.x, this.touchStart.x - this.touchEnd.x);
+    setTimeout(() => {
+      this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
+    }, 100);
+  }
 
-    // this.itemsHolderNode.style.left = `${-(this.touchStart.x - this.touchEnd.x)}px`;
+  /**
+   * Перемещение последнего слайда вперед
+   */
+  private insertSlideBefore(): void {
+    this.slidesNodes = <HTMLElement[]>Array.from(this.itemsHolderNode.children);
+
+    // Берем последний слайд и перемещаем его в начало
+    this.itemsHolderNode.insertBefore(this.slidesNodes[this.slidesNodes.length - 1], this.slidesNodes[0]);
+  }
+
+  /**
+   * Перемещение первого слайда в конец
+   */
+  private insertSlideAfter(): void {
+    this.slidesNodes = <HTMLElement[]>Array.from(this.itemsHolderNode.children);
+
+    // Берем первый слайд и перемещаем его в конец
+    this.itemsHolderNode.appendChild(this.slidesNodes[0]);
   }
 
   /**
@@ -686,8 +768,10 @@ class Carousel {
 
   /**
    * Переключение карусели вперед
+   *
+   * @param needToChange - нужно ли вставлять DOM элемент следующего слайда
    */
-  next(): void {
+  next(needToChange: boolean = true): void {
     if (this.isIdle) {
       this.index += 1;
       if (this.index >= this.totalSlides) {
@@ -695,13 +779,20 @@ class Carousel {
       }
     }
 
-    this.changeSlide('next', 1);
+    if (needToChange) {
+      this.changeSlide('next', 1);
+    } else {
+      // Инменяем индикаторы
+      this.changeControls();
+    }
   }
 
   /**
    * Переключение карусели назад
+   *
+   * @param needToChange - нужно ли вставлять DOM элемент следующего слайда
    */
-  prev(): void {
+  prev(needToChange: boolean = true): void {
     if (this.isIdle) {
       this.index -= 1;
       if (this.index < 0) {
@@ -709,7 +800,12 @@ class Carousel {
       }
     }
 
-    this.changeSlide('prev', 1);
+    if (needToChange) {
+      this.changeSlide('prev', 1);
+    } else {
+      // Инменяем индикаторы
+      this.changeControls();
+    }
   }
 
   /**
@@ -731,11 +827,19 @@ class Carousel {
       return;
     }
 
+    // Рассчёт на сколько слайдов нужно сдвинуть карусель
+    let amount;
+    if (index > this.index) {
+      amount = index - this.index;
+    } else {
+      amount = Math.abs(this.index - index);
+    }
+
     // Присваиваем текущий индекс
     this.index = index;
 
     // Применяем изменения
-    this.changeSlide(direction, 1);
+    this.changeSlide(direction, amount);
   }
 
   /**
@@ -780,7 +884,10 @@ class Carousel {
    * @private
    */
   private changeSlide(direction?: string, amount: number = 1): void {
-    // Проверка на границы
+    // Вызываем пользовательскую функцию "beforeChanged"
+    this.beforeChangeCallbackCall(direction);
+
+    // Проверка на границы, если не бесконечная прокрутка
     if (!this.config.infinite) {
       this.checkBounds();
     }
@@ -864,7 +971,7 @@ class Carousel {
               }
 
               // Присваиваем текущий слайд
-              currentSlide = this.slidesNodes[this.index];
+              currentSlide = this.slidesNodes.find(tmpSlideNode => parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index) || this.slidesNodes[0];
 
               // Выставление флага, что карусель в простое и готова к новой анимации
               this.isIdle = true;
@@ -904,7 +1011,7 @@ class Carousel {
 
             // И после выполнения анимации, ставится флаг, что карусель свободна
             setTimeout(() => {
-              currentSlide = this.slidesNodes[this.index];
+              currentSlide = this.slidesNodes.find(tmpSlideNode => parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index) || this.slidesNodes[0];
 
               // Удаляем класс с "предыдущего" слайда, т.к. он уже стал текущим
               if (prevSlide) {
@@ -929,12 +1036,12 @@ class Carousel {
   }
 
   /**
-   * Выполнение пользовательской функции
+   * Выполнение пользовательской функции "changed"
    *
    * @param currentSlide - DOM элемент текущего слайда
    * @param direction - направление карусели
    */
-  changeCallbackCall(currentSlide: HTMLElement | null, direction?: string): void {
+  private changeCallbackCall(currentSlide: HTMLElement | null, direction?: string): void {
     if (typeof this.config.callbacks.changed === 'function') {
       try {
         this.config.callbacks.changed({
@@ -945,6 +1052,37 @@ class Carousel {
           totalSlides: this.totalSlides,
           index: this.index,
           currentSlideNode: currentSlide,
+          controlsNode: this.controlsNode,
+          counterNode: this.counterNode,
+          arrowsNode: this.arrowsNode,
+          arrowsNodes: this.arrowsNodes,
+          pagesNode: this.pagesNode,
+        });
+      } catch (error) {
+        this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+      }
+    }
+  }
+
+  /**
+   * Выполнение пользовательской функции "beforeChanged"
+   *
+   * @param direction - направление карусели
+   */
+  private beforeChangeCallbackCall(direction?: string): void {
+    if (typeof this.config.callbacks.beforeChanged === 'function') {
+      // Текущий слайд(по факту он следующий, т.к. изменение уже началось)
+      const currentSlideNode = this.slidesNodes.find(tmpSlideNode => parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index) || this.slidesNodes[0];
+
+      try {
+        this.config.callbacks.beforeChanged({
+          direction,
+          currentSlideNode,
+          holderNode: this.itemsHolderNode,
+          carouselNode: this.node,
+          slidesNodes: this.slidesNodes,
+          totalSlides: this.totalSlides,
+          index: this.index,
           controlsNode: this.controlsNode,
           counterNode: this.counterNode,
           arrowsNode: this.arrowsNode,
@@ -976,13 +1114,7 @@ class Carousel {
    * Изменение активной точки в пагинации
    */
   changePagination(): void {
-    this.pagesNodes.forEach((pageNode: HTMLElement, pageIndex: number) => {
-      if (this.index === pageIndex) {
-        pageNode.classList.add('faze-active');
-      } else {
-        pageNode.classList.remove('faze-active');
-      }
-    });
+    Faze.Helpers.activateItem(Array.from(this.pagesNodes), this.index, 'faze-active');
   }
 
   /**
@@ -996,15 +1128,11 @@ class Carousel {
 
       this.slideWidth = slideNode.offsetWidth +
         parseFloat(style.marginLeft || '0') +
-        parseFloat(style.marginRight || '0') +
-        parseFloat(style.paddingLeft || '0') +
-        parseFloat(style.paddingRight || '0');
+        parseFloat(style.marginRight || '0');
 
       this.slideHeight = slideNode.offsetHeight +
         parseFloat(style.marginTop || '0') +
-        parseFloat(style.marginBottom || '0') +
-        parseFloat(style.paddingTop || '0') +
-        parseFloat(style.paddingBottom || '0');
+        parseFloat(style.marginBottom || '0');
     } else {
       this.slideWidth = slideNode.offsetWidth;
       this.slideHeight = slideNode.offsetHeight;

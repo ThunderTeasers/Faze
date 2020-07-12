@@ -5,11 +5,8 @@
  * Дата: 17.10.2018
  */
 
-.faze-spoiler {
-  & > .faze-title {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+.faze-spoiler, [data-faze="spoiler"] {
+  & > .faze-title, & > [data-faze-spoiler="title"] {
     user-select: none;
 
     &:hover {
@@ -17,12 +14,12 @@
     }
   }
 
-  & > .faze-body {
+  & > .faze-body, & > [data-faze-spoiler="body"] {
     display: none;
   }
 
   &.faze-active {
-    & > .faze-body {
+    & > .faze-body, & > [data-faze-spoiler="body"] {
       display: block;
     }
   }

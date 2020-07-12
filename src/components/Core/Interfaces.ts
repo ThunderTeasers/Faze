@@ -40,3 +40,15 @@ interface FazePositionAndSize {
   size: FazeSize;
   position: FazePosition;
 }
+
+/**
+ * Интерфейс описания диапазаона отключения модулей относительно ширины экрана
+ *
+ * Содержит:
+ *   from{number} - с какого пикселя отключаем
+ *   to{number} - до какого пикселя отключаем
+ */
+interface FazeDisallowRange {
+  from?: number,
+  to?: number,
+}

@@ -56,6 +56,7 @@ interface Config {
   stopOnHover: boolean;
   amountPerSlide: number;
   mouseMove: boolean;
+  disallowRanges: FazeDisallowRange[];
   animation: {
     type: string;
     time: number;
@@ -200,6 +201,7 @@ class Carousel {
       stopOnHover: false,
       mouseMove: false,
       amountPerSlide: 1,
+      disallowRanges: [],
       animation: {
         type: 'fade',
         time: 1000,
@@ -218,6 +220,11 @@ class Carousel {
 
     this.config = Object.assign(defaultConfig, config);
     this.node = node;
+
+    // Проверка на границы инициализации
+    if (!this._checkDisallowRanges()) {
+      return;
+    }
 
     // Инициализация переменных
     // Общих
@@ -376,6 +383,29 @@ class Carousel {
     if (this.config.stopOnHover && this.config.autoplay) {
       this.bindStopOnHover();
     }
+  }
+
+  /**
+   * Проверка на границы инициализации, границ может быть несколько, их структура следующая:
+   *   from?: number
+   *   to?: number
+   *
+   * Если отстутствует нижняя граница, принимаем её за 0, если отстутсвует верхняя, то проверяем просто на вхождение в нижнюю.
+   * Если ширина экрана попала хоть в одну проверяемую границу, то возвращается "false" и модуль не инициализитуестя вообще.
+   *
+   * @return{boolean} Прошла ли проверка, "true" если да, "false" если нет
+   *
+   * @private
+   */
+  _checkDisallowRanges(): boolean {
+    // Проходимся по всем границам, при первом же попадении выходим из цикла, т.к. проверять уже нет смысла
+    for (const disallowRange of this.config.disallowRanges) {
+      if (window.innerWidth > (disallowRange.from || 0) && window.innerWidth < (disallowRange.to || window.screen.width)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -1173,6 +1203,7 @@ class Carousel {
       useSlideFullSize: (carouselNode.dataset.fazeCarouselUseSlideFullSize || 'false') === 'true',
       stopOnHover: (carouselNode.dataset.fazeCarouselStopOnHover || 'false') === 'true',
       amountPerSlide: parseInt(carouselNode.dataset.fazeCarouselAmountPerSlide || '1', 10),
+      disallowRanges: JSON.parse(carouselNode.dataset.fazeCarouselDisallowRanges || '[]'),
       animation: {
         type: carouselNode.dataset.fazeCarouselAnimationType || 'fade',
         time: carouselNode.dataset.fazeCarouselAnimationTime || 1000,

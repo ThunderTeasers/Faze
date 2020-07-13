@@ -20,6 +20,17 @@ class Shortcuts {
     (window as any).fazePageReload = () => {
       window.location.reload();
     };
+
+    // Реагирование на результат формы входа/выхода
+    (window as any).fazeAuthFormResult = (result: any) => {
+      if (result.error) {
+        console.error('Ошибка в "fazeAuthFormResult": ', result.error);
+      } else if (result.event === 'login' || result.event === 'logout') {
+        setTimeout(function () {
+          window.location.reload()
+        }, 200);
+      }
+    }
   }
 }
 

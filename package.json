@@ -6,7 +6,8 @@
   "scripts": {
     "start": "webpack-dev-server --open --config webpack.dev.js",
     "prod": "webpack --env=production --config webpack.prod.js",
-    "dev": "webpack --env=development --config webpack.prod.js"
+    "dev": "webpack --env=development --config webpack.prod.js",
+    "full": "webpack --env=production --clean=false --config webpack.prod.js && webpack --env=development --clean=false --config webpack.prod.js"
   },
   "author": "Erokhin Maxim",
   "license": "ISC",

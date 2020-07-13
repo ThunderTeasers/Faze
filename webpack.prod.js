@@ -5,9 +5,16 @@ const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
-module.exports = env => {
+module.exports = (env, argv) => {
   // Минимайзеры
   let minimizer = [];
+
+  // Плагины
+  const plugins = [
+    new MiniCssExtractPlugin({
+      filename: 'faze.min.css',
+    }),
+  ];
 
   // Если это продакшн версия, то добавляем их
   if (env === 'production') {
@@ -15,6 +22,10 @@ module.exports = env => {
       new TerserPlugin(),
       new OptimizeCSSAssetsPlugin({}),
     ];
+  }
+
+  if (argv.clean !== 'false') {
+    plugins.unshift(new CleanWebpackPlugin(['dist']));
   }
 
   return merge(common(env), {
@@ -35,11 +46,6 @@ module.exports = env => {
         },
       ],
     },
-    plugins: [
-      new CleanWebpackPlugin(['dist']),
-      new MiniCssExtractPlugin({
-        filename: 'faze.min.css',
-      }),
-    ],
+    plugins,
   });
 };

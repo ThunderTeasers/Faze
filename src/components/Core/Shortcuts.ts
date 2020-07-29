@@ -30,6 +30,13 @@ class Shortcuts {
           window.location.reload()
         }, 200);
       }
+    };
+
+    // Реагирование на результат формы создания КП
+    (window as any).fazeOfferFormResult = (result: any) => {
+      if ('offer' in result && 'href' in result.offer) {
+        window.location.href = result.offer.href;
+      }
     }
   }
 }

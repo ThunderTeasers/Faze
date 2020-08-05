@@ -12,6 +12,7 @@
  */
 
 import './Faze.scss';
+import Logger from './Logger';
 
 /**
  * Импорты всех плагинов
@@ -25,6 +26,7 @@ import Drag from '../Modules/Drag/Drag';
 import Dropdown from '../Modules/Dropdown/Dropdown';
 import Select from '../Modules/Select/Select';
 import Carousel from '../Modules/Carousel/Carousel';
+import Carousel2 from '../Modules/Carousel2/Carousel2';
 import Zoom from '../Modules/Zoom/Zoom';
 import ZoomBox from '../Modules/ZoomBox/ZoomBox';
 import Scroll from '../Modules/Scroll/Scroll';
@@ -90,6 +92,9 @@ interface InnerPluginsData {
  * для их удобного подключения в другие модули без повторной загрузки
  */
 class Faze {
+  // Помощник для логирования
+  private static logger: Logger;
+
   // Переменная, содержащая в себе всю информацию о плагинах, а так же их тела для дальнейшего исполнения
   static plugins: PluginsData = {};
 
@@ -98,6 +103,7 @@ class Faze {
   static Modal: any = Modal;
   static Tab: any = Tab;
   static Carousel: any = Carousel;
+  static Carousel2: any = Carousel2;
   static Zoom: any = Zoom;
   static ZoomBox: any = ZoomBox;
   static Gallery: any = Gallery;
@@ -119,6 +125,8 @@ class Faze {
   static REST: any = REST;
 
   constructor() {
+    // Инициализация логгера
+    Faze.logger = new Logger();
   }
 
   /**
@@ -262,6 +270,22 @@ class Faze {
   }
 
   /**
+   * Запуск функции с проверкой на ошибки
+   *
+   * @param callback{() => void} Функция для исполнения
+   * @param moduleName{string} Название модуля
+   */
+  static callFunction(callback: () => void, moduleName: string = 'Core') {
+    if (typeof callback === 'function') {
+      try {
+        callback();
+      } catch (error) {
+        this.logger.error(`Модуль Faze.${moduleName}: Ошибка исполнения пользовательского метода "${callback.name}": ${error}`);
+      }
+    }
+  }
+
+  /**
    * Удаление плагина
    *
    * @param name - ключ по которому удаляем
@@ -277,7 +301,7 @@ class Faze {
     Faze.Modal.hotInitialize();
     Faze.Gallery.hotInitialize();
     Faze.Page.hotInitialize();
-    Faze.Tab.hotInitialize();
+    Faze.Tab.hotInitialize('tab');
     Faze.Spoiler.hotInitialize();
     Faze.Carousel.hotInitialize();
     Faze.Tooltip.hotInitialize();

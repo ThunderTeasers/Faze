@@ -2,6 +2,7 @@
  * Родительский класс любого плагина, содержит базовую и необходимую информацию для интеграции плагина в систему
  */
 
+import Faze from "./Faze";
 import Logger from './Logger';
 
 /**
@@ -12,14 +13,12 @@ import Logger from './Logger';
  *   node{HTMLElement | undefined} - основной DOM элемент
  *   nodes{HTMLElement[] | undefined} - дополнительные DOM элементы
  *   config{any} - конфигурационные данные для плагина
- *   defaultConfig{any} - конфигурационные данные для плагина по умолчанию
  */
 interface ModuleData {
   name: string;
   node?: HTMLElement;
   nodes?: HTMLElement[];
   config: any;
-  defaultConfig: any;
 }
 
 class Module {
@@ -38,7 +37,7 @@ class Module {
   /**
    * Стандартный конструктор
    *
-   * @param data{PluginData} - данные для создания плагина
+   * @param data{PluginData} Данные для создания плагина
    */
   constructor(data: ModuleData) {
     // Получаем имя плагина
@@ -54,48 +53,65 @@ class Module {
 
     // Инициализируем переменные
     this.node = data.node;
-    this.config = Object.assign(data.defaultConfig, data.config);
+    this.config = data.config;
 
     // Вызываем стандартные методы
     this.initialize();
+    this.build();
     this.bind();
   }
 
   /**
    * Главный метод инициализации
+   *
+   * @protected
    */
-  public initialize(): void {
+  protected initialize(): void {
     // У основного DOM элемента, добавляем классы, показывающие, что данный плагин инициализирован, это необходимо для "hotInitialize"
-    this.node.classList.add('faze-tabs');
-    this.node.classList.add('faze-tabs-initialized');
+    this.node.classList.add(`faze-${this.name.toLowerCase()}2`);
+    this.node.classList.add(`faze-${this.name.toLowerCase()}-initialized`);
+  }
+
+  /**
+   * Построение необходимых DOM элементов
+   *
+   * @protected
+   */
+  protected build(): void {
   }
 
   /**
    * Главный метод навешивания событий
+   *
+   * @protected
    */
-  public bind(): void {}
+  protected bind(): void {
+  }
 
-  // /**
-  //  * Инициализация модуля по data атрибутам
-  //  *
-  //  * @param node - DOM элемент на который нужно инициализировать плагин
-  //  */
-  // static initializeByDataAttributes(node: HTMLElement): void {}
-  //
-  // /**
-  //  * "Горячая" инициализация модуля через "observer"
-  //  */
-  // static hotInitialize(): void {
-  //   // Инициализация через "observer"
-  //   Faze.Observer.watch(`[data-faze~="${this.name.toLowerCase()}"]`, (node: HTMLElement) => {
-  //     this.initializeByDataAttributes(node);
-  //   });
-  //
-  //   // Стандартная инициализация по data атрибутам
-  //   document.querySelectorAll<HTMLElement>(`[data-faze~="${this.name.toLowerCase()}"]`).forEach((node: HTMLElement) => {
-  //     this.initializeByDataAttributes(node);
-  //   });
-  // }
+  /**
+   * Инициализация модуля по data атрибутам
+   *
+   * @param node{HTMLElement} DOM элемент на который нужно инициализировать плагин
+   */
+  static initializeByDataAttributes(node: HTMLElement): void {
+  }
+
+  /**
+   * "Горячая" инициализация модуля через "observer"
+   *
+   * @param name{string} Имя модуля
+   */
+  static hotInitialize(name: string): void {
+    // Инициализация через "observer"
+    Faze.Observer.watch(`[data-faze~="${name}"]`, (node: HTMLElement) => {
+      this.initializeByDataAttributes(node);
+    });
+
+    // Стандартная инициализация по data атрибутам
+    document.querySelectorAll<HTMLElement>(`[data-faze~="${name}"]`).forEach((node: HTMLElement) => {
+      this.initializeByDataAttributes(node);
+    });
+  }
 }
 
 export default Module;

@@ -11,7 +11,6 @@
 
 import './Tab.scss';
 import Module from '../../Core/Module';
-import Faze from '../../Core/Faze';
 
 /**
  * Структура конфига табов
@@ -50,8 +49,7 @@ class Tab extends Module {
     // Инициализируем базовый класс
     super({
       node,
-      config,
-      defaultConfig,
+      config: Object.assign(defaultConfig, config),
       name: 'Tab',
     });
   }
@@ -152,21 +150,6 @@ class Tab extends Module {
   static initializeByDataAttributes(node: HTMLElement): void {
     new Tab(node, {
       headerActiveClass: node.dataset.fazeTabHeaderActiveClass,
-    });
-  }
-
-  /**
-   * "Горячая" инициализация модуля через "observer"
-   */
-  static hotInitialize(): void {
-    // Инициализация через "observer"
-    Faze.Observer.watch('[data-faze~="tab"]', (node: HTMLElement) => {
-      this.initializeByDataAttributes(node);
-    });
-
-    // Стандартная инициализация по data атрибутам
-    document.querySelectorAll<HTMLElement>('[data-faze~="tab"]').forEach((node: HTMLElement) => {
-      this.initializeByDataAttributes(node);
     });
   }
 }

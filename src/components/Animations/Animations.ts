@@ -143,6 +143,64 @@ class Animations {
       transition: 'width 0.5s, height 0.5s',
     }) as Promise<FazeSize>;
   }
+
+  /**
+   * Плавное увеличение между двумя значениями
+   *
+   * @param from{number} С какого значения ведём отсчёт
+   * @param to{number} К какому стремимся
+   * @param duration{number} Время действия
+   * @param durationCallback{() => void} Функция вызываемая каждый кадр
+   * @param completeCallback{() => void} Функция вызываемая в конце
+   */
+  static smoothBetween(from: number, to: number, duration: number, durationCallback: (value: number) => void, completeCallback?: (value: number) => void): void {
+    // Начальное время
+    let startTime: number;
+
+    // Текущее значение
+    let currentValue: number;
+
+    function animateNextFrame(currentTime: number) {
+      // Простановка начального времени
+      if (!startTime) {
+        startTime = currentTime;
+      }
+
+      // Сколько всего прошло
+      let elapsedTime = currentTime - startTime;
+
+      // Если анимация ещё идет, то делаем рассчёты и всё остальное
+      if (elapsedTime < duration) {
+        currentValue = (elapsedTime / duration) * (to - from);
+
+        // Вызываем колбек для проброса текущего значения
+        Faze.callFunction(() => {
+          durationCallback(currentValue);
+        }, 'Animations');
+
+        // Ставим следующий кадр
+        window.requestAnimationFrame(animateNextFrame);
+      } else {
+        // Если время закончилось то значение достигло своего максимума
+        currentValue = to;
+
+        // Вызываем колбек для проброса текущего значения
+        Faze.callFunction(() => {
+          durationCallback(currentValue);
+        }, 'Animations');
+
+        // Вызываем колбек завершения
+        if (completeCallback) {
+          Faze.callFunction(() => {
+            completeCallback(currentValue);
+          }, 'Animations');
+        }
+      }
+    }
+
+    // Запускаем анимацию
+    window.requestAnimationFrame(animateNextFrame);
+  }
 }
 
 export default Animations;

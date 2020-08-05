@@ -45,7 +45,7 @@ Faze.add({
   callback: () => {
     document.querySelectorAll('.js-notification').forEach((buttonNode) => {
       buttonNode.addEventListener('click', () => {
-        console.log(123);
+        // console.log(123);
       });
     });
   },
@@ -79,13 +79,13 @@ Faze.add({
       default: true,
       callbacks: {
         created: (data: any) => {
-          console.log(data);
+          // console.log(data);
         },
         opened: (data: any) => {
-          console.log('opened', data);
+          // console.log('opened', data);
         },
         changed: (data: any) => {
-          console.log('changed', data);
+          // console.log('changed', data);
         },
       },
     });
@@ -112,10 +112,10 @@ Faze.add({
       },
       callbacks: {
         created: (data: any) => {
-          console.log(data);
+          // console.log(data);
         },
         changed: ({currentSlideNode}: { currentSlideNode?: any }) => {
-          console.log(currentSlideNode);
+          // console.log(currentSlideNode);
         },
       },
     });
@@ -129,10 +129,10 @@ Faze.add({
 
     // carousel.changeAnimationDirection('vertical');
 
-    const zoom = new Faze.Zoom(document.querySelector('.image'), {
+    new Faze.Zoom(document.querySelector('.image'), {
       side: 'right',
     });
-    console.log(zoom);
+    // console.log(zoom);
 
     new Faze.Spoiler(document.querySelector('.spoiler-test'));
 
@@ -144,7 +144,7 @@ Faze.add({
     new Faze.Form(document.querySelector('.form-order'), {
       callbacks: {
         error: (data: any) => {
-          console.log(data);
+          // console.log(data);
         },
       },
     });
@@ -161,7 +161,7 @@ Faze.add({
     const slider = new Faze.Slider(document.querySelector('.js-slider'), {
       callbacks: {
         changed: (data: any) => {
-          console.log(data.values);
+          // console.log(data.values);
         },
       },
     });
@@ -187,7 +187,7 @@ Faze.add({
           module: '287707',
           response_html: '.faze-dropdown',
           callback: (response: any) => {
-            console.log(response);
+            // console.log(response);
           },
         },
         'test',

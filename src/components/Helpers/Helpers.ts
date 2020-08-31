@@ -638,6 +638,23 @@ class Helpers {
   }
 
   /**
+   * Проверка, находится ли курсор на искомом DOM элементе
+   *
+   * @param event{Event} Событие мыши
+   * @param node{HTMLElement} Искомый DOM элемент
+   */
+  static isMouseOverlapsNode(event: Event, node: HTMLElement): boolean {
+    const path = (<any>event).path || (event.composedPath && event.composedPath());
+    if (path) {
+      if (path.find((element: HTMLElement) => element === node)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Присваивание стилей DOM Элементу
    *
    * @param node    - DOM элемент которому присваиваем

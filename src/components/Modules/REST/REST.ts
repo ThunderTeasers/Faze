@@ -192,7 +192,7 @@ class REST {
         }
 
         const key: string = itemNode.dataset.fazeRestapiJsonKey || itemNode.name;
-        let value: string | null = itemNode.dataset.fazeRestapiJsonValue || itemNode.value;
+        let value: string | null = itemNode.dataset.fazeRestapiJsonValue || itemNode.value || itemNode.dataset.fazeRestapiDisabledValue || null;
 
         // Если это не активный чекбокс, то присваиваем ему значение из data атрибута
         // Гарантированность того, что оно задано, обеспечивает условие сверху

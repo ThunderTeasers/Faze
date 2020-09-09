@@ -337,15 +337,15 @@ class Slider {
 
     // Проверка на заезд дальше следующего ползунка
     if (nextPointNode) {
-      if (tmpPosition >= nextPointNode.offsetLeft - nextPointNode.offsetWidth) {
-        tmpPosition = nextPointNode.offsetLeft - nextPointNode.offsetWidth;
+      if (tmpPosition >= nextPointNode.offsetLeft) {
+        tmpPosition = nextPointNode.offsetLeft;
       }
     }
 
     // Проверка на заезд до следующего ползунка
     if (prevPointNode && index !== 0 && this.pointsNodes.length > 1) {
-      if (tmpPosition <= prevPointNode.offsetLeft + prevPointNode.offsetWidth) {
-        tmpPosition = prevPointNode.offsetLeft + prevPointNode.offsetWidth;
+      if (tmpPosition <= prevPointNode.offsetLeft) {
+        tmpPosition = prevPointNode.offsetLeft;
       }
     }
 

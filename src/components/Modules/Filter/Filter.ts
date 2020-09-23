@@ -445,6 +445,10 @@ class Filter {
     this.restoreFilteredInput('text', (textNode: HTMLInputElement, value?: string) => {
       textNode.value = value || textNode.value || '';
     });
+
+    this.restoreFilteredInput('number', (textNode: HTMLInputElement, value?: string) => {
+      textNode.value = value || textNode.value || '';
+    });
   }
 
   /**

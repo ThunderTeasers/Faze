@@ -440,12 +440,21 @@ class Filter {
 
   /**
    * Восстановление текстовых значений после перезагрузки страницы
+   *
+   * @private
    */
-  restoreFilteredTextFields(): void {
+  private restoreFilteredTextFields(): void {
     this.restoreFilteredInput('text', (textNode: HTMLInputElement, value?: string) => {
       textNode.value = value || textNode.value || '';
     });
+  }
 
+  /**
+   * Восстановление текстовых значений после перезагрузки страницы
+   *
+   * @private
+   */
+  private restoreFilteredNumberFields(): void {
     this.restoreFilteredInput('number', (textNode: HTMLInputElement, value?: string) => {
       textNode.value = value || textNode.value || '';
     });
@@ -453,8 +462,10 @@ class Filter {
 
   /**
    * Восстановление значений выбранных чекбоксов после перезагрузки страницы
+   *
+   * @private
    */
-  restoreFilteredCheckboxes(): void {
+  private restoreFilteredCheckboxes(): void {
     this.restoreFilteredInput('checkbox', (checkboxNode: HTMLInputElement) => {
       checkboxNode.checked = true;
     });
@@ -462,8 +473,10 @@ class Filter {
 
   /**
    * Восстановление значений выбранных радио кнопок после перезагрузки страницы
+   *
+   * @private
    */
-  restoreFilteredRadioButtons(): void {
+  private restoreFilteredRadioButtons(): void {
     this.restoreFilteredInput('radio', (radioNode: HTMLInputElement) => {
       radioNode.checked = true;
     });
@@ -533,6 +546,7 @@ class Filter {
    */
   restoreFilteredInputs(): void {
     this.restoreFilteredTextFields();
+    this.restoreFilteredNumberFields();
     this.restoreFilteredCheckboxes();
     this.restoreFilteredRadioButtons();
   }

@@ -490,6 +490,13 @@ class Slider {
   }
 
   /**
+   * Перерасчёт модификатора движения
+   */
+  recalculateRatio(): void {
+    this.ratio = this.node.getBoundingClientRect().width / (this.config.range[1] - this.config.range[0]);
+  }
+
+  /**
    * Сброс слайдера в первоначальное положение
    */
   reset(): void {

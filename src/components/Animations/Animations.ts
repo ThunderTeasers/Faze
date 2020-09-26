@@ -171,7 +171,11 @@ class Animations {
 
       // Если анимация ещё идет, то делаем рассчёты и всё остальное
       if (elapsedTime < duration) {
-        currentValue = (elapsedTime / duration) * (to - from);
+        if (from > to || from < 0) {
+          currentValue = from + ((elapsedTime / duration) * (to - from));
+        } else {
+          currentValue = (elapsedTime / duration) * (to - from);
+        }
 
         // Вызываем колбек для проброса текущего значения
         Faze.callFunction(() => {

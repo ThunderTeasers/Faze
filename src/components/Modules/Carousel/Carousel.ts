@@ -811,6 +811,8 @@ class Carousel {
 
     if (needToChange) {
       this.changeSlide('next', 1);
+
+      this.index += 1;
     } else {
       // Инменяем индикаторы
       this.changeControls();
@@ -832,6 +834,8 @@ class Carousel {
 
     if (needToChange) {
       this.changeSlide('prev', 1);
+
+      this.index -= 1;
     } else {
       // Инменяем индикаторы
       this.changeControls();

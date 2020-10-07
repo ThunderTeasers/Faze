@@ -460,13 +460,27 @@ class Carousel2 extends Module {
             this.itemsHolderNode.style.left = '0';
           });
         } else {
-          // Переставляем слайд в конец
-          this.insertSlideAfter();
-
           // Плавно двигаем в изначальное положение
-          Faze.Animations.smoothBetween(-Math.abs(offset), 0, this.config.animation.time, (value: number) => {
-            this.itemsHolderNode.style.left = `${value}px`;
-          });
+          if (offset < 0) {
+            // Переставляем слайд в конец
+            this.insertSlideAfter();
+
+            // Анимируем
+            Faze.Animations.smoothBetween(-Math.abs(offset), 0, this.config.animation.time, (value: number) => {
+              this.itemsHolderNode.style.left = `${value}px`;
+            });
+          } else {
+            // Анимируем
+            Faze.Animations.smoothBetween(-(-Math.abs(offset) + this.slideWidth), -this.slideWidth, this.config.animation.time, (value: number) => {
+              this.itemsHolderNode.style.left = `${value}px`;
+            }, () => {
+              // Переставляем слайд в конец
+              this.insertSlideAfter();
+
+              // Обнуляем сдвиг для продолжения корректной работы
+              this.itemsHolderNode.style.left = '0';
+            });
+          }
         }
       }
     });

@@ -96,7 +96,7 @@ Faze.add({
       autoplay: false,
       pages: true,
       arrows: true,
-      arrowsOutside: true,
+      // arrowsOutside: true,
       counter: false,
       infinite: false,
       mouseMove: false,

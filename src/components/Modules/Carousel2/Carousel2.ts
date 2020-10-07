@@ -408,15 +408,6 @@ class Carousel2 extends Module {
         } else if (parseInt(this.itemsHolderNode.style.left, 10) <= -(this.slideWidth * 2)) {
           this.itemsHolderNode.style.left = `-${this.slideWidth * 2}px`;
         }
-
-        // Проверка на выход за границы
-        // this.checkMoveBounds({
-        //   x: this.touchStart.x - this.touchEnd.x,
-        //   y: this.touchStart.y - this.touchEnd.y,
-        // });
-
-        // Производим работу с перетаскиванием
-        // this.handleGesturesMove();
       }
     });
 
@@ -427,14 +418,56 @@ class Carousel2 extends Module {
       this.touchEnd.y = event.clientY;
 
       if (isDown) {
-        // Передвигаем первый слайд в конец
-        this.insertSlideAfter();
-
-        // Если мышка была отпущена, но передвинули слайд недостаточно, то позвращаем на место
-        this.itemsHolderNode.style.left = '0';
-
         // Убираем нажатие
         isDown = false;
+
+        // Вычисляем сдвиг и двигаем весь враппер на это число вбок
+        const offset = -(this.touchStart.x - this.touchEnd.x);
+
+        // Производим работу с перетаскиванием
+        // Если сдвинуто влево больше чем на пол слайда, то активируем следующий слайд
+        if (offset < -(this.slideWidth / 2)) {
+          Faze.Animations.smoothBetween(-(Math.abs(offset) + this.slideWidth), -(this.slideWidth * 2), this.config.animation.time, (value: number) => {
+            this.itemsHolderNode.style.left = `${value}px`;
+          }, () => {
+            // Перемещаем вперед два слайда, т.к. изначально там был один который мы должны были переместить, плюс во время начала
+            // перетаскивания был добавлен дополнительный, для возможности перетаскивать в противоположную сторону
+            this.insertSlideAfter();
+            this.insertSlideAfter();
+
+            // Увеличиваем и проверяем текущий индекс
+            this.index += 1;
+            this.checkIndexBounds();
+
+            // Производим остаточные действия для корректного переключения слайда
+            this.updateAfterChangeSlide(this.slidesNodes[this.index]);
+
+            // Обнуляем сдвиг для продолжения корректной работы
+            this.itemsHolderNode.style.left = '0';
+          });
+        } else if (offset > this.slideWidth / 2) {
+          Faze.Animations.smoothBetween(-(this.slideWidth - Math.abs(offset)), 0, this.config.animation.time, (value: number) => {
+            this.itemsHolderNode.style.left = `${value}px`;
+          }, () => {
+            // Уменьшаем и проверяем текущий индекс
+            this.index -= 1;
+            this.checkIndexBounds();
+
+            // Производим остаточные действия для корректного переключения слайда
+            this.updateAfterChangeSlide(this.slidesNodes[this.index - 1]);
+
+            // Обнуляем сдвиг для продолжения корректной работы
+            this.itemsHolderNode.style.left = '0';
+          });
+        } else {
+          // Переставляем слайд в конец
+          this.insertSlideAfter();
+
+          // Плавно двигаем в изначальное положение
+          Faze.Animations.smoothBetween(-Math.abs(offset), 0, this.config.animation.time, (value: number) => {
+            this.itemsHolderNode.style.left = `${value}px`;
+          });
+        }
       }
     });
   }
@@ -600,6 +633,19 @@ class Carousel2 extends Module {
   }
 
   /**
+   * Корректировка индекса
+   *
+   * @private
+   */
+  private checkIndexBounds(): void {
+    if (this.index > this.totalSlides - 1) {
+      this.index = 0;
+    } else if (this.index < 0) {
+      this.index = this.totalSlides - 1;
+    }
+  }
+
+  /**
    * Изменение текущего слайда
    *
    * @param direction{FazeCarouselMoveDirection} Направление движения
@@ -671,10 +717,8 @@ class Carousel2 extends Module {
         Faze.Animations.smoothBetween(0, slidesWidth, this.config.animation.time, (value: number) => {
           // Если двигаем вперед
           if (direction === FazeCarouselMoveDirection.Forward) {
-            // Плавно сдвигаем весь враппер
             this.itemsHolderNode.style.left = `-${value}px`;
           } else {
-            // Плавно сдвигаем весь враппер
             this.itemsHolderNode.style.left = `-${slidesWidth - value}px`;
           }
         }, () => {
@@ -694,30 +738,34 @@ class Carousel2 extends Module {
             slideNode.classList.remove('faze-active');
           });
 
-          // Проставляем класс активного слайда
-          nextSlide.classList.add('faze-active');
-
-          // Переопределяем текущий слайд
-          this.currentSlide = nextSlide;
-
-          // Обновление размеров текущего слайда
-          this.updateCurrentSlideSizes();
-
-          // Снова получаем все слайды, т.к. при анимации "slide" DOM элементы слайдов перемещаются внутри родителя, что в свою очередь
-          // говорит о том, что изначальный массив this.slidesNodes будет содержать неправельные ссылки на элемент когда мы обращаемся
-          // по индексу, например [0]
-          this.slidesNodes = <HTMLElement[]>Array.from(this.itemsHolderNode.children);
-
-          // Карусель снова свободна
-          this.isIdle = true;
-
-          // Изменение состояний элементов управления
-          this.changeControls();
+          this.updateAfterChangeSlide(nextSlide);
         });
         break;
       default:
         break;
     }
+  }
+
+  private updateAfterChangeSlide(nextSlide: HTMLElement): void {
+    // Проставляем класс активного слайда
+    nextSlide.classList.add('faze-active');
+
+    // Переопределяем текущий слайд
+    this.currentSlide = nextSlide;
+
+    // Обновление размеров текущего слайда
+    this.updateCurrentSlideSizes();
+
+    // Снова получаем все слайды, т.к. при анимации "slide" DOM элементы слайдов перемещаются внутри родителя, что в свою очередь
+    // говорит о том, что изначальный массив this.slidesNodes будет содержать неправельные ссылки на элемент когда мы обращаемся
+    // по индексу, например [0]
+    this.slidesNodes = <HTMLElement[]>Array.from(this.itemsHolderNode.children);
+
+    // Карусель снова свободна
+    this.isIdle = true;
+
+    // Изменение состояний элементов управления
+    this.changeControls();
   }
 
   /**

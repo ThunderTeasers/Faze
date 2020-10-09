@@ -319,6 +319,7 @@ class Carousel2 extends Module {
     // Если анимация слайдов и разрешены движения мышью, то навешиваем
     if (this.config.animation.type === 'slide') {
       this.bindMouseGestures();
+      this.bindTouchGestures();
     }
   }
 
@@ -519,6 +520,30 @@ class Carousel2 extends Module {
 
     // Убираем флаг нажатия в любом случае при отпускании мыши
     document.body.addEventListener('mouseup', (event: MouseEvent) => {
+      this.mouseOrTouchUp(event, isDown);
+      isDown = false;
+    });
+  }
+
+  /**
+   * Навешивание событий для отслеживания жестов пальцем
+   */
+  private bindTouchGestures(): void {
+    // Флаг показывающий нажатие, для отслеживания движения внутри
+    let isDown = false;
+
+    // При нажатии на враппер для слайдов ставим флаг, что можно отслеживать движение
+    document.body.addEventListener('touchstart', (event: TouchEvent) => {
+      isDown = this.mouseOrTouchDown(event);
+    });
+
+    // Отслеживаем движение, если находимся внутри враппера слайдов
+    document.body.addEventListener('touchmove', (event: TouchEvent) => {
+      this.mouseOrTouchMove(event, isDown);
+    });
+
+    // Убираем флаг нажатия в любом случае при отпускании мыши
+    document.body.addEventListener('touchend', (event: TouchEvent) => {
       this.mouseOrTouchUp(event, isDown);
       isDown = false;
     });

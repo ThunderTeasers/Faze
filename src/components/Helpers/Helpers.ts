@@ -653,8 +653,8 @@ class Helpers {
       position.x = event.clientX;
       position.y = event.clientY;
     } else {
-      position.x = event.changedTouches[0].screenX;
-      position.y = event.changedTouches[0].screenY;
+      position.x = event.changedTouches[0].clientX;
+      position.y = event.changedTouches[0].clientY;
     }
 
     return position;

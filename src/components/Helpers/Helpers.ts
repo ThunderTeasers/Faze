@@ -585,17 +585,20 @@ class Helpers {
    *
    * @return{boolean} - "true" если вхождение есть, "false" если нет
    */
-  static isMouseOver(event: MouseEvent, itemNode: HTMLElement, calculateSides: { vertical: boolean, horizontal: boolean } = {
+  static isMouseOver(event: MouseEvent | TouchEvent, itemNode: HTMLElement, calculateSides: { vertical: boolean, horizontal: boolean } = {
     vertical: false,
     horizontal: false,
   }): MouseOverResult {
     // DOMRect текущего элемента
     const itemRect = itemNode.getBoundingClientRect();
 
+    // Получаем координаты касания/нажатия
+    let {x, y} = this.getMouseOrTouchPosition(event);
+
     // Объект с результатами проверки
     const result: MouseOverResult = {
-      contains: ((event.clientX > itemRect.left) && (event.clientX < itemRect.left + itemRect.width))
-        && ((event.clientY > itemRect.top) && (event.clientY < itemRect.top + itemRect.height)),
+      contains: ((x > itemRect.left) && (x < itemRect.left + itemRect.width))
+        && ((y > itemRect.top) && (y < itemRect.top + itemRect.height)),
       sides: {
         top: undefined,
         bottom: undefined,
@@ -610,13 +613,13 @@ class Helpers {
       const halfHeight = itemRect.height / 2;
 
       // Проверяем внутри ли мышь по горизонтали
-      const isInsideHorizontally = ((event.clientX > itemRect.left) && (event.clientX < itemRect.left + itemRect.width));
+      const isInsideHorizontally = ((x > itemRect.left) && (x < itemRect.left + itemRect.width));
 
       // Проверяем на вхождение в верхнюю часть
-      result.sides.top = ((event.clientY > itemRect.top) && (event.clientY < itemRect.top + halfHeight)) && isInsideHorizontally;
+      result.sides.top = ((y > itemRect.top) && (y < itemRect.top + halfHeight)) && isInsideHorizontally;
 
       // Проверяем на вхождение в нижнюю часть
-      result.sides.bottom = ((event.clientY > itemRect.top + halfHeight) && (event.clientY < itemRect.top + itemRect.height)) && isInsideHorizontally;
+      result.sides.bottom = ((y > itemRect.top + halfHeight) && (y < itemRect.top + itemRect.height)) && isInsideHorizontally;
     }
 
     // Вычисляем входы в горизонтальном направлении(верх и низ)
@@ -625,13 +628,13 @@ class Helpers {
       const halfWidth = itemRect.width / 2;
 
       // Проверяем внутри ли мышь по горизонтали
-      const isInsideVertically = ((event.clientY > itemRect.top) && (event.clientY < itemRect.top + itemRect.height));
+      const isInsideVertically = ((y > itemRect.top) && (y < itemRect.top + itemRect.height));
 
       // Проверяем на вхождение в верхнюю часть
-      result.sides.left = ((event.clientX > itemRect.left) && (event.clientX < itemRect.left + halfWidth)) && isInsideVertically;
+      result.sides.left = ((x > itemRect.left) && (x < itemRect.left + halfWidth)) && isInsideVertically;
 
       // Проверяем на вхождение в нижнюю часть
-      result.sides.right = ((event.clientX > itemRect.left + halfWidth) && (event.clientX < itemRect.left + itemRect.width)) && isInsideVertically;
+      result.sides.right = ((x > itemRect.left + halfWidth) && (x < itemRect.left + itemRect.width)) && isInsideVertically;
     }
 
     return result;

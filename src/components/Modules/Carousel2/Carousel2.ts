@@ -364,6 +364,143 @@ class Carousel2 extends Module {
   }
 
   /**
+   * Отслеживание события нажатия пальцем или мышью на область карусели
+   *
+   * @param event{MouseEvent | TouchEvent} Событие нажатия мышью или пальцем
+   *
+   * @private
+   */
+  private mouseOrTouchDown(event: MouseEvent | TouchEvent) {
+    if (Faze.Helpers.isMouseOver(event, this.node).contains && !Faze.Helpers.isMouseOverlapsNode(event, this.controlsNode) && this.isIdle) {
+      // Отключаем стандартное перетаскивание
+      event.preventDefault();
+
+      // Получаем координаты касания/нажатия
+      this.touchStart = Faze.Helpers.getMouseOrTouchPosition(event);
+
+      // Вставляем слайд перед текущим, чтобы можно было сдвигать карусель вправо
+      this.insertSlideBefore();
+
+      // Сдвигаем карусель на ширину этого слайда, чтобы визуально ничего не изменилось
+      this.itemsHolderNode.style.left = `${-this.slideWidth}px`;
+
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Передвижение мыши или движение пальцем
+   *
+   * @param event{MouseEvent | TouchEvent} Событие мыши или пальца
+   * @param isDown{boolean} Было ли события нажатия до этого момента, если нет, то метод не выполняется
+   *
+   * @private
+   */
+  private mouseOrTouchMove(event: MouseEvent | TouchEvent, isDown: boolean): void {
+    // Если не было нажатия, то не выполняем метод
+    if (!isDown) {
+      return;
+    }
+
+    // Получаем координаты касания/нажатия
+    this.touchEnd = Faze.Helpers.getMouseOrTouchPosition(event);
+
+    // Вычисляем сдвиг и двигаем весь враппер на это число вбок
+    const offset = -(this.touchStart.x - this.touchEnd.x);
+    this.itemsHolderNode.style.left = `${offset - this.slideWidth}px`;
+
+    // Проверяем выход за границы
+    if (parseInt(this.itemsHolderNode.style.left, 10) >= 0) {
+      this.itemsHolderNode.style.left = '0';
+    } else if (parseInt(this.itemsHolderNode.style.left, 10) <= -(this.slideWidth * 2)) {
+      this.itemsHolderNode.style.left = `-${this.slideWidth * 2}px`;
+    }
+  }
+
+  /**
+   * Отпускание мыши или пальца, в данном методе происходит вся основная работа по переключению слайда, т.к. необходимо определить,
+   * преодолел ли слайд половину своей ширины/высоты для переключения. Если да, то изменяем его на следующий/предыдущий, если нет, то
+   * необходимо вернуть всё как было до начала движения
+   *
+   * @param event{MouseEvent | TouchEvent} Событие мыши или пальца
+   * @param isDown{boolean} Было ли события нажатия до этого момента, если нет, то метод не выполняется
+   *
+   * @private
+   */
+  private mouseOrTouchUp(event: MouseEvent | TouchEvent, isDown: boolean): void {
+    if (!isDown) {
+      return;
+    }
+
+    // Получаем координаты касания/нажатия
+    this.touchEnd = Faze.Helpers.getMouseOrTouchPosition(event);
+
+    // Вычисляем сдвиг и двигаем весь враппер на это число вбок
+    const offset = -(this.touchStart.x - this.touchEnd.x);
+
+    // Производим работу с перетаскиванием
+    // Если сдвинуто влево больше чем на пол слайда, то активируем следующий слайд
+    if (offset < -(this.slideWidth / 2)) {
+      Faze.Animations.smoothBetween(-(Math.abs(offset) + this.slideWidth), -(this.slideWidth * 2), this.config.animation.time, (value: number) => {
+        this.itemsHolderNode.style.left = `${value}px`;
+      }, () => {
+        // Перемещаем вперед два слайда, т.к. изначально там был один который мы должны были переместить, плюс во время начала
+        // перетаскивания был добавлен дополнительный, для возможности перетаскивать в противоположную сторону
+        this.insertSlideAfter();
+        this.insertSlideAfter();
+
+        // Увеличиваем и проверяем текущий индекс
+        this.index += 1;
+        this.checkIndexBounds();
+
+        // Производим остаточные действия для корректного переключения слайда
+        this.updateAfterChangeSlide(this.slidesNodes[this.index]);
+
+        // Обнуляем сдвиг для продолжения корректной работы
+        this.itemsHolderNode.style.left = '0';
+      });
+    } else if (offset > this.slideWidth / 2) {
+      Faze.Animations.smoothBetween(-(this.slideWidth - Math.abs(offset)), 0, this.config.animation.time, (value: number) => {
+        this.itemsHolderNode.style.left = `${value}px`;
+      }, () => {
+        // Уменьшаем и проверяем текущий индекс
+        this.index -= 1;
+        this.checkIndexBounds();
+
+        // Производим остаточные действия для корректного переключения слайда
+        this.updateAfterChangeSlide(this.slidesNodes[this.index - 1]);
+
+        // Обнуляем сдвиг для продолжения корректной работы
+        this.itemsHolderNode.style.left = '0';
+      });
+    } else {
+      // Плавно двигаем в изначальное положение
+      if (offset < 0) {
+        // Переставляем слайд в конец
+        this.insertSlideAfter();
+
+        // Анимируем
+        Faze.Animations.smoothBetween(-Math.abs(offset), 0, this.config.animation.time, (value: number) => {
+          this.itemsHolderNode.style.left = `${value}px`;
+        });
+      } else {
+        // Анимируем
+        Faze.Animations.smoothBetween(-(-Math.abs(offset) + this.slideWidth), -this.slideWidth, this.config.animation.time, (value: number) => {
+          this.itemsHolderNode.style.left = `${value}px`;
+        }, () => {
+          // Переставляем слайд в конец
+          this.insertSlideAfter();
+
+          // Обнуляем сдвиг для продолжения корректной работы
+          this.itemsHolderNode.style.left = '0';
+        });
+      }
+    }
+  }
+
+  /**
    * Навешивание событий для отслеживания жестов мышкой
    */
   private bindMouseGestures(): void {
@@ -372,117 +509,18 @@ class Carousel2 extends Module {
 
     // При нажатии на враппер для слайдов ставим флаг, что можно отслеживать движение
     document.body.addEventListener('mousedown', (event: MouseEvent) => {
-      if (Faze.Helpers.isMouseOver(event, this.node).contains && !Faze.Helpers.isMouseOverlapsNode(event, this.controlsNode) && this.isIdle) {
-        // Отключаем стандартное перетаскивание
-        event.preventDefault();
-
-        // Проставляем флаг что есть нажатие
-        isDown = true;
-
-        // Получаем координаты мыши
-        this.touchStart.x = event.clientX;
-        this.touchStart.y = event.clientY;
-
-        // Вставляем слайд перед текущим, чтобы можно было сдвигать карусель вправо
-        this.insertSlideBefore();
-
-        // Сдвигаем карусель на ширину этого слайда, чтобы визуально ничего не изменилось
-        this.itemsHolderNode.style.left = `${-this.slideWidth}px`;
-      }
+      isDown = this.mouseOrTouchDown(event);
     });
 
     // Отслеживаем движение, если находимся внутри враппера слайдов
     document.body.addEventListener('mousemove', (event: MouseEvent) => {
-      if (isDown) {
-        // Получаем координаты мыши
-        this.touchEnd.x = event.clientX;
-        this.touchEnd.y = event.clientY;
-
-        // Вычисляем сдвиг и двигаем весь враппер на это число вбок
-        const offset = -(this.touchStart.x - this.touchEnd.x);
-        this.itemsHolderNode.style.left = `${offset - this.slideWidth}px`;
-
-        // Проверяем выход за границы
-        if (parseInt(this.itemsHolderNode.style.left, 10) >= 0) {
-          this.itemsHolderNode.style.left = '0';
-        } else if (parseInt(this.itemsHolderNode.style.left, 10) <= -(this.slideWidth * 2)) {
-          this.itemsHolderNode.style.left = `-${this.slideWidth * 2}px`;
-        }
-      }
+      this.mouseOrTouchMove(event, isDown);
     });
 
     // Убираем флаг нажатия в любом случае при отпускании мыши
     document.body.addEventListener('mouseup', (event: MouseEvent) => {
-      // Получаем координаты мыши
-      this.touchEnd.x = event.clientX;
-      this.touchEnd.y = event.clientY;
-
-      if (isDown) {
-        // Убираем нажатие
-        isDown = false;
-
-        // Вычисляем сдвиг и двигаем весь враппер на это число вбок
-        const offset = -(this.touchStart.x - this.touchEnd.x);
-
-        // Производим работу с перетаскиванием
-        // Если сдвинуто влево больше чем на пол слайда, то активируем следующий слайд
-        if (offset < -(this.slideWidth / 2)) {
-          Faze.Animations.smoothBetween(-(Math.abs(offset) + this.slideWidth), -(this.slideWidth * 2), this.config.animation.time, (value: number) => {
-            this.itemsHolderNode.style.left = `${value}px`;
-          }, () => {
-            // Перемещаем вперед два слайда, т.к. изначально там был один который мы должны были переместить, плюс во время начала
-            // перетаскивания был добавлен дополнительный, для возможности перетаскивать в противоположную сторону
-            this.insertSlideAfter();
-            this.insertSlideAfter();
-
-            // Увеличиваем и проверяем текущий индекс
-            this.index += 1;
-            this.checkIndexBounds();
-
-            // Производим остаточные действия для корректного переключения слайда
-            this.updateAfterChangeSlide(this.slidesNodes[this.index]);
-
-            // Обнуляем сдвиг для продолжения корректной работы
-            this.itemsHolderNode.style.left = '0';
-          });
-        } else if (offset > this.slideWidth / 2) {
-          Faze.Animations.smoothBetween(-(this.slideWidth - Math.abs(offset)), 0, this.config.animation.time, (value: number) => {
-            this.itemsHolderNode.style.left = `${value}px`;
-          }, () => {
-            // Уменьшаем и проверяем текущий индекс
-            this.index -= 1;
-            this.checkIndexBounds();
-
-            // Производим остаточные действия для корректного переключения слайда
-            this.updateAfterChangeSlide(this.slidesNodes[this.index - 1]);
-
-            // Обнуляем сдвиг для продолжения корректной работы
-            this.itemsHolderNode.style.left = '0';
-          });
-        } else {
-          // Плавно двигаем в изначальное положение
-          if (offset < 0) {
-            // Переставляем слайд в конец
-            this.insertSlideAfter();
-
-            // Анимируем
-            Faze.Animations.smoothBetween(-Math.abs(offset), 0, this.config.animation.time, (value: number) => {
-              this.itemsHolderNode.style.left = `${value}px`;
-            });
-          } else {
-            // Анимируем
-            Faze.Animations.smoothBetween(-(-Math.abs(offset) + this.slideWidth), -this.slideWidth, this.config.animation.time, (value: number) => {
-              this.itemsHolderNode.style.left = `${value}px`;
-            }, () => {
-              // Переставляем слайд в конец
-              this.insertSlideAfter();
-
-              // Обнуляем сдвиг для продолжения корректной работы
-              this.itemsHolderNode.style.left = '0';
-            });
-          }
-        }
-      }
+      this.mouseOrTouchUp(event, isDown);
+      isDown = false;
     });
   }
 

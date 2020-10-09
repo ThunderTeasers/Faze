@@ -641,6 +641,26 @@ class Helpers {
   }
 
   /**
+   * Получение позиции мыши или пальца на экране
+   *
+   * @param event{MouseEvent | TouchEvent} Событие мыши или пальца
+   *
+   * @return{FazePosition} Позиция на экране
+   */
+  static getMouseOrTouchPosition(event: MouseEvent | TouchEvent): FazePosition {
+    const position: FazePosition = {x: 0, y: 0};
+    if (event instanceof MouseEvent) {
+      position.x = event.clientX;
+      position.y = event.clientY;
+    } else {
+      position.x = event.changedTouches[0].screenX;
+      position.y = event.changedTouches[0].screenY;
+    }
+
+    return position;
+  }
+
+  /**
    * Проверка, находится ли курсор на искомом DOM элементе
    *
    * @param event{Event} Событие мыши

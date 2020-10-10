@@ -385,6 +385,9 @@ class Carousel2 extends Module {
       // Сдвигаем карусель на ширину этого слайда, чтобы визуально ничего не изменилось
       this.itemsHolderNode.style.left = `${-this.slideWidth}px`;
 
+      // Ставим флаг, что карусель не бездействует
+      this.isIdle = false;
+
       return true;
     }
 
@@ -461,6 +464,9 @@ class Carousel2 extends Module {
 
         // Обнуляем сдвиг для продолжения корректной работы
         this.itemsHolderNode.style.left = '0';
+
+        // Карусель снова бездействует
+        this.isIdle = true;
       });
     } else if (offset > this.slideWidth / 2) {
       Faze.Animations.smoothBetween(-(this.slideWidth - Math.abs(offset)), 0, this.config.animation.time, (value: number) => {
@@ -475,6 +481,9 @@ class Carousel2 extends Module {
 
         // Обнуляем сдвиг для продолжения корректной работы
         this.itemsHolderNode.style.left = '0';
+
+        // Карусель снова бездействует
+        this.isIdle = true;
       });
     } else {
       // Плавно двигаем в изначальное положение
@@ -485,6 +494,9 @@ class Carousel2 extends Module {
         // Анимируем
         Faze.Animations.smoothBetween(-Math.abs(offset), 0, this.config.animation.time, (value: number) => {
           this.itemsHolderNode.style.left = `${value}px`;
+        }, () => {
+          // Карусель снова бездействует
+          this.isIdle = true;
         });
       } else {
         // Анимируем
@@ -496,6 +508,9 @@ class Carousel2 extends Module {
 
           // Обнуляем сдвиг для продолжения корректной работы
           this.itemsHolderNode.style.left = '0';
+
+          // Карусель снова бездействует
+          this.isIdle = true;
         });
       }
     }

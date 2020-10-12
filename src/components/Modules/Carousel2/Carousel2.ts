@@ -183,7 +183,7 @@ class Carousel2 extends Module {
     super({
       node,
       config: Object.assign(defaultConfig, config),
-      name: 'Carousel',
+      name: 'Carousel2',
     });
   }
 

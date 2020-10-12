@@ -304,6 +304,7 @@ class Faze {
     Faze.Tab.hotInitialize('tab');
     Faze.Spoiler.hotInitialize();
     Faze.Carousel.hotInitialize();
+    Faze.Carousel2.hotInitialize('carousel2');
     Faze.Tooltip.hotInitialize();
     Faze.Zoom.hotInitialize();
     Faze.ZoomBox.hotInitialize();

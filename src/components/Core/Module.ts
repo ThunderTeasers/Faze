@@ -68,7 +68,7 @@ class Module {
    */
   protected initialize(): void {
     // У основного DOM элемента, добавляем классы, показывающие, что данный плагин инициализирован, это необходимо для "hotInitialize"
-    this.node.classList.add(`faze-${this.name.toLowerCase()}2`);
+    this.node.classList.add(`faze-${this.name.toLowerCase()}`);
     this.node.classList.add(`faze-${this.name.toLowerCase()}-initialized`);
   }
 

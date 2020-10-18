@@ -17,11 +17,13 @@ import Module from '../../Core/Module';
  *
  * Содержит:
  *   headerActiveClass - CSS класс активного таба
+ *   useHash - использовать ли window.location.hash при переключении и инициализации
  *   callbacks
  *     changed - пользовательская функция, исполняющаяся после изменения таба
  */
 interface Config {
   headerActiveClass?: string;
+  useHash: boolean;
   callbacks: {
     changed?: () => void;
   };
@@ -41,6 +43,7 @@ class Tab extends Module {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       headerActiveClass: undefined,
+      useHash: false,
       callbacks: {
         changed: undefined,
       },
@@ -64,11 +67,18 @@ class Tab extends Module {
     this.initializeTabs();
 
     let key: string;
+
+    // Открытие тел табов если у шапки задан класс "faze-active"
     const alreadyActiveTabNode: HTMLElement | undefined = Array.from(this.headersNodes).find(headerNode => headerNode.classList.contains('faze-active'));
     if (alreadyActiveTabNode) {
       key = alreadyActiveTabNode.dataset.fazeTabHead || alreadyActiveTabNode.dataset.fazeTabBody || '';
     } else {
       key = this.headersNodes[0].dataset.fazeTabHead || this.headersNodes[0].dataset.fazeTabBody || '';
+    }
+
+    // Открытие таба если есть hash и его разрешено использовать
+    if (this.config.useHash && window.location.hash) {
+      key = window.location.hash.substring(1);
     }
 
     // Активация первой вкладки по умолчанию
@@ -132,6 +142,11 @@ class Tab extends Module {
       bodyNode.classList.toggle('faze-active', keys.includes(bodyNode.dataset.fazeTabBody || ''));
     });
 
+    // Прописываем hash если необходимо
+    if (this.config.useHash) {
+      window.location.hash = key;
+    }
+
     // Вызываем пользовательский метод
     if (typeof this.config.callbacks.changed === 'function') {
       try {
@@ -150,6 +165,7 @@ class Tab extends Module {
   static initializeByDataAttributes(node: HTMLElement): void {
     new Tab(node, {
       headerActiveClass: node.dataset.fazeTabHeaderActiveClass,
+      useHash: (node.dataset.fazeTabUseHash || 'false') === 'true',
     });
   }
 }

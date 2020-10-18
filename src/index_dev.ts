@@ -71,7 +71,9 @@ Faze.add({
       },
     });
 
-    new Faze.Tab(document.querySelector('.faze-tabs'));
+    new Faze.Tab(document.querySelector('.faze-tabs'), {
+      useHash: true,
+    });
 
     new Faze.Dropdown(document.querySelector('.js-dropdown'));
 

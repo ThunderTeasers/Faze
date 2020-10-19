@@ -32,6 +32,7 @@ interface CallbackData {
  *   showTotal  - показывать и обновлять общее количество отфильтрованных элементов
  *   changeButton - нужно ли изменять кнопку(блокировать, писать "Обработка" и т.д.)
  *   updateQuery - нужно ли обновлять URL через HTML5 history, либо делать это скрыто
+ *   submitAfterChange - обновляется ли сразу после изменения любого инпута
  *   modules
  *     get      - модуль show в plarson
  *   cookie
@@ -55,6 +56,7 @@ interface Config {
   usePathnameFromQuery: boolean;
   useAPI: boolean;
   updateQuery: boolean;
+  submitAfterChange: boolean;
   modules: {
     get?: number;
   };
@@ -136,6 +138,7 @@ class Filter {
       usePathnameFromQuery: true,
       updateQuery: true,
       useAPI: false,
+      submitAfterChange: false,
       modules: {
         get: undefined,
       },
@@ -607,13 +610,14 @@ class Filter {
       changeButton: filterNode.dataset.fazeFilterChangeButton === 'true',
       usePathnameFromQuery: filterNode.dataset.fazeFilterUsePathnameFromQuery === 'true',
       updateQuery: filterNode.dataset.fazeFilterUpdateQuery === 'true',
+      submitAfterChange: (filterNode.dataset.fazeFilterUpdateQuery || 'false') === 'true',
       modules: {
         get: filterNode.dataset.fazeFilterModulesGet,
       },
       selectors: {
-        form: filterNode.dataset.fazeFilterSelectorsForm,
-        itemsHolder: filterNode.dataset.fazeFilterSelectorsItemsHolder,
-        total: filterNode.dataset.fazeFilterSelectorsTotal,
+        form: filterNode.dataset.fazeFilterSelectorsForm || '.faze-filter-form',
+        itemsHolder: filterNode.dataset.fazeFilterSelectorsItemsHolder || '.faze-filter-items',
+        total: filterNode.dataset.fazeFilterSelectorsTotal || '.faze-filter-total',
       },
     });
   }

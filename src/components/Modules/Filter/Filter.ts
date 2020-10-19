@@ -335,6 +335,24 @@ class Filter {
           });
       });
     }
+
+    // Навешивание событий на сабмит фильтра при изменении инпутов
+    if (this.config.submitAfterChange) {
+      this._bindSubmitAfterChange();
+    }
+  }
+
+  /**
+   * Навешивание событий на сабмит фильтра при изменении инпутов
+   */
+  _bindSubmitAfterChange(): void {
+    this.formNode?.querySelectorAll<HTMLInputElement>('input:not([type="hidden"])').forEach((inputNode: HTMLInputElement) => {
+      if (['checkbox', 'radio'].includes(inputNode.type)) {
+        inputNode.addEventListener('change', () => {
+          this.updateFilter();
+        });
+      }
+    });
   }
 
   /**

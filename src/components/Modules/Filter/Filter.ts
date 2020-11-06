@@ -628,7 +628,7 @@ class Filter {
       changeButton: filterNode.dataset.fazeFilterChangeButton === 'true',
       usePathnameFromQuery: filterNode.dataset.fazeFilterUsePathnameFromQuery === 'true',
       updateQuery: filterNode.dataset.fazeFilterUpdateQuery === 'true',
-      submitAfterChange: (filterNode.dataset.fazeFilterUpdateQuery || 'false') === 'true',
+      submitAfterChange: (filterNode.dataset.fazeFilterSubmitAfterChange || 'false') === 'true',
       modules: {
         get: filterNode.dataset.fazeFilterModulesGet,
       },

@@ -19,6 +19,41 @@ enum FazeCarouselMoveDirection {
 }
 
 /**
+ * Структура возвращаемого объекта в пользовательских функциях
+ *
+ * Содержит:
+ *   holderNode   - DOM элемент содержащий слайды
+ *   carouselNode - DOM элемент в котором находится всё, что относится карусели
+ *   slidesNodes  - DOM элементы слайдов
+ *   controlsNode - DOM элемент родителя всех управляющих элементов карусели
+ *   pagesNode    - DOM элемент пагинации слайдов
+ *   arrowsNode   - DOM элемент родителя стрелок
+ *   arrowsNodes  - DOM элементы стрелок, не путать с arrowsNode
+ *   counterNode  - DOM элемент счетчика слайдов
+ *   totalSlides  - общее число слайдов
+ *   index        - индекс активного слайда
+ *   direction    - направление карусели(может быть "vertical" и "horizontal")
+ *   currentSlideNode - DOM элемент активного слайда
+ */
+interface CallbackData {
+  holderNode: HTMLElement;
+  carouselNode: HTMLElement;
+  slidesNodes: HTMLElement[];
+  controlsNode?: HTMLElement;
+  pagesNode?: HTMLElement;
+  arrowsNode?: HTMLElement;
+  arrowsNodes?: {
+    left: HTMLElement;
+    right: HTMLElement;
+  };
+  counterNode?: HTMLElement;
+  totalSlides: number;
+  index: number;
+  direction?: string;
+  currentSlideNode: HTMLElement | null;
+}
+
+/**
  * Структура конфига карусели
  *
  * Содержит:
@@ -64,6 +99,11 @@ interface Config {
   selectors: {
     arrowLeft?: string;
     arrowRight?: string;
+  };
+  callbacks: {
+    created?: (data: CallbackData) => void;
+    beforeChanged?: (data: CallbackData) => void;
+    changed?: (data: CallbackData) => void;
   };
 }
 
@@ -177,6 +217,11 @@ class Carousel2 extends Module {
         arrowLeft: undefined,
         arrowRight: undefined,
       },
+      callbacks: {
+        created: undefined,
+        beforeChanged: undefined,
+        changed: undefined,
+      },
     };
 
     // Инициализация модуля
@@ -239,6 +284,29 @@ class Carousel2 extends Module {
 
     // Обновляем размеры текущего слайда
     this.updateCurrentSlideSizes();
+
+    // ===========================================
+    // Выполнение пользовательской функции
+    // ===========================================
+    if (typeof this.config.callbacks.created === 'function') {
+      try {
+        this.config.callbacks.created({
+          holderNode: this.itemsHolderNode,
+          carouselNode: this.node,
+          slidesNodes: this.slidesNodes,
+          totalSlides: this.totalSlides,
+          index: this.index,
+          controlsNode: this.controlsNode,
+          counterNode: this.counterNode,
+          arrowsNode: this.arrowsNode,
+          arrowsNodes: this.arrowsNodes,
+          pagesNode: this.pagesNode,
+          currentSlideNode: this.slidesNodes[this.index],
+        });
+      } catch (error) {
+        this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
+      }
+    }
   }
 
   /**
@@ -725,6 +793,65 @@ class Carousel2 extends Module {
   }
 
   /**
+   * Выполнение пользовательской функции "changed"
+   *
+   * @param direction{FazeCarouselMoveDirection} Направление карусели
+   */
+  private changeCallbackCall(direction?: FazeCarouselMoveDirection): void {
+    if (typeof this.config.callbacks.changed === 'function') {
+      try {
+        this.config.callbacks.changed({
+          direction,
+          holderNode: this.itemsHolderNode,
+          carouselNode: this.node,
+          slidesNodes: this.slidesNodes,
+          totalSlides: this.totalSlides,
+          index: this.index,
+          currentSlideNode: this.currentSlide,
+          controlsNode: this.controlsNode,
+          counterNode: this.counterNode,
+          arrowsNode: this.arrowsNode,
+          arrowsNodes: this.arrowsNodes,
+          pagesNode: this.pagesNode,
+        });
+      } catch (error) {
+        this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+      }
+    }
+  }
+
+  /**
+   * Выполнение пользовательской функции "beforeChanged"
+   *
+   * @param direction{FazeCarouselMoveDirection} Направление карусели
+   */
+  private beforeChangeCallbackCall(direction?: FazeCarouselMoveDirection): void {
+    if (typeof this.config.callbacks.beforeChanged === 'function') {
+      // Текущий слайд(по факту он следующий, т.к. изменение уже началось)
+      const currentSlideNode = this.slidesNodes.find(tmpSlideNode => parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index) || this.slidesNodes[0];
+
+      try {
+        this.config.callbacks.beforeChanged({
+          direction,
+          currentSlideNode,
+          holderNode: this.itemsHolderNode,
+          carouselNode: this.node,
+          slidesNodes: this.slidesNodes,
+          totalSlides: this.totalSlides,
+          index: this.index,
+          controlsNode: this.controlsNode,
+          counterNode: this.counterNode,
+          arrowsNode: this.arrowsNode,
+          arrowsNodes: this.arrowsNodes,
+          pagesNode: this.pagesNode,
+        });
+      } catch (error) {
+        this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+      }
+    }
+  }
+
+  /**
    * Корректировка индекса
    *
    * @private
@@ -746,6 +873,9 @@ class Carousel2 extends Module {
    * @private
    */
   private updateSlides(direction: FazeCarouselMoveDirection, amount: number = 1): void {
+    // Вызываем пользовательскую функцию "beforeChanged"
+    this.beforeChangeCallbackCall(direction);
+
     // Блокируем карусель
     this.isIdle = false;
 
@@ -786,6 +916,9 @@ class Carousel2 extends Module {
             // Изменение состояний элементов управления
             this.changeControls();
           });
+
+        // Вызываем пользовательскую функцию
+        this.changeCallbackCall(direction);
 
         break;
       case 'slide':
@@ -832,6 +965,10 @@ class Carousel2 extends Module {
 
           this.updateAfterChangeSlide(nextSlide);
         });
+
+        // Вызываем пользовательскую функцию
+        this.changeCallbackCall(direction);
+
         break;
       default:
         break;

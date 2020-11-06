@@ -17,7 +17,7 @@
       & > img {
         display: flex;
         width: 100%;
-        height: 100%;
+        height: auto;
 
         object-fit: cover;
       }
@@ -27,12 +27,11 @@
   // Анимация появления-исчезновения
   &.faze-animation-fade {
     .faze-carousel-holder {
-      padding-bottom: 100%;
-
+      // Элемент карусели
       & > .faze-item {
         display: flex;
 
-        position: absolute;
+        position: relative;
         top: 0;
         left: 0;
         right: 0;
@@ -43,6 +42,14 @@
 
         z-index: 1;
 
+        // Рассчёт сдвигов для слайдов
+        @for $i from 2 through 20 {
+          &:nth-child(#{$i}) {
+            left: calc(-100% * #{$i - 1});
+          }
+        }
+
+        // Активный элемент
         &.faze-active {
           z-index: 3;
         }

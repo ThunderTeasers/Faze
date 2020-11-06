@@ -309,6 +309,7 @@ class Faze {
     Faze.Zoom.hotInitialize();
     Faze.ZoomBox.hotInitialize();
     Faze.Select.hotInitialize();
+    Faze.Filter.hotInitialize();
     Faze.Steps.hotInitialize();
     Faze.Drag.hotInitialize();
     Faze.Dropdown.hotInitialize();

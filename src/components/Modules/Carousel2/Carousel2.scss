@@ -29,7 +29,7 @@
     .faze-carousel-holder {
       // Элемент карусели
       & > .faze-item {
-        position: relative;
+        position: absolute;
         top: 0;
         left: 0;
         right: 0;
@@ -42,15 +42,10 @@
 
         z-index: 1;
 
-        // Рассчёт сдвигов для слайдов
-        @for $i from 2 through 20 {
-          &:nth-child(#{$i}) {
-            left: calc(-100% * #{$i - 1});
-          }
-        }
-
         // Активный элемент
         &.faze-active {
+          position: relative;
+
           display: flex;
 
           opacity: 1;

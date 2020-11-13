@@ -882,13 +882,16 @@ class Carousel2 extends Module {
     // DOM элемент следующего слайда
     let nextSlide: HTMLElement;
 
+    // Анимация
     switch (this.config.animation.type) {
       case 'fade':
         // Следующий слайд
         nextSlide = this.slidesNodes[this.index];
 
         // Проставляем ему z-index равно 2, чтобы он был ниже активного слайда(3) и выше остальных(1)
+        // А так же убираем прозрачность, чтобы видеть слайд(по умолчанию они скрыты)
         nextSlide.style.zIndex = '2';
+        nextSlide.style.opacity = '1';
 
         // Плавно изменяем прозрачность у текущего слайда
         Faze.Animations.smoothBetween(0, 1, this.config.animation.time,

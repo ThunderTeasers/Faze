@@ -108,7 +108,7 @@ class Faze {
   static plugins: PluginsData = {};
 
 // Резервирование статических переменных под заводские плагины
-  static Carousel: any;
+  static Carousel: any = Carousel;
   static Carousel2: any = Carousel2;
   static Tooltip: any = Tooltip;
   static Modal: any = Modal;

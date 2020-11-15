@@ -310,7 +310,7 @@ class Faze {
    * @private
    */
   private static parseVersion(versionString: string | null): Version {
-    let version: Version = Version.FAZE_1;
+    let version: Version;
     switch (versionString) {
       case '1': version = Version.FAZE_1; break;
       case '2': version = Version.FAZE_2; break;

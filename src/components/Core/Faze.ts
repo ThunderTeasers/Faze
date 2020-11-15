@@ -14,6 +14,12 @@
 import './Faze.scss';
 import Logger from './Logger';
 
+// Версии
+enum Version {
+  FAZE_1,
+  FAZE_2
+}
+
 /**
  * Импорты всех плагинов
  */
@@ -295,6 +301,50 @@ class Faze {
   }
 
   /**
+   * Парсинг и получение версии фреймворка в нужном формате(enum) из строки
+   *
+   * @param{string | null} versionString Строка с версией
+   *
+   * @return{Version} Версия в формате Faze
+   *
+   * @private
+   */
+  private static parseVersion(versionString: string | null): Version {
+    let version: Version = Version.FAZE_1;
+    switch (versionString) {
+      case '1': version = Version.FAZE_1; break;
+      case '2': version = Version.FAZE_2; break;
+      default: version = Version.FAZE_1;
+    }
+
+    return version;
+  }
+
+  /**
+   * Получение нужной версии фреймворка
+   *
+   * @return{Version} Версия фреймворка
+   */
+  static getVersion(): Version {
+    // Путь к файлу, для получения GET параметров
+    const src = (<HTMLScriptElement>document.currentScript)?.src;
+
+    // Итоговая версия
+    let version: Version = Version.FAZE_1;
+
+    // "search" строка пути к файлу
+    const search = src.split('?');
+
+    // Если есть GET параметры, то определяем версию
+    if(search[1]){
+      const params = new URLSearchParams(search[1]);
+      version = Faze.parseVersion(params.get('version'));
+    }
+
+    return version;
+  }
+
+  /**
    * Инициализация плагинов по data атрибутам
    */
   static hotInitialize(): void {
@@ -303,8 +353,13 @@ class Faze {
     Faze.Page.hotInitialize();
     Faze.Tab.hotInitialize('tab');
     Faze.Spoiler.hotInitialize();
-    Faze.Carousel.hotInitialize();
-    Faze.Carousel2.hotInitialize('carousel2');
+
+    if(Faze.getVersion() === Version.FAZE_2){
+      Faze.Carousel2.hotInitialize('carousel');
+    }else{
+      Faze.Carousel.hotInitialize();
+    }
+
     Faze.Tooltip.hotInitialize();
     Faze.Zoom.hotInitialize();
     Faze.ZoomBox.hotInitialize();

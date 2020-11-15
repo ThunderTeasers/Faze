@@ -101,15 +101,18 @@ class Faze {
   // Помощник для логирования
   private static logger: Logger;
 
+  // Версия фреймворка
+  static version: Version;
+
   // Переменная, содержащая в себе всю информацию о плагинах, а так же их тела для дальнейшего исполнения
   static plugins: PluginsData = {};
 
-  // Резервирование статических переменных под заводские плагины
+// Резервирование статических переменных под заводские плагины
+  static Carousel: any;
+  static Carousel2: any = Carousel2;
   static Tooltip: any = Tooltip;
   static Modal: any = Modal;
   static Tab: any = Tab;
-  static Carousel: any = Carousel;
-  static Carousel2: any = Carousel2;
   static Zoom: any = Zoom;
   static ZoomBox: any = ZoomBox;
   static Gallery: any = Gallery;
@@ -133,6 +136,16 @@ class Faze {
   constructor() {
     // Инициализация логгера
     Faze.logger = new Logger();
+
+    // Версия фреймворка
+    Faze.version = Faze.getVersion();
+
+    // Определение версий модулей отностельно фреймворка
+    if (Faze.version === Version.FAZE_2) {
+      Faze.Carousel = Carousel2;
+    } else {
+      Faze.Carousel = Carousel;
+    }
   }
 
   /**
@@ -312,9 +325,14 @@ class Faze {
   private static parseVersion(versionString: string | null): Version {
     let version: Version;
     switch (versionString) {
-      case '1': version = Version.FAZE_1; break;
-      case '2': version = Version.FAZE_2; break;
-      default: version = Version.FAZE_1;
+      case '1':
+        version = Version.FAZE_1;
+        break;
+      case '2':
+        version = Version.FAZE_2;
+        break;
+      default:
+        version = Version.FAZE_1;
     }
 
     return version;
@@ -336,7 +354,7 @@ class Faze {
     const search = src.split('?');
 
     // Если есть GET параметры, то определяем версию
-    if(search[1]){
+    if (search[1]) {
       const params = new URLSearchParams(search[1]);
       version = Faze.parseVersion(params.get('version'));
     }
@@ -354,9 +372,9 @@ class Faze {
     Faze.Tab.hotInitialize('tab');
     Faze.Spoiler.hotInitialize();
 
-    if(Faze.getVersion() === Version.FAZE_2){
+    if (Faze.getVersion() === Version.FAZE_2) {
       Faze.Carousel2.hotInitialize('carousel');
-    }else{
+    } else {
       Faze.Carousel.hotInitialize();
     }
 

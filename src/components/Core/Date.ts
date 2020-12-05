@@ -12,7 +12,7 @@ namespace Faze {
      * @return{string} День недели в человекочитаемом виде
      */
     static getDayOfWeek(day: number, isShort: boolean = false): string {
-      let result = '';
+      let result;
       switch (day) {
         case 0:
           result = isShort ? 'Пн' : 'Понедельник';
@@ -53,7 +53,7 @@ namespace Faze {
      * @return{string} Месяц в человекочитаемом виде
      */
     static getMonth(month: number, isDeclination: boolean = false): string {
-      let result = '';
+      let result;
 
       switch (month) {
         case 0:

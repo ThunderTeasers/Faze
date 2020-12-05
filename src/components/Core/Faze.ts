@@ -14,17 +14,12 @@
 import './Faze.scss';
 import Logger from './Logger';
 
-// Версии
-enum Version {
-  FAZE_1,
-  FAZE_2
-}
-
 /**
  * Импорты всех плагинов
  */
 import Modal from '../Modules/Modal/Modal';
 import Helpers from '../Helpers/Helpers';
+import Date from './Date';
 import Animations from '../Animations/Animations';
 import Tooltip from '../Modules/Tooltip/Tooltip';
 import Tab from '../Modules/Tab/Tab';
@@ -47,6 +42,12 @@ import LazyImage from '../Modules/LazyImage/LazyImage';
 import LazyImageController from '../Modules/LazyImage/LazyImageController';
 import REST from '../Modules/REST/REST';
 import Observer from './Observer';
+
+// Версии
+export enum Version {
+  FAZE_1,
+  FAZE_2,
+}
 
 /**
  * Структура конфигурации плагина при его инициализации
@@ -101,13 +102,10 @@ class Faze {
   // Помощник для логирования
   private static logger: Logger;
 
-  // Версия фреймворка
-  static version: Version;
-
   // Переменная, содержащая в себе всю информацию о плагинах, а так же их тела для дальнейшего исполнения
   static plugins: PluginsData = {};
 
-// Резервирование статических переменных под заводские плагины
+  // Резервирование статических переменных под заводские плагины
   static Carousel: any = Carousel;
   static Carousel2: any = Carousel2;
   static Tooltip: any = Tooltip;
@@ -117,6 +115,7 @@ class Faze {
   static ZoomBox: any = ZoomBox;
   static Gallery: any = Gallery;
   static Helpers: any = Helpers;
+  static Date: any = Date;
   static Animations: any = Animations;
   static Scroll: any = Scroll;
   static Spoiler: any = Spoiler;
@@ -133,19 +132,12 @@ class Faze {
   static Observer: any = new Observer();
   static REST: any = REST;
 
+  // Версии
+  static Versions: Version;
+
   constructor() {
     // Инициализация логгера
     Faze.logger = new Logger();
-
-    // Версия фреймворка
-    Faze.version = Faze.getVersion();
-
-    // Определение версий модулей отностельно фреймворка
-    if (Faze.version === Version.FAZE_2) {
-      Faze.Carousel = Carousel2;
-    } else {
-      Faze.Carousel = Carousel;
-    }
   }
 
   /**
@@ -323,16 +315,11 @@ class Faze {
    * @private
    */
   private static parseVersion(versionString: string | null): Version {
-    let version: Version;
+    let version: Version = Version.FAZE_1;
     switch (versionString) {
-      case '1':
-        version = Version.FAZE_1;
-        break;
-      case '2':
-        version = Version.FAZE_2;
-        break;
-      default:
-        version = Version.FAZE_1;
+      case '1': version = Version.FAZE_1; break;
+      case '2': version = Version.FAZE_2; break;
+      default: version = Version.FAZE_1;
     }
 
     return version;
@@ -354,7 +341,7 @@ class Faze {
     const search = src.split('?');
 
     // Если есть GET параметры, то определяем версию
-    if (search[1]) {
+    if(search[1]){
       const params = new URLSearchParams(search[1]);
       version = Faze.parseVersion(params.get('version'));
     }
@@ -371,13 +358,8 @@ class Faze {
     Faze.Page.hotInitialize();
     Faze.Tab.hotInitialize('tab');
     Faze.Spoiler.hotInitialize();
-
-    if (Faze.getVersion() === Version.FAZE_2) {
-      Faze.Carousel2.hotInitialize('carousel');
-    } else {
-      Faze.Carousel.hotInitialize();
-    }
-
+    Faze.Carousel2.hotInitialize('carousel');
+    // Faze.Carousel.hotInitialize();
     Faze.Tooltip.hotInitialize();
     Faze.Zoom.hotInitialize();
     Faze.ZoomBox.hotInitialize();

@@ -802,17 +802,15 @@ class Carousel {
    * @param needToChange - нужно ли вставлять DOM элемент следующего слайда
    */
   next(needToChange: boolean = true): void {
-    if (this.isIdle) {
-      this.index += 1;
-      if (this.index >= this.totalSlides) {
-        this.index = Math.max(this.index - this.totalSlides, 0);
-      }
-    }
-
     if (needToChange) {
-      this.changeSlide('next', 1);
+      if (this.isIdle) {
+        this.index += 1;
+        if (this.index >= this.totalSlides) {
+          this.index = Math.max(this.index - this.totalSlides, 0);
+        }
+      }
 
-      this.index += 1;
+      this.changeSlide('next', 1);
     } else {
       // Инменяем индикаторы
       this.changeControls();
@@ -825,17 +823,15 @@ class Carousel {
    * @param needToChange - нужно ли вставлять DOM элемент следующего слайда
    */
   prev(needToChange: boolean = true): void {
-    if (this.isIdle) {
-      this.index -= 1;
-      if (this.index < 0) {
-        this.index = Math.min(this.totalSlides - Math.abs(this.index), this.totalSlides - 1);
-      }
-    }
-
     if (needToChange) {
-      this.changeSlide('prev', 1);
+      if (this.isIdle) {
+        this.index -= 1;
+        if (this.index < 0) {
+          this.index = Math.min(this.totalSlides - Math.abs(this.index), this.totalSlides - 1);
+        }
+      }
 
-      this.index -= 1;
+      this.changeSlide('prev', 1);
     } else {
       // Инменяем индикаторы
       this.changeControls();

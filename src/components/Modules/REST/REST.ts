@@ -520,8 +520,11 @@ class REST {
             }
           }
 
+          // Продолжаем исполнять цепочку запросов
           REST.chain(chainData, finalCallback, response);
         });
+      } else if ('redirect' in data) {
+        window.location.href = data['redirect'];
       } else {
         throw new Error('Не указан обязательный параметр "method" или "function" в ajaxChain');
       }

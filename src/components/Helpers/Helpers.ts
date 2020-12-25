@@ -216,7 +216,7 @@ class Helpers {
 
     input.addEventListener('focus', (event: FocusEvent) => {
       // Проверка на пустую строку, если это так и пользователь нажимает не backspace то добавляется начало телефона
-      if (value.length === 0 && event.which !== 8) {
+      if (value.length === 0) {
         value += '+7 (';
       }
 
@@ -228,25 +228,22 @@ class Helpers {
       event.preventDefault();
 
       // Если это backspace то не удаляем дальше чем 3 символа
-      if (event.which === 8) {
-        if (value.length <= 5) {
-          value = '+7 ( ';
+      if (event.key === 'Backspace') {
+        value = value.slice(0, -1);
+
+        if (value.length <= 4) {
+          value = '+7 (';
         }
       }
 
       // Добавление цифры, проверка на цифры и что номер меньше 18 знаков(включая -, ( и ))
-      if (((event.which > 47 && event.which < 58) || (event.which > 95 && event.which < 106)) && value.length < 18) {
+      if (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].includes(event.key) && value.length < 18) {
         value += event.key;
         if (value.length === 7) {
           value += ') ';
         } else if (value.length === 12 || value.length === 15) {
           value += '-';
         }
-      }
-
-      // Удаление цифры
-      if (event.which === 8) {
-        value = value.slice(0, -1);
       }
 
       // Присваиваем собранный номер

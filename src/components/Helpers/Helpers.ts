@@ -224,21 +224,17 @@ class Helpers {
       input.value = value;
     });
 
-    input.addEventListener('keydown', (event: KeyboardEvent) => {
-      event.preventDefault();
-
+    input.addEventListener('input', (event: any) => {
       // Если это backspace то не удаляем дальше чем 3 символа
-      if (event.key === 'Backspace') {
+      if ('data' in event && !event.data) {
         value = value.slice(0, -1);
 
         if (value.length <= 4) {
           value = '+7 (';
         }
-      }
-
-      // Добавление цифры, проверка на цифры и что номер меньше 18 знаков(включая -, ( и ))
-      if (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].includes(event.key) && value.length < 18) {
-        value += event.key;
+      } else if (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].includes(event.data) && value.length < 18) {
+        // Добавление цифры, проверка на цифры и что номер меньше 18 знаков(включая -, ( и ))
+        value += event.data;
         if (value.length === 7) {
           value += ') ';
         } else if (value.length === 12 || value.length === 15) {

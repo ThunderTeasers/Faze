@@ -510,6 +510,11 @@ class REST {
 
         dataType = data['mime'] === 'json' ? 'json' : 'html';
 
+        // Добавляем encode="utf8" если его нет
+        if (!('encoding' in data)) {
+          data['encoding'] = 'utf8';
+        }
+
         // Отправляем запрос, после выполнения которого снова вызываем ajaxChain
         REST.request(method, dataType, url, data, (response: any) => {
           if (typeof callback === 'function') {

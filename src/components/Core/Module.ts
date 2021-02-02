@@ -34,6 +34,9 @@ class Module {
   // Имя плагина
   private readonly name: string;
 
+  // CSS класс главного DOM элемента
+  protected readonly className: string;
+
   /**
    * Стандартный конструктор
    *
@@ -54,6 +57,7 @@ class Module {
     // Инициализируем переменные
     this.node = data.node;
     this.config = data.config;
+    this.className = `.${data.node?.className.replace(' ', '.')}`;
 
     // Вызываем стандартные методы
     this.initialize();

@@ -13,6 +13,18 @@ import './Tab.scss';
 import Module from '../../Core/Module';
 
 /**
+ * Структура возвращаемого объекта в пользовательском методе
+ *
+ * Содержит:
+ *   head  - DOM элемент выбранной шапки
+ *   body  - DOM Элемент выбранного тела
+ */
+interface CallbackData {
+  headNode: HTMLElement | undefined;
+  bodyNode: HTMLElement | undefined;
+}
+
+/**
  * Структура конфига табов
  *
  * Содержит:
@@ -25,7 +37,7 @@ interface Config {
   headerActiveClass?: string;
   useHash: boolean;
   callbacks: {
-    changed?: () => void;
+    changed?: (activeTabData: CallbackData) => void;
   };
 }
 
@@ -119,6 +131,10 @@ class Tab extends Module {
    * @param key{string} - ключ в data атрибутах по которому ищем шапку и тело
    */
   activateTab(key: string): void {
+    // Активные DOM Элементы таба
+    let activeHeadNode: HTMLElement | undefined = undefined;
+    let activeBodyNode: HTMLElement | undefined = undefined;
+
     // Активируем шапку
     this.headersNodes.forEach((headerNode: HTMLElement) => {
       // Является ли заголовок активным
@@ -131,6 +147,11 @@ class Tab extends Module {
       if (this.config.headerActiveClass) {
         headerNode.classList.toggle(this.config.headerActiveClass, isActive);
       }
+
+      // Берём активную шапку
+      if (isActive) {
+        activeHeadNode = headerNode;
+      }
     });
 
     // Получаем все ключи для выбора нужных тел, т.к. их может быть несколько через пробел
@@ -138,8 +159,15 @@ class Tab extends Module {
 
     // Активируем тела
     this.bodiesNodes.forEach((bodyNode: HTMLElement) => {
-      bodyNode.style.display = keys.includes(bodyNode.dataset.fazeTabBody || '') ? 'block' : 'none';
-      bodyNode.classList.toggle('faze-active', keys.includes(bodyNode.dataset.fazeTabBody || ''));
+      const isActive = keys.includes(bodyNode.dataset.fazeTabBody || '');
+
+      bodyNode.style.display = isActive ? 'block' : 'none';
+      bodyNode.classList.toggle('faze-active', isActive);
+
+      // Берём активное тело
+      if (isActive) {
+        activeBodyNode = bodyNode;
+      }
     });
 
     // Прописываем hash если необходимо
@@ -150,7 +178,10 @@ class Tab extends Module {
     // Вызываем пользовательский метод
     if (typeof this.config.callbacks.changed === 'function') {
       try {
-        this.config.callbacks.changed();
+        this.config.callbacks.changed({
+          headNode: activeHeadNode,
+          bodyNode: activeBodyNode,
+        });
       } catch (error) {
         console.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
       }

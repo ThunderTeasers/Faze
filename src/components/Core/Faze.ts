@@ -358,8 +358,8 @@ class Faze {
     Faze.Page.hotInitialize();
     Faze.Tab.hotInitialize('tab');
     Faze.Spoiler.hotInitialize();
-    Faze.Carousel2.hotInitialize('carousel');
-    // Faze.Carousel.hotInitialize();
+    Faze.Carousel2.hotInitialize('carousel2');
+    Faze.Carousel.hotInitialize();
     Faze.Tooltip.hotInitialize();
     Faze.Zoom.hotInitialize();
     Faze.ZoomBox.hotInitialize();

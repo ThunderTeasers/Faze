@@ -13,6 +13,10 @@ Helpers.initialize();
 // @ts-ignore
 window.Faze = Faze;
 
+if (Faze.getVersion() === 1 || true) {
+  // Faze.Carousel = Faze.Carousel2;
+}
+
 // Faze.Helpers.setElementStyle(document.querySelector('[name="product_chr_search"]'), {width: '123px'});
 // Faze.Helpers.setElementAttributes(document.querySelector('[name="product_chr_search"]'), {width: '123px'});
 
@@ -49,6 +53,37 @@ Faze.add({
       });
     });
   },
+});
+
+// Тесты
+Faze.add({
+  pluginName: 'Tests',
+  condition: document.querySelectorAll('.js-carousel-test1').length > 0,
+  callback: () => {
+    new Faze.Carousel(document.querySelector('.js-carousel-test1'), {
+      autoplay: false,
+      pages: true,
+      arrows: true,
+      // arrowsOutside: true,
+      counter: false,
+      infinite: false,
+      mouseMove: false,
+      // amountPerSlide: 2,
+      animation: {
+        type: 'fade',
+        time: 1000,
+        direction: 'horizontal',
+      },
+      callbacks: {
+        created: (data: any) => {
+          // console.log(data);
+        },
+        changed: ({currentSlideNode}: { currentSlideNode?: any }) => {
+          // console.log(currentSlideNode);
+        },
+      },
+    });
+  }
 });
 
 // Тесты

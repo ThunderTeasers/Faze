@@ -57,6 +57,9 @@ interface Config {
   amountPerSlide: number;
   mouseMove: boolean;
   disallowRanges: FazeDisallowRange[];
+  templates: {
+    page: string;
+  },
   animation: {
     type: string;
     time: number;
@@ -70,6 +73,7 @@ interface Config {
     created?: (data: CallbackData) => void;
     beforeChanged?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
+    afterChanged?: (data: CallbackData) => void;
   };
 }
 
@@ -202,6 +206,9 @@ class Carousel {
       mouseMove: false,
       amountPerSlide: 1,
       disallowRanges: [],
+      templates: {
+        page: '',
+      },
       animation: {
         type: 'fade',
         time: 1000,
@@ -215,6 +222,7 @@ class Carousel {
         created: undefined,
         beforeChanged: undefined,
         changed: undefined,
+        afterChanged: undefined,
       },
     };
 
@@ -748,7 +756,7 @@ class Carousel {
 
     let pagesHTML: string = '';
     for (let i = 0; i < this.totalSlides; i += 1) {
-      pagesHTML += `<div class="faze-page" data-faze-index="${i}"></div>`;
+      pagesHTML += `<div class="faze-page" data-faze-index="${i}">${this.config.templates.page}</div>`;
     }
     this.pagesNode.innerHTML = pagesHTML;
     this.pagesNodes = this.pagesNode.querySelectorAll('.faze-page');
@@ -1063,6 +1071,9 @@ class Carousel {
 
     // Инменяем индикаторы
     this.changeControls();
+
+    // Исполняем пользовательский метод "afterChange"
+    this.afterChangeCallbackCall();
   }
 
   /**
@@ -1106,6 +1117,37 @@ class Carousel {
 
       try {
         this.config.callbacks.beforeChanged({
+          direction,
+          currentSlideNode,
+          holderNode: this.itemsHolderNode,
+          carouselNode: this.node,
+          slidesNodes: this.slidesNodes,
+          totalSlides: this.totalSlides,
+          index: this.index,
+          controlsNode: this.controlsNode,
+          counterNode: this.counterNode,
+          arrowsNode: this.arrowsNode,
+          arrowsNodes: this.arrowsNodes,
+          pagesNode: this.pagesNode,
+        });
+      } catch (error) {
+        this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+      }
+    }
+  }
+
+  /**
+   * Выполнение пользовательской функции "afterChanged"
+   *
+   * @param direction - направление карусели
+   */
+  private afterChangeCallbackCall(direction?: string): void {
+    if (typeof this.config.callbacks.afterChanged === 'function') {
+      // Текущий слайд(по факту он следующий, т.к. изменение уже началось)
+      const currentSlideNode = this.slidesNodes.find(tmpSlideNode => parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index) || this.slidesNodes[0];
+
+      try {
+        this.config.callbacks.afterChanged({
           direction,
           currentSlideNode,
           holderNode: this.itemsHolderNode,

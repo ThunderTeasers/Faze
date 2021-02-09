@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <style>
+        .carousel-test {
+            width: 500px;
+            margin-left: 200px;
+        }
+    </style>
+</head>
+<body>
+<div class="carousel-test">
+    <img src="https://via.placeholder.com/350x480" alt="">
+    <img src="https://via.placeholder.com/351x480" alt="">
+    <img src="https://via.placeholder.com/352x480" alt="">
+    <img src="https://via.placeholder.com/353x480" alt="">
+    <img src="https://via.placeholder.com/354x480" alt="">
+</div>
+
+<script>
+    setTimeout(() => {
+      new Faze.Carousel(document.querySelector('.carousel-test'), {
+        pages: true,
+        templates: {
+          page: '${i}',
+        },
+      });
+    }, 1000)
+</script>
+</body>
+</html>

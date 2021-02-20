@@ -116,13 +116,15 @@ class Tab extends Module {
    * Инициализация шапок и тел табов
    */
   private initializeTabs(): void {
+    const className = this.className ? `, ${this.className}` : '';
+
     // Получаем шапки
     this.headersNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-header, [data-faze-tab="header"], [data-faze-tab-head]'))
-      .filter((headerNode: HTMLElement) => headerNode.closest(`.faze-tabs, [data-faze~="tab"], ${this.className}`) === this.node);
+      .filter((headerNode: HTMLElement) => headerNode.closest(`.faze-tabs, [data-faze~="tab"] ${className}`) === this.node);
 
     // Получаем тела
     this.bodiesNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-body, [data-faze-tab="body"], [data-faze-tab-body]:not([data-faze-tab="header"]):not(.faze-tab-header)'))
-      .filter((bodyNode: HTMLElement) => bodyNode.closest(`.faze-tabs, [data-faze~="tab"], ${this.className}`) === this.node);
+      .filter((bodyNode: HTMLElement) => bodyNode.closest(`.faze-tabs, [data-faze~="tab"] ${className}`) === this.node);
   }
 
   /**

@@ -35,7 +35,7 @@ class Module {
   private readonly name: string;
 
   // CSS класс главного DOM элемента
-  protected readonly className: string;
+  protected readonly className?: string;
 
   /**
    * Стандартный конструктор
@@ -57,7 +57,10 @@ class Module {
     // Инициализируем переменные
     this.node = data.node;
     this.config = data.config;
-    this.className = `.${data.node?.className.replace(' ', '.')}`;
+
+    // Вычисляем CSS селектор класса
+    const classNameTmp = data.node?.className;
+    this.className = classNameTmp ? `.${classNameTmp.replace(' ', '.')}` : undefined;
 
     // Вызываем стандартные методы
     this.initialize();

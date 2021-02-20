@@ -26,8 +26,13 @@ class Shortcuts {
       if (result.error) {
         console.error('Ошибка в "fazeAuthFormResult": ', result.error);
       } else if (result.event === 'login' || result.event === 'logout') {
-        setTimeout(function () {
-          window.location.reload()
+        setTimeout(() => {
+          // Если есть ссылку куда идти, то переходим на неё, если нет - то просто перезагружаем страницу
+          if ('href' in result) {
+            window.location.href = result.href;
+          } else {
+            window.location.reload()
+          }
         }, 200);
       }
     };

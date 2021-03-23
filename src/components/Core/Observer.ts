@@ -59,44 +59,61 @@ class Observer {
   }
 
   /**
+   * Вызов метода слушателя на DOM элемент
+   *
+   * @param listener{Listener} Слушатель
+   * @param node{HTMLElement} DOM элемент
+   *
+   * @private
+   */
+  private call(listener: Listener, node: HTMLElement) {
+    if (!Array.from(listener.alreadyExistedNodes).includes(node)) {
+      if (typeof listener.callback === 'function') {
+        try {
+          // Вызываем пользовательскую функцию
+          listener.callback(node);
+        } catch (error) {
+          console.error('Ошибка исполнения пользовательской функции переданной в Observer, текст ошибки: ', error);
+        }
+
+        // Обновляем уже существующие элементы у слушателя, чтобы при следующем добавлении элемента, пользовательская
+        // функция срабатывала только на последний, а не на все которые были добавлены после инициализации
+        listener.alreadyExistedNodes.push(node);
+      }
+    }
+  }
+
+  /**
    * Отслеживание всех изменений DOM элементов на сайте
    *
    * @param mutationRecords - список изменения
    */
   private check(mutationRecords: MutationRecord[]) {
-    // Проходимся по всем слушателям
-    this.listeners.forEach((listener: Listener) => {
-      // Проходимся по всем изменениям
-      mutationRecords.forEach((mutationRecord: MutationRecord) => {
-        // Проходимся по всем добавленым DOM элементам
-        mutationRecord.addedNodes.forEach((addedNode: Node) => {
-          const parentNode: HTMLElement | null = addedNode.parentNode as HTMLElement;
-          if (parentNode) {
-            // Делаем выборку по селектору у родителя вставленного элемента, для того чтобы избежать случая, когда в "addedNode"
-            // передаются элементы которые не соответствуют заданному в "listener" селектору
-            parentNode.querySelectorAll(listener.selector).forEach((insertedElement) => {
-              // Если этого элемента не было изначально, то исполняем заданную пользовательскую функцию
-              if (!Array.from(listener.alreadyExistedNodes).includes(<HTMLElement>insertedElement)) {
-                if (typeof listener.callback === 'function') {
-                  try {
-                    // Вызываем пользовательскую функцию
-                    listener.callback(<HTMLElement>insertedElement);
-                  } catch (error) {
-                    console.error('Ошибка исполнения пользовательской функции переданной в Observer, текст ошибки: ', error);
-                  }
+    // Проходимся по всем изменениям
+    mutationRecords.forEach((mutationRecord: MutationRecord) => {
+      // Проходимся по всем добавленым DOM элементам
+      mutationRecord.addedNodes.forEach((addedNode: any) => {
+        if (addedNode.nodeType === Node.ELEMENT_NODE) {
+          // Проходимся по всем слушателям
+          this.listeners.forEach((listener) => {
+            // Если сам элемент является искомым, то вызываем метод на него
+            if (addedNode.matches(listener.selector)) {
+              this.call(listener, addedNode);
+            }
 
-                  // Обновляем уже существующие элементы у слушателя, чтобы при следующем добавлении элемента, пользовательская
-                  // функция срабатывала только на последний, а не на все которые были добавлены после инициализации
-                  listener.alreadyExistedNodes.push(<HTMLElement>insertedElement);
-                }
-              }
+            // Ищём в добавленом DOM элементе детей с необходимыми нам селекторами и на них мешаем метод
+            addedNode.querySelectorAll(listener.selector).forEach((node: HTMLElement) => {
+              this.call(listener, node);
             });
-          }
-        });
+          });
+        }
+      });
 
-        // Проходимся по всем удаленным DOM элементам и убираем их из массива существующих элементов слушателя, чтобы не засорять его и
-        // очистить память
-        mutationRecord.removedNodes.forEach((removedNode: Node) => {
+      // Проходимся по всем удаленным DOM элементам и убираем их из массива существующих элементов слушателя, чтобы не засорять его и
+      // очистить память
+      mutationRecord.removedNodes.forEach((removedNode: Node) => {
+        // Проходимся по всем слушателям
+        this.listeners.forEach((listener) => {
           listener.alreadyExistedNodes.forEach((existedNode: HTMLElement) => {
             if (existedNode === removedNode) {
               listener.alreadyExistedNodes = listener.alreadyExistedNodes.filter(node => node !== existedNode);

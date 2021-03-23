@@ -1210,6 +1210,21 @@ class Helpers {
 
     return data;
   }
+
+  /**
+   * Проверка, валиден ли селектор, то есть имеет ли он хоть одну ноду при выборке
+   *
+   * @param selector{string} CSS селектор по которому выбираем
+   */
+  static isSelectorValid(selector: string): boolean {
+    try {
+      document.createDocumentFragment().querySelector(selector);
+    } catch {
+      return false;
+    }
+
+    return true;
+  }
 }
 
 export default Helpers;

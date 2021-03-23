@@ -53,6 +53,10 @@ module.exports = env => {
         template: './src/tests/views/carousel_old.html',
       }),
       new HtmlWebpackPlugin({
+        filename: 'perf_tests.html',
+        template: './src/tests/views/perf_tests.html',
+      }),
+      new HtmlWebpackPlugin({
         template: './src/index.html',
       }),
       new webpack.HotModuleReplacementPlugin(),

@@ -33,6 +33,7 @@ interface CallbackData {
  *   changeButton - нужно ли изменять кнопку(блокировать, писать "Обработка" и т.д.)
  *   updateQuery - нужно ли обновлять URL через HTML5 history, либо делать это скрыто
  *   submitAfterChange - обновляется ли сразу после изменения любого инпута
+ *   needToRequest - нужно ли делать запрос к серверу
  *   modules
  *     get      - модуль show в plarson
  *   cookie
@@ -56,6 +57,7 @@ interface Config {
   usePathnameFromQuery: boolean;
   useAPI: boolean;
   updateQuery: boolean;
+  needToRequest: boolean;
   submitAfterChange: boolean;
   modules: {
     get?: number;
@@ -139,6 +141,7 @@ class Filter {
       updateQuery: true,
       useAPI: false,
       submitAfterChange: false,
+      needToRequest: true,
       modules: {
         get: undefined,
       },
@@ -282,57 +285,62 @@ class Filter {
         // URL для запроса к серверу
         const urlForRequest: string = `${basePath}?${formDataURLString.toString()}`;
 
-        // Отправка запрос на сервер
-        fetch(urlForRequest, {credentials: 'same-origin'})
-          .then((response: Response) => response.text())
-          .then((response: string) => {
-            // Парсинг ответа от сервера
-            const responseHTML: Document = (new DOMParser()).parseFromString(response, 'text/html');
+        // Отправка запрос на сервер, если это нужно
+        if (this.config.needToRequest) {
+          fetch(urlForRequest, {credentials: 'same-origin'})
+            .then((response: Response) => response.text())
+            .then((response: string) => {
+              // Парсинг ответа от сервера
+              const responseHTML: Document = (new DOMParser()).parseFromString(response, 'text/html');
 
-            // Ищем в ответе от сервера DOM элемент с такими же классами как у элемента фильтра
-            const responseNode: HTMLElement | null = responseHTML.querySelector(`.${Array.from(this.node.classList).filter(className => className !== 'faze-filter-initialized').join('.')}`);
-            if (responseNode) {
-              if (this.itemsHolderNode) {
-                // Проверка, если отфильтрованных элементов больше 0, тогда происходит их вывод
-                // иначе сообщение об отсутствии элементов по данному запросу
-                const itemsHolderNode: HTMLElement | null = responseNode.querySelector(this.config.selectors.itemsHolder);
-                if (itemsHolderNode) {
-                  this.itemsHolderNode.innerHTML = itemsHolderNode.innerHTML;
-                } else {
-                  this.itemsHolderNode.innerHTML = '<p class="error">К сожалению, ничего не найдено...</p>';
-                }
-              }
-
-              // Обновление количества элементов
-              const total: string = responseNode.dataset.fazeFilterTotal || '0';
-              if (this.config.showTotal && this.totalNode) {
-                this.totalNode.textContent = total;
-              }
-              this.node.dataset.fazeFilterTotal = total;
-            }
-
-            // Если используем API то получаем ссылку из Plarson
-            if (this.config.useAPI) {
-              this.getURL(urlForHistory, this.cleanPath)
-                .then((data) => {
-                  // Обновление строки в браузере
-                  if (this.config.updateQuery) {
-                    window.history.pushState({}, '', data.url);
+              // Ищем в ответе от сервера DOM элемент с такими же классами как у элемента фильтра
+              const responseNode: HTMLElement | null = responseHTML.querySelector(`.${Array.from(this.node.classList).filter(className => className !== 'faze-filter-initialized').join('.')}`);
+              if (responseNode) {
+                if (this.itemsHolderNode) {
+                  // Проверка, если отфильтрованных элементов больше 0, тогда происходит их вывод
+                  // иначе сообщение об отсутствии элементов по данному запросу
+                  const itemsHolderNode: HTMLElement | null = responseNode.querySelector(this.config.selectors.itemsHolder);
+                  if (itemsHolderNode) {
+                    this.itemsHolderNode.innerHTML = itemsHolderNode.innerHTML;
+                  } else {
+                    this.itemsHolderNode.innerHTML = '<p class="error">К сожалению, ничего не найдено...</p>';
                   }
+                }
 
-                  // Действия выполняемые после фильтрации
-                  this.afterFilterActions(response, responseHTML, data.query);
-                });
-            } else {
-              // Обновление строки в браузере
-              if (this.config.updateQuery) {
-                window.history.pushState({}, '', urlForHistory);
+                // Обновление количества элементов
+                const total: string = responseNode.dataset.fazeFilterTotal || '0';
+                if (this.config.showTotal && this.totalNode) {
+                  this.totalNode.textContent = total;
+                }
+                this.node.dataset.fazeFilterTotal = total;
               }
 
-              // Действия выполняемые после фильтрации
-              this.afterFilterActions(response, responseHTML);
-            }
-          });
+              // Если используем API то получаем ссылку из Plarson
+              if (this.config.useAPI) {
+                this.getURL(urlForHistory, this.cleanPath)
+                  .then((data) => {
+                    // Обновление строки в браузере
+                    if (this.config.updateQuery) {
+                      window.history.pushState({}, '', data.url);
+                    }
+
+                    // Действия выполняемые после фильтрации
+                    this.afterFilterActions(response, responseHTML, data.query);
+                  });
+              } else {
+                // Обновление строки в браузере
+                if (this.config.updateQuery) {
+                  window.history.pushState({}, '', urlForHistory);
+                }
+
+                // Действия выполняемые после фильтрации
+                this.afterFilterActions(response, responseHTML);
+              }
+            });
+        } else {
+          // Действия выполняемые после фильтрации
+          this.afterFilterActions(undefined, undefined, urlForRequest);
+        }
       });
     }
 
@@ -379,12 +387,14 @@ class Filter {
    * @param responseHTML - сконвертированная в HTML версия ответа
    * @param query        - параметры запроса
    */
-  afterFilterActions(response: string, responseHTML: Document, query?: string) {
+  afterFilterActions(response?: string, responseHTML?: Document, query?: string) {
     // По заданной строке поиска поработали, теперь отключаем её
     this.disablePresetQuery = true;
 
     // Замена заголовка
-    this.changeHeading(responseHTML);
+    if (responseHTML) {
+      this.changeHeading(responseHTML);
+    }
 
     // Обновляем хранимые параметры
     this.updateSearchParams(query);
@@ -629,6 +639,7 @@ class Filter {
       usePathnameFromQuery: filterNode.dataset.fazeFilterUsePathnameFromQuery === 'true',
       updateQuery: filterNode.dataset.fazeFilterUpdateQuery === 'true',
       submitAfterChange: (filterNode.dataset.fazeFilterSubmitAfterChange || 'false') === 'true',
+      needToRequest: (filterNode.dataset.fazeFilterNeedToRequest || 'false') === 'true',
       modules: {
         get: filterNode.dataset.fazeFilterModulesGet,
       },

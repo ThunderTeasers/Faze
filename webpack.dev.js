@@ -57,6 +57,10 @@ module.exports = env => {
         template: './src/tests/views/perf_tests.html',
       }),
       new HtmlWebpackPlugin({
+        filename: 'modal.html',
+        template: './src/tests/views/modal.html',
+      }),
+      new HtmlWebpackPlugin({
         template: './src/index.html',
       }),
       new webpack.HotModuleReplacementPlugin(),

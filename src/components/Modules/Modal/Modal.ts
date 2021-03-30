@@ -92,6 +92,7 @@ interface Config {
   draggable: boolean;
   resizable: boolean;
   delayToClose?: number;
+  additionalParams?: string;
   callbacks: {
     success?: (parts: ModalParts) => void,
     error?: (parts: ModalParts) => void,
@@ -153,6 +154,7 @@ class Modal {
       draggable: false,
       resizable: false,
       delayToClose: 0,
+      additionalParams: undefined,
       callbacks: {
         success: undefined,
         error: undefined,
@@ -211,6 +213,7 @@ class Modal {
     this.getContent()
       .then((responseText: string) => {
         this.build(responseText);
+        this.addAdditionalParams();
 
         if (this.config.draggable) {
           this.bindDrag();
@@ -244,6 +247,35 @@ class Modal {
           }
         }
       });
+  }
+
+  /**
+   * Добавление дополнительных параметров в скрытые поля формы в модальном окне(если она есть)
+   * @private
+   */
+  private addAdditionalParams() {
+    // DOM элемент формы куда будем вставлять дополнительные параметры
+    const formNode = this.modalParts.bodyNode.querySelector('form');
+    if (formNode) {
+      // Пытаемся распарсить JSON с параметрами
+      try {
+        // Парсим
+        const params = JSON.parse(this.config.additionalParams || '{}');
+
+        // Проходимся по всем ключам для добавления в форму
+        Object.keys(params).forEach((param: string) => {
+          // Создаём новый "hidden" инпут и вставляем его в форму
+          const hiddenNode = document.createElement('input');
+          hiddenNode.type = 'hidden';
+          hiddenNode.name = param;
+          hiddenNode.value = params[param];
+
+          formNode.appendChild(hiddenNode);
+        });
+      } catch (e) {
+        console.error(`Неправильный формат дополнительных переменных переданных в модальное окно!\nТребуется JSON объект!\n${e}`);
+      }
+    }
   }
 
   /**
@@ -640,6 +672,7 @@ class Modal {
         resizable: callerNode.dataset.fazeModalResizable === 'true',
         url: callerNode.dataset.fazeModalUrl || '',
         class: callerNode.dataset.fazeModalClass || '',
+        additionalParams: callerNode.dataset.fazeModalAdditionalParams || '{}',
       });
     });
   }

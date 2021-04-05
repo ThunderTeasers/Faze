@@ -41,6 +41,15 @@ if (Faze.getVersion() === 1 || true) {
 //   ],
 // });
 
+Faze.add({
+  pluginName: 'Global',
+  callback: () => {
+    const a = 10;
+
+    return {a};
+  }
+});
+
 // Тесты
 Faze.add({
   pluginName: 'ObserveTest',

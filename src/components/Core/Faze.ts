@@ -208,6 +208,13 @@ class Faze {
       throw new Error('Не задано имя плагина!');
     }
 
+    // Если у плагина стоит имя "Global", то кладём всё что он возвращяет в глобальную область видимости
+    if (config.pluginName.toLowerCase() === 'global') {
+      if (typeof config.callback === 'function') {
+        Object.assign(window, config.callback());
+      }
+    }
+
     // Сначала просто записываем модуль в таблицу, если его еще нет в хэше, но не загружаем его
     if (!(config.pluginName in Faze.plugins)) {
       Faze.plugins[config.pluginName] = {
@@ -317,9 +324,14 @@ class Faze {
   private static parseVersion(versionString: string | null): Version {
     let version: Version = Version.FAZE_1;
     switch (versionString) {
-      case '1': version = Version.FAZE_1; break;
-      case '2': version = Version.FAZE_2; break;
-      default: version = Version.FAZE_1;
+      case '1':
+        version = Version.FAZE_1;
+        break;
+      case '2':
+        version = Version.FAZE_2;
+        break;
+      default:
+        version = Version.FAZE_1;
     }
 
     return version;
@@ -341,7 +353,7 @@ class Faze {
     const search = src.split('?');
 
     // Если есть GET параметры, то определяем версию
-    if(search[1]){
+    if (search[1]) {
       const params = new URLSearchParams(search[1]);
       version = Faze.parseVersion(params.get('version'));
     }

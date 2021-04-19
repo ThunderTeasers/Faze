@@ -1,13 +1,13 @@
 {
   "name": "plarson",
   "version": "1.0.0",
-  "description": "A plarson framework ",
+  "description": "A 'Faze' framework",
   "private": true,
   "scripts": {
     "start": "webpack-dev-server --open --config webpack.dev.js",
     "prod": "webpack --env=production --config webpack.prod.js",
     "dev": "webpack --env=development --config webpack.prod.js",
-    "full": "webpack --env=production --clean=false --config webpack.prod.js && webpack --env=development --clean=false --config webpack.prod.js"
+    "full": "webpack --env=production --config webpack.prod.js && webpack --env=development --config webpack.prod.js"
   },
   "author": "Erokhin Maxim",
   "license": "ISC",
@@ -16,15 +16,15 @@
     "@babel/preset-env": "^7.12.11",
     "babel-loader": "^8.2.2",
     "clean-webpack-plugin": "^0.1.19",
-    "css-loader": "^1.0.1",
-    "file-loader": "^4.3.0",
+    "css-loader": "^5.2.2",
+    "css-minimizer-webpack-plugin": "^2.0.0",
+    "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.0.0-beta.1",
-    "mini-css-extract-plugin": "^0.4.5",
-    "node-sass": "^4.14.1",
-    "optimize-css-assets-webpack-plugin": "^5.0.4",
-    "sass-loader": "^7.3.1",
+    "mini-css-extract-plugin": "^1.5.0",
+    "node-sass": "^5.0.0",
+    "sass-loader": "^11.0.1",
     "style-loader": "^0.23.1",
-    "tar": "^4.4.13",
+    "tar": "^6.1.0",
     "terser-webpack-plugin": "^3.1.0",
     "ts-loader": "^5.4.5",
     "tslint": "^5.20.1",
@@ -36,7 +36,7 @@
     "util": "^0.11.1",
     "webpack": "^5.11.0",
     "webpack-bundle-analyzer": "^3.9.0",
-    "webpack-cli": "^3.3.12",
+    "webpack-cli": "^4.6.0",
     "webpack-dev-server": "^3.11.0",
     "webpack-merge": "^4.2.2"
   }

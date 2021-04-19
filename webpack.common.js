@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = env => {
   return {
     output: {
-      filename: env === 'production' ? 'faze.min.js' : 'faze.js',
+      filename: ('production' in env && env.production) ? 'faze.min.js' : 'faze.js',
       path: path.resolve(__dirname, 'dist'),
       publicPath: '/',
     },

@@ -456,7 +456,9 @@ class Modal {
    */
   async getContent(): Promise<string> {
     if (this.config.url) {
-      const response = await fetch(this.config.url, {credentials: 'same-origin'});
+      const response = await fetch(this.config.url, {
+        credentials: 'same-origin',
+      });
       return await response.text();
     } else {
       return await this.config.html || '';
@@ -598,22 +600,6 @@ class Modal {
     };
 
     /**
-     * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
-     *
-     * @param event - событие мыши
-     */
-    const dragMouseDown = (event: MouseEvent) => {
-      event.preventDefault();
-
-      // Получение позиции курсора при нажатии на элемент
-      startMousePosition.x = event.clientX;
-      startMousePosition.y = event.clientY;
-
-      document.addEventListener('mouseup', endDragElement);
-      document.addEventListener('mousemove', elementDrag);
-    };
-
-    /**
      * Функция перетаскивания модального окна.
      * Тут идет расчет координат и они присваиваются окну через стили "top" и "left", окно в таком случае естественно должно иметь
      * позиционирование "absolute"
@@ -640,6 +626,22 @@ class Modal {
     const endDragElement = () => {
       document.removeEventListener('mouseup', endDragElement);
       document.removeEventListener('mousemove', elementDrag);
+    };
+
+    /**
+     * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
+     *
+     * @param event - событие мыши
+     */
+    const dragMouseDown = (event: MouseEvent) => {
+      event.preventDefault();
+
+      // Получение позиции курсора при нажатии на элемент
+      startMousePosition.x = event.clientX;
+      startMousePosition.y = event.clientY;
+
+      document.addEventListener('mouseup', endDragElement);
+      document.addEventListener('mousemove', elementDrag);
     };
 
     // Навешиваем событие перетаскивания окна по нажатию на его заголовок

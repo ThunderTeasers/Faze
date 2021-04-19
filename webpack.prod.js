@@ -17,16 +17,16 @@ module.exports = (env, argv) => {
   ];
 
   // Если это продакшн версия, то добавляем их
-  if (env === 'production') {
+  if ('production' in env && env.production) {
     minimizer = [
       new TerserPlugin(),
       new OptimizeCSSAssetsPlugin({}),
     ];
   }
 
-  if (argv.clean !== 'false') {
-    plugins.unshift(new CleanWebpackPlugin(['dist']));
-  }
+  // if (argv.clean !== 'false') {
+  //   plugins.unshift(new CleanWebpackPlugin(['dist']));
+  // }
 
   return merge(common(env), {
     entry: './src/index_prod.ts',

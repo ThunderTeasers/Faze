@@ -125,7 +125,10 @@ class ZoomBox {
       controlsNodes: {},
     };
     this.ANIMATION_TIME = 400;
-    this.OFFSET = {width: 12, height: 12};
+    this.OFFSET = {
+      width: 12,
+      height: 12,
+    };
     this.currentIndex = Array.from(this.callerNodes).indexOf(this.callerNode);
     this.viewport = {
       width: document.documentElement.clientWidth,
@@ -636,7 +639,7 @@ class ZoomBox {
     Faze.on('click', '[data-faze~="zoombox"]', (event: Event, callerNode: HTMLElement) => {
       const group: string | undefined = callerNode.dataset.fazeZoomboxGroup;
       const align: string = callerNode.dataset.fazeZoomboxAlign || 'self';
-      let size: FazeSize | undefined = undefined;
+      let size: FazeSize | undefined;
       if (callerNode.dataset.fazeZoomboxWidth && callerNode.dataset.fazeZoomboxHeight) {
         size = {
           width: parseInt(callerNode.dataset.fazeZoomboxWidth || '0', 10),

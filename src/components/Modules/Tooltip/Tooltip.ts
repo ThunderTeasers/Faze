@@ -183,7 +183,11 @@ class Tooltip {
    * Переключение видимости тултипа
    */
   private toggle(): void {
-    this.tooltipNode.style.visibility === 'visible' ? this.hide() : this.show();
+    if (this.tooltipNode.style.visibility === 'visible') {
+      this.hide();
+    } else {
+      this.show();
+    }
   }
 
   /**
@@ -205,7 +209,7 @@ class Tooltip {
     const offsetHorizontal = callerRect.width / 2 + tooltipRect.width / 2 + this.config.margin;
     const offsetVertical = callerRect.height / 2 + tooltipRect.height / 2 + this.config.margin;
 
-    const documentElement = document.documentElement;
+    const {documentElement} = document;
     let left = 0;
     let top = 0;
     if (documentElement) {

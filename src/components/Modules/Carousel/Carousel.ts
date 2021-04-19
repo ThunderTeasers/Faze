@@ -56,6 +56,7 @@ interface Config {
   stopOnHover: boolean;
   amountPerSlide: number;
   mouseMove: boolean;
+  touchMove: boolean;
   disallowRanges: FazeDisallowRange[];
   templates: {
     page: string;
@@ -204,6 +205,7 @@ class Carousel {
       useSlideFullSize: false,
       stopOnHover: false,
       mouseMove: false,
+      touchMove: false,
       amountPerSlide: 1,
       disallowRanges: [],
       templates: {
@@ -476,7 +478,9 @@ class Carousel {
    * Навешивание событий для отслеживания жестов и мышки
    */
   bindGestures(): void {
-    this.bindTouchGestures();
+    if (this.config.touchMove) {
+      this.bindTouchGestures();
+    }
 
     if (this.config.mouseMove) {
       this.bindMouseGestures();

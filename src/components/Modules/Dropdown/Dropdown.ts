@@ -114,7 +114,7 @@ class Dropdown {
     let topOffset: number = this.title.offsetHeight + this.config.positionTopOffset;
     if (this.config.strictPosition) {
       const callerRect: DOMRect = this.node.getBoundingClientRect();
-      const documentElement: HTMLElement = document.documentElement;
+      const {documentElement} = document;
 
       if (documentElement) {
         topOffset += (window.pageYOffset || documentElement.scrollTop) + callerRect.top;

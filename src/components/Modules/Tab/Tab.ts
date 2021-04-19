@@ -134,8 +134,8 @@ class Tab extends Module {
    */
   activateTab(key: string): void {
     // Активные DOM Элементы таба
-    let activeHeadNode: HTMLElement | undefined = undefined;
-    let activeBodyNode: HTMLElement | undefined = undefined;
+    let activeHeadNode: HTMLElement | undefined;
+    let activeBodyNode: HTMLElement | undefined;
 
     // Активируем шапку
     this.headersNodes.forEach((headerNode: HTMLElement) => {

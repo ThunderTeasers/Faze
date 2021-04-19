@@ -1,0 +1,23 @@
+{
+  "extends": "airbnb-typescript/base",
+  "parserOptions": {
+    "project": [
+      "./tsconfig.json"
+    ]
+  },
+  "rules": {
+    "no-param-reassign": "off",
+    "arrow-parens": "off",
+    "import/no-cycle": "off",
+    "@typescript-eslint/object-curly-spacing": "off",
+    "no-console": "off",
+    "no-new": "off",
+    "max-len": [
+      "error",
+      {
+        "code": 200,
+        "tabWidth": 2
+      }
+    ]
+  }
+}

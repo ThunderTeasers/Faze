@@ -4,25 +4,22 @@ const common = require('./webpack.common.js');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const path = require('path');
 
-module.exports = env => {
+module.exports = (env) => {
   return merge(common(env), {
     entry: './src/index_dev.ts',
     mode: 'development',
     devtool: 'inline-source-map',
     devServer: {
-      contentBase: 'dist/',
+      contentBase: path.resolve(__dirname, 'dist'),
       hot: true,
     },
     module: {
       rules: [
         {
           test: /\.scss$/,
-          use: [
-            'style-loader',
-            'css-loader',
-            'sass-loader',
-          ],
+          use: ['style-loader', 'css-loader', 'sass-loader'],
         },
       ],
     },

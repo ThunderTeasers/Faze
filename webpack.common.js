@@ -1,9 +1,9 @@
 const path = require('path');
 
-module.exports = env => {
+module.exports = (env) => {
   return {
     output: {
-      filename: ('production' in env && env.production) ? 'faze.min.js' : 'faze.js',
+      filename: 'production' in env && env.production ? 'faze.min.js' : 'faze.js',
       path: path.resolve(__dirname, 'dist'),
       publicPath: '/',
     },
@@ -19,11 +19,9 @@ module.exports = env => {
         },
         {
           test: /\.(png|svg|jpg|gif)$/,
-          use: [
-            'file-loader',
-          ],
+          use: ['file-loader'],
         },
       ],
     },
-  }
+  };
 };

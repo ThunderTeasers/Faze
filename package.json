@@ -4,7 +4,7 @@
   "description": "A 'Faze' framework",
   "private": true,
   "scripts": {
-    "start": "webpack-dev-server --open --config webpack.dev.js",
+    "start": "webpack serve --open --config webpack.dev.js",
     "prod": "webpack --env=production --config webpack.prod.js",
     "dev": "webpack --env=development --config webpack.prod.js",
     "full": "webpack --env=production --config webpack.prod.js && webpack --env=development --config webpack.prod.js"

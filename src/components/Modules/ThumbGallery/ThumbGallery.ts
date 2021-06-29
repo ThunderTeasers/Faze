@@ -37,9 +37,10 @@ class ThumbGallery extends Module {
   // Список фотографий
   private imagesData: Array<string>;
 
+  // DOM элементы элементов пагинации
   private galleryElementsNodes: Array<HTMLDivElement>;
 
-  constructor(node?: HTMLElement, config?: Partial<Config>) {
+  constructor(node?: HTMLElement, config?: Partial<Config>, rawData?: string) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       data: undefined,
@@ -52,6 +53,9 @@ class ThumbGallery extends Module {
       node,
       config: Object.assign(defaultConfig, config),
       name: 'ThumbGallery',
+      additionalParams: {
+        rawData,
+      },
     });
   }
 
@@ -63,6 +67,7 @@ class ThumbGallery extends Module {
     this.imageNode = this.node?.querySelector('img');
     this.imagesData = [];
     this.galleryElementsNodes = [];
+    this.config.data = this.additionalParams?.rawData || this.node.dataset.fazeThumbgalleryData;
 
     // Инициализация
     super.initialize();
@@ -143,6 +148,7 @@ class ThumbGallery extends Module {
     // Если нет данных или не начинается как JSON, то пропускаем элемент
     if (!this.config.data || !this.config.data.startsWith('[')) {
       this.imagesData = [];
+      return;
     }
 
     // Парсинг JSON
@@ -156,6 +162,7 @@ class ThumbGallery extends Module {
     // Если один элемент, то пропускаем
     if (jsonData.length <= 1) {
       this.imagesData = [];
+      return;
     }
 
     // Сокращаем до заданного количества
@@ -180,7 +187,7 @@ class ThumbGallery extends Module {
     this.generateSliderElementsHTML(photosSliderNode);
 
     // Ставим первое изображение
-    if (this.imageNode) {
+    if (this.imageNode && this.imagesData.length > 0) {
       [this.imageNode.src] = this.imagesData;
     }
 

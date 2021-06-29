@@ -13,12 +13,14 @@ import Logger from './Logger';
  *   node{HTMLElement | undefined} - основной DOM элемент
  *   nodes{HTMLElement[] | undefined} - дополнительные DOM элементы
  *   config{any} - конфигурационные данные для плагина
+ *   additionalParams{any} - дополнительные параметры
  */
 interface ModuleData {
   name: string;
   node?: HTMLElement;
   nodes?: HTMLElement[];
   config: any;
+  additionalParams?: any;
 }
 
 class Module {
@@ -36,6 +38,9 @@ class Module {
 
   // CSS класс главного DOM элемента
   protected readonly className?: string;
+
+  // Дополнительные параметры
+  protected additionalParams?: any;
 
   /**
    * Стандартный конструктор
@@ -57,6 +62,7 @@ class Module {
     // Инициализируем переменные
     this.node = data.node;
     this.config = data.config;
+    this.additionalParams = data.additionalParams;
 
     // Вычисляем CSS селектор класса
     const classNameTmp = data.node?.className;

@@ -8,6 +8,14 @@
  */
 
 /**
+ * Возможные типы слушателя
+ */
+enum ListenerType {
+  Attribute = 0,
+  Node = 1,
+}
+
+/**
  * Структура слушателя плагина
  *
  * Содержит:
@@ -20,6 +28,7 @@ interface Listener {
   selector: string;
   callback: (addedNode: HTMLElement) => void;
   alreadyExistedNodes: HTMLElement[];
+  type: ListenerType;
 }
 
 /**
@@ -41,6 +50,7 @@ class Observer {
     this.mutationObserver.observe(document.documentElement, {
       childList: true,
       subtree: true,
+      attributes: true,
     });
   }
 
@@ -50,11 +60,12 @@ class Observer {
    * @param selector{string} - CSS селектор DOM элемента для отслеживания
    * @param callback{HTMLElement} - пользовательский метод, исполняющийся после добавления нужного DOM элемента
    */
-  watch(selector: string, callback: (addedNode: HTMLElement) => void) {
+  watch(selector: string, callback: (addedNode: HTMLElement) => void, type: ListenerType = ListenerType.Node) {
     this.listeners.push({
       selector,
       callback,
       alreadyExistedNodes: Array.from(document.querySelectorAll(selector)),
+      type,
     });
   }
 
@@ -116,7 +127,7 @@ class Observer {
         this.listeners.forEach((listener) => {
           listener.alreadyExistedNodes.forEach((existedNode: HTMLElement) => {
             if (existedNode === removedNode) {
-              listener.alreadyExistedNodes = listener.alreadyExistedNodes.filter(node => node !== existedNode);
+              listener.alreadyExistedNodes = listener.alreadyExistedNodes.filter((node) => node !== existedNode);
             }
           });
         });

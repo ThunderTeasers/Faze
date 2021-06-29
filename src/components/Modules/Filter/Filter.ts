@@ -257,7 +257,7 @@ class Filter {
 
         // Собираем вручную строку запроса из FormData т.к. Edge и другие отсталые браузеры, даже имея официалиьную поддержку
         // URLSearchParams не имеют возможности создать её через передачу параметра FormData в конструкторе.
-        const formDataQuery: string = [...formData.entries()].map(entry => `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(<any>entry[1])}`).join('&');
+        const formDataQuery: string = [...formData.entries()].map((entry) => `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(<any>entry[1])}`).join('&');
 
         // Парсим данные формы
         const formDataURLString: URLSearchParams = new URLSearchParams(formDataQuery);
@@ -287,14 +287,18 @@ class Filter {
 
         // Отправка запрос на сервер, если это нужно
         if (this.config.needToRequest) {
-          fetch(urlForRequest, {credentials: 'same-origin'})
+          fetch(urlForRequest, { credentials: 'same-origin' })
             .then((response: Response) => response.text())
             .then((response: string) => {
               // Парсинг ответа от сервера
-              const responseHTML: Document = (new DOMParser()).parseFromString(response, 'text/html');
+              const responseHTML: Document = new DOMParser().parseFromString(response, 'text/html');
 
               // Ищем в ответе от сервера DOM элемент с такими же классами как у элемента фильтра
-              const responseNode: HTMLElement | null = responseHTML.querySelector(`.${Array.from(this.node.classList).filter(className => className !== 'faze-filter-initialized').join('.')}`);
+              const responseNode: HTMLElement | null = responseHTML.querySelector(
+                `.${Array.from(this.node.classList)
+                  .filter((className) => className !== 'faze-filter-initialized')
+                  .join('.')}`
+              );
               if (responseNode) {
                 if (this.itemsHolderNode) {
                   // Проверка, если отфильтрованных элементов больше 0, тогда происходит их вывод
@@ -317,16 +321,15 @@ class Filter {
 
               // Если используем API то получаем ссылку из Plarson
               if (this.config.useAPI) {
-                this.getURL(urlForHistory, this.cleanPath)
-                  .then((data) => {
-                    // Обновление строки в браузере
-                    if (this.config.updateQuery) {
-                      window.history.pushState({}, '', data.url);
-                    }
+                this.getURL(urlForHistory, this.cleanPath).then((data) => {
+                  // Обновление строки в браузере
+                  if (this.config.updateQuery) {
+                    window.history.pushState({}, '', data.url);
+                  }
 
-                    // Действия выполняемые после фильтрации
-                    this.afterFilterActions(response, responseHTML, data.query);
-                  });
+                  // Действия выполняемые после фильтрации
+                  this.afterFilterActions(response, responseHTML, data.query);
+                });
               } else {
                 // Обновление строки в браузере
                 if (this.config.updateQuery) {
@@ -346,14 +349,16 @@ class Filter {
 
     // Навешивание событий на сабмит фильтра при изменении инпутов
     if (this.config.submitAfterChange) {
-      this._bindSubmitAfterChange();
+      this.bindSubmitAfterChange();
     }
   }
 
   /**
    * Навешивание событий на сабмит фильтра при изменении инпутов
+   *
+   * @private
    */
-  _bindSubmitAfterChange(): void {
+  private bindSubmitAfterChange(): void {
     this.formNode?.querySelectorAll<HTMLInputElement>('input:not([type="hidden"])').forEach((inputNode: HTMLInputElement) => {
       if (['checkbox', 'radio'].includes(inputNode.type)) {
         inputNode.addEventListener('change', () => {
@@ -369,15 +374,15 @@ class Filter {
    * @param queryForHistory - параметры фильтра
    * @param pathname        - базовый pathname
    */
-  async getURL(queryForHistory: string, pathname: string = window.location.pathname): Promise<{ url: string, query: string }> {
+  async getURL(queryForHistory: string, pathname: string = window.location.pathname): Promise<{ url: string; query: string }> {
     const params = new URLSearchParams(queryForHistory);
     params.append('mime', 'api');
     params.append('api', 'get_uri_scheme');
 
-    const response = await fetch(`${pathname}?${params.toString()}`, {credentials: 'same-origin'});
+    const response = await fetch(`${pathname}?${params.toString()}`, { credentials: 'same-origin' });
     const data = await response.json();
 
-    return {url: data.scheme_uri_path_query, query: data.query_string};
+    return { url: data.scheme_uri_path_query, query: data.query_string };
   }
 
   /**
@@ -586,7 +591,7 @@ class Filter {
    * Обновление внутненних параметров поиска, для того чтобы они совпадали с теми, что содержатся в поисковой строке
    */
   updateSearchParams(query?: string): void {
-    let queryParams: string | undefined = undefined;
+    let queryParams: string | undefined;
     if (this.node.dataset.fazeFilterQuery && !this.disablePresetQuery) {
       queryParams = this.node.dataset.fazeFilterQuery.split('?')[1];
     }
@@ -622,7 +627,7 @@ class Filter {
    */
   updateFilter(): void {
     if (this.formNode) {
-      this.formNode.dispatchEvent(new Event('submit', {cancelable: true}));
+      this.formNode.dispatchEvent(new Event('submit', { cancelable: true }));
     }
   }
 

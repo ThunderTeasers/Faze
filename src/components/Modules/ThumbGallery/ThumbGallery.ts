@@ -83,10 +83,13 @@ class ThumbGallery extends Module {
 
   /**
    * Реинициализация галереи
+   *
+   * @param data Новый массив изображений
    */
-  reinitialize() {
+  reinitialize(data: string): void {
     this.imagesData = [];
     this.galleryElementsNodes = [];
+    this.config.data = data;
 
     // Создание галереи
     this.parseProductJSON();
@@ -167,7 +170,7 @@ class ThumbGallery extends Module {
    *
    * @private
    */
-  private generateSliderHTML() {
+  private generateSliderHTML(): void {
     // Создаём DOM элемент слайдера фотографий
     const photosSliderNode = document.createElement('div');
     photosSliderNode.className = 'faze-thumbgallery-gallery';
@@ -192,7 +195,7 @@ class ThumbGallery extends Module {
    *
    * @private
    */
-  private generateSliderElementsHTML(photosSliderNode: HTMLDivElement) {
+  private generateSliderElementsHTML(photosSliderNode: HTMLDivElement): void {
     // Создаём DOM элементы отдельных фотографий
     this.imagesData.forEach((photoData, photoIndex) => {
       const photoNode = document.createElement('div');

@@ -99,6 +99,7 @@ class ThumbGallery extends Module {
     // Очищаем всё
     this.imagesData = [];
     this.galleryElementsNodes.forEach((galleryElementNode) => galleryElementNode.remove());
+    this.galleryElementsNodes = [];
     this.galleryNode?.remove();
 
     // Присваиваем новые данные

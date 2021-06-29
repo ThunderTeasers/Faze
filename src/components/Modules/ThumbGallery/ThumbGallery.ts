@@ -96,8 +96,12 @@ class ThumbGallery extends Module {
    * @param data Новый массив изображений
    */
   reinitialize(data: string): void {
+    // Очищаем всё
     this.imagesData = [];
-    this.galleryElementsNodes = [];
+    this.galleryElementsNodes.forEach((galleryElementNode) => galleryElementNode.remove());
+    this.galleryNode?.remove();
+
+    // Присваиваем новые данные
     this.config.data = data;
 
     // Создание галереи

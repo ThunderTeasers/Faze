@@ -244,6 +244,15 @@ class ThumbGallery extends Module {
       gap: parseFloat(node.dataset.fazeThumbgalleryGap || '0'),
       amount: parseInt(node.dataset.fazeThumbgalleryGap || '5', 10),
     });
+
+    Faze.Observer.watchNode({
+      node,
+      callback: () => {
+        console.log(123123);
+      },
+      type: 0,
+      attribute: 'data-faze-thumbgallery-data',
+    });
   }
 }
 

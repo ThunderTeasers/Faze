@@ -110,6 +110,11 @@ class ThumbGallery extends Module {
     // Получаем необходимые данные
     const total = this.imagesData.length;
 
+    // Если нет изображений в галереи, то нет смысла в дальнейшем коде
+    if (total <= 1) {
+      return;
+    }
+
     // Ширина изображения на котором распологаются элементы, относительно неё идут все рассчёты
     const imageWidth = this.node.getBoundingClientRect().width;
 

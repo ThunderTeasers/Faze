@@ -12,6 +12,8 @@
     "@typescript-eslint/object-curly-spacing": "off",
     "no-console": "off",
     "no-new": "off",
+    "comma-dangle": "off",
+    "class-methods-use-this": "off",
     "max-len": [
       "error",
       {

@@ -10,10 +10,10 @@ class REST {
 
     // Проверка method на корректность
     if (method.toLowerCase() === 'post') {
-      dataType = type ? type : 'json';
+      dataType = type || 'json';
       testedMethod = 'POST';
     } else {
-      dataType = type ? type : 'html';
+      dataType = type || 'html';
       testedMethod = 'GET';
     }
 
@@ -52,29 +52,29 @@ class REST {
 
     // Если это GET запрос, подставляем параметры
     if (method.toLowerCase() === 'get') {
-      const formDataQuery: string = [...formData.entries()].map(entry => `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(<any>entry[1])}`).join('&');
-      currentURL += `?${(new URLSearchParams(formDataQuery)).toString()}`;
+      const formDataQuery: string = [...formData.entries()].map((entry) => `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(<any>entry[1])}`).join('&');
+      currentURL += `?${new URLSearchParams(formDataQuery).toString()}`;
     }
 
     fetch(`${currentURL}`, fetchOptions)
       .then((response: Response) => {
-        let data = null;
+        let responseData = null;
 
         // В зависимости от типа запроса нужно по разному получить ответ от сервера
         try {
-          data = dataType === 'json' ? response.json() : response.text();
+          responseData = dataType === 'json' ? response.json() : response.text();
         } catch (error) {
           console.error(error);
         }
 
-        return data;
+        return responseData;
       })
       .then((response: any) => {
         // const responseNodeParent
 
         if (data['response_html'] && typeof data['response_html'] === 'string') {
           // Парсинг ответа
-          const responseHTML = (new DOMParser()).parseFromString(response, 'text/html');
+          const responseHTML = new DOMParser().parseFromString(response, 'text/html');
 
           document.querySelectorAll(data['response_html']).forEach((el) => {
             const responseNode = responseHTML.querySelector(data['response_html']);
@@ -142,11 +142,15 @@ class REST {
     const jsonFields: NodeListOf<HTMLElement> = formNode.querySelectorAll('[data-faze-restapi-json-name]');
 
     // Получение уникальных названий полей для сборки JSON объектов
-    const jsonNames: string[] = [...new Set(Array.from(jsonFields).map((item: any) => {
-      const inputDataName = item.dataset.fazeRestapiJsonName;
+    const jsonNames: string[] = [
+      ...new Set(
+        Array.from(jsonFields).map((item: any) => {
+          const inputDataName = item.dataset.fazeRestapiJsonName;
 
-      return inputDataName.includes('.') ? inputDataName.substring(0, inputDataName.indexOf('.')) : inputDataName;
-    }))];
+          return inputDataName.includes('.') ? inputDataName.substring(0, inputDataName.indexOf('.')) : inputDataName;
+        })
+      ),
+    ];
 
     // Проходимся по уникальным именам объектов JSON которые надо собрать
     for (const jsonName of jsonNames) {
@@ -172,10 +176,8 @@ class REST {
         if (
           // Кнопки
           ['button', 'submit'].includes(itemNode.type) ||
-
           // Радио кнопки которые не в активном положении
           (isRadioButton && !itemNode.checked) ||
-
           // Чекбоксы в неактивном положении у которых нет data атрибута с значением неактивного положения, либо атрибут пустой
           (isCheckbox && !itemNode.checked && !itemNode.dataset.fazeRestapiDisabledValue)
         ) {
@@ -354,10 +356,10 @@ class REST {
         currentValue = REST.getElementValue(element);
       }
 
-      if (chain[0]['delay']) {
+      if (chain[0].delay) {
         // Назначим ID если не было
         if (!element.hasAttribute('id')) {
-          element.id = Math.round(new Date().getTime() + (Math.random() * 100000));
+          element.id = Math.round(new Date().getTime() + Math.random() * 100000);
         }
 
         if (timeoutID[element.id]) {
@@ -370,7 +372,7 @@ class REST {
           if (element && element.name) chain[0][element.name] = newValue;
 
           REST.chain(chain, finalCallback);
-        }, chain[0]['delay']);
+        }, chain[0].delay);
       } else {
         // Запускаем цепочку AJAX запросов
         if (element && element.name) {

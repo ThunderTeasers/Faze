@@ -288,11 +288,6 @@ class Filter {
         // URL для запроса к серверу
         let urlForRequest: string = `${basePath}?${formDataURLString.toString()}`;
 
-        // Если не нужна пагинация
-        if (this.config.resetPagination) {
-          urlForRequest = urlForRequest.replace(/offset=\d+\//gi, '');
-        }
-
         // Отправка запрос на сервер, если это нужно
         if (this.config.needToRequest) {
           fetch(urlForRequest, { credentials: 'same-origin' })
@@ -386,6 +381,11 @@ class Filter {
     const params = new URLSearchParams(queryForHistory);
     params.append('mime', 'api');
     params.append('api', 'get_uri_scheme');
+
+    // Если не нужна пагинация
+    if (this.config.resetPagination) {
+      pathname = pathname.replace(/offset=\d+\//gi, '');
+    }
 
     const response = await fetch(`${pathname}?${params.toString()}`, { credentials: 'same-origin' });
     const data = await response.json();

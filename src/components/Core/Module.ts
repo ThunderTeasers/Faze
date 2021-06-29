@@ -72,6 +72,8 @@ class Module {
     this.initialize();
     this.build();
     this.bind();
+
+    (this.node as any).self = this;
   }
 
   /**

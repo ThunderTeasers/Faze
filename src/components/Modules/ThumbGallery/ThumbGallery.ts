@@ -37,6 +37,9 @@ class ThumbGallery extends Module {
   // Список фотографий
   private imagesData: Array<string>;
 
+  // DOM элемент враппера галереи
+  private galleryNode?: HTMLDivElement;
+
   // DOM элементы элементов пагинации
   private galleryElementsNodes: Array<HTMLDivElement>;
 
@@ -66,6 +69,7 @@ class ThumbGallery extends Module {
     // Инициализация переменных
     this.imageNode = this.node?.querySelector('img');
     this.imagesData = [];
+    this.galleryNode = undefined;
     this.galleryElementsNodes = [];
     this.config.data = this.additionalParams?.rawData || this.node.dataset.fazeThumbgalleryData;
 
@@ -184,12 +188,12 @@ class ThumbGallery extends Module {
    */
   private generateSliderHTML(): void {
     // Создаём DOM элемент слайдера фотографий
-    const photosSliderNode = document.createElement('div');
-    photosSliderNode.className = 'faze-thumbgallery-gallery';
-    photosSliderNode.dataset.fazeThumbgalleryTotal = this.imagesData.length.toString();
+    this.galleryNode = document.createElement('div');
+    this.galleryNode.className = 'faze-thumbgallery-gallery';
+    this.galleryNode.dataset.fazeThumbgalleryTotal = this.imagesData.length.toString();
 
     // Генерируем HTML для элементов слайдера
-    this.generateSliderElementsHTML(photosSliderNode);
+    this.generateSliderElementsHTML();
 
     // Ставим первое изображение
     if (this.imageNode && this.imagesData.length > 0) {
@@ -197,17 +201,15 @@ class ThumbGallery extends Module {
     }
 
     // Добавляем созданный слайдер к элементу
-    this.node.appendChild(photosSliderNode);
+    this.node.appendChild(this.galleryNode);
   }
 
   /**
    * Генерация HTML для элемента пагинации галереи
    *
-   * @param photosSliderNode{HTMLDivElement} DOM элемент враппера пагинации галереи
-   *
    * @private
    */
-  private generateSliderElementsHTML(photosSliderNode: HTMLDivElement): void {
+  private generateSliderElementsHTML(): void {
     // Создаём DOM элементы отдельных фотографий
     this.imagesData.forEach((photoData, photoIndex) => {
       const photoNode = document.createElement('div');
@@ -221,7 +223,8 @@ class ThumbGallery extends Module {
       // Добавляем в массив для дальнейшей работы
       this.galleryElementsNodes.push(photoNode);
 
-      photosSliderNode.appendChild(photoNode);
+      // Добавляем во враппер
+      this.galleryNode?.appendChild(photoNode);
     });
   }
 

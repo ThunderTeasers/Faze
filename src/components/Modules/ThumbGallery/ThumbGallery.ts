@@ -245,10 +245,11 @@ class ThumbGallery extends Module {
       amount: parseInt(node.dataset.fazeThumbgalleryGap || '5', 10),
     });
 
+    // Отслеживаем изменение в атрибуте содержащий данные изображений
     Faze.Observer.watchNode({
       node,
       callback: () => {
-        console.log(123123);
+        (node as any).self.reinitialize();
       },
       type: 0,
       attribute: 'data-faze-thumbgallery-data',

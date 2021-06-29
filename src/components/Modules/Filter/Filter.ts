@@ -285,8 +285,17 @@ class Filter {
           basePath = this.cleanPath;
         }
 
+        // Если не нужна пагинация
+        if (this.config.resetPagination) {
+          if (basePath === '') {
+            basePath = window.location.pathname.replace(/offset=\d+\//gi, '');
+          } else {
+            basePath = basePath.replace(/offset=\d+\//gi, '');
+          }
+        }
+
         // URL для запроса к серверу
-        let urlForRequest: string = `${basePath}?${formDataURLString.toString()}`;
+        const urlForRequest: string = `${basePath}?${formDataURLString.toString()}`;
 
         // Отправка запрос на сервер, если это нужно
         if (this.config.needToRequest) {

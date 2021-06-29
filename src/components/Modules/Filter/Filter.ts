@@ -34,6 +34,7 @@ interface CallbackData {
  *   updateQuery - нужно ли обновлять URL через HTML5 history, либо делать это скрыто
  *   submitAfterChange - обновляется ли сразу после изменения любого инпута
  *   needToRequest - нужно ли делать запрос к серверу
+ *   resetPagination - нужно ли сбрасывать пагинацию при фильтрации
  *   modules
  *     get      - модуль show в plarson
  *   cookie
@@ -56,6 +57,7 @@ interface Config {
   changeButton: boolean;
   usePathnameFromQuery: boolean;
   useAPI: boolean;
+  resetPagination: boolean;
   updateQuery: boolean;
   needToRequest: boolean;
   submitAfterChange: boolean;
@@ -142,6 +144,7 @@ class Filter {
       useAPI: false,
       submitAfterChange: false,
       needToRequest: true,
+      resetPagination: true,
       modules: {
         get: undefined,
       },
@@ -283,7 +286,12 @@ class Filter {
         }
 
         // URL для запроса к серверу
-        const urlForRequest: string = `${basePath}?${formDataURLString.toString()}`;
+        let urlForRequest: string = `${basePath}?${formDataURLString.toString()}`;
+
+        // Если не нужна пагинация
+        if (this.config.resetPagination) {
+          urlForRequest = urlForRequest.replace(/offset=\d+\//gi, '');
+        }
 
         // Отправка запрос на сервер, если это нужно
         if (this.config.needToRequest) {
@@ -645,6 +653,7 @@ class Filter {
       updateQuery: filterNode.dataset.fazeFilterUpdateQuery === 'true',
       submitAfterChange: (filterNode.dataset.fazeFilterSubmitAfterChange || 'false') === 'true',
       needToRequest: (filterNode.dataset.fazeFilterNeedToRequest || 'false') === 'true',
+      resetPagination: (filterNode.dataset.fazeFilterResetPagination || 'true') === 'true',
       modules: {
         get: filterNode.dataset.fazeFilterModulesGet,
       },

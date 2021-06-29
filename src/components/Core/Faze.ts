@@ -28,6 +28,7 @@ import Dropdown from '../Modules/Dropdown/Dropdown';
 import Select from '../Modules/Select/Select';
 import Carousel from '../Modules/Carousel/Carousel';
 import Carousel2 from '../Modules/Carousel2/Carousel2';
+import ThumbGallery from '../Modules/ThumbGallery/ThumbGallery';
 import Zoom from '../Modules/Zoom/Zoom';
 import ZoomBox from '../Modules/ZoomBox/ZoomBox';
 import Scroll from '../Modules/Scroll/Scroll';
@@ -116,6 +117,7 @@ class Faze {
   static Gallery: any = Gallery;
   static Helpers: any = Helpers;
   static Date: any = Date;
+  static ThumbGallery: any = ThumbGallery;
   static Animations: any = Animations;
   static Scroll: any = Scroll;
   static Spoiler: any = Spoiler;
@@ -174,30 +176,7 @@ class Faze {
     const currentPlugins: InnerPluginsData = {};
 
     // Зарезервированные имена
-    const predefinedNames: string[] = [
-      'Plugin',
-      'Module',
-      'Zoom',
-      'ZoomBox',
-      'Tooltip',
-      'Carousel',
-      'Page',
-      'Gallery',
-      'Form',
-      'Spoiler',
-      'Select',
-      'Scroll',
-      'Tab',
-      'Dropdown',
-      'Slider',
-      'Steps',
-      'Helpers',
-      'Observer',
-      'Modal',
-      'Filter',
-      'REST',
-      'Logger',
-    ];
+    const predefinedNames: string[] = ['Plugin', 'Module', 'Zoom', 'ZoomBox', 'Tooltip', 'Carousel', 'Page', 'Gallery', 'Form', 'Spoiler', 'Select', 'Scroll', 'Tab', 'Dropdown', 'Slider', 'Steps', 'Helpers', 'Observer', 'Modal', 'Filter', 'REST', 'Logger'];
 
     // Проверка на ошибки
     if (!config) {
@@ -369,6 +348,7 @@ class Faze {
     Faze.Gallery.hotInitialize();
     Faze.Page.hotInitialize();
     Faze.Tab.hotInitialize('tab');
+    Faze.ThumbGallery.hotInitialize('thumbgallery');
     Faze.Spoiler.hotInitialize();
     Faze.Carousel2.hotInitialize('carousel2');
     Faze.Carousel.hotInitialize();

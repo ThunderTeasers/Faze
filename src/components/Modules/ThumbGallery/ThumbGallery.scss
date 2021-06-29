@@ -1,0 +1,73 @@
+/**
+ * Стили для плагина галереи превью
+ *
+ * Автор: Ерохин Максим, plarson.ru
+ * Дата: 29.06.2021
+ */
+
+// Главная фото
+.faze-thumbgallery {
+  position: relative;
+
+  // Слайдер фотографий
+  .faze-thumbgallery-gallery {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 0.4rem;
+
+    width: 100%;
+    height: 0.2rem;
+
+    margin: 0 auto;
+
+    visibility: hidden;
+
+    z-index: 2;
+
+    // Фотография
+    .faze-thumbgallery-gallery-element {
+      height: 100%;
+
+      background-color: rgb(190, 190, 190);
+
+      // Активный элемент
+      &.active {
+        background-color: rgb(43, 43, 43);
+      }
+    }
+
+    // Если один или ноль элементов то скрываем
+    &[data-faze-thumbgallery-total='0'],
+    &[data-faze-thumbgallery-total='1'] {
+      display: none;
+    }
+
+    // Рассчёт относительно количества элементов
+    &[data-faze-thumbgallery-total='2'] {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    &[data-faze-thumbgallery-total='3'] {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    &[data-faze-thumbgallery-total='4'] {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    &[data-faze-thumbgallery-total='5'] {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+
+  // При наведении
+  &:hover {
+    .faze-thumbgallery-gallery {
+      visibility: visible;
+    }
+  }
+}

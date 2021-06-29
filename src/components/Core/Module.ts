@@ -2,7 +2,7 @@
  * Родительский класс любого плагина, содержит базовую и необходимую информацию для интеграции плагина в систему
  */
 
-import Faze from "./Faze";
+import Faze from './Faze';
 import Logger from './Logger';
 
 /**
@@ -84,24 +84,21 @@ class Module {
    *
    * @protected
    */
-  protected build(): void {
-  }
+  protected build(): void {}
 
   /**
    * Главный метод навешивания событий
    *
    * @protected
    */
-  protected bind(): void {
-  }
+  protected bind(): void {}
 
   /**
    * Инициализация модуля по data атрибутам
    *
    * @param node{HTMLElement} DOM элемент на который нужно инициализировать плагин
    */
-  static initializeByDataAttributes(node: HTMLElement): void {
-  }
+  static initializeByDataAttributes(node: HTMLElement): void {}
 
   /**
    * "Горячая" инициализация модуля через "observer"

@@ -49,6 +49,6 @@ interface FazePositionAndSize {
  *   to{number} - до какого пикселя отключаем
  */
 interface FazeDisallowRange {
-  from?: number,
-  to?: number,
+  from?: number;
+  to?: number;
 }

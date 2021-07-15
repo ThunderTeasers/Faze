@@ -116,25 +116,25 @@ class ThumbGallery extends Module {
    * @private
    */
   private bindChange(): void {
-    // Получаем необходимые данные
-    const total = this.imagesData.length;
-
-    // Если нет изображений в галереи, то нет смысла в дальнейшем коде
-    if (total <= 1) {
-      return;
-    }
-
-    // Ширина изображения на котором распологаются элементы, относительно неё идут все рассчёты
-    const imageWidth = this.node.getBoundingClientRect().width;
-
-    // Общая ширина пустого пространства(отступов между элементами)
-    const totalSpace = total * this.config.gap;
-
-    // Ширина фото в слайдере
-    const sliderPhotoWidth = (imageWidth - totalSpace) / total;
-
     // Навешиваем событие изменения изображения относительно положения курсора
     this.node.addEventListener('mousemove', (event: any) => {
+      // Получаем необходимые данные
+      const total = this.imagesData.length;
+
+      // Если нет изображений в галереи, то нет смысла в дальнейшем коде
+      if (total <= 1) {
+        return;
+      }
+
+      // Ширина изображения на котором распологаются элементы, относительно неё идут все рассчёты
+      const imageWidth = this.node.getBoundingClientRect().width;
+
+      // Общая ширина пустого пространства(отступов между элементами)
+      const totalSpace = total * this.config.gap;
+
+      // Ширина фото в слайдере
+      const sliderPhotoWidth = (imageWidth - totalSpace) / total;
+
       // Индекс фотографии которую нужно вывести
       let currentPhotoIndex = Math.floor(event.layerX / sliderPhotoWidth);
 
@@ -249,7 +249,7 @@ class ThumbGallery extends Module {
     Faze.Observer.watchNode({
       node,
       callback: () => {
-        (node as any).self.reinitialize();
+        (node as any).self.reinitialize(node.dataset.fazeThumbgalleryData);
       },
       type: 0,
       attribute: 'data-faze-thumbgallery-data',

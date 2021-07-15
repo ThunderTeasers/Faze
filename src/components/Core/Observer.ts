@@ -150,8 +150,6 @@ class Observer {
         // Проходимся по всем слушателям
         this.listenersByNode.forEach((listener) => {
           if (listener.type === ListenerType.Attribute && listener.attribute === mutationRecord.attributeName && listener.node === mutationRecord.target) {
-            console.log(mutationRecord);
-
             this.call(listener, <HTMLElement>mutationRecord.target);
           }
         });

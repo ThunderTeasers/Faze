@@ -174,7 +174,7 @@ class ThumbGallery extends Module {
     }
 
     // Если один элемент, то пропускаем
-    if (jsonData.length <= 1) {
+    if (jsonData.length === 0) {
       this.imagesData = [];
       return;
     }

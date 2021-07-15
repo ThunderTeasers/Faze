@@ -53,7 +53,12 @@ class REST {
     // Если это GET запрос, подставляем параметры
     if (method.toLowerCase() === 'get') {
       const formDataQuery: string = [...formData.entries()].map((entry) => `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(<any>entry[1])}`).join('&');
-      currentURL += `?${new URLSearchParams(formDataQuery).toString()}`;
+
+      if (currentURL.includes('?')) {
+        currentURL += `&${new URLSearchParams(formDataQuery).toString()}`;
+      } else {
+        currentURL += `?${new URLSearchParams(formDataQuery).toString()}`;
+      }
     }
 
     fetch(`${currentURL}`, fetchOptions)

@@ -627,11 +627,11 @@ class Carousel {
     const offset = -(this.touchStart.x - this.touchEnd.x);
 
     // Если сдвинуто влево больше чем на пол слайда, то активируем следующий слайд
-    if (offset < -(this.slideWidth / 2)) {
+    if (offset < -(this.slideWidth / 6)) {
       this.insertSlideAfter();
       this.itemsHolderNode.style.left = `${parseInt(this.itemsHolderNode.style.left, 10) + this.slideWidth}px`;
       this.next();
-    } else if (offset > this.slideWidth / 2) {
+    } else if (offset > this.slideWidth / 6) {
       // Если тоже самое вправо, то предыдущий
       this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
       this.itemsHolderNode.style.left = '0';
@@ -703,9 +703,10 @@ class Carousel {
         sliderGroupNode.style.transitionDuration = this.transitionDuration;
 
         // Перемещаем в неё слайды
-        this.slidesNodes.slice(i * this.config.amountPerSlide, i * this.config.amountPerSlide + this.config.amountPerSlide).forEach((slideNode) => {
-          sliderGroupNode.appendChild(slideNode);
-        });
+        this.slidesNodes.slice(i * this.config.amountPerSlide, i * this.config.amountPerSlide + this.config.amountPerSlide)
+          .forEach((slideNode) => {
+            sliderGroupNode.appendChild(slideNode);
+          });
 
         // Перевещаем слайд в родителя
         this.itemsHolderNode.appendChild(sliderGroupNode);
@@ -847,6 +848,11 @@ class Carousel {
     } else {
       // Инменяем индикаторы
       this.changeControls();
+
+      // @ts-ignore
+      this.config.callbacks.changed({
+        direction: 'prev',
+      });
     }
   }
 
@@ -1248,6 +1254,8 @@ class Carousel {
       infinite: (carouselNode.dataset.fazeCarouselInfinite || 'true') === 'true',
       useSlideFullSize: (carouselNode.dataset.fazeCarouselUseSlideFullSize || 'false') === 'true',
       stopOnHover: (carouselNode.dataset.fazeCarouselStopOnHover || 'false') === 'true',
+      mouseMove: (carouselNode.dataset.fazeCarouselMouseMove || 'false') === 'true',
+      touchMove: (carouselNode.dataset.fazeCarouselTouchMove || 'false') === 'true',
       amountPerSlide: parseInt(carouselNode.dataset.fazeCarouselAmountPerSlide || '1', 10),
       disallowRanges: JSON.parse(carouselNode.dataset.fazeCarouselDisallowRanges || '[]'),
       animation: {
@@ -1270,9 +1278,10 @@ class Carousel {
       Carousel.initializeByDataAttributes(carouselNode);
     });
 
-    document.querySelectorAll<HTMLElement>('[data-faze~="carousel"]').forEach((carouselNode: HTMLElement) => {
-      Carousel.initializeByDataAttributes(carouselNode);
-    });
+    document.querySelectorAll<HTMLElement>('[data-faze~="carousel"]')
+      .forEach((carouselNode: HTMLElement) => {
+        Carousel.initializeByDataAttributes(carouselNode);
+      });
   }
 }
 

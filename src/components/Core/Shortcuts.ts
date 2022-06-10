@@ -16,6 +16,11 @@ class Shortcuts {
       });
     };
 
+    // Редирект на другую страницу
+    (window as any).fazeRedirect = (url: string) => {
+      window.location.href = url;
+    };
+
     // Перезагрузка страницы
     (window as any).fazePageReload = () => {
       window.location.reload();
@@ -31,7 +36,7 @@ class Shortcuts {
           if ('href' in result) {
             window.location.href = result.href;
           } else {
-            window.location.reload()
+            window.location.reload();
           }
         }, 200);
       }
@@ -42,7 +47,7 @@ class Shortcuts {
       if ('offer' in result && 'href' in result.offer) {
         window.location.href = result.offer.href;
       }
-    }
+    };
   }
 }
 

@@ -19,6 +19,7 @@ import Logger from './Logger';
  */
 import Modal from '../Modules/Modal/Modal';
 import Helpers from '../Helpers/Helpers';
+import URL from '../Helpers/URL';
 import Date from './Date';
 import Animations from '../Animations/Animations';
 import Tooltip from '../Modules/Tooltip/Tooltip';
@@ -116,6 +117,7 @@ class Faze {
   static ZoomBox: any = ZoomBox;
   static Gallery: any = Gallery;
   static Helpers: any = Helpers;
+  static URL: any = URL;
   static Date: any = Date;
   static ThumbGallery: any = ThumbGallery;
   static Animations: any = Animations;
@@ -176,7 +178,7 @@ class Faze {
     const currentPlugins: InnerPluginsData = {};
 
     // Зарезервированные имена
-    const predefinedNames: string[] = ['Plugin', 'Module', 'Zoom', 'ZoomBox', 'Tooltip', 'Carousel', 'Page', 'Gallery', 'Form', 'Spoiler', 'Select', 'Scroll', 'Tab', 'Dropdown', 'Slider', 'Steps', 'Helpers', 'Observer', 'Modal', 'Filter', 'REST', 'Logger'];
+    const predefinedNames: string[] = ['Plugin', 'Module', 'Zoom', 'ZoomBox', 'Tooltip', 'Carousel', 'Page', 'Gallery', 'Form', 'Spoiler', 'Select', 'Scroll', 'Tab', 'Dropdown', 'Slider', 'Steps', 'Helpers', 'URL', 'Observer', 'Modal', 'Filter', 'REST', 'Logger'];
 
     // Проверка на ошибки
     if (!config) {

@@ -1,0 +1,35 @@
+class URL {
+  /**
+   * Метод удаляет заданный GET параметр из URL и совершает переход по новому адресу
+   *
+   * @param param Параметр который удаляем из URL
+   * @param historyMode Используем ли HTML5 history mode
+   */
+  static removeParam(param: string, historyMode: boolean = false): void {
+    // Текущие параметры
+    const params: URLSearchParams = new URLSearchParams(window.location.search);
+
+    // Если искомого параметра нет, то выходим из метода
+    if (!params.has(param)) {
+      return;
+    }
+
+    // Удаляем параметр
+    params.delete(param);
+
+    // Собираем новый URL
+    let url = `${window.location.origin}${window.location.pathname}`;
+    if (Array.from(params.keys()).length) {
+      url += `?${params.toString()}`;
+    }
+
+    // Совершаем переход в зависимости от флага, либо просто редирект, либо через HTML5 history
+    if (historyMode) {
+      window.history.pushState({}, '', url);
+    } else {
+      window.location.href = url;
+    }
+  }
+}
+
+export default URL;

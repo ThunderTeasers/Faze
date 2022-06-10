@@ -74,11 +74,13 @@ interface Config {
   quantity: number;
   modifyPath: boolean;
   tableName?: string;
+  updatePagination: boolean;
   modules: {
     get?: number;
   };
   selectors: {
     items: string;
+    pagination: string;
   };
   callbacks: {
     created?: (data: CallbackData) => void;
@@ -126,11 +128,13 @@ class Page {
       quantity: 10,
       tableName: undefined,
       modifyPath: false,
+      updatePagination: false,
       modules: {
         get: undefined,
       },
       selectors: {
         items: '.item',
+        pagination: '.pagination',
       },
       callbacks: {
         created: undefined,
@@ -229,7 +233,7 @@ class Page {
       const url: string = `${basePath}${basePath.includes('?') ? '&' : '?'}${this.params.toString()}`;
 
       // Получение новых элементов
-      fetch(url, { credentials: 'same-origin' })
+      fetch(url, {credentials: 'same-origin'})
         .then((response: Response) => response.text())
         .then((response: string) => {
           // Парсинг ответа
@@ -242,6 +246,11 @@ class Page {
           loadedItemNodes.forEach((loadedItemNode: HTMLElement) => {
             this.node.append(loadedItemNode);
           });
+
+          // Обновляем пагинацию, если это нужно
+          if (this.config.updatePagination) {
+            this.updatePagination(responseHTML);
+          }
 
           // Изменение сдвига
           this.offset += this.config.quantity;
@@ -276,6 +285,29 @@ class Page {
           console.error('Ошибка получения новых элементов для бесконечной подгрузки', error);
         });
     });
+  }
+
+  /**
+   * Обновление пагинации
+   *
+   * @param responseHTML{Document} DOM элемент ответа от сервера
+   *
+   * @private
+   */
+  private updatePagination(responseHTML: Document) {
+    // DOM элемент пагинации
+    const newPaginationNode = responseHTML.querySelector(this.config.selectors.pagination);
+
+    // DOM элемент пагинации
+    const oldPaginationNode = this.node.querySelector(this.config.selectors.pagination);
+
+    // Если присутствуют и старая и новая пагинация, то удаляем текущую
+    if (newPaginationNode && oldPaginationNode) {
+      oldPaginationNode.innerHTML = newPaginationNode.innerHTML;
+
+      // Перемещаем его в самый низ
+      oldPaginationNode.parentNode?.appendChild(oldPaginationNode);
+    }
   }
 
   /**
@@ -351,18 +383,20 @@ class Page {
    * Инициализация модуля по data атрибутам
    */
   static hotInitialize(): void {
-    const pageInitializators: NodeListOf<HTMLElement> = document.querySelectorAll('[data-faze~="page"]');
-    pageInitializators.forEach((pageInitializator: any) => {
-      new Page(pageInitializator, {
-        offset: parseInt(pageInitializator.dataset.fazePageOffset || '10', 10),
-        quantity: parseInt(pageInitializator.dataset.fazePageQuantity || '10', 10),
-        tableName: pageInitializator.getAttribute('data-faze-page-table_name'),
-        modifyPath: pageInitializator.getAttribute('data-faze-page-modify_path'),
+    const pageInitializers: NodeListOf<HTMLElement> = document.querySelectorAll('[data-faze~="page"]');
+    pageInitializers.forEach((pageInitializer: any) => {
+      new Page(pageInitializer, {
+        offset: parseInt(pageInitializer.dataset.fazePageOffset || '10', 10),
+        quantity: parseInt(pageInitializer.dataset.fazePageQuantity || '10', 10),
+        tableName: pageInitializer.getAttribute('data-faze-page-table_name'),
+        modifyPath: pageInitializer.getAttribute('data-faze-page-modify_path'),
+        updatePagination: (pageInitializer.dataset.fazePageUpdatePagination || 'false') === 'true',
         modules: {
-          get: pageInitializator.dataset.fazePageModulesGet,
+          get: pageInitializer.dataset.fazePageModulesGet,
         },
         selectors: {
-          items: pageInitializator.dataset.fazePageSelectorsItems || '.item',
+          items: pageInitializer.dataset.fazePageSelectorsItems || '.item',
+          pagination: pageInitializer.dataset.fazePageSelectorsPagination || '.pagination',
         },
       });
     });

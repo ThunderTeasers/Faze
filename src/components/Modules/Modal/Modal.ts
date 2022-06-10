@@ -91,6 +91,7 @@ interface Config {
   evented: boolean;
   draggable: boolean;
   resizable: boolean;
+  wrapper: boolean;
   delayToClose?: number;
   additionalParams?: string;
   callbacks: {
@@ -153,6 +154,7 @@ class Modal {
       evented: true,
       draggable: false,
       resizable: false,
+      wrapper: true,
       delayToClose: 0,
       additionalParams: undefined,
       callbacks: {
@@ -263,15 +265,16 @@ class Modal {
         const params = JSON.parse(this.config.additionalParams || '{}');
 
         // Проходимся по всем ключам для добавления в форму
-        Object.keys(params).forEach((param: string) => {
-          // Создаём новый "hidden" инпут и вставляем его в форму
-          const hiddenNode = document.createElement('input');
-          hiddenNode.type = 'hidden';
-          hiddenNode.name = param;
-          hiddenNode.value = params[param];
+        Object.keys(params)
+          .forEach((param: string) => {
+            // Создаём новый "hidden" инпут и вставляем его в форму
+            const hiddenNode = document.createElement('input');
+            hiddenNode.type = 'hidden';
+            hiddenNode.name = param;
+            hiddenNode.value = params[param];
 
-          formNode.appendChild(hiddenNode);
-        });
+            formNode.appendChild(hiddenNode);
+          });
       } catch (e) {
         console.error(`Неправильный формат дополнительных переменных переданных в модальное окно!\nТребуется JSON объект!\n${e}`);
       }
@@ -291,9 +294,8 @@ class Modal {
     this.buildFooter();
     this.buildFull();
 
-    this.modalParts.wrapperNode.className = 'faze-modal-wrapper';
+    this.modalParts.wrapperNode.className = `faze-modal-wrapper ${this.config.wrapper ? '' : 'faze-modal-wrapper-hide'}`;
     this.modalParts.wrapperNode.appendChild(this.modalParts.fullNode);
-
     document.body.appendChild(this.modalParts.wrapperNode);
   }
 
@@ -672,6 +674,7 @@ class Modal {
         evented: false,
         draggable: callerNode.dataset.fazeModalDraggable === 'true',
         resizable: callerNode.dataset.fazeModalResizable === 'true',
+        wrapper: (callerNode.dataset.fazeModalWrapper || 'true') === 'true',
         url: callerNode.dataset.fazeModalUrl || '',
         class: callerNode.dataset.fazeModalClass || '',
         additionalParams: callerNode.dataset.fazeModalAdditionalParams || '{}',

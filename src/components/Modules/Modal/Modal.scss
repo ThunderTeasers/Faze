@@ -157,4 +157,15 @@
       }
     }
   }
+
+  // Не должно быть видимого враппера
+  &.faze-modal-wrapper-hide {
+    pointer-events: none;
+
+    background-color: transparent;
+
+    .faze-modal {
+      pointer-events: all;
+    }
+  }
 }

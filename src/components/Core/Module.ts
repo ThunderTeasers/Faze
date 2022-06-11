@@ -23,7 +23,7 @@ interface ModuleData {
   additionalParams?: any;
 }
 
-class Module {
+abstract class Module {
   // Основной DOM элемент
   protected readonly node: HTMLElement;
 

@@ -23,7 +23,7 @@ class Logger {
    * @param node    - DOM элемент, если необходимо
    */
   warning(message: string, node: HTMLElement): void {
-    console.warn(`${this.prefix} ${message} ${this.postfix}`, node ? node : '');
+    console.warn(`${this.prefix} ${message} ${this.postfix}`, node || '');
   }
 
   /**

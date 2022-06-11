@@ -28,6 +28,7 @@ import Tab from '../Modules/Tab/Tab';
 import Drag from '../Modules/Drag/Drag';
 import Dropdown from '../Modules/Dropdown/Dropdown';
 import Select from '../Modules/Select/Select';
+import SmartSelect from '../Modules/SmartSelect/SmartSelect';
 import Carousel from '../Modules/Carousel/Carousel';
 import Carousel2 from '../Modules/Carousel2/Carousel2';
 import ThumbGallery from '../Modules/ThumbGallery/ThumbGallery';
@@ -131,6 +132,7 @@ class Faze {
   static Drag: any = Drag;
   static Dropdown: any = Dropdown;
   static Select: any = Select;
+  static SmartSelect: any = SmartSelect;
   static Slider: any = Slider;
   static Steps: any = Steps;
   static LazyImage: any = LazyImage;
@@ -353,6 +355,7 @@ class Faze {
     Faze.Page.hotInitialize();
     Faze.Tab.hotInitialize('tab');
     Faze.ThumbGallery.hotInitialize('thumbgallery');
+    Faze.SmartSelect.hotInitialize('smartselect');
     Faze.Spoiler.hotInitialize();
     Faze.Carousel2.hotInitialize('carousel2');
     Faze.Carousel.hotInitialize();

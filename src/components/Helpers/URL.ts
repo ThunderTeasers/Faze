@@ -30,6 +30,29 @@ class URL {
       window.location.href = url;
     }
   }
+
+  /**
+   * Добавление параметра существующему URL
+   *
+   * @param name{string} Имя параметра
+   * @param value{string} Значение параметра
+   * @param url{string} URL к которому добавляем параметр
+   */
+  static addParamToURL(name: string, value: string, url: string): string {
+    let result: string = url;
+
+    if (url.includes('?')) {
+      if (url.endsWith('&')) {
+        result += `${name}=${value}`;
+      } else {
+        result += `&${name}=${value}`;
+      }
+    } else {
+      result += `?${name}=${value}`;
+    }
+
+    return result;
+  }
 }
 
 export default URL;

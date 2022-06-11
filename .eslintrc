@@ -10,6 +10,7 @@
     "arrow-parens": "off",
     "import/no-cycle": "off",
     "@typescript-eslint/object-curly-spacing": "off",
+    "@typescript-eslint/keyword-spacing": "off",
     "no-console": "off",
     "no-new": "off",
     "comma-dangle": "off",

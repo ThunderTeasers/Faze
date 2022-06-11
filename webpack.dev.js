@@ -19,12 +19,20 @@ module.exports = (env) => {
       rules: [
         {
           test: /\.scss$/,
-          use: ['style-loader', 'css-loader', 'sass-loader'],
+          use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+          sideEffects: true,
+        },
+        {
+          test: /\.html$/,
+          use: 'html-loader',
         },
       ],
     },
     plugins: [
       new CleanWebpackPlugin(['dist']),
+      new MiniCssExtractPlugin({
+        filename: 'faze.min.css',
+      }),
       new HtmlWebpackPlugin({
         filename: 'drag.html',
         template: './src/tests/views/drag.html',
@@ -62,12 +70,13 @@ module.exports = (env) => {
         template: './src/tests/views/thumbgallery.html',
       }),
       new HtmlWebpackPlugin({
+        filename: 'smartselect.html',
+        template: './src/tests/views/smartselect.html',
+      }),
+      new HtmlWebpackPlugin({
         template: './src/index.html',
       }),
       new webpack.HotModuleReplacementPlugin(),
-      new MiniCssExtractPlugin({
-        filename: 'faze.min.css',
-      }),
     ],
   });
 };

@@ -77,8 +77,9 @@ class Observer {
   /**
    * Добавление слушателя по CSS селектору к общему списку
    *
-   * @param selector{string} - CSS селектор DOM элемента для отслеживания
-   * @param callback{HTMLElement} - пользовательский метод, исполняющийся после добавления нужного DOM элемента
+   * @param selector{string} CSS селектор DOM элемента для отслеживания
+   * @param callback{HTMLElement} Пользовательский метод, исполняющийся после добавления нужного DOM элемента
+   * @param type{ListenerType} Тип слушателя
    */
   watch(selector: string, callback: (addedNode: HTMLElement) => void, type: ListenerType = ListenerType.Node) {
     this.listenersBySelector.push({
@@ -92,8 +93,7 @@ class Observer {
   /**
    * Добавление слушателя по CSS селектору к общему списку
    *
-   * @param node{string} - CSS селектор DOM элемента для отслеживания
-   * @param callback{HTMLElement} - пользовательский метод, исполняющийся после добавления нужного DOM элемента
+   * @param params{ListenerByNode} Параметры слушателя
    */
   watchNode(params: ListenerByNode) {
     this.listenersByNode.push({

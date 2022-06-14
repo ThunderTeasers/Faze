@@ -212,6 +212,8 @@ class SmartSelect extends Module {
    * @private
    */
   private buildItems(items: any[]): void {
+    let isOpen = false;
+
     items.forEach((item: any) => {
       // Не добавляем элемент если он такой же, как и введенное значение
       if ((<HTMLInputElement>this.node).value === item[`${this.config.tableName}_chr_name`]) {
@@ -224,10 +226,13 @@ class SmartSelect extends Module {
       this.itemsNodes.push(itemNode);
 
       this.itemsNode.appendChild(itemNode);
+
+      // Ставим на открытие, если добавили хоть один элемент
+      isOpen = true;
     });
 
     // Открытие выпадающего списка, если есть варианты
-    if (items.length > 0) {
+    if (isOpen) {
       this.open();
     }
   }

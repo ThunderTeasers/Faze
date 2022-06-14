@@ -11,6 +11,11 @@
   left: 0;
 
   display: none;
+  max-height: 300px;
+
+  background-color: #fff;
+
+  overflow: auto;
 
   // Элемент
   .faze-smartsearch-item {

@@ -22,6 +22,8 @@ import Faze from '../../Core/Faze';
 interface Config {
   url?: string;
   tableName?: string;
+  fixed: boolean;
+  minLength: number;
 }
 
 class SmartSelect extends Module {
@@ -36,6 +38,8 @@ class SmartSelect extends Module {
     const defaultConfig: Config = {
       url: undefined,
       tableName: undefined,
+      fixed: false,
+      minLength: 3,
     };
 
     // Инициализируем базовый класс
@@ -53,6 +57,7 @@ class SmartSelect extends Module {
     super.initialize();
 
     this.itemsNodes = [];
+    (<HTMLInputElement>this.node).autocomplete = 'off';
   }
 
   /**
@@ -61,7 +66,21 @@ class SmartSelect extends Module {
   bind(): void {
     super.bind();
 
+    this.bindCloseOnClickOutside();
     this.handleInput();
+  }
+
+  /**
+   * Закрытие при клике вне области выбора
+   *
+   * @private
+   */
+  private bindCloseOnClickOutside(): void {
+    document.addEventListener('click', (event) => {
+      if (!Faze.Helpers.isMouseOverlapsNodes(event, [this.node, this.itemsNode])) {
+        this.close();
+      }
+    });
   }
 
   /**
@@ -84,16 +103,35 @@ class SmartSelect extends Module {
   }
 
   /**
+   * Рассчёт позиции, если нужно фиксировать блок с подсказками
+   *
+   * @private
+   */
+  private calculateFixed(): void {
+    const rect = this.node.getBoundingClientRect();
+
+    this.itemsNode.style.position = 'fixed';
+    this.itemsNode.style.top = `${rect.top + rect.height}px`;
+    this.itemsNode.style.left = `${rect.left}px`;
+    this.itemsNode.style.width = `${rect.width}px`;
+  }
+
+  /**
    * Отслеживание ввода данных в инпут
    *
    * @private
    */
   private handleInput(): void {
     let inputTimer: number;
-    this.node.addEventListener('keyup', () => {
+    Faze.Helpers.addEventListeners(this.node, ['keyup', 'focus'], () => {
       clearTimeout(inputTimer);
 
       inputTimer = window.setTimeout(() => {
+        if ((<HTMLInputElement>this.node).value.length < this.config.minLength) {
+          this.clearItems();
+          return;
+        }
+
         this.request()
           .then((rawItems: string) => {
             let items: any[] = [];
@@ -128,6 +166,10 @@ class SmartSelect extends Module {
    */
   protected build(): void {
     this.buildWrapper();
+
+    if (this.config.fixed) {
+      this.calculateFixed();
+    }
   }
 
   /**
@@ -138,7 +180,12 @@ class SmartSelect extends Module {
   private buildWrapper(): void {
     this.itemsNode = document.createElement('div');
     this.itemsNode.className = 'faze-smartsearch-items';
-    Faze.DOM.insertAfter(this.itemsNode, this.node);
+
+    if (this.config.fixed) {
+      document.body.appendChild(this.itemsNode);
+    } else {
+      Faze.DOM.insertAfter(this.itemsNode, this.node);
+    }
   }
 
   /**
@@ -166,6 +213,11 @@ class SmartSelect extends Module {
    */
   private buildItems(items: any[]): void {
     items.forEach((item: any) => {
+      // Не добавляем элемент если он такой же, как и введенное значение
+      if ((<HTMLInputElement>this.node).value === item[`${this.config.tableName}_chr_name`]) {
+        return;
+      }
+
       const itemNode = document.createElement('div');
       itemNode.className = 'faze-smartsearch-item';
       itemNode.textContent = item[`${this.config.tableName}_chr_name`];
@@ -203,6 +255,8 @@ class SmartSelect extends Module {
     new SmartSelect(node, {
       url: node.dataset.fazeSmartselectUrl,
       tableName: node.dataset.fazeSmartselectTableName,
+      fixed: (node.dataset.fazeSmartselectFixed || 'false') === 'true',
+      minLength: parseInt(node.dataset.fazeSmartselectMinLength || '3', 10),
     });
   }
 }

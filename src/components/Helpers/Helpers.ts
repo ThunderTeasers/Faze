@@ -85,9 +85,10 @@ class Helpers {
    * Маска мобильного телефона для поля ввода
    */
   static bindMobileMask(): void {
-    document.querySelectorAll<HTMLInputElement>('.faze-mask-mobile').forEach((inputNode: HTMLInputElement) => {
-      Helpers.mobileMask(inputNode);
-    });
+    document.querySelectorAll<HTMLInputElement>('.faze-mask-mobile')
+      .forEach((inputNode: HTMLInputElement) => {
+        Helpers.mobileMask(inputNode);
+      });
   }
 
   /**
@@ -254,7 +255,12 @@ class Helpers {
    * @param options - настройки
    */
   static showNotification(message: string, options: NotificationOptions): void {
-    const {className = '', isNested = true, time = 3000, backgroundColor = '#00b938'} = options;
+    const {
+      className = '',
+      isNested = true,
+      time = 3000,
+      backgroundColor = '#00b938'
+    } = options;
 
     // DOM элемент обертки для информационнах сообщений, она нужна для того, чтобы сообщения шли друг под другом, если их несколько
     let notificationWrapperNode: HTMLDivElement | null = document.querySelector('.faze-notification-wrapper');
@@ -314,7 +320,13 @@ class Helpers {
    * @param showMinutes  - показывать ли минуты, имеет приоритет выше, чем "showEmpty"
    * @param showSeconds  - показывать ли секунды, имеет приоритет выше, чем "showEmpty"
    */
-  static secondsToTime({totalSeconds = 0, showEmpty = false, showHours = true, showMinutes = true, showSeconds = true} = {}): string {
+  static secondsToTime({
+                         totalSeconds = 0,
+                         showEmpty = false,
+                         showHours = true,
+                         showMinutes = true,
+                         showSeconds = true
+                       } = {}): string {
     let totalSecondsRaw: number = totalSeconds;
 
     // Время в человекопонимаемом формате
@@ -525,7 +537,8 @@ class Helpers {
   static objectFromString(jsonObject: any = {}, stringData: string, key: string, value: string, arrayGroup = 'default'): object {
     // Разбиваем строку на токены, при этом фильтруя на пустоту токена, т.к. если мы пытаемся разделить пустую строку, "split" вернет
     // массив у которого 1 пустой элемент, а это некорректно в данном случае.
-    const objectTokens: string[] = stringData.split('.').filter(token => token.length !== 0);
+    const objectTokens: string[] = stringData.split('.')
+      .filter(token => token.length !== 0);
 
     // Конечный результат генерации объекта из строки
     const result = {};
@@ -586,7 +599,10 @@ class Helpers {
     const itemRect = itemNode.getBoundingClientRect();
 
     // Получаем координаты касания/нажатия
-    let {x, y} = this.getMouseOrTouchPosition(event);
+    let {
+      x,
+      y
+    } = this.getMouseOrTouchPosition(event);
 
     // Объект с результатами проверки
     const result: MouseOverResult = {
@@ -641,7 +657,10 @@ class Helpers {
    * @return{FazePosition} Позиция на экране
    */
   static getMouseOrTouchPosition(event: MouseEvent | TouchEvent): FazePosition {
-    const position: FazePosition = {x: 0, y: 0};
+    const position: FazePosition = {
+      x: 0,
+      y: 0
+    };
     if (event instanceof MouseEvent) {
       position.x = event.clientX;
       position.y = event.clientY;
@@ -679,7 +698,8 @@ class Helpers {
   static isMouseOverlapsNodes(event: Event, nodes: HTMLElement[]): boolean {
     const path = (<any>event).path || (event.composedPath && event.composedPath());
     if (path) {
-      if (path.find((element: HTMLElement) => Array.from(nodes).some(node => node === element))) {
+      if (path.find((element: HTMLElement) => Array.from(nodes)
+        .some(node => node === element))) {
         return true;
       }
     }
@@ -753,9 +773,15 @@ class Helpers {
    *
    * @return{FazePosition} - позиция элемента
    */
-  static getElementPosition(node: HTMLElement, offset: FazePosition = {x: 0, y: 0}): FazePosition {
+  static getElementPosition(node: HTMLElement, offset: FazePosition = {
+    x: 0,
+    y: 0
+  }): FazePosition {
     // Возвращаемый объект
-    const position = {x: node.offsetLeft - offset.x, y: node.offsetTop - offset.y};
+    const position = {
+      x: node.offsetLeft - offset.x,
+      y: node.offsetTop - offset.y
+    };
 
     // DOM элемент с которым производим действия
     let calculatedNode: HTMLElement = node;
@@ -783,8 +809,14 @@ class Helpers {
    */
   static getElementPositionAndSize(
     node: HTMLElement,
-    sizeOffset: FazeSize = {width: 0, height: 0},
-    positionOffset: FazePosition = {x: 0, y: 0},
+    sizeOffset: FazeSize = {
+      width: 0,
+      height: 0
+    },
+    positionOffset: FazePosition = {
+      x: 0,
+      y: 0
+    },
   ): FazePositionAndSize {
     return {
       size: {
@@ -976,7 +1008,10 @@ class Helpers {
         node.src = source;
 
         // Исполняем промис и возвращаем размеры изображения
-        resolve({width: image.width, height: image.height});
+        resolve({
+          width: image.width,
+          height: image.height
+        });
       };
 
       // При ошибке
@@ -1099,14 +1134,15 @@ class Helpers {
     const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
     const windowWidth = (window.innerWidth || document.documentElement.clientWidth);
 
-    return Array.from(nodes).filter((node) => {
-      const rect = node.getBoundingClientRect();
+    return Array.from(nodes)
+      .filter((node) => {
+        const rect = node.getBoundingClientRect();
 
-      const vertInView = (rect.top - offset <= windowHeight) && (enableWhenOnTop ? true : ((rect.top + rect.height) >= 0));
-      const horInView = (rect.left - offset <= windowWidth) && (enableWhenOnTop ? true : ((rect.left + rect.width) >= 0));
+        const vertInView = (rect.top - offset <= windowHeight) && (enableWhenOnTop ? true : ((rect.top + rect.height) >= 0));
+        const horInView = (rect.left - offset <= windowWidth) && (enableWhenOnTop ? true : ((rect.left + rect.width) >= 0));
 
-      return (vertInView && horInView);
-    });
+        return (vertInView && horInView);
+      });
   }
 
   /**
@@ -1187,11 +1223,12 @@ class Helpers {
       "ю": "yu"
     };
 
-    return text.split('').map(function (char: string) {
-      return dictionary[char] || char;
-    }).join('');
+    return text.split('')
+      .map(function (char: string) {
+        return dictionary[char] || char;
+      })
+      .join('');
   }
-
 
   /**
    * Парсинг JSON с отловом ошибок
@@ -1218,12 +1255,28 @@ class Helpers {
    */
   static isSelectorValid(selector: string): boolean {
     try {
-      document.createDocumentFragment().querySelector(selector);
+      document.createDocumentFragment()
+        .querySelector(selector);
     } catch {
       return false;
     }
 
     return true;
+  }
+
+  /**
+   * Навешивание нескольких событий на DOM элемент
+   *
+   * @param node{HTMLElement} DOM элемент на который навешиваем событие
+   * @param events{string[]} Список событий
+   * @param callback{(event: Event) => void} Пользовательская функция, которая выполнится после срабатывания события
+   */
+  static addEventListeners(node: HTMLElement, events: string[], callback: (event: Event) => void): void {
+    events.forEach((eventName: string) => {
+      node.addEventListener(eventName, (event: Event) => {
+        callback(event);
+      });
+    });
   }
 }
 

@@ -96,6 +96,7 @@ interface Config {
   additionalParams?: string;
   callbacks: {
     success?: (parts: ModalParts) => void,
+    close?: (parts: ModalParts) => void,
     error?: (parts: ModalParts) => void,
   };
   buttons?: Buttons;
@@ -159,6 +160,7 @@ class Modal {
       additionalParams: undefined,
       callbacks: {
         success: undefined,
+        close: undefined,
         error: undefined,
       },
       buttons: [],
@@ -342,6 +344,15 @@ class Modal {
 
     // Снимаем слушатели на нажатие кнопки
     this.unbindKeys();
+
+    // Исполняем пользовательский метод при успешном получении данных
+    if (typeof this.config.callbacks.close === 'function') {
+      try {
+        this.config.callbacks.close(this.modalParts);
+      } catch (e) {
+        console.error('Ошибка исполнения пользовательского метода "close":', e);
+      }
+    }
   }
 
   /**

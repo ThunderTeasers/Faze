@@ -112,9 +112,6 @@
       .faze-modal-resize-border {
         position: absolute;
 
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
         user-select: none;
 
         &.faze-modal-resize-border-top, &.faze-modal-resize-border-bottom {

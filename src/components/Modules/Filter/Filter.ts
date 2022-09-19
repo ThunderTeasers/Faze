@@ -260,7 +260,8 @@ class Filter {
 
         // Собираем вручную строку запроса из FormData т.к. Edge и другие отсталые браузеры, даже имея официалиьную поддержку
         // URLSearchParams не имеют возможности создать её через передачу параметра FormData в конструкторе.
-        const formDataQuery: string = [...formData.entries()].map((entry) => `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(<any>entry[1])}`).join('&');
+        const formDataQuery: string = [...formData.entries()].map((entry) => `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(<any>entry[1])}`)
+          .join('&');
 
         // Парсим данные формы
         const formDataURLString: URLSearchParams = new URLSearchParams(formDataQuery);
@@ -299,59 +300,64 @@ class Filter {
 
         // Отправка запрос на сервер, если это нужно
         if (this.config.needToRequest) {
-          fetch(urlForRequest, { credentials: 'same-origin' })
-            .then((response: Response) => response.text())
-            .then((response: string) => {
-              // Парсинг ответа от сервера
-              const responseHTML: Document = new DOMParser().parseFromString(response, 'text/html');
+          if (this.node.dataset.fazeFilterReload && this.node.dataset.fazeFilterReload === 'true') {
+            this.formNode?.submit();
+          } else {
+            fetch(urlForRequest, {credentials: 'same-origin'})
+              .then((response: Response) => response.text())
+              .then((response: string) => {
+                // Парсинг ответа от сервера
+                const responseHTML: Document = new DOMParser().parseFromString(response, 'text/html');
 
-              // Ищем в ответе от сервера DOM элемент с такими же классами как у элемента фильтра
-              const responseNode: HTMLElement | null = responseHTML.querySelector(
-                `.${Array.from(this.node.classList)
-                  .filter((className) => className !== 'faze-filter-initialized')
-                  .join('.')}`
-              );
-              if (responseNode) {
-                if (this.itemsHolderNode) {
-                  // Проверка, если отфильтрованных элементов больше 0, тогда происходит их вывод
-                  // иначе сообщение об отсутствии элементов по данному запросу
-                  const itemsHolderNode: HTMLElement | null = responseNode.querySelector(this.config.selectors.itemsHolder);
-                  if (itemsHolderNode) {
-                    this.itemsHolderNode.innerHTML = itemsHolderNode.innerHTML;
-                  } else {
-                    this.itemsHolderNode.innerHTML = '<p class="error">К сожалению, ничего не найдено...</p>';
+                // Ищем в ответе от сервера DOM элемент с такими же классами как у элемента фильтра
+                const responseNode: HTMLElement | null = responseHTML.querySelector(
+                  `.${Array.from(this.node.classList)
+                    .filter((className) => className !== 'faze-filter-initialized')
+                    .join('.')}`,
+                );
+                if (responseNode) {
+                  if (this.itemsHolderNode) {
+                    // Проверка, если отфильтрованных элементов больше 0, тогда происходит их вывод
+                    // иначе сообщение об отсутствии элементов по данному запросу
+                    const itemsHolderNode: HTMLElement | null = responseNode.querySelector(this.config.selectors.itemsHolder);
+                    if (itemsHolderNode) {
+                      this.itemsHolderNode.innerHTML = itemsHolderNode.innerHTML;
+                    } else {
+                      this.itemsHolderNode.innerHTML = '<p class="error">К сожалению, ничего не найдено...</p>';
+                    }
                   }
+
+                  // Обновление количества элементов
+                  const total: string = responseNode.dataset.fazeFilterTotal || '0';
+                  if (this.config.showTotal && this.totalNode) {
+                    this.totalNode.textContent = total;
+                  }
+                  this.node.dataset.fazeFilterTotal = total;
                 }
 
-                // Обновление количества элементов
-                const total: string = responseNode.dataset.fazeFilterTotal || '0';
-                if (this.config.showTotal && this.totalNode) {
-                  this.totalNode.textContent = total;
-                }
-                this.node.dataset.fazeFilterTotal = total;
-              }
+                // Если используем API то получаем ссылку из Plarson
+                if (this.config.useAPI) {
+                  this.getURL(urlForHistory, this.cleanPath)
+                    .then((data) => {
+                      // Обновление строки в браузере
+                      if (this.config.updateQuery) {
+                        window.history.pushState({}, '', data.url);
+                      }
 
-              // Если используем API то получаем ссылку из Plarson
-              if (this.config.useAPI) {
-                this.getURL(urlForHistory, this.cleanPath).then((data) => {
+                      // Действия выполняемые после фильтрации
+                      this.afterFilterActions(response, responseHTML, data.query);
+                    });
+                } else {
                   // Обновление строки в браузере
                   if (this.config.updateQuery) {
-                    window.history.pushState({}, '', data.url);
+                    window.history.pushState({}, '', urlForHistory);
                   }
 
                   // Действия выполняемые после фильтрации
-                  this.afterFilterActions(response, responseHTML, data.query);
-                });
-              } else {
-                // Обновление строки в браузере
-                if (this.config.updateQuery) {
-                  window.history.pushState({}, '', urlForHistory);
+                  this.afterFilterActions(response, responseHTML);
                 }
-
-                // Действия выполняемые после фильтрации
-                this.afterFilterActions(response, responseHTML);
-              }
-            });
+              });
+          }
         } else {
           // Действия выполняемые после фильтрации
           this.afterFilterActions(undefined, undefined, urlForRequest);
@@ -371,13 +377,14 @@ class Filter {
    * @private
    */
   private bindSubmitAfterChange(): void {
-    this.formNode?.querySelectorAll<HTMLInputElement>('input:not([type="hidden"])').forEach((inputNode: HTMLInputElement) => {
-      if (['checkbox', 'radio'].includes(inputNode.type)) {
-        inputNode.addEventListener('change', () => {
-          this.updateFilter();
-        });
-      }
-    });
+    this.formNode?.querySelectorAll<HTMLInputElement>('input:not([type="hidden"])')
+      .forEach((inputNode: HTMLInputElement) => {
+        if (['checkbox', 'radio'].includes(inputNode.type)) {
+          inputNode.addEventListener('change', () => {
+            this.updateFilter();
+          });
+        }
+      });
   }
 
   /**
@@ -396,10 +403,13 @@ class Filter {
       pathname = pathname.replace(/offset=\d+\//gi, '');
     }
 
-    const response = await fetch(`${pathname}?${params.toString()}`, { credentials: 'same-origin' });
+    const response = await fetch(`${pathname}?${params.toString()}`, {credentials: 'same-origin'});
     const data = await response.json();
 
-    return { url: data.scheme_uri_path_query, query: data.query_string };
+    return {
+      url: data.scheme_uri_path_query,
+      query: data.query_string
+    };
   }
 
   /**
@@ -473,21 +483,22 @@ class Filter {
     if (this.formNode) {
       const inputFields = ['text', 'number', 'date', 'phone', 'email', 'datetime', 'textarea'];
 
-      this.formNode.querySelectorAll<HTMLInputElement>(`input[type="${type}"], select`).forEach((foundNode: HTMLInputElement) => {
-        const foundNodeName = foundNode.name;
-        const foundNodeValue = foundNode.value;
+      this.formNode.querySelectorAll<HTMLInputElement>(`input[type="${type}"], select`)
+        .forEach((foundNode: HTMLInputElement) => {
+          const foundNodeName = foundNode.name;
+          const foundNodeValue = foundNode.value;
 
-        const values: string[] = this.params.getAll(foundNodeName);
-        if (values.includes(foundNodeValue)) {
-          if (typeof callback === 'function') {
-            callback(foundNode);
+          const values: string[] = this.params.getAll(foundNodeName);
+          if (values.includes(foundNodeValue)) {
+            if (typeof callback === 'function') {
+              callback(foundNode);
+            }
+          } else if (inputFields.includes(type) && values.length > 0) {
+            if (typeof callback === 'function') {
+              callback(foundNode, values[0]);
+            }
           }
-        } else if (inputFields.includes(type) && values.length > 0) {
-          if (typeof callback === 'function') {
-            callback(foundNode, values[0]);
-          }
-        }
-      });
+        });
     }
   }
 
@@ -574,9 +585,10 @@ class Filter {
       if (cookieValue) {
         // Если в значении присутствует разделитель, то это сборная строка из чекбоксов, её надо разобрать
         if (cookieValue.includes(this.config.cookie.delimiter)) {
-          cookieValue.split(this.config.cookie.delimiter).forEach((paramValue: string) => {
-            this.params.append(storedParamName, decodeURIComponent(paramValue));
-          });
+          cookieValue.split(this.config.cookie.delimiter)
+            .forEach((paramValue: string) => {
+              this.params.append(storedParamName, decodeURIComponent(paramValue));
+            });
         } else {
           // Иначе просто задаем нужное значение
           this.params.append(storedParamName, decodeURIComponent(cookieValue));
@@ -644,7 +656,7 @@ class Filter {
    */
   updateFilter(): void {
     if (this.formNode) {
-      this.formNode.dispatchEvent(new Event('submit', { cancelable: true }));
+      this.formNode.dispatchEvent(new Event('submit', {cancelable: true}));
     }
   }
 
@@ -682,9 +694,10 @@ class Filter {
       Filter.initializeByDataAttributes(filterNode);
     });
 
-    document.querySelectorAll<HTMLElement>('[data-faze~="filter"]').forEach((filterNode: HTMLElement) => {
-      Filter.initializeByDataAttributes(filterNode);
-    });
+    document.querySelectorAll<HTMLElement>('[data-faze~="filter"]')
+      .forEach((filterNode: HTMLElement) => {
+        Filter.initializeByDataAttributes(filterNode);
+      });
   }
 }
 

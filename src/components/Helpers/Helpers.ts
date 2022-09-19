@@ -1237,7 +1237,11 @@ class Helpers {
    *
    * @return{object} Готовый JS объект
    */
-  static parseJSON(text: string): object {
+  static parseJSON(text?: string): object {
+    if (!text || text.trim() === '') {
+      return {};
+    }
+
     let data: object = {};
     try {
       data = JSON.parse(text);

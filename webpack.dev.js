@@ -74,6 +74,10 @@ module.exports = (env) => {
         template: './src/tests/views/smartselect.html',
       }),
       new HtmlWebpackPlugin({
+        filename: 'look.html',
+        template: './src/tests/views/look.html',
+      }),
+      new HtmlWebpackPlugin({
         template: './src/index.html',
       }),
       new webpack.HotModuleReplacementPlugin(),

@@ -34,6 +34,7 @@ import Carousel2 from '../Modules/Carousel2/Carousel2';
 import ThumbGallery from '../Modules/ThumbGallery/ThumbGallery';
 import Zoom from '../Modules/Zoom/Zoom';
 import ZoomBox from '../Modules/ZoomBox/ZoomBox';
+import Look from '../Modules/Look/Look';
 import Scroll from '../Modules/Scroll/Scroll';
 import Form from '../Modules/Form/Form';
 import Page from '../Modules/Page/Page';
@@ -132,6 +133,7 @@ class Faze {
   static Drag: any = Drag;
   static Dropdown: any = Dropdown;
   static Select: any = Select;
+  static Look: any = Look;
   static SmartSelect: any = SmartSelect;
   static Slider: any = Slider;
   static Steps: any = Steps;
@@ -182,7 +184,7 @@ class Faze {
     const currentPlugins: InnerPluginsData = {};
 
     // Зарезервированные имена
-    const predefinedNames: string[] = ['Plugin', 'Module', 'Zoom', 'ZoomBox', 'Tooltip', 'Carousel', 'Page', 'Gallery', 'SmartSelect', 'Form', 'Spoiler', 'Select', 'Scroll', 'Tab', 'Dropdown', 'Slider', 'Steps', 'Helpers', 'URL', 'Observer', 'Modal', 'Filter', 'REST', 'Logger'];
+    const predefinedNames: string[] = ['Plugin', 'Module', 'Zoom', 'Look', 'ZoomBox', 'Tooltip', 'Carousel', 'Page', 'Gallery', 'SmartSelect', 'Form', 'Spoiler', 'Select', 'Scroll', 'Tab', 'Dropdown', 'Slider', 'Steps', 'Helpers', 'URL', 'Observer', 'Modal', 'Filter', 'REST', 'Logger'];
 
     // Проверка на ошибки
     if (!config) {
@@ -364,6 +366,7 @@ class Faze {
     Faze.ZoomBox.hotInitialize();
     Faze.Select.hotInitialize();
     Faze.Filter.hotInitialize();
+    Faze.Look.hotInitialize('look');
     Faze.Steps.hotInitialize();
     Faze.Drag.hotInitialize();
     Faze.Dropdown.hotInitialize();

@@ -1,0 +1,27 @@
+/**
+ * Стили для плагина просмотра изображений
+ *
+ * Автор: Ерохин Максим
+ * Дата: 19.09.2022
+ */
+
+// Анимация появления
+@keyframes faze-look-appear {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+// Увеличенное изображение
+.faze-look-image {
+  position: absolute;
+
+  animation-name: faze-notification-appear;
+  animation-duration: 0.25s;
+
+  object-fit: cover;
+}

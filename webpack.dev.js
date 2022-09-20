@@ -1,8 +1,8 @@
 const webpack = require('webpack');
-const merge = require('webpack-merge');
+const {merge} = require('webpack-merge');
 const common = require('./webpack.common.js');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 
@@ -12,7 +12,9 @@ module.exports = (env) => {
     mode: 'development',
     devtool: 'inline-source-map',
     devServer: {
-      contentBase: path.resolve(__dirname, 'dist'),
+      static: {
+        directory: path.resolve(__dirname, 'dist'),
+      },
       hot: true,
     },
     module: {
@@ -29,7 +31,7 @@ module.exports = (env) => {
       ],
     },
     plugins: [
-      new CleanWebpackPlugin(['dist']),
+      new CleanWebpackPlugin(),
       new MiniCssExtractPlugin({
         filename: 'faze.min.css',
       }),
@@ -76,6 +78,10 @@ module.exports = (env) => {
       new HtmlWebpackPlugin({
         filename: 'look.html',
         template: './src/tests/views/look.html',
+      }),
+      new HtmlWebpackPlugin({
+        filename: 'gallery.html',
+        template: './src/tests/views/gallery.html',
       }),
       new HtmlWebpackPlugin({
         template: './src/index.html',

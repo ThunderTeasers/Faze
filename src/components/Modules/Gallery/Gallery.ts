@@ -1,6 +1,11 @@
 import './Gallery.scss';
 import Faze from '../../Core/Faze';
 
+interface ImageData {
+  thumbnail: string;
+  full: string;
+}
+
 /**
  * Структура конфига галереи
  *
@@ -26,40 +31,46 @@ interface Config {
 
 class Gallery {
   // DOM элементы фотографий из которых надо составить галерею
-  readonly callerNodes: HTMLElement[];
+  private readonly callerNodes: HTMLElement[];
 
-  // DOM элементы которые относятся к текущей активной группе
-  activeNodes: HTMLElement[];
+  // Изображения галереи
+  private imagesData: ImageData[];
 
   // Конфиг с настройками
-  readonly config: Config;
+  private readonly config: Config;
 
   // DOM элемент содержащий все элементы галереи
-  wrapperNode: HTMLDivElement;
+  private wrapperNode: HTMLDivElement;
 
   // DOM элементы стрелок переключения
-  arrowsNodes: {
+  private arrowsNodes: {
     prev: HTMLDivElement,
     next: HTMLDivElement,
   };
 
   // DOM элемент крестика для закрытия галереи
-  closeButtonNode: HTMLDivElement;
+  private closeButtonNode: HTMLDivElement;
 
-  // DOM элемент враммера картинки
-  imageWrapperNode: HTMLDivElement;
+  // DOM элемент враппера картинки
+  private imageWrapperNode: HTMLDivElement;
+
+  // DOM элемент списка превью
+  private thumbnailsNode: HTMLDivElement;
+
+  // DOM элементы превью
+  private thumbnailsNodes: HTMLDivElement[];
 
   // DOM элемент картинки
-  imageNode: HTMLImageElement;
+  private imageNode: HTMLImageElement;
 
   // Общее количество картинок в галерее
-  totalImages: number;
+  private totalImages: number;
 
   // Индекс текущей картинки в галереи
-  index: number;
+  private index: number;
 
   // DOM элемент счётчика
-  counterNode: HTMLElement;
+  private counterNode: HTMLElement;
 
   constructor(nodes: HTMLElement[] | null, config: Partial<Config>) {
     if (!nodes) {
@@ -90,7 +101,8 @@ class Gallery {
 
     // Инициализирование переменных
     this.totalImages = this.callerNodes.length;
-    this.activeNodes = [];
+    this.imagesData = [];
+    this.thumbnailsNodes = [];
 
     // Вызов стандартных методов плагина
     this.initialize();
@@ -121,15 +133,22 @@ class Gallery {
         // Вызываем галерею только на элементах у которых нет data атрибута "data-faze-gallery-passive"
         if (!callerNode.dataset.fazeGalleryPassive) {
           callerNode.addEventListener(this.config.event, () => {
-            // Фильтруем только элементы у которых такая же группа, как и у элемента по которому инициализируем галерею
-            this.activeNodes = Array.from(this.callerNodes)
-              .filter(tmpCallerNode => tmpCallerNode.dataset.fazeGalleryGroup === callerNode.dataset.fazeGalleryGroup);
+            // Фильтруем только элементы у которых такая же группа, как и у элемента инициализировавшего галерею
+            this.imagesData = Array.from(this.callerNodes)
+              .filter(tmpCallerNode => tmpCallerNode.dataset.fazeGalleryGroup === callerNode.dataset.fazeGalleryGroup)
+              .map(tmpCallerNode => ({
+                thumbnail: (tmpCallerNode as HTMLImageElement).src,
+                full: tmpCallerNode.dataset.fazeGalleryImage || (tmpCallerNode as HTMLImageElement).src,
+              }));
 
             // Обновляем общее количество элементов
-            this.totalImages = this.activeNodes.length;
+            this.totalImages = this.imagesData.length;
 
             // Присвоение корректного индекса
-            this.index = this.activeNodes.indexOf(callerNode);
+            this.index = this.imagesData.indexOf({
+              thumbnail: (callerNode as HTMLImageElement).src,
+              full: callerNode.dataset.fazeGalleryImage || (callerNode as HTMLImageElement).src,
+            });
 
             // Построение галереи
             this.build();
@@ -141,12 +160,16 @@ class Gallery {
         }
       });
     } else {
-      // Фильтруем только элементы у которых такая же группа, как и у элемента по которому инициализируем галерею
-      this.activeNodes = Array.from(this.callerNodes)
-        .filter(callerNode => callerNode.dataset.fazeGalleryGroup === this.config.group);
+      // Фильтруем только элементы у которых такая же группа, как и у элемента инициализирующего галерею
+      this.imagesData = Array.from(this.callerNodes)
+        .filter(callerNode => callerNode.dataset.fazeGalleryGroup === this.config.group)
+        .map(callerNode => ({
+          thumbnail: (callerNode as HTMLImageElement).src,
+          full: callerNode.dataset.fazeGalleryImage || (callerNode as HTMLImageElement).src,
+        }));
 
       // Обновляем общее количество элементов
-      this.totalImages = this.activeNodes.length;
+      this.totalImages = this.imagesData.length;
 
       // Присвоение корректного индекса
       this.index = this.config.index || 0;
@@ -189,15 +212,9 @@ class Gallery {
     // Сборка элементов друг с другом
     this.wrapperNode.appendChild(this.arrowsNodes.prev);
 
-    const source: string | undefined = this.activeNodes[this.index].dataset.fazeGalleryImage;
-    if (source) {
-      this.imageNode.src = source;
-    }
     this.imageWrapperNode.appendChild(this.imageNode);
     this.wrapperNode.appendChild(this.imageWrapperNode);
-
     this.wrapperNode.appendChild(this.closeButtonNode);
-
     this.wrapperNode.appendChild(this.arrowsNodes.next);
 
     document.body.appendChild(this.wrapperNode);
@@ -207,12 +224,65 @@ class Gallery {
     if (this.config.counter) {
       this.buildPagination();
     }
+
+    // Строим превью
+    if (!!this.config.thumbnailsPosition) {
+      this.buildThumbnails();
+    }
+
+    // Загрузка нового изображения
+    this.change(this.index);
+  }
+
+  /**
+   * Построение превью
+   *
+   * @private
+   */
+  private buildThumbnails(): void {
+    // Создаём список превью
+    this.thumbnailsNode = document.createElement('div');
+    this.thumbnailsNode.className = `faze-gallery-thumbnails faze-gallery-thumbnails-${this.config.thumbnailsPosition}`;
+
+    // Проходимся по всем данным изображений и создаём превью
+    this.imagesData.forEach((imageData: ImageData, imageIndex: number) => {
+      // Создаём превью
+      const thumbnailNode = document.createElement('img');
+      thumbnailNode.src = imageData.thumbnail;
+      thumbnailNode.className = 'faze-gallery-thumbnail';
+      thumbnailNode.dataset.index = imageIndex.toString();
+
+      // Добавляем превью везде
+      this.thumbnailsNodes.push(thumbnailNode);
+      this.bindThumbnail(thumbnailNode, imageIndex);
+      this.thumbnailsNode.appendChild(thumbnailNode);
+    });
+
+    // Добавляем список превью в галерею
+    this.wrapperNode.appendChild(this.thumbnailsNode);
+  }
+
+  /**
+   * Навешивание событий на нажатия по превью, для показа изображения
+   *
+   * @param thumbnailNode DOM элемент превью
+   * @param index Индекс превью
+   *
+   * @private
+   */
+  private bindThumbnail(thumbnailNode: HTMLImageElement, index: number): void {
+    thumbnailNode.addEventListener('click', (event: MouseEvent) => {
+      event.preventDefault();
+
+      // Изменяем текущее изображение
+      this.change(index);
+    });
   }
 
   /**
    * Создание счётчика изображений
    */
-  buildPagination(): void {
+  private buildPagination(): void {
     // DOM элемент счётчика
     this.counterNode = document.createElement('div');
     this.counterNode.className = 'faze-gallery-counter';
@@ -224,14 +294,14 @@ class Gallery {
   /**
    * Обновление счётчика
    */
-  updateCounter(): void {
+  private updateCounter(): void {
     this.counterNode.innerHTML = `<span class="faze-gallery-counter-current">${this.index + 1}</span> <span class="faze-gallery-counter-delimiter">/</span> <span class="faze-gallery-counter-total">${this.totalImages}</span>`;
   }
 
   /**
    * Навешивание событий на стрелки переключения фотографий
    */
-  bindArrows(): void {
+  private bindArrows(): void {
     // Кнопка перелистывания назад
     this.arrowsNodes.prev.addEventListener('click', (event: Event) => {
       event.preventDefault();
@@ -250,7 +320,7 @@ class Gallery {
   /**
    * Навешивание событий переключения фотографий при нажатии на соответствующие клавиши
    */
-  bindKeyboardButtons(): void {
+  private bindKeyboardButtons(): void {
     const callbackFn = (event: KeyboardEvent) => {
       switch (event.code) {
         case 'ArrowRight':
@@ -276,7 +346,7 @@ class Gallery {
   /**
    * Навешивание события на кнопку закрытия
    */
-  bindCloseButton(): void {
+  private bindCloseButton(): void {
     this.closeButtonNode.addEventListener('click', (event: Event) => {
       event.preventDefault();
 
@@ -287,24 +357,20 @@ class Gallery {
   /**
    * Закрытие галереи
    */
-  close(): void {
+  private close(): void {
     this.wrapperNode.remove();
     document.body.classList.remove('faze-gallery');
+    this.imagesData = [];
   }
 
   /**
-   * Переключение галареи на одну фотографию вперед
+   * Переключение галереи на одну фотографию вперед
    */
-  next(): void {
+  private next(): void {
     this.index += 1;
-    if (this.index >= this.totalImages) {
-      this.index = 0;
-    }
 
-    const source: string | undefined = this.activeNodes[this.index].dataset.fazeGalleryImage;
-    if (source) {
-      this.imageNode.src = source;
-    }
+    // Загрузка нового изображения
+    this.change(this.index);
 
     // Обновление счётчика
     if (this.config.counter) {
@@ -313,29 +379,71 @@ class Gallery {
   }
 
   /**
-   * Переключение галареи на одну фотографию назад
+   * Переключение галереи на одну фотографию назад
    */
-  prev(): void {
+  private prev(): void {
     this.index -= 1;
+
+    // Загрузка нового изображения
+    this.change(this.index);
+
+    // Обновление счётчика
+    if (this.config.counter) {
+      this.updateCounter();
+    }
+  }
+
+  /**
+   * Изменение текущего изображения
+   *
+   * @param index Индекс нового изображения
+   */
+  public change(index: number) {
+    this.index = index;
+
+    // Проверка границ
+    this.checkIndexBounds();
+
+    // Загружаем изображение
+    this.loadImage();
+
+    // Проставляем класс нужному элементу
+    Faze.Helpers.activateItem(this.thumbnailsNodes, this.index, 'faze-active');
+  }
+
+  /**
+   * Проверка на выход за границы массива доступных изображений для галереи
+   *
+   * @private
+   */
+  private checkIndexBounds(): void {
     if (this.index < 0) {
       this.index = this.totalImages - 1;
+    } else if (this.index >= this.totalImages) {
+      this.index = 0;
     }
+  }
 
-    const source: string | undefined = this.activeNodes[this.index].dataset.fazeGalleryImage;
+  /**
+   * Загрузка нового изображения
+   *
+   * @private
+   */
+  private loadImage(): void {
+    const source: string | undefined = this.imagesData[this.index].full;
     if (source) {
-      this.imageNode.src = source;
-    }
-
-    // Обновление счётчика
-    if (this.config.counter) {
-      this.updateCounter();
+      const image = new Image();
+      image.src = source;
+      image.onload = () => {
+        this.imageNode.src = source;
+      };
     }
   }
 
   /**
    * Проверка конфиг файла на ошибки
    */
-  checkConfig(): void {
+  private checkConfig(): void {
     // Если задано значение положения превью и оно не равно нужным, выдаем ошибку
     if (this.config.thumbnailsPosition && !['left', 'right', 'top', 'bottom'].includes(this.config.thumbnailsPosition)) {
       throw new Error('Значение "thumbnailsPosition" некорректно, возможные значения: "left", "right", "top", "bottom".');
@@ -347,13 +455,14 @@ class Gallery {
    */
   static hotInitialize(): void {
     // Задаем всем элементам без группы стандартную
-    document.querySelectorAll<HTMLElement>('[data-faze="gallery"]').forEach((callerNode: HTMLElement) => {
-      callerNode.classList.add('faze-gallery-caller');
+    document.querySelectorAll<HTMLElement>('[data-faze="gallery"]')
+      .forEach((callerNode: HTMLElement) => {
+        callerNode.classList.add('faze-gallery-caller');
 
-      if (!callerNode.dataset.fazeGalleryGroup) {
-        callerNode.dataset.fazeGalleryGroup = 'default';
-      }
-    });
+        if (!callerNode.dataset.fazeGalleryGroup) {
+          callerNode.dataset.fazeGalleryGroup = 'default';
+        }
+      });
 
     Faze.on('click', '[data-faze="gallery"]:not([data-faze-gallery-passive])', (event: Event, callerNode: HTMLElement) => {
       const group: string | undefined = callerNode.dataset.fazeGalleryGroup;
@@ -363,8 +472,10 @@ class Gallery {
         new Faze.Gallery(callerNodes, {
           group,
           evented: false,
-          index: Array.from(callerNodes).indexOf(callerNode),
+          index: Array.from(callerNodes)
+            .indexOf(callerNode),
           counter: (callerNode.dataset.fazeGalleryCounter || 'false') === 'true',
+          thumbnailsPosition: callerNode.dataset.fazeGalleryThumbnailsPosition,
         });
       }
     });

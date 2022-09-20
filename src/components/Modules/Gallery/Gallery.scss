@@ -69,9 +69,6 @@
       & > faze-gallery-image {
         display: flex;
 
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
         user-select: none;
       }
     }
@@ -141,6 +138,46 @@
     }
   }
 
+  // Список превью
+  .faze-gallery-thumbnails {
+    position: absolute;
+
+    display: flex;
+
+    // Превью
+    .faze-gallery-thumbnail {
+      width: 4.8rem;
+      height: 4.8rem;
+
+      border: 0.1rem solid transparent;
+
+      // Активное состояние
+      &.faze-active {
+        border-color: var(--color-primary);
+      }
+
+      // При наведении
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    // Расположение снизу и сверху
+    &.faze-gallery-thumbnails-top, &.faze-gallery-thumbnails-bottom {
+      left: 50%;
+      bottom: 1rem;
+
+      flex-direction: row;
+
+      transform: translateX(-50%);
+
+      // Превью
+      .faze-gallery-thumbnail:not(:last-child) {
+        margin-right: 1rem;
+      }
+    }
+  }
+
   // Счётчик
   .faze-gallery-counter {
     position: absolute;
@@ -153,6 +190,7 @@
   }
 }
 
+// Элемент вызывающий галерею
 .faze-gallery-caller {
   &:hover {
     cursor: pointer;

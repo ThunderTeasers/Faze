@@ -5,6 +5,12 @@
  * Дата: 12.11.2018
  */
 
+* {
+  outline: none;
+  box-sizing: border-box;
+}
+
+// Принудительное скрытие
 .faze-hide {
   display: none !important;
 }

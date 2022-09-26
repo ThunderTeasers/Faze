@@ -242,7 +242,8 @@ class Gallery {
   private buildThumbnails(): void {
     // Создаём список превью
     this.thumbnailsNode = document.createElement('div');
-    this.thumbnailsNode.className = `faze-gallery-thumbnails faze-gallery-thumbnails-${this.config.thumbnailsPosition}`;
+    this.thumbnailsNode.className = 'faze-gallery-thumbnails';
+    this.wrapperNode.classList.add(`faze-gallery-wrapper-thumbnails-${this.config.thumbnailsPosition}`);
 
     // Проходимся по всем данным изображений и создаём превью
     this.imagesData.forEach((imageData: ImageData, imageIndex: number) => {

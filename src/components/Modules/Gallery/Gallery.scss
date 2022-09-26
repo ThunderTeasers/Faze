@@ -153,27 +153,12 @@
 
       // Активное состояние
       &.faze-active {
-        border-color: var(--color-primary);
+        border-color: #000;
       }
 
       // При наведении
       &:hover {
         cursor: pointer;
-      }
-    }
-
-    // Расположение снизу и сверху
-    &.faze-gallery-thumbnails-top, &.faze-gallery-thumbnails-bottom {
-      left: 50%;
-      bottom: 1rem;
-
-      flex-direction: row;
-
-      transform: translateX(-50%);
-
-      // Превью
-      .faze-gallery-thumbnail:not(:last-child) {
-        margin-right: 1rem;
       }
     }
   }
@@ -187,6 +172,81 @@
     color: #fff;
 
     transform: translateX(-50%);
+  }
+
+  // Расположение снизу и сверху
+  &.faze-gallery-wrapper-thumbnails-top, &.faze-gallery-wrapper-thumbnails-bottom {
+    // Список превью
+    .faze-gallery-thumbnails {
+      left: 50%;
+
+      flex-direction: row;
+
+      transform: translateX(-50%);
+
+      // Превью
+      .faze-gallery-thumbnail:not(:last-child) {
+        margin-right: 1rem;
+      }
+    }
+  }
+
+  // Расположение сверху
+  &.faze-gallery-wrapper-thumbnails-top {
+    // Список превью
+    .faze-gallery-thumbnails {
+      top: 1rem;
+    }
+  }
+
+  // Расположение снизу
+  &.faze-gallery-wrapper-thumbnails-bottom {
+    // Список превью
+    .faze-gallery-thumbnails {
+      bottom: 1rem;
+    }
+  }
+
+  // Расположение слева и справа
+  &.faze-gallery-wrapper-thumbnails-left, &.faze-gallery-wrapper-thumbnails-right {
+    // Список превью
+    .faze-gallery-thumbnails {
+      top: 50%;
+
+      flex-direction: column;
+
+      transform: translateY(-50%);
+
+      // Превью
+      .faze-gallery-thumbnail:not(:last-child) {
+        margin-bottom: 1rem;
+      }
+    }
+  }
+
+  // Расположение слева
+  &.faze-gallery-wrapper-thumbnails-left {
+    padding-left: 6.8rem;
+
+    // Список превью
+    .faze-gallery-thumbnails {
+      left: 1rem;
+    }
+  }
+
+  // Расположение справа
+  &.faze-gallery-wrapper-thumbnails-right {
+    padding-right: 6.8rem;
+
+    // Список превью
+    .faze-gallery-thumbnails {
+      right: 1rem;
+    }
+
+    // Кнопка закрытия
+    & > .faze-gallery-close {
+      right: 6.8rem;
+    }
   }
 }
 

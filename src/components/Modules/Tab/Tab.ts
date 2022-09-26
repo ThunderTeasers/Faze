@@ -1,7 +1,7 @@
 /**
  * Плагин табов
  *
- * Модуль табов представляет из себя набор "заголовков" связанных с набором "тел" через data атрибут. Одновременно может отображаться
+ * Модуль табов представляет собой набор "заголовков" связанных с набором "тел" через data атрибут. Одновременно может отображаться
  * только одно "тело", какое именно отображается, зависит от того, на какой "заголовок" нажали. По умолчанию отображается первый.
  *
  * Автор: Ерохин Максим, plarson.ru
@@ -16,8 +16,8 @@ import Module from '../../Core/Module';
  * Структура возвращаемого объекта в пользовательском методе
  *
  * Содержит:
- *   head  - DOM элемент выбранной шапки
- *   body  - DOM Элемент выбранного тела
+ *   head - DOM элемент выбранной шапки
+ *   body - DOM Элемент выбранного тела
  */
 interface CallbackData {
   headNode: HTMLElement | undefined;
@@ -30,12 +30,14 @@ interface CallbackData {
  * Содержит:
  *   headerActiveClass - CSS класс активного таба
  *   useHash - использовать ли window.location.hash при переключении и инициализации
+ *   removeEmpty - удалять ли пустые табы с их шапками
  *   callbacks
  *     changed - пользовательская функция, исполняющаяся после изменения таба
  */
 interface Config {
   headerActiveClass?: string;
   useHash: boolean;
+  removeEmpty: boolean;
   callbacks: {
     changed?: (activeTabData: CallbackData) => void;
   };
@@ -56,6 +58,7 @@ class Tab extends Module {
     const defaultConfig: Config = {
       headerActiveClass: undefined,
       useHash: false,
+      removeEmpty: false,
       callbacks: {
         changed: undefined,
       },
@@ -81,7 +84,8 @@ class Tab extends Module {
     let key: string;
 
     // Открытие тел табов если у шапки задан класс "faze-active"
-    const alreadyActiveTabNode: HTMLElement | undefined = Array.from(this.headersNodes).find(headerNode => headerNode.classList.contains('faze-active'));
+    const alreadyActiveTabNode: HTMLElement | undefined = Array.from(this.headersNodes)
+      .find(headerNode => headerNode.classList.contains('faze-active'));
     if (alreadyActiveTabNode) {
       key = alreadyActiveTabNode.dataset.fazeTabHead || alreadyActiveTabNode.dataset.fazeTabBody || '';
     } else {
@@ -125,6 +129,11 @@ class Tab extends Module {
     // Получаем тела
     this.bodiesNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-body, [data-faze-tab="body"], [data-faze-tab-body]:not([data-faze-tab="header"]):not(.faze-tab-header)'))
       .filter((bodyNode: HTMLElement) => bodyNode.closest(`.faze-tabs, [data-faze~="tab"] ${className}`) === this.node);
+
+    // Удаляем пустые табы
+    if (this.config.removeEmpty) {
+      this.checkAndRemoveEmptyTabs();
+    }
   }
 
   /**
@@ -191,6 +200,26 @@ class Tab extends Module {
   }
 
   /**
+   * Проверяем и удаляем пустые табы
+   *
+   * @private
+   */
+  private checkAndRemoveEmptyTabs() {
+    this.bodiesNodes.forEach((bodyNode: HTMLElement) => {
+      // Проверяем, если тело таба пустое
+      if (bodyNode.textContent?.trim() === '') {
+        // То скрываем и шапку и само тело
+        const headerNode: HTMLElement | undefined = this.headersNodes.find((tmpHeaderNode: HTMLElement) => tmpHeaderNode.dataset.fazeTabBody === bodyNode.dataset.fazeTabBody);
+        if (headerNode) {
+          headerNode.remove();
+        }
+
+        bodyNode.remove();
+      }
+    });
+  }
+
+  /**
    * Инициализация модуля по data атрибутам
    *
    * @param node - DOM элемент на который нужно инициализировать плагин
@@ -199,6 +228,7 @@ class Tab extends Module {
     new Tab(node, {
       headerActiveClass: node.dataset.fazeTabHeaderActiveClass,
       useHash: (node.dataset.fazeTabUseHash || 'false') === 'true',
+      removeEmpty: (node.dataset.fazeTabRemoveEmpty || 'false') === 'true',
     });
   }
 }

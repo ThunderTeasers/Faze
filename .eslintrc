@@ -9,6 +9,8 @@
     "no-param-reassign": "off",
     "arrow-parens": "off",
     "import/no-cycle": "off",
+    "import/extensions": "off",
+    "import/no-extraneous-dependencies": "off",
     "@typescript-eslint/object-curly-spacing": "off",
     "@typescript-eslint/keyword-spacing": "off",
     "no-console": "off",

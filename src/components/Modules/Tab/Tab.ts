@@ -209,7 +209,8 @@ class Tab extends Module {
       // Проверяем, если тело таба пустое
       if (bodyNode.textContent?.trim() === '') {
         // То скрываем и шапку и само тело
-        const headerNode: HTMLElement | undefined = this.headersNodes.find((tmpHeaderNode: HTMLElement) => tmpHeaderNode.dataset.fazeTabBody === bodyNode.dataset.fazeTabBody);
+        const headerNode: HTMLElement | undefined = this.headersNodes.find((tmpHeaderNode: HTMLElement) => tmpHeaderNode.dataset.fazeTabBody === bodyNode.dataset.fazeTabBody
+          || tmpHeaderNode.dataset.fazeTabHead === bodyNode.dataset.fazeTabBody);
         if (headerNode) {
           headerNode.remove();
         }

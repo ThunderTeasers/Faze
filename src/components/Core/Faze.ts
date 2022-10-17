@@ -263,15 +263,20 @@ class Faze {
    * @param callback      - пользовательская функция которая будет исполнена после срабатывания события
    */
   static on(eventName: string, childSelector: string, callback: (event: Event, child: HTMLElement) => void): void {
-    window.addEventListener(eventName, (event: Event) => {
-      const clickedElement: HTMLElement | null = event.target as HTMLElement;
-      if (clickedElement) {
-        const matchingChild: HTMLElement | null = clickedElement.closest(childSelector);
-        if (matchingChild) {
-          callback(event, matchingChild);
-        }
-      }
-    });
+    eventName
+      .split(',')
+      .map(tmpEventName => tmpEventName.trim())
+      .forEach((tmpEventName: string) => {
+        window.addEventListener(tmpEventName, (event: Event) => {
+          const clickedElement: HTMLElement | null = event.target as HTMLElement;
+          if (clickedElement) {
+            const matchingChild: HTMLElement | null = clickedElement.closest(childSelector);
+            if (matchingChild) {
+              callback(event, matchingChild);
+            }
+          }
+        });
+      });
   }
 
   /**

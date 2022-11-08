@@ -50,6 +50,17 @@ Faze.add({
   }
 });
 
+// Тест "loadJS"
+Faze.add({
+  pluginName: 'LoadJS',
+  condition: document.querySelectorAll('.test-helpers').length > 0,
+  callback: () => {
+    Faze.Helpers.loadJS('https://unpkg.com/fabric@5.2.4/dist/fabric.min.js');
+    Faze.Helpers.loadJS('https://unpkg.com/fabric@5.2.4/dist/fabric.min.js');
+    Faze.Helpers.loadJS('https://unpkg.com/fabric@5.2.4/dist/fabric.min.js');
+  },
+});
+
 // Тесты
 Faze.add({
   pluginName: 'ObserveTest',
@@ -83,14 +94,6 @@ Faze.add({
         time: 1000,
         direction: 'horizontal',
       },
-      callbacks: {
-        created: (data: any) => {
-          // console.log(data);
-        },
-        changed: ({currentSlideNode}: { currentSlideNode?: any }) => {
-          // console.log(currentSlideNode);
-        },
-      },
     });
   }
 });
@@ -123,17 +126,6 @@ Faze.add({
 
     const fazeSelect = new Faze.Select(document.querySelector('.faze-select'), {
       default: true,
-      callbacks: {
-        created: (data: any) => {
-          // console.log(data);
-        },
-        opened: (data: any) => {
-          // console.log('opened', data);
-        },
-        changed: (data: any) => {
-          // console.log('changed', data);
-        },
-      },
     });
 
     fazeSelect.setValue('Выбор 2');
@@ -156,14 +148,6 @@ Faze.add({
         arrowLeft: '.js-test-arrow-left',
         arrowRight: '.js-test-arrow-right',
       },
-      callbacks: {
-        created: (data: any) => {
-          // console.log(data);
-        },
-        changed: ({currentSlideNode}: { currentSlideNode?: any }) => {
-          // console.log(currentSlideNode);
-        },
-      },
     });
 
     const carouselChangeButtonNode = document.querySelector('.js-notification');
@@ -178,7 +162,6 @@ Faze.add({
     new Faze.Zoom(document.querySelector('.image'), {
       side: 'right',
     });
-    // console.log(zoom);
 
     new Faze.Spoiler(document.querySelector('.spoiler-test'));
 
@@ -221,11 +204,6 @@ Faze.add({
       });
     }
 
-    // slider.setValues([0, 100], true);
-    // slider.reset();
-
-    // new Faze.Gallery(document.querySelectorAll('.image-product'), {});
-
     Faze.on('click', '.test-on', () => {
       Faze.REST.chain([
         {
@@ -263,17 +241,6 @@ Faze.add({
         });
       });
     }
-
-    // let testObject = {};
-    //
-    // testObject = Faze.Helpers.objectFromString(testObject, 'offer.news', 'title', 'Hello!');
-    // testObject = Faze.Helpers.objectFromString(testObject, 'offer.news', 'date', 'today');
-    // testObject = Faze.Helpers.objectFromString(testObject, 'test', 'author', 'me');
-    // testObject = Faze.Helpers.objectFromString(testObject, '', 'day', 'good');
-    // testObject = Faze.Helpers.objectFromString(testObject, 'offer.manager.contacts', 'name', 'max');
-    // testObject = Faze.Helpers.objectFromString(testObject, 'house.address', 'name', 'max');
-    //
-    // console.log(testObject);
   },
 });
 

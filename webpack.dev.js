@@ -84,6 +84,10 @@ module.exports = (env) => {
         template: './src/tests/views/gallery.html',
       }),
       new HtmlWebpackPlugin({
+        filename: 'helpers.html',
+        template: './src/tests/views/helpers.html',
+      }),
+      new HtmlWebpackPlugin({
         template: './src/index.html',
       }),
       new webpack.HotModuleReplacementPlugin(),

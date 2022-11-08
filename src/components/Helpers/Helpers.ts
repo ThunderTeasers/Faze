@@ -34,8 +34,8 @@ interface DragCallbackData {
  * Структура настроек метода для перетаскивания
  *
  * Содержит:
- *   node - DOM элемент который перетаскиваем
- *   absolute - позицианируется ли элемент через "absolute"
+ *   node - DOM элемент, который перетаскиваем
+ *   absolute - позиционируется ли элемент через "absolute"
  *   callbacks
  *     beforeDrag - пользовательская функция, исполняющаяся до перетаскивания
  *     drag - пользовательская функция, исполняющаяся во время перетаскивания
@@ -98,8 +98,8 @@ class Helpers {
     Faze.on('click', '.faze-copy-text', (event: Event, textNode: HTMLElement) => {
       // Если есть что копировать
       if (textNode.textContent) {
-        // Создаем инпут с этим текстом и позицианированием "absolute" чтобы вьюпорт не прыгал вниз
-        const inputNode = document.createElement('input');
+        // Создаем инпут с этим текстом и позиционированием "absolute" чтобы вьюпорт не прыгал вниз
+        const inputNode = document.createElement('textarea');
         inputNode.value = textNode.dataset.fazeCopyTextValue || textNode.textContent || '';
         inputNode.style.position = 'fixed';
         inputNode.style.top = `${(event as MouseEvent).clientY}px`;
@@ -146,6 +146,10 @@ class Helpers {
    */
   static loadJS(url: string): Promise<any> {
     return new Promise((resolve, reject) => {
+      if (document.querySelector(`script[src="${url}"]`)) {
+        return reject(`Faze.Helpers.loadJS: Скрипт "${url}" уже загружен на странице!`);
+      }
+
       const nodeScript = document.createElement('script');
       document.body.appendChild(nodeScript);
       nodeScript.src = url;
@@ -160,7 +164,7 @@ class Helpers {
    *
    * @param array     - массив DOM объектов
    * @param index     - индекс искомого элемента
-   * @param cssClass  - CSS класс который вешается на айтивный элемент, по умолчанию 'active'
+   * @param cssClass  - CSS класс, который вешается на активный элемент, по умолчанию 'active'
    */
   static activateItem(array: HTMLElement[], index: number, cssClass: string = 'active'): void {
     array.forEach((itemNode: HTMLElement, i: number) => {
@@ -659,7 +663,7 @@ class Helpers {
   static getMouseOrTouchPosition(event: MouseEvent | TouchEvent): FazePosition {
     const position: FazePosition = {
       x: 0,
-      y: 0
+      y: 0,
     };
     if (event instanceof MouseEvent) {
       position.x = event.clientX;
@@ -874,7 +878,7 @@ class Helpers {
       y: 0,
     };
 
-    // КОнечная позиция мыши
+    // Конечная позиция мыши
     const endMousePosition = {
       x: 0,
       y: 0,
@@ -907,7 +911,7 @@ class Helpers {
       startMousePosition.y = event.clientY;
 
       // Вызываем пользовательскую функцию
-      if (typeof options.callbacks.beforeDrag === 'function') {
+      if (options.callbacks && 'beforeDrag' in options.callbacks && typeof options.callbacks.beforeDrag === 'function') {
         try {
           options.callbacks.beforeDrag();
         } catch (error) {
@@ -940,12 +944,12 @@ class Helpers {
       startMousePosition.x = event.clientX;
       startMousePosition.y = event.clientY;
 
-      // Рассчет новой позиции
+      // Расчёт новой позиции
       options.node.style.left = `${(parseInt(options.node.style.left, 10) - endMousePosition.x)}px`;
       options.node.style.top = `${(parseInt(options.node.style.top, 10) - endMousePosition.y)}px`;
 
       // Вызываем пользовательскую функцию
-      if (typeof options.callbacks.drag === 'function') {
+      if (options.callbacks && 'drag' in options.callbacks && typeof options.callbacks.drag === 'function') {
         try {
           options.callbacks.drag();
         } catch (error) {
@@ -972,7 +976,7 @@ class Helpers {
       options.node.classList.remove('faze-drag-active');
 
       // Вызываем пользовательскую функцию
-      if (typeof options.callbacks.afterDrag === 'function') {
+      if (options.callbacks && 'afterDrag' in options.callbacks && typeof options.callbacks.afterDrag === 'function') {
         try {
           options.callbacks.afterDrag({
             startPosition,

@@ -10,13 +10,14 @@ interface ImageData {
  * Структура конфига галереи
  *
  * Содержит:
- *   thumbnails - позиция превьюшек фотографий относительно экрана("left", "right", "top", "bottom"), так же может быть пусто,
+ *   thumbnails - позиция превью фотографий относительно экрана("left", "right", "top", "bottom"), так же может быть пусто,
  *                тогда они показываться не будут
- *   index      - индекс картики в группе при нажатии на которую была инициализированна галерея
- *   group      - группа галереи, если на странице несколько галерей, то они связаны через это поле
- *   event      - событие по которому происходит инициализация галереи
- *   evented    - инициализировать по событию или сразу
- *   counter    - отображать ли счетчик
+ *   index - индекс картинки в группе при нажатии на которую была инициализирована галерея
+ *   group - группа галереи, если на странице несколько галерей, то они связаны через это поле
+ *   event - событие по которому происходит инициализация галереи
+ *   evented - инициализировать по событию или сразу
+ *   zoomable - можно ли приближать фотографию
+ *   counter - отображать ли счетчик
  *   disableResolution - разрешение ниже которого не показывать галерею
  */
 interface Config {
@@ -26,6 +27,7 @@ interface Config {
   event: string;
   evented: boolean;
   counter: boolean;
+  zoomable: boolean;
   disableResolution: number;
 }
 
@@ -84,6 +86,7 @@ class Gallery {
       index: undefined,
       group: 'default',
       evented: true,
+      zoomable: false,
       counter: false,
       disableResolution: 0,
     };
@@ -181,6 +184,11 @@ class Gallery {
       this.bindArrows();
       this.bindKeyboardButtons();
       this.bindCloseButton();
+
+      // Если есть увеличение, навешиваем его
+      if (this.config.zoomable) {
+        this.bindZoom();
+      }
     }
   }
 
@@ -199,7 +207,7 @@ class Gallery {
     this.imageNode = document.createElement('img');
 
     // Присваиваем необходимые классы
-    this.wrapperNode.className = 'faze-gallery-wrapper';
+    this.wrapperNode.className = `faze-gallery-wrapper ${this.config.zoomable ? 'faze-gallery-wrapper-zoomable' : ''}`;
 
     this.arrowsNodes.prev.className = 'faze-gallery-arrow faze-gallery-arrow-prev';
     this.arrowsNodes.next.className = 'faze-gallery-arrow faze-gallery-arrow-next';
@@ -264,6 +272,34 @@ class Gallery {
   }
 
   /**
+   * Навешивание событий на увеличения изображения по нажатию на него
+   *
+   * @private
+   */
+  private bindZoom() {
+    let isZoomed = false;
+
+    this.imageNode.addEventListener('click', (event: MouseEvent) => {
+      event.preventDefault();
+
+      isZoomed = !isZoomed;
+
+      this.wrapperNode.classList.add('faze-gallery-wrapper-zoomable-active');
+
+      if (isZoomed) {
+        Faze.Helpers.bindDrag({
+          node: this.imageNode,
+          callbacks: {
+            drag: () => {
+              console.log(this.imageNode.getBoundingClientRect());
+            },
+          },
+        });
+      }
+    });
+  }
+
+  /**
    * Навешивание событий на нажатия по превью, для показа изображения
    *
    * @param thumbnailNode DOM элемент превью
@@ -296,7 +332,8 @@ class Gallery {
    * Обновление счётчика
    */
   private updateCounter(): void {
-    this.counterNode.innerHTML = `<span class="faze-gallery-counter-current">${this.index + 1}</span> <span class="faze-gallery-counter-delimiter">/</span> <span class="faze-gallery-counter-total">${this.totalImages}</span>`;
+    this.counterNode.innerHTML =
+      `<span class="faze-gallery-counter-current">${this.index + 1}</span> <span class="faze-gallery-counter-delimiter">/</span> <span class="faze-gallery-counter-total">${this.totalImages}</span>`;
   }
 
   /**
@@ -476,6 +513,7 @@ class Gallery {
           index: Array.from(callerNodes)
             .indexOf(callerNode),
           counter: (callerNode.dataset.fazeGalleryCounter || 'false') === 'true',
+          zoomable: (callerNode.dataset.fazeGalleryZoomable || 'false') === 'true',
           thumbnailsPosition: callerNode.dataset.fazeGalleryThumbnailsPosition,
         });
       }

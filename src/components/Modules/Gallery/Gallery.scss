@@ -65,14 +65,6 @@
       }
     }
 
-    & > .faze-gallery-wrapper-image {
-      & > faze-gallery-image {
-        display: flex;
-
-        user-select: none;
-      }
-    }
-
     &:hover {
       cursor: pointer;
 
@@ -246,6 +238,40 @@
     // Кнопка закрытия
     & > .faze-gallery-close {
       right: 6.8rem;
+    }
+  }
+
+  // Если изображение увеличивается
+  &.faze-gallery-wrapper-zoomable {
+    // Изображение
+    .faze-gallery-image {
+      // При наведении
+      &:hover {
+        cursor: zoom-in;
+      }
+    }
+
+    // Если оно уже увеличено
+    &.faze-gallery-wrapper-zoomable-active {
+      // Изображение
+      .faze-gallery-image {
+        position: absolute;
+
+        width: initial;
+        max-width: initial;
+        height: initial;
+        max-height: initial;
+
+        // При наведении
+        &:hover {
+          cursor: zoom-out;
+        }
+
+        // Когда перетаскиваем
+        &.faze-drag-active {
+          cursor: move;
+        }
+      }
     }
   }
 }

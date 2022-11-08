@@ -35,7 +35,7 @@ interface ListenerBySelector {
  * Структура слушателя изменения по DOM элементам
  *
  * Содержит:
- *   node                 - DOM элемент который слушаем
+ *   node                 - DOM элемент, который слушаем
  *   callback             - пользовательский метод, исполняющийся при добавлении нового элемента с указанным селектором,
  *                          передает его DOM элемент
  *   alreadyExistedNodes  - список уже существующих DOM элементов с указанным селектором
@@ -71,6 +71,8 @@ class Observer {
       childList: true,
       subtree: true,
       attributes: true,
+      characterData: true,
+      characterDataOldValue: true,
     });
   }
 
@@ -114,7 +116,8 @@ class Observer {
    */
   private call(listener: ListenerBySelector | ListenerByNode, node: HTMLElement) {
     if ('alreadyExistedNodes' in listener) {
-      if (!Array.from(listener.alreadyExistedNodes).includes(node)) {
+      if (!Array.from(listener.alreadyExistedNodes)
+        .includes(node)) {
         if (typeof listener.callback === 'function') {
           try {
             // Вызываем пользовательскую функцию
@@ -153,8 +156,17 @@ class Observer {
             this.call(listener, <HTMLElement>mutationRecord.target);
           }
         });
+      } else if (mutationRecord.type === 'characterData') {
+        // Проходимся по всем слушателям
+        this.listenersBySelector.forEach((listener) => {
+          // Ищем элемент, который попадает под слушателя
+          const found = listener.alreadyExistedNodes.find(node => node.matches(listener.selector));
+          if (found) {
+            listener.callback(found);
+          }
+        });
       } else {
-        // Проходимся по всем добавленым DOM элементам
+        // Проходимся по всем добавленным DOM элементам
         mutationRecord.addedNodes.forEach((addedNode: any) => {
           if (addedNode.nodeType === Node.ELEMENT_NODE) {
             // Проходимся по всем слушателям
@@ -164,10 +176,11 @@ class Observer {
                 this.call(listener, addedNode);
               }
 
-              // Ищём в добавленом DOM элементе детей с необходимыми нам селекторами и на них мешаем метод
-              addedNode.querySelectorAll(listener.selector).forEach((node: HTMLElement) => {
-                this.call(listener, node);
-              });
+              // Ищем в добавленном DOM элементе детей с необходимыми нам селекторами и на них мешаем метод
+              addedNode.querySelectorAll(listener.selector)
+                .forEach((node: HTMLElement) => {
+                  this.call(listener, node);
+                });
             });
           }
         });

@@ -1,8 +1,8 @@
 const webpack = require('webpack');
-const {merge} = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 
@@ -86,6 +86,10 @@ module.exports = (env) => {
       new HtmlWebpackPlugin({
         filename: 'helpers.html',
         template: './src/tests/views/helpers.html',
+      }),
+      new HtmlWebpackPlugin({
+        filename: 'slider.html',
+        template: './src/tests/views/slider.html',
       }),
       new HtmlWebpackPlugin({
         template: './src/index.html',

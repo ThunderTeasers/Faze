@@ -62,6 +62,9 @@ class Slider {
   // DOM элементы ползунков
   readonly pointsNodes: HTMLElement[];
 
+  // Размер ползунка
+  pointSize: number;
+
   // DOM элемент соединительной полоски
   connectNode: HTMLElement | null;
 
@@ -76,7 +79,7 @@ class Slider {
     // Инициализация переменных из конфига
     let points: number[] = [];
     if (node && node.dataset.fazeSliderPoints) {
-      points = node.dataset.fazeSliderPoints.split(',').map(point => parseInt(point, 10));
+      points = node.dataset.fazeSliderPoints.split(',').map((point) => parseInt(point, 10));
     }
 
     // Конфиг по умолчанию
@@ -102,6 +105,7 @@ class Slider {
     // Инициализация переменных
     this.ratio = this.node.getBoundingClientRect().width / (this.config.range[1] - this.config.range[0]);
     this.pointsNodes = [];
+    this.pointSize = 10;
     this.connectNode = null;
 
     // Инициализация
@@ -195,22 +199,6 @@ class Slider {
       const prevPointNode = <HTMLElement>pointNode.previousSibling;
 
       /**
-       * Функция нажатия на ползунок для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
-       *
-       * @param event - событие мыши
-       */
-      const dragMouseDown = (event: MouseEvent) => {
-        // Получение позиции курсора при нажатии на элемент
-        startMousePosition = event.clientX;
-
-        document.addEventListener('mouseup', <any>endDragElement);
-        document.addEventListener('touchend', <any>endDragElement);
-
-        document.addEventListener('mousemove', <any>elementDrag);
-        document.addEventListener('touchmove', <any>elementDrag);
-      };
-
-      /**
        * Функция перетаскивания ползунка
        *
        * @param event - событие мыши
@@ -218,7 +206,7 @@ class Slider {
       const elementDrag = (event: any): void => {
         // Рассчет новой позиции курсора
         endMousePosition = startMousePosition - (event.clientX || (event.touches ? event.touches[0].clientX : 0));
-        startMousePosition = (event.clientX || (event.touches ? event.touches[0].clientX : 0));
+        startMousePosition = event.clientX || (event.touches ? event.touches[0].clientX : 0);
 
         // Передвижение ползунка
         this.move(pointNode, nextPointNode, prevPointNode, pointNode.offsetLeft - endMousePosition, i);
@@ -271,6 +259,22 @@ class Slider {
             return this.logger.error(`Ошибка исполнения пользовательского метода "stopped", дословно: ${error}!`);
           }
         }
+      };
+
+      /**
+       * Функция нажатия на ползунок для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
+       *
+       * @param event - событие мыши
+       */
+      const dragMouseDown = (event: MouseEvent) => {
+        // Получение позиции курсора при нажатии на элемент
+        startMousePosition = event.clientX;
+
+        document.addEventListener('mouseup', <any>endDragElement);
+        document.addEventListener('touchend', <any>endDragElement);
+
+        document.addEventListener('mousemove', <any>elementDrag);
+        document.addEventListener('touchmove', <any>elementDrag);
       };
 
       // Навешиваем событие перетаскивания
@@ -337,15 +341,15 @@ class Slider {
 
     // Проверка на заезд дальше следующего ползунка
     if (nextPointNode) {
-      if (tmpPosition >= nextPointNode.offsetLeft) {
-        tmpPosition = nextPointNode.offsetLeft;
+      if (tmpPosition >= nextPointNode.offsetLeft - this.pointSize) {
+        tmpPosition = nextPointNode.offsetLeft - this.pointSize;
       }
     }
 
     // Проверка на заезд до следующего ползунка
     if (prevPointNode && index !== 0 && this.pointsNodes.length > 1) {
-      if (tmpPosition <= prevPointNode.offsetLeft) {
-        tmpPosition = prevPointNode.offsetLeft;
+      if (tmpPosition <= prevPointNode.offsetLeft + this.pointSize) {
+        tmpPosition = prevPointNode.offsetLeft + this.pointSize;
       }
     }
 
@@ -375,7 +379,7 @@ class Slider {
 
     // Рассчет позиции если необходимо считать через проценты
     if (this.config.pointsInPercent) {
-      left = this.node.getBoundingClientRect().width * position / 100;
+      left = (this.node.getBoundingClientRect().width * position) / 100;
     }
 
     pointNode.style.left = `${left}px`;
@@ -389,12 +393,12 @@ class Slider {
     // Ширина всего слайдера
     const sliderWidth = this.node.getBoundingClientRect().width;
 
-    // Половина ширины ползунка
-    const pointWidth = pointNode.getBoundingClientRect().width;
+    // Размер ползунка
+    this.pointSize = pointNode.getBoundingClientRect().width;
 
     // Ограничение для последнего ползунка
-    if (pointNode.offsetLeft >= sliderWidth - pointWidth) {
-      pointNode.style.left = `${sliderWidth - pointWidth}px`;
+    if (pointNode.offsetLeft >= sliderWidth - this.pointSize) {
+      pointNode.style.left = `${sliderWidth - this.pointSize}px`;
     }
   }
 
@@ -450,7 +454,7 @@ class Slider {
 
       // Рассчет позиции если необходимо считать через проценты
       if (inPercent) {
-        left = this.node.getBoundingClientRect().width * value / 100;
+        left = (this.node.getBoundingClientRect().width * value) / 100;
       }
 
       // Передвигаем ползунок на нужное место
@@ -478,11 +482,13 @@ class Slider {
    */
   getValues(): number[] {
     return this.pointsNodes.map((pointNode, i) => {
-      let value = Math.round(parseFloat((pointNode.offsetLeft / this.ratio).toString())) + this.config.range[0];
+      const ratio = (this.node.getBoundingClientRect().width - 32) / (this.config.range[1] - this.config.range[0]);
+
+      let value = Math.round(parseFloat((pointNode.offsetLeft / ratio).toString())) + this.config.range[0];
 
       // Для последнего ползунка необходимо добавить значение равное половине его ширины
       if (i === this.pointsNodes.length - 1 && this.pointsNodes.length > 1) {
-        value += Math.round(parseFloat((pointNode.getBoundingClientRect().width / this.ratio).toString()));
+        value += Math.round(parseFloat(((pointNode.getBoundingClientRect().width - 32) / ratio).toString()));
       }
 
       return value;

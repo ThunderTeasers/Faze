@@ -15,7 +15,7 @@ import Module from '../../Core/Module';
  */
 enum FazeCarouselMoveDirection {
   Forward,
-  Backward
+  Backward,
 }
 
 /**
@@ -176,6 +176,9 @@ class Carousel2 extends Module {
   // Текущий индекс слайда
   private index: number;
 
+  // Сдвиг карусели при прокрутке
+  private offset: number;
+
   // Простаивает ли слайдер, взаимодействие возможно только если стоит "true"
   private isIdle: boolean;
 
@@ -246,6 +249,7 @@ class Carousel2 extends Module {
     this.itemsHolderNode = document.createElement('div');
     this.controlsNode = document.createElement('div');
     this.index = 0;
+    this.offset = 0;
     this.isIdle = true;
 
     this.touchStart = {
@@ -447,12 +451,6 @@ class Carousel2 extends Module {
       // Получаем координаты касания/нажатия
       this.touchStart = Faze.Helpers.getMouseOrTouchPosition(event);
 
-      // Вставляем слайд перед текущим, чтобы можно было сдвигать карусель вправо
-      this.insertSlideBefore();
-
-      // Сдвигаем карусель на ширину этого слайда, чтобы визуально ничего не изменилось
-      this.itemsHolderNode.style.left = `${-this.slideWidth}px`;
-
       // Ставим флаг, что карусель не бездействует
       this.isIdle = false;
 
@@ -515,71 +513,84 @@ class Carousel2 extends Module {
     // Производим работу с перетаскиванием
     // Если сдвинуто влево больше чем на пол слайда, то активируем следующий слайд
     if (offset < -(this.slideWidth / 2)) {
-      Faze.Animations.smoothBetween(-(Math.abs(offset) + this.slideWidth), -(this.slideWidth * 2), this.config.animation.time, (value: number) => {
-        this.itemsHolderNode.style.left = `${value}px`;
-      }, () => {
-        // Перемещаем вперед два слайда, т.к. изначально там был один который мы должны были переместить, плюс во время начала
-        // перетаскивания был добавлен дополнительный, для возможности перетаскивать в противоположную сторону
-        this.insertSlideAfter();
-        this.insertSlideAfter();
-
-        // Увеличиваем и проверяем текущий индекс
-        this.index += 1;
-        this.checkIndexBounds();
-
-        // Производим остаточные действия для корректного переключения слайда
-        this.updateAfterChangeSlide(this.slidesNodes[this.index]);
-
-        // Обнуляем сдвиг для продолжения корректной работы
-        this.itemsHolderNode.style.left = '0';
-
-        // Карусель снова бездействует
-        this.isIdle = true;
-      });
-    } else if (offset > this.slideWidth / 2) {
-      Faze.Animations.smoothBetween(-(this.slideWidth - Math.abs(offset)), 0, this.config.animation.time, (value: number) => {
-        this.itemsHolderNode.style.left = `${value}px`;
-      }, () => {
-        // Уменьшаем и проверяем текущий индекс
-        this.index -= 1;
-        this.checkIndexBounds();
-
-        // Производим остаточные действия для корректного переключения слайда
-        this.updateAfterChangeSlide(this.slidesNodes[this.index - 1]);
-
-        // Обнуляем сдвиг для продолжения корректной работы
-        this.itemsHolderNode.style.left = '0';
-
-        // Карусель снова бездействует
-        this.isIdle = true;
-      });
-    } else {
-      // Плавно двигаем в изначальное положение
-      if (offset < 0) {
-        // Переставляем слайд в конец
-        this.insertSlideAfter();
-
-        // Анимируем
-        Faze.Animations.smoothBetween(-Math.abs(offset), 0, this.config.animation.time, (value: number) => {
+      Faze.Animations.smoothBetween(
+        -(Math.abs(offset) + this.slideWidth),
+        -(this.slideWidth * 2),
+        this.config.animation.time,
+        (value: number) => {
           this.itemsHolderNode.style.left = `${value}px`;
-        }, () => {
-          // Карусель снова бездействует
-          this.isIdle = true;
-        });
-      } else {
-        // Анимируем
-        Faze.Animations.smoothBetween(-(-Math.abs(offset) + this.slideWidth), -this.slideWidth, this.config.animation.time, (value: number) => {
-          this.itemsHolderNode.style.left = `${value}px`;
-        }, () => {
-          // Переставляем слайд в конец
-          this.insertSlideAfter();
+        },
+        () => {
+          // Увеличиваем и проверяем текущий индекс
+          this.index += 1;
+          this.checkIndexBounds();
+
+          // Производим остаточные действия для корректного переключения слайда
+          this.updateAfterChangeSlide(this.slidesNodes[this.index]);
 
           // Обнуляем сдвиг для продолжения корректной работы
           this.itemsHolderNode.style.left = '0';
 
           // Карусель снова бездействует
           this.isIdle = true;
-        });
+        },
+      );
+    } else if (offset > this.slideWidth / 2) {
+      Faze.Animations.smoothBetween(
+        -(this.slideWidth - Math.abs(offset)),
+        0,
+        this.config.animation.time,
+        (value: number) => {
+          this.itemsHolderNode.style.left = `${value}px`;
+        },
+        () => {
+          // Уменьшаем и проверяем текущий индекс
+          this.index -= 1;
+          this.checkIndexBounds();
+
+          // Производим остаточные действия для корректного переключения слайда
+          this.updateAfterChangeSlide(this.slidesNodes[this.index - 1]);
+
+          // Обнуляем сдвиг для продолжения корректной работы
+          this.itemsHolderNode.style.left = '0';
+
+          // Карусель снова бездействует
+          this.isIdle = true;
+        },
+      );
+    } else {
+      // Плавно двигаем в изначальное положение
+      if (offset < 0) {
+        // Анимируем
+        Faze.Animations.smoothBetween(
+          -Math.abs(offset),
+          0,
+          this.config.animation.time,
+          (value: number) => {
+            this.itemsHolderNode.style.left = `${value}px`;
+          },
+          () => {
+            // Карусель снова бездействует
+            this.isIdle = true;
+          },
+        );
+      } else {
+        // Анимируем
+        Faze.Animations.smoothBetween(
+          -(-Math.abs(offset) + this.slideWidth),
+          -this.slideWidth,
+          this.config.animation.time,
+          (value: number) => {
+            this.itemsHolderNode.style.left = `${value}px`;
+          },
+          () => {
+            // Обнуляем сдвиг для продолжения корректной работы
+            this.itemsHolderNode.style.left = '0';
+
+            // Карусель снова бездействует
+            this.isIdle = true;
+          },
+        );
       }
     }
   }
@@ -828,7 +839,7 @@ class Carousel2 extends Module {
   private beforeChangeCallbackCall(direction?: FazeCarouselMoveDirection): void {
     if (typeof this.config.callbacks.beforeChanged === 'function') {
       // Текущий слайд(по факту он следующий, т.к. изменение уже началось)
-      const currentSlideNode = this.slidesNodes.find(tmpSlideNode => parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index) || this.slidesNodes[0];
+      const currentSlideNode = this.slidesNodes.find((tmpSlideNode) => parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index) || this.slidesNodes[0];
 
       try {
         this.config.callbacks.beforeChanged({
@@ -888,37 +899,25 @@ class Carousel2 extends Module {
         // Следующий слайд
         nextSlide = this.slidesNodes[this.index];
 
-        // Проставляем ему z-index равно 2, чтобы он был ниже активного слайда(3) и выше остальных(1)
-        // А так же убираем прозрачность, чтобы видеть слайд(по умолчанию они скрыты)
-        nextSlide.style.zIndex = '2';
-        nextSlide.style.opacity = '1';
+        // Активируем текущий слайд
+        Faze.Helpers.activateItem(this.slidesNodes, this.index, 'faze-active');
 
-        // Плавно изменяем прозрачность у текущего слайда
-        Faze.Animations.smoothBetween(0, 1, this.config.animation.time,
-          (value: number) => {
-            this.currentSlide.style.opacity = (1 - value).toString();
-          },
-          () => {
-            // Активируем текущий слайд
-            Faze.Helpers.activateItem(this.slidesNodes, this.index, 'faze-active');
+        // Удаляем у всех слайдов стили
+        this.slidesNodes.forEach((slideNode: HTMLElement) => {
+          slideNode.removeAttribute('style');
+        });
 
-            // Удаляем у всех слайдов стили
-            this.slidesNodes.forEach((slideNode: HTMLElement) => {
-              slideNode.removeAttribute('style');
-            });
+        // Переназначаем текущий слайд
+        this.currentSlide = nextSlide;
 
-            // Переназначаем текущий слайд
-            this.currentSlide = nextSlide;
+        // Обновление размеров текущего слайда
+        this.updateCurrentSlideSizes();
 
-            // Обновление размеров текущего слайда
-            this.updateCurrentSlideSizes();
+        // Карусель снова свободна
+        this.isIdle = true;
 
-            // Карусель снова свободна
-            this.isIdle = true;
-
-            // Изменение состояний элементов управления
-            this.changeControls();
-          });
+        // Изменение состояний элементов управления
+        this.changeControls();
 
         // Вызываем пользовательскую функцию
         this.changeCallbackCall(direction);
@@ -928,46 +927,33 @@ class Carousel2 extends Module {
         // Следующий слайд
         nextSlide = this.slidesNodes[amount];
 
-        // Ширина текущего слайда
-        const slidesWidth = this.slideWidth * amount;
+        const totalWidth = this.slideWidth * this.totalSlides;
 
-        // Если двигаем назад
-        if (direction === FazeCarouselMoveDirection.Backward) {
-          this.itemsHolderNode.style.left = `-${slidesWidth}px`;
-
-          // Сдвигаем слайды
-          for (let i = 0; i < amount; i++) {
-            this.insertSlideBefore();
-          }
+        // Изменяем сдвиг относительно направления
+        this.offset += direction === FazeCarouselMoveDirection.Forward ? -this.slideWidth : this.slideWidth;
+        if (Math.abs(this.offset) > totalWidth) {
+          this.offset = 0;
         }
 
-        // Плавно изменяем отступ у враппера
-        Faze.Animations.smoothBetween(0, slidesWidth, this.config.animation.time, (value: number) => {
-          // Если двигаем вперед
-          if (direction === FazeCarouselMoveDirection.Forward) {
-            this.itemsHolderNode.style.left = `-${value}px`;
-          } else {
-            this.itemsHolderNode.style.left = `-${slidesWidth - value}px`;
+        this.slidesNodes.forEach((slideNode: HTMLElement, slideIndex: number) => {
+          if (slideIndex + 1 < this.index) {
+            slideNode.style.transform = `translate(${totalWidth}px, 0)`;
           }
-        }, () => {
-          // Если двигаем вперед
-          if (direction === FazeCarouselMoveDirection.Forward) {
-            // Сдвигаем слайды
-            for (let i = 0; i < amount; i++) {
-              this.insertSlideAfter();
-            }
-          }
-
-          // Отменяем сдвиг
-          this.itemsHolderNode.style.left = '0';
-
-          // Удаляем у всех класс
-          this.slidesNodes.forEach((slideNode: HTMLElement) => {
-            slideNode.classList.remove('faze-active');
-          });
-
-          this.updateAfterChangeSlide(nextSlide);
         });
+
+        if (this.index === 0) {
+          this.slidesNodes.forEach((slideNode: HTMLElement) => {
+            slideNode.style.transform = '';
+          });
+        }
+
+        this.itemsHolderNode.style.transform = `translate(${this.offset}px, 0)`;
+
+        // Карусель снова свободна
+        this.isIdle = true;
+
+        // Изменение состояний элементов управления
+        this.changeControls();
 
         // Вызываем пользовательскую функцию
         this.changeCallbackCall(direction);
@@ -1022,7 +1008,7 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private changeCounter() {
+  private changeCounter(): void {
     this.counterNode.innerHTML = `<span class="faze-carousel-counter-current">${this.index + 1}</span> / <span class="faze-carousel-counter-total">${this.totalSlides}</span>`;
   }
 
@@ -1033,30 +1019,6 @@ class Carousel2 extends Module {
    */
   private changePagination(): void {
     Faze.Helpers.activateItem(Array.from(this.pagesNodes), this.index, 'faze-active');
-  }
-
-  /**
-   * Перемещение последнего слайда вперед
-   *
-   * @private
-   */
-  insertSlideBefore(): void {
-    this.slidesNodes = <HTMLElement[]>Array.from(this.itemsHolderNode.children);
-
-    // Берем последний слайд и перемещаем его в начало
-    this.itemsHolderNode.insertBefore(this.slidesNodes[this.slidesNodes.length - 1], this.slidesNodes[0]);
-  }
-
-  /**
-   * Перемещение первого слайда в конец
-   *
-   * @private
-   */
-  insertSlideAfter(): void {
-    this.slidesNodes = <HTMLElement[]>Array.from(this.itemsHolderNode.children);
-
-    // Берем первый слайд и перемещаем его в конец
-    this.itemsHolderNode.appendChild(this.slidesNodes[0]);
   }
 
   /**

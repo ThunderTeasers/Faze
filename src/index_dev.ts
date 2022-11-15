@@ -46,8 +46,8 @@ Faze.add({
   callback: () => {
     const a = 10;
 
-    return {a};
-  }
+    return { a };
+  },
 });
 
 // Тест "loadJS"
@@ -75,27 +75,43 @@ Faze.add({
   },
 });
 
-// Тесты
+// Тесты карусели
 Faze.add({
-  pluginName: 'Tests',
+  pluginName: 'TestCarousel',
   condition: document.querySelectorAll('.js-carousel-test1').length > 0,
   callback: () => {
-    new Faze.Carousel(document.querySelector('.js-carousel-test1'), {
+    new Faze.Carousel2(document.querySelector('.js-carousel-test1'), {
       autoplay: false,
       pages: true,
       arrows: true,
       // arrowsOutside: true,
-      counter: false,
+      counter: true,
       infinite: false,
       mouseMove: false,
       // amountPerSlide: 2,
       animation: {
-        type: 'fade',
+        type: 'slide',
         time: 1000,
         direction: 'horizontal',
       },
     });
-  }
+  },
+});
+
+// Тесты слайдера
+Faze.add({
+  pluginName: 'TestSlider',
+  condition: document.querySelectorAll('.js-slider').length > 0,
+  callback: () => {
+    new Faze.Slider(document.querySelector('.js-slider'), {
+      points: [0, 100],
+      callbacks: {
+        changed: (data: any) => {
+          console.log(data.values);
+        },
+      },
+    });
+  },
 });
 
 // Тесты

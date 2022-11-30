@@ -99,7 +99,8 @@ class Tooltip {
    * Инициализация
    */
   initialize(): void {
-    this.tooltipNode.className = `faze-tooltip faze-tooltip-initialized faze-tooltip-${this.config.side} ${this.config.class}`;
+    this.node.classList.add('faze-tooltip-initialized');
+    this.tooltipNode.className = `faze-tooltip faze-tooltip-${this.config.side} ${this.config.class}`;
     this.tooltipNode.style.visibility = 'hidden';
     this.tooltipNode.innerHTML = this.config.text || this.node.dataset.fazeTooltipText || this.node.title || '';
   }

@@ -159,11 +159,16 @@ class Observer {
       } else if (mutationRecord.type === 'characterData') {
         // Проходимся по всем слушателям
         this.listenersBySelector.forEach((listener) => {
-          // Ищем элемент, который попадает под слушателя
-          const found = listener.alreadyExistedNodes.find(node => node.matches(listener.selector));
-          if (found) {
-            listener.callback(found);
+          // Проверяем, произошли ли изменения внутри искомой ноды, если да, то далее проверяем у какой конкретно
+          const tmpNode = document.querySelector(listener.selector);
+          if (tmpNode && tmpNode.contains(mutationRecord.target)) {
+            // Ищем элемент, который попадает под слушателя
+            const found = listener.alreadyExistedNodes.find(node => node.matches(listener.selector));
+            if (found) {
+              listener.callback(found);
+            }
           }
+
         });
       } else {
         // Проходимся по всем добавленным DOM элементам

@@ -75,6 +75,15 @@ Faze.add({
   },
 });
 
+// Тесты
+Faze.add({
+  pluginName: 'GalleryTest',
+  condition: document.querySelectorAll('.gallery-test').length > 0,
+  callback: () => {
+    new Faze.Gallery(document.querySelectorAll('.gallery-test'));
+  },
+});
+
 // Тесты карусели
 Faze.add({
   pluginName: 'TestCarousel',

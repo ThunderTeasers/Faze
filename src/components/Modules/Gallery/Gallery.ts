@@ -60,7 +60,7 @@ class Gallery {
   private thumbnailsNode: HTMLDivElement;
 
   // DOM элементы превью
-  private thumbnailsNodes: HTMLDivElement[];
+  private readonly thumbnailsNodes: HTMLDivElement[];
 
   // DOM элемент картинки
   private imageNode: HTMLImageElement;
@@ -148,10 +148,8 @@ class Gallery {
             this.totalImages = this.imagesData.length;
 
             // Присвоение корректного индекса
-            this.index = this.imagesData.indexOf({
-              thumbnail: (callerNode as HTMLImageElement).src,
-              full: callerNode.dataset.fazeGalleryImage || (callerNode as HTMLImageElement).src,
-            });
+            this.index = Array.from(this.callerNodes)
+              .indexOf(callerNode);
 
             // Построение галереи
             this.build();

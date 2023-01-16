@@ -45,6 +45,11 @@ class REST {
       throw new Error('Параметр "data" функции ajaxRequest не является объектом');
     }
 
+    // Заполняем "from", если его нет
+    if (!formData.has('from')) {
+      formData.append('from', window.location.href);
+    }
+
     // Заполняем данные, если это POST запрос
     if (method.toLowerCase() === 'post') {
       fetchOptions.body = formData;
@@ -52,7 +57,8 @@ class REST {
 
     // Если это GET запрос, подставляем параметры
     if (method.toLowerCase() === 'get') {
-      const formDataQuery: string = [...formData.entries()].map((entry) => `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(<any>entry[1])}`).join('&');
+      const formDataQuery: string = [...formData.entries()].map((entry) => `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(<any>entry[1])}`)
+        .join('&');
 
       if (currentURL.includes('?')) {
         currentURL += `&${new URLSearchParams(formDataQuery).toString()}`;
@@ -81,20 +87,23 @@ class REST {
           // Парсинг ответа
           const responseHTML = new DOMParser().parseFromString(response, 'text/html');
 
-          document.querySelectorAll(data['response_html']).forEach((el) => {
-            const responseNode = responseHTML.querySelector(data['response_html']);
-            el.innerHTML = responseNode ? responseNode.innerHTML : '';
-          });
+          document.querySelectorAll(data['response_html'])
+            .forEach((el) => {
+              const responseNode = responseHTML.querySelector(data['response_html']);
+              el.innerHTML = responseNode ? responseNode.innerHTML : '';
+            });
         } else if (data['response_text'] && typeof data['response_text'] === 'string') {
-          document.querySelectorAll(data['response_text']).forEach((el) => {
-            el.innerHTML = response;
-          });
+          document.querySelectorAll(data['response_text'])
+            .forEach((el) => {
+              el.innerHTML = response;
+            });
         } else if (data['response_callback'] && typeof data['response_callback'] === 'string' && data['response_callback'] in window && (window as any)[data['response_callback']] instanceof Function) {
           (window as any)[data['response_callback']](response);
         } else if (data['response_json'] && typeof data['response_json'] === 'string') {
-          document.querySelectorAll(data['response_json']).forEach((el) => {
-            el.innerHTML = response.message;
-          });
+          document.querySelectorAll(data['response_json'])
+            .forEach((el) => {
+              el.innerHTML = response.message;
+            });
         }
 
         // Выполнение пользовательской функции
@@ -149,11 +158,12 @@ class REST {
     // Получение уникальных названий полей для сборки JSON объектов
     const jsonNames: string[] = [
       ...new Set(
-        Array.from(jsonFields).map((item: any) => {
-          const inputDataName = item.dataset.fazeRestapiJsonName;
+        Array.from(jsonFields)
+          .map((item: any) => {
+            const inputDataName = item.dataset.fazeRestapiJsonName;
 
-          return inputDataName.includes('.') ? inputDataName.substring(0, inputDataName.indexOf('.')) : inputDataName;
-        })
+            return inputDataName.includes('.') ? inputDataName.substring(0, inputDataName.indexOf('.')) : inputDataName;
+          })
       ),
     ];
 
@@ -162,12 +172,13 @@ class REST {
       let jsonObject: any = {};
 
       // Проходимся по всем инпутам название в атрибуте которых начинается с имени ключа объекта в который мы собираем их
-      const inputsNodes: HTMLInputElement[] = Array.from(formNode.querySelectorAll('[data-faze-restapi-json-name]')).filter((inputNode: any) => {
-        const attrJsonName = inputNode.dataset.fazeRestapiJsonName;
+      const inputsNodes: HTMLInputElement[] = Array.from(formNode.querySelectorAll('[data-faze-restapi-json-name]'))
+        .filter((inputNode: any) => {
+          const attrJsonName = inputNode.dataset.fazeRestapiJsonName;
 
-        // Проверяем, если название содержит точку, то значит нужно проверять вместе с ней, если нет - то нет, это очень важно
-        return attrJsonName.includes('.') ? attrJsonName.startsWith(`${jsonName}.`) : attrJsonName.startsWith(`${jsonName}`);
-      }) as HTMLInputElement[];
+          // Проверяем, если название содержит точку, то значит нужно проверять вместе с ней, если нет - то нет, это очень важно
+          return attrJsonName.includes('.') ? attrJsonName.startsWith(`${jsonName}.`) : attrJsonName.startsWith(`${jsonName}`);
+        }) as HTMLInputElement[];
 
       // Проходимся по всем инпутам и собираем итоговый объект
       inputsNodes.forEach((itemNode: HTMLInputElement) => {
@@ -424,7 +435,7 @@ class REST {
     }
 
     // Берем данные первого элемента и удаляем его из массива
-    const data = <any>chainData.shift();
+    let data = <any>chainData.shift();
 
     // Тип ответа от сервера
     let dataType = data.type || null;
@@ -459,9 +470,9 @@ class REST {
         }
 
         REST.chain(chainData, finalCallback, response);
-      } else if ('method' in data) {
+      } else if ('method' in data || 'formData' in data) {
         // Если в объекте присутствует поле "method" значит это объект с настройками для отправки через ajaxRequest
-        const method = data['method'];
+        let method = data['method'];
         let url = window.location.pathname;
 
         // Разбор параметров "page" и "module" относительно присутствия которых им присваиваются соответствующие значения
@@ -476,18 +487,24 @@ class REST {
 
           // Добавляем параметры к запросу, если они не относятся к "системным"
           const params = new URLSearchParams(window.location.search);
-          Array.from(params).forEach((param) => {
-            const name = param[0];
-            const value = param[1];
+          Array.from(params)
+            .forEach((param) => {
+              const name = param[0];
+              const value = param[1];
 
-            if (!systemParams.includes(name)) {
-              data[name] = value;
-            }
-          });
+              if (!systemParams.includes(name)) {
+                data[name] = value;
+              }
+            });
 
           data['show'] = data['module'];
         } else if (data['page']) {
           url = /^\//.test(data['page']) ? data['page'] : `/${data['page']}.txt`;
+        }
+
+        // Если это FormData, то метод всегда "POST"
+        if ('formData' in data) {
+          method = 'POST';
         }
 
         // Если это POST метод
@@ -520,6 +537,11 @@ class REST {
         // Добавляем encode="utf8" если его нет
         if (!('encoding' in data)) {
           data['encoding'] = 'utf8';
+        }
+
+        // Если это FormData, то передаваться будет только её объект
+        if ('formData' in data) {
+          data = data.formData;
         }
 
         // Отправляем запрос, после выполнения которого снова вызываем ajaxChain

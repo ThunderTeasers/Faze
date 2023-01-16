@@ -95,6 +95,7 @@ interface Config {
   delayToClose?: number;
   additionalParams?: string;
   callbacks: {
+    beforeSuccess?: (parts: ModalParts) => void,
     success?: (parts: ModalParts) => void,
     close?: (parts: ModalParts) => void,
     error?: (parts: ModalParts) => void,
@@ -159,6 +160,7 @@ class Modal {
       delayToClose: 0,
       additionalParams: undefined,
       callbacks: {
+        beforeSuccess: undefined,
         success: undefined,
         close: undefined,
         error: undefined,
@@ -216,6 +218,15 @@ class Modal {
     // Получение контента
     this.getContent()
       .then((responseText: string) => {
+        // Исполняем пользовательский метод при успешном получении данных
+        if (typeof this.config.callbacks.beforeSuccess === 'function') {
+          try {
+            this.config.callbacks.beforeSuccess(this.modalParts);
+          } catch (e) {
+            console.error('Ошибка исполнения пользовательского метода "beforeSuccess":', e);
+          }
+        }
+
         this.build(responseText);
         this.addAdditionalParams();
 

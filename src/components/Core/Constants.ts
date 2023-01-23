@@ -24,3 +24,5 @@ class Constants {
     'декабрь',
   ];
 }
+
+export default Constants;

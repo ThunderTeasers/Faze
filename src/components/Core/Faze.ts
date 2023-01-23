@@ -19,10 +19,12 @@ import Logger from './Logger';
  */
 import Modal from '../Modules/Modal/Modal';
 import Helpers from '../Helpers/Helpers';
+import Constants from '../Core/Constants';
 import URL from '../Helpers/URL';
 import DOM from '../Helpers/DOM';
 import Date from './Date';
 import Animations from '../Animations/Animations';
+import Placeholder from '../Modules/Placeholder/Placeholder';
 import Tooltip from '../Modules/Tooltip/Tooltip';
 import Tab from '../Modules/Tab/Tab';
 import Drag from '../Modules/Drag/Drag';
@@ -32,6 +34,7 @@ import SmartSelect from '../Modules/SmartSelect/SmartSelect';
 import Carousel from '../Modules/Carousel/Carousel';
 import Carousel2 from '../Modules/Carousel2/Carousel2';
 import ThumbGallery from '../Modules/ThumbGallery/ThumbGallery';
+import TableSorter from '../Modules/TableSorter/TableSorter';
 import Zoom from '../Modules/Zoom/Zoom';
 import ZoomBox from '../Modules/ZoomBox/ZoomBox';
 import Look from '../Modules/Look/Look';
@@ -120,11 +123,14 @@ class Faze {
   static ZoomBox: any = ZoomBox;
   static Gallery: any = Gallery;
   static Helpers: any = Helpers;
+  static Constants: any = Constants;
+  static TableSorter: any = TableSorter;
   static URL: any = URL;
   static DOM: any = DOM;
   static Date: any = Date;
   static ThumbGallery: any = ThumbGallery;
   static Animations: any = Animations;
+  static Placeholder: any = Placeholder;
   static Scroll: any = Scroll;
   static Spoiler: any = Spoiler;
   static Page: any = Page;
@@ -184,7 +190,7 @@ class Faze {
     const currentPlugins: InnerPluginsData = {};
 
     // Зарезервированные имена
-    const predefinedNames: string[] = ['Plugin', 'Module', 'Zoom', 'Look', 'ZoomBox', 'Tooltip', 'Carousel', 'Page', 'Gallery', 'SmartSelect', 'Form', 'Spoiler', 'Select', 'Scroll', 'Tab', 'Dropdown', 'Slider', 'Steps', 'Helpers', 'URL', 'Observer', 'Modal', 'Filter', 'REST', 'Logger'];
+    const predefinedNames: string[] = ['Plugin', 'Module', 'Zoom', 'Look', 'ZoomBox', 'TableSorter', 'Tooltip', 'Carousel', 'Page', 'Gallery', 'SmartSelect', 'Form', 'Spoiler', 'Select', 'Scroll', 'Tab', 'Dropdown', 'Slider', 'Steps', 'Helpers', 'Constants', 'URL', 'Observer', 'Modal', 'Filter', 'REST', 'Logger'];
 
     // Проверка на ошибки
     if (!config) {
@@ -265,7 +271,7 @@ class Faze {
   static on(eventName: string, childSelector: string, callback: (event: Event, child: HTMLElement) => void): void {
     eventName
       .split(',')
-      .map(tmpEventName => tmpEventName.trim())
+      .map((tmpEventName) => tmpEventName.trim())
       .forEach((tmpEventName: string) => {
         window.addEventListener(tmpEventName, (event: Event) => {
           const clickedElement: HTMLElement | null = event.target as HTMLElement;
@@ -363,6 +369,8 @@ class Faze {
     Faze.Tab.hotInitialize('tab');
     Faze.ThumbGallery.hotInitialize('thumbgallery');
     Faze.SmartSelect.hotInitialize('smartselect');
+    Faze.TableSorter.hotInitialize('tablesorter');
+    Faze.Placeholder.hotInitialize('placeholder');
     Faze.Spoiler.hotInitialize();
     Faze.Carousel2.hotInitialize('carousel2');
     Faze.Carousel.hotInitialize();

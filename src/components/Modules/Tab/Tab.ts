@@ -53,6 +53,12 @@ class Tab extends Module {
   // DOM элементы тел табов
   bodiesNodes: HTMLElement[];
 
+  /**
+   * Стандартный конструктор
+   *
+   * @param node DOM элемент на который навешивается модуль
+   * @param config Конфиг модуля
+   */
   constructor(node?: HTMLElement, config?: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
@@ -75,7 +81,7 @@ class Tab extends Module {
   /**
    * Инициализация
    */
-  initialize(): void {
+  protected initialize(): void {
     super.initialize();
 
     // Инициализация шапок и тел табов
@@ -104,7 +110,7 @@ class Tab extends Module {
   /**
    * Навешивание событий
    */
-  bind(): void {
+  protected bind(): void {
     super.bind();
 
     this.headersNodes.forEach((header: HTMLElement) => {

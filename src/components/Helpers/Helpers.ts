@@ -72,6 +72,13 @@ interface MouseOverResult {
   };
 }
 
+export interface DataParser {
+  id: string | null;
+  is: ((text: string) => boolean) | null;
+  format: (text: string) => string | number;
+  type: string;
+}
+
 class Helpers {
   /**
    * Инициализация методов, которые должны работать всегда, а не по указанию пользователя
@@ -81,14 +88,169 @@ class Helpers {
     Helpers.bindMobileMask();
   }
 
+  static DataParsers: DataParser[] = [
+    {
+      id: 'digit',
+      is: (text: string) => {
+        const DECIMAL = '[\\.,\\s]';
+        const exp = '/(^0$)|(^[+]?0(' + DECIMAL + '0+)?$)|(^([-+]?[1-9][0-9]*)$)|(^([-+]?((0?|[1-9][0-9]*)' + DECIMAL + '(0*[1-9][0-9]*)))$)|(^[-+]?[1-9]+[0-9]*' + DECIMAL + '0+$)|(^[-+]?[1-9][0-9]*[.,\\s][0-9]*[.,\\s][0-9]*$)/';
+
+        text = text.replace(/ /g, '');
+        return RegExp(exp).test(text.trim());
+      },
+      format: (text: string) => {
+        return Helpers.formatFloat(text.replace(/ /g, '').replace(/,/g, '.'));
+      },
+      type: 'numeric',
+    },
+    {
+      id: 'digitWithParentheses',
+      is: (text: string) => {
+        text = text.replace(/ /g, '');
+        return /^\d+\(\d*\)$|^\d+[\.,\s]d*\(\d*\)$/.test(text.trim());
+      },
+      format: function (text: string) {
+        text = text.replace(/ /g, '').replace(/,/g, '.');
+
+        const number: RegExpMatchArray | null = text.match(/^(\d+)\(\d*\)$|^(\d+[\.,\s]d*)\(\d*\)$/);
+        if (number) {
+          return Helpers.formatFloat(number[0] || '0');
+        } else {
+          return 0;
+        }
+      },
+      type: 'numeric',
+    },
+    {
+      id: 'currency',
+      is: (text: string) => {
+        return /^[£$€₽元?.]|[£$€₽元]$/.test(text);
+      },
+      format: function (text: string) {
+        return Helpers.formatFloat(text.replace(/,/g, '.').replace(new RegExp(/[^0-9.]/g), ''));
+      },
+      type: 'numeric',
+    },
+    {
+      id: 'url',
+      is: (text: string) => {
+        return /^(https?|http?|ftp|file):\/\/$/.test(text);
+      },
+      format: (text: string) => {
+        return text.trim().replace(new RegExp(/(https?|http?|ftp|file):\/\//), '');
+      },
+      type: 'text',
+    },
+    {
+      id: 'dayMonth',
+      is: (text: string) => {
+        return /^\d{1,2}[\.\/-]\d{1,2}$/.test(text);
+      },
+      format: (text: string) => {
+        const date = text.match(/^(\d{1,2})[\.\/-](\d{1,2})$/);
+        return Helpers.formatFloat(date && date.length === 3 ? new Date(text.replace(new RegExp(/-/g), '/')).getTime().toString() : '0');
+      },
+      type: 'numeric',
+    },
+    {
+      id: 'isoDateTime',
+      is: (text: string) => {
+        return /^\d{4}[\.\/-]\d{1,2}[\.\/-]\d{1,2}\s*\d{2}:\d{2}/.test(text);
+      },
+      format: (text: string) => {
+        const date = text.match(/^(\d{4})[\.\/-](\d{1,2})[\.\/-](\d{1,2})\s*\d{2}:\d{2}/);
+        return Helpers.formatFloat(date && date.length === 4 ? new Date(text.replace(new RegExp(/-/g), '/')).getTime().toString() : '0');
+      },
+      type: 'numeric',
+    },
+    {
+      id: 'isoDateTimeReverse',
+      is: (text: string) => {
+        return /^\d{1,2}[\.\/-]\d{1,2}[\.\/-]\d{4}\s*\d{2}:\d{2}/.test(text);
+      },
+      format: (text: string) => {
+        const date = text.match(/^(\d{1,2})[\.\/-](\d{1,2})[\.\/-](\d{4})\s*(\d{2}):(\d{2})/);
+
+        let dateString;
+        if (date && date.length === 6) {
+          dateString = `${date[3]}-${date[2]}-${date[1]} ${date[4]}:${date[5]}`;
+        } else {
+          dateString = '0';
+        }
+
+        return Helpers.formatFloat(date && date.length === 6 ? new Date(dateString.replace(new RegExp(/-/g), '/')).getTime().toString() : '0');
+      },
+      type: 'numeric',
+    },
+    {
+      id: 'isoDate',
+      is: (text: string) => {
+        return /^\d{4}[\.\/-]\d{1,2}[\.\/-]\d{1,2}$/.test(text);
+      },
+      format: (text: string) => {
+        const date = text.match(/^(\d{4})[\.\/-](\d{1,2})[\.\/-](\d{1,2})$/);
+        return Helpers.formatFloat(date && date.length === 4 ? new Date(text.replace(new RegExp(/-/g), '/')).getTime().toString() : '0');
+      },
+      type: 'numeric',
+    },
+    {
+      id: 'isoDateReverse',
+      is: (text: string) => {
+        return /^\d{1,2}[\.\/-]\d{1,2}[\.\/-]\d{4}$/.test(text);
+      },
+      format: (text: string) => {
+        const date = text.match(/^(\d{1,2})[\.\/-](\d{1,2})[\.\/-](\d{4})$/);
+
+        let dateString;
+        if (date && date.length === 4) {
+          dateString = `${date[3]}-${date[2]}-${date[1]}`;
+        } else {
+          dateString = '0';
+        }
+
+        return Helpers.formatFloat(new Date(dateString).getTime().toString());
+      },
+      type: 'numeric',
+    },
+    {
+      id: 'percent',
+      is: (text: string) => {
+        return /%$/.test(text.trim());
+      },
+      format: (text: string) => {
+        return Helpers.formatFloat(text.replace(/ %/g, '').replace(/,/g, '.'));
+      },
+      type: 'numeric',
+    },
+    {
+      id: 'month',
+      is: (text: string) => {
+        return Faze.Constants.MONTHS.includes(text.toLowerCase());
+      },
+      format: (text: string) => {
+        return Faze.Constants.MONTHS.indexOf(text.toLowerCase());
+      },
+      type: 'numeric',
+    },
+    {
+      id: 'text',
+      is: () => {
+        return true;
+      },
+      format: (text: string) => {
+        return text.toLowerCase().trim();
+      },
+      type: 'text',
+    },
+  ];
+
   /**
    * Маска мобильного телефона для поля ввода
    */
   static bindMobileMask(): void {
-    document.querySelectorAll<HTMLInputElement>('.faze-mask-mobile')
-      .forEach((inputNode: HTMLInputElement) => {
-        Helpers.mobileMask(inputNode);
-      });
+    document.querySelectorAll<HTMLInputElement>('.faze-mask-mobile').forEach((inputNode: HTMLInputElement) => {
+      Helpers.mobileMask(inputNode);
+    });
   }
 
   /**
@@ -177,7 +339,17 @@ class Helpers {
   }
 
   /**
-   * Разделение трех знаком у числа пробелами, необходимо для форматирования цен в цдобочитаемом для человека виде.
+   * Форматирование float при парсинге из текста
+   *
+   * @param text Текст содержащий число с плавающей точкой
+   */
+  static formatFloat(text: string): number {
+    const result: number = parseFloat(text);
+    return isNaN(result) ? 0 : result;
+  }
+
+  /**
+   * Разделение трех знаком у числа пробелами, необходимо для форматирования цен в удобочитаемом для человека виде.
    * Если передали целое число, то есть которое не содержит точку, то просто разделяем по 3, если же передали число с плавающей точкой,
    * то форматируем у неё только левую часть, то есть ту которая до точки, после этого склеиваем обе части и возвращаем их.
    *
@@ -259,12 +431,7 @@ class Helpers {
    * @param options - настройки
    */
   static showNotification(message: string, options: NotificationOptions): void {
-    const {
-      className = '',
-      isNested = true,
-      time = 3000,
-      backgroundColor = '#00b938'
-    } = options;
+    const { className = '', isNested = true, time = 3000, backgroundColor = '#00b938' } = options;
 
     // DOM элемент обертки для информационнах сообщений, она нужна для того, чтобы сообщения шли друг под другом, если их несколько
     let notificationWrapperNode: HTMLDivElement | null = document.querySelector('.faze-notification-wrapper');
@@ -312,7 +479,7 @@ class Helpers {
    */
   static wordEnd(quantity: number, endings: string[] = ['', 'а', 'ов']): string {
     const cases: number[] = [2, 0, 1, 1, 1, 2];
-    return endings[(quantity % 100 > 4 && quantity % 100 < 20) ? 2 : cases[(quantity % 10 < 5) ? quantity % 10 : 5]];
+    return endings[quantity % 100 > 4 && quantity % 100 < 20 ? 2 : cases[quantity % 10 < 5 ? quantity % 10 : 5]];
   }
 
   /**
@@ -324,13 +491,7 @@ class Helpers {
    * @param showMinutes  - показывать ли минуты, имеет приоритет выше, чем "showEmpty"
    * @param showSeconds  - показывать ли секунды, имеет приоритет выше, чем "showEmpty"
    */
-  static secondsToTime({
-                         totalSeconds = 0,
-                         showEmpty = false,
-                         showHours = true,
-                         showMinutes = true,
-                         showSeconds = true
-                       } = {}): string {
+  static secondsToTime({ totalSeconds = 0, showEmpty = false, showHours = true, showMinutes = true, showSeconds = true } = {}): string {
     let totalSecondsRaw: number = totalSeconds;
 
     // Время в человекопонимаемом формате
@@ -388,7 +549,7 @@ class Helpers {
     let expires: string = '';
     if (expiresInDays) {
       const date: Date = new Date();
-      date.setTime(date.getTime() + (expiresInDays * 24 * 60 * 60 * 1000));
+      date.setTime(date.getTime() + expiresInDays * 24 * 60 * 60 * 1000);
       expires = `;expires=${date.toUTCString()}`;
     }
 
@@ -426,7 +587,7 @@ class Helpers {
    * @param item - переменная которую надо проверить
    */
   static isObject(item: any): boolean {
-    return (item && typeof item === 'object' && !Array.isArray(item));
+    return item && typeof item === 'object' && !Array.isArray(item);
   }
 
   /**
@@ -466,7 +627,7 @@ class Helpers {
         if (source.hasOwnProperty(key)) {
           if (Helpers.isObject(source[key])) {
             if (!target[key]) {
-              Object.assign(target, {[key]: {}});
+              Object.assign(target, { [key]: {} });
             }
 
             Helpers.mergeDeep(arraysReplace, target[key], source[key]);
@@ -492,7 +653,7 @@ class Helpers {
                   target[key].push(source[key][0]);
                 } else {
                   // Если нашли, то объединяем объекты этого элемента с новым
-                  target[key][foundIndex] = {...foundElement, ...source[key][0]};
+                  target[key][foundIndex] = { ...foundElement, ...source[key][0] };
                 }
               } else {
                 // Если не содержит, то это просто элемент массива, значит пушим его
@@ -503,7 +664,7 @@ class Helpers {
                 }
               }
             } else {
-              Object.assign(target, {[key]: source[key]});
+              Object.assign(target, { [key]: source[key] });
             }
           }
         }
@@ -541,8 +702,7 @@ class Helpers {
   static objectFromString(jsonObject: any = {}, stringData: string, key: string, value: string, arrayGroup = 'default'): object {
     // Разбиваем строку на токены, при этом фильтруя на пустоту токена, т.к. если мы пытаемся разделить пустую строку, "split" вернет
     // массив у которого 1 пустой элемент, а это некорректно в данном случае.
-    const objectTokens: string[] = stringData.split('.')
-      .filter(token => token.length !== 0);
+    const objectTokens: string[] = stringData.split('.').filter((token) => token.length !== 0);
 
     // Конечный результат генерации объекта из строки
     const result = {};
@@ -571,10 +731,12 @@ class Helpers {
 
         // Определяем элемент массива, так же важно добавить "__group", это служебное поле,
         // для будущего слияния ключей-значений в один объект элемента массива
-        ref[clearArrayKey.split('.')[0]] = [{
-          __group: arrayGroup,
-          [objectArrayName]: value,
-        }];
+        ref[clearArrayKey.split('.')[0]] = [
+          {
+            __group: arrayGroup,
+            [objectArrayName]: value,
+          },
+        ];
       } else {
         ref[clearArrayKey] = [value];
       }
@@ -595,23 +757,23 @@ class Helpers {
    *
    * @return{boolean} - "true" если вхождение есть, "false" если нет
    */
-  static isMouseOver(event: MouseEvent | TouchEvent, itemNode: HTMLElement, calculateSides: { vertical: boolean, horizontal: boolean } = {
-    vertical: false,
-    horizontal: false,
-  }): MouseOverResult {
+  static isMouseOver(
+    event: MouseEvent | TouchEvent,
+    itemNode: HTMLElement,
+    calculateSides: { vertical: boolean; horizontal: boolean } = {
+      vertical: false,
+      horizontal: false,
+    },
+  ): MouseOverResult {
     // DOMRect текущего элемента
     const itemRect = itemNode.getBoundingClientRect();
 
     // Получаем координаты касания/нажатия
-    let {
-      x,
-      y
-    } = this.getMouseOrTouchPosition(event);
+    let { x, y } = this.getMouseOrTouchPosition(event);
 
     // Объект с результатами проверки
     const result: MouseOverResult = {
-      contains: ((x > itemRect.left) && (x < itemRect.left + itemRect.width))
-        && ((y > itemRect.top) && (y < itemRect.top + itemRect.height)),
+      contains: x > itemRect.left && x < itemRect.left + itemRect.width && y > itemRect.top && y < itemRect.top + itemRect.height,
       sides: {
         top: undefined,
         bottom: undefined,
@@ -626,13 +788,13 @@ class Helpers {
       const halfHeight = itemRect.height / 2;
 
       // Проверяем внутри ли мышь по горизонтали
-      const isInsideHorizontally = ((x > itemRect.left) && (x < itemRect.left + itemRect.width));
+      const isInsideHorizontally = x > itemRect.left && x < itemRect.left + itemRect.width;
 
       // Проверяем на вхождение в верхнюю часть
-      result.sides.top = ((y > itemRect.top) && (y < itemRect.top + halfHeight)) && isInsideHorizontally;
+      result.sides.top = y > itemRect.top && y < itemRect.top + halfHeight && isInsideHorizontally;
 
       // Проверяем на вхождение в нижнюю часть
-      result.sides.bottom = ((y > itemRect.top + halfHeight) && (y < itemRect.top + itemRect.height)) && isInsideHorizontally;
+      result.sides.bottom = y > itemRect.top + halfHeight && y < itemRect.top + itemRect.height && isInsideHorizontally;
     }
 
     // Вычисляем входы в горизонтальном направлении(верх и низ)
@@ -641,13 +803,13 @@ class Helpers {
       const halfWidth = itemRect.width / 2;
 
       // Проверяем внутри ли мышь по горизонтали
-      const isInsideVertically = ((y > itemRect.top) && (y < itemRect.top + itemRect.height));
+      const isInsideVertically = y > itemRect.top && y < itemRect.top + itemRect.height;
 
       // Проверяем на вхождение в верхнюю часть
-      result.sides.left = ((x > itemRect.left) && (x < itemRect.left + halfWidth)) && isInsideVertically;
+      result.sides.left = x > itemRect.left && x < itemRect.left + halfWidth && isInsideVertically;
 
       // Проверяем на вхождение в нижнюю часть
-      result.sides.right = ((x > itemRect.left + halfWidth) && (x < itemRect.left + itemRect.width)) && isInsideVertically;
+      result.sides.right = x > itemRect.left + halfWidth && x < itemRect.left + itemRect.width && isInsideVertically;
     }
 
     return result;
@@ -702,8 +864,7 @@ class Helpers {
   static isMouseOverlapsNodes(event: Event, nodes: HTMLElement[]): boolean {
     const path = (<any>event).path || (event.composedPath && event.composedPath());
     if (path) {
-      if (path.find((element: HTMLElement) => Array.from(nodes)
-        .some(node => node === element))) {
+      if (path.find((element: HTMLElement) => Array.from(nodes).some((node) => node === element))) {
         return true;
       }
     }
@@ -777,14 +938,17 @@ class Helpers {
    *
    * @return{FazePosition} - позиция элемента
    */
-  static getElementPosition(node: HTMLElement, offset: FazePosition = {
-    x: 0,
-    y: 0
-  }): FazePosition {
+  static getElementPosition(
+    node: HTMLElement,
+    offset: FazePosition = {
+      x: 0,
+      y: 0,
+    },
+  ): FazePosition {
     // Возвращаемый объект
     const position = {
       x: node.offsetLeft - offset.x,
-      y: node.offsetTop - offset.y
+      y: node.offsetTop - offset.y,
     };
 
     // DOM элемент с которым производим действия
@@ -815,11 +979,11 @@ class Helpers {
     node: HTMLElement,
     sizeOffset: FazeSize = {
       width: 0,
-      height: 0
+      height: 0,
     },
     positionOffset: FazePosition = {
       x: 0,
-      y: 0
+      y: 0,
     },
   ): FazePositionAndSize {
     return {
@@ -945,8 +1109,8 @@ class Helpers {
       startMousePosition.y = event.clientY;
 
       // Расчёт новой позиции
-      options.node.style.left = `${(parseInt(options.node.style.left, 10) - endMousePosition.x)}px`;
-      options.node.style.top = `${(parseInt(options.node.style.top, 10) - endMousePosition.y)}px`;
+      options.node.style.left = `${parseInt(options.node.style.left, 10) - endMousePosition.x}px`;
+      options.node.style.top = `${parseInt(options.node.style.top, 10) - endMousePosition.y}px`;
 
       // Вызываем пользовательскую функцию
       if (options.callbacks && 'drag' in options.callbacks && typeof options.callbacks.drag === 'function') {
@@ -1014,7 +1178,7 @@ class Helpers {
         // Исполняем промис и возвращаем размеры изображения
         resolve({
           width: image.width,
-          height: image.height
+          height: image.height,
         });
       };
 
@@ -1115,14 +1279,14 @@ class Helpers {
    * @return{boolean} - true если элемент находится во вьюпорте
    */
   static isElementInViewport(node: HTMLElement, offset: number = 0, enableWhenOnTop: boolean = false): boolean {
-    const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
-    const windowWidth = (window.innerWidth || document.documentElement.clientWidth);
+    const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+    const windowWidth = window.innerWidth || document.documentElement.clientWidth;
     const rect = node.getBoundingClientRect();
 
-    const vertInView = (rect.top - offset <= windowHeight) && (enableWhenOnTop ? true : ((rect.top + rect.height) >= 0));
-    const horInView = (rect.left - offset <= windowWidth) && (enableWhenOnTop ? true : ((rect.left + rect.width) >= 0));
+    const vertInView = rect.top - offset <= windowHeight && (enableWhenOnTop ? true : rect.top + rect.height >= 0);
+    const horInView = rect.left - offset <= windowWidth && (enableWhenOnTop ? true : rect.left + rect.width >= 0);
 
-    return (vertInView && horInView);
+    return vertInView && horInView;
   }
 
   /**
@@ -1135,18 +1299,17 @@ class Helpers {
    * @return{HTMLElement[]} - список DOM элементов которые находятся во вьюпорте
    */
   static isElementsInViewport(nodes: HTMLElement[], offset: number = 0, enableWhenOnTop: boolean = false): HTMLElement[] {
-    const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
-    const windowWidth = (window.innerWidth || document.documentElement.clientWidth);
+    const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+    const windowWidth = window.innerWidth || document.documentElement.clientWidth;
 
-    return Array.from(nodes)
-      .filter((node) => {
-        const rect = node.getBoundingClientRect();
+    return Array.from(nodes).filter((node) => {
+      const rect = node.getBoundingClientRect();
 
-        const vertInView = (rect.top - offset <= windowHeight) && (enableWhenOnTop ? true : ((rect.top + rect.height) >= 0));
-        const horInView = (rect.left - offset <= windowWidth) && (enableWhenOnTop ? true : ((rect.left + rect.width) >= 0));
+      const vertInView = rect.top - offset <= windowHeight && (enableWhenOnTop ? true : rect.top + rect.height >= 0);
+      const horInView = rect.left - offset <= windowWidth && (enableWhenOnTop ? true : rect.left + rect.width >= 0);
 
-        return (vertInView && horInView);
-      });
+      return vertInView && horInView;
+    });
   }
 
   /**
@@ -1159,75 +1322,76 @@ class Helpers {
   static transliterate(text: string): string {
     // Словарь букв и их транслитерации
     const dictionary: { [key: string]: string } = {
-      "Ё": "YO",
-      "Й": "I",
-      "Ц": "TS",
-      "У": "U",
-      "К": "K",
-      "Е": "E",
-      "Н": "N",
-      "Г": "G",
-      "Ш": "SH",
-      "Щ": "SCH",
-      "З": "Z",
-      "Х": "H",
-      "Ъ": "'",
-      "ё": "yo",
-      "й": "i",
-      "ц": "ts",
-      "у": "u",
-      "к": "k",
-      "е": "e",
-      "н": "n",
-      "г": "g",
-      "ш": "sh",
-      "щ": "sch",
-      "з": "z",
-      "х": "h",
-      "ъ": "'",
-      "Ф": "F",
-      "Ы": "I",
-      "В": "V",
-      "А": "a",
-      "П": "P",
-      "Р": "R",
-      "О": "O",
-      "Л": "L",
-      "Д": "D",
-      "Ж": "ZH",
-      "Э": "E",
-      "ф": "f",
-      "ы": "i",
-      "в": "v",
-      "а": "a",
-      "п": "p",
-      "р": "r",
-      "о": "o",
-      "л": "l",
-      "д": "d",
-      "ж": "zh",
-      "э": "e",
-      "Я": "Ya",
-      "Ч": "CH",
-      "С": "S",
-      "М": "M",
-      "И": "I",
-      "Т": "T",
-      "Ь": "'",
-      "Б": "B",
-      "Ю": "YU",
-      "я": "ya",
-      "ч": "ch",
-      "с": "s",
-      "м": "m",
-      "и": "i",
-      "т": "t",
-      "ь": "'",
-      "б": "b",
-      "ю": "yu"
+      Ё: 'YO',
+      Й: 'I',
+      Ц: 'TS',
+      У: 'U',
+      К: 'K',
+      Е: 'E',
+      Н: 'N',
+      Г: 'G',
+      Ш: 'SH',
+      Щ: 'SCH',
+      З: 'Z',
+      Х: 'H',
+      Ъ: "'",
+      ё: 'yo',
+      й: 'i',
+      ц: 'ts',
+      у: 'u',
+      к: 'k',
+      е: 'e',
+      н: 'n',
+      г: 'g',
+      ш: 'sh',
+      щ: 'sch',
+      з: 'z',
+      х: 'h',
+      ъ: "'",
+      Ф: 'F',
+      Ы: 'I',
+      В: 'V',
+      А: 'a',
+      П: 'P',
+      Р: 'R',
+      О: 'O',
+      Л: 'L',
+      Д: 'D',
+      Ж: 'ZH',
+      Э: 'E',
+      ф: 'f',
+      ы: 'i',
+      в: 'v',
+      а: 'a',
+      п: 'p',
+      р: 'r',
+      о: 'o',
+      л: 'l',
+      д: 'd',
+      ж: 'zh',
+      э: 'e',
+      Я: 'Ya',
+      Ч: 'CH',
+      С: 'S',
+      М: 'M',
+      И: 'I',
+      Т: 'T',
+      Ь: "'",
+      Б: 'B',
+      Ю: 'YU',
+      я: 'ya',
+      ч: 'ch',
+      с: 's',
+      м: 'm',
+      и: 'i',
+      т: 't',
+      ь: "'",
+      б: 'b',
+      ю: 'yu',
     };
 
-    return text.split('')
+    return text
+      .split('')
       .map(function (char: string) {
         return dictionary[char] || char;
       })
@@ -1263,8 +1427,7 @@ class Helpers {
    */
   static isSelectorValid(selector: string): boolean {
     try {
-      document.createDocumentFragment()
-        .querySelector(selector);
+      document.createDocumentFragment().querySelector(selector);
     } catch {
       return false;
     }

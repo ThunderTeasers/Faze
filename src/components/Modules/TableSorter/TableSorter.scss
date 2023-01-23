@@ -1,0 +1,19 @@
+/**
+ * Стили для плагина сортировки таблиц
+ *
+ * Автор: Ерохин Максим
+ * Дата: 17.01.2023
+ */
+
+// Базовые стили для работы
+.faze-tablesorter,
+[data-faze='tablesorter'] {
+  .faze-tablesorter-header {
+    user-select: none;
+
+    // При наведении
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}

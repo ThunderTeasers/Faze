@@ -1,44 +1,43 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8"/>
-  <title>Title</title>
-</head>
-<body>
-<table data-faze="tablesorter">
-  <thead>
-  <tr>
-    <th>ID</th>
-    <th>Name</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr>
-    <td>1</td>
-    <td>A</td>
-  </tr>
-  <tr>
-    <td>2</td>
-    <td>B</td>
-  </tr>
-  </tbody>
-</table>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+  </head>
+  <body>
+    <table data-faze="tablesorter">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>A</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>B</td>
+        </tr>
+      </tbody>
+    </table>
 
-<div data-faze="tablesorter">
+    <div data-faze="tablesorter">
+      <div data-faze-tablesorter="header">
+        <div data-faze-tablesorter="cell" data-faze-tablesorter-type="numeric">ID</div>
+      </div>
 
-  <div data-faze-tablesorter="header">
-    <div data-faze-tablesorter="cell" data-faze-tablesorter-type="numeric">ID</div>
-  </div>
+      <div data-faze-tablesorter="body">
+        <div data-faze-tablesorter="row">
+          <div data-faze-tablesorter="cell">1</div>
+        </div>
 
-  <div data-faze-tablesorter="body">
-    <div data-faze-tablesorter="row">
-      <div data-faze-tablesorter="cell">1</div>
+        <div data-faze-tablesorter="row">
+          <div data-faze-tablesorter="cell">2</div>
+        </div>
+      </div>
     </div>
-
-    <div data-faze-tablesorter="row">
-      <div data-faze-tablesorter="cell">2</div>
-    </div>
-  </div>
-</div>
-</body>
+  </body>
 </html>

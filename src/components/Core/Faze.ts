@@ -35,6 +35,7 @@ import Carousel from '../Modules/Carousel/Carousel';
 import Carousel2 from '../Modules/Carousel2/Carousel2';
 import ThumbGallery from '../Modules/ThumbGallery/ThumbGallery';
 import TableSorter from '../Modules/TableSorter/TableSorter';
+import Sorter from '../Modules/Sorter/Sorter';
 import Zoom from '../Modules/Zoom/Zoom';
 import ZoomBox from '../Modules/ZoomBox/ZoomBox';
 import Look from '../Modules/Look/Look';
@@ -125,6 +126,7 @@ class Faze {
   static Helpers: any = Helpers;
   static Constants: any = Constants;
   static TableSorter: any = TableSorter;
+  static Sorter: any = Sorter;
   static URL: any = URL;
   static DOM: any = DOM;
   static Date: any = Date;
@@ -370,6 +372,7 @@ class Faze {
     Faze.ThumbGallery.hotInitialize('thumbgallery');
     Faze.SmartSelect.hotInitialize('smartselect');
     Faze.TableSorter.hotInitialize('tablesorter');
+    Faze.Sorter.hotInitialize('sorter');
     Faze.Placeholder.hotInitialize('placeholder');
     Faze.Spoiler.hotInitialize();
     Faze.Carousel2.hotInitialize('carousel2');

@@ -1,4 +1,4 @@
-import './TableSorter.scss';
+import './Sorter.scss';
 import Module from '../../Core/Module';
 import Faze from '../../Core/Faze';
 import { DataParser } from '../../Helpers/Helpers';
@@ -27,10 +27,6 @@ class Sorter extends Module {
   // DOM элементы заголовков сортировщика
   private headerNodes: NodeListOf<HTMLElement>;
 
-  private tbodyNode: HTMLElement;
-
-  private tbodyRowsNodes: HTMLElement[];
-
   /**
    * Стандартный конструктор
    *
@@ -58,28 +54,31 @@ class Sorter extends Module {
    */
   protected initialize(): void {
     this.headerNodes = document.querySelectorAll('[data-faze-sorter-head]');
-    this.headerNodes.forEach((head: HTMLElement) => {
-      if (!head.dataset.fazeSorterHead) {
-        alert(`Не задана группа для заголовка ${head.textContent}`);
+    this.headerNodes.forEach((headNode: HTMLElement) => {
+      if (!headNode.dataset.fazeSorterHead) {
+        console.error(`Не задана группа для заголовка ${headNode.textContent}`);
       }
 
       let data: HTMLElement[];
 
-      const bodyNode = document.querySelector(`[data-faze-sorter-body=${head.dataset.fazeSorterHead}]`);
+      const bodyNode = document.querySelector(`[data-faze-sorter-body=${headNode.dataset.fazeSorterHead}]`);
       if (bodyNode) {
         data = Array.from((bodyNode.children || []) as any);
       } else {
-        data = Array.from(document.querySelectorAll(`[data-faze-sorter-data=${head.dataset.fazeSorterHead}]`));
+        data = Array.from(document.querySelectorAll(`[data-faze-sorter-data=${headNode.dataset.fazeSorterHead}]`));
       }
 
       if (data.length) {
-        const parentNode = data[0].parentNode;
-
-        if (!head.dataset.fazeSorterValue) {
-          alert(`Не задан атрибут сортировки для заголовка ${head.textContent}`);
+        const parentNode = data[0].parentNode as HTMLElement;
+        if (!parentNode) {
+          return;
         }
 
-        const dataSortValue = head.dataset.fazeSorterValue || '';
+        if (!headNode.dataset.fazeSorterValue) {
+          console.error(`Не задан атрибут сортировки для заголовка ${headNode.textContent}`);
+        }
+
+        const dataSortValue = headNode.dataset.fazeSorterValue || '';
         const dataSortValueString = `fazeSorter${dataSortValue[0].toUpperCase()}${dataSortValue.slice(1)}`;
 
         const parserConfig = this.detectParserForColumn(data, dataSortValueString);
@@ -87,42 +86,47 @@ class Sorter extends Module {
         // Флаг обратной сортировки
         let descFlag = false;
 
-        Faze.Helpers.createElement('i', { class: 'fas fa-sort sort-arrow' }, {}, head);
+        Faze.Helpers.createElement('i', { class: 'fas fa-sort sort-arrow' }, {}, headNode);
 
-        head.addEventListener('click', () => {
-          heads.forEach((head) => {
-            head.querySelector('.sort-arrow').classList.remove('fa-sort-up');
-            head.querySelector('.sort-arrow').classList.remove('fa-sort-down');
-            head.querySelector('.sort-arrow').classList.add('fa-sort');
+        headNode.addEventListener('click', () => {
+          this.headerNodes.forEach((tmpHeadNode: HTMLElement) => {
+            const arrowNodeTmp = tmpHeadNode.querySelector('.sort-arrow');
+            if (arrowNodeTmp) {
+              arrowNodeTmp.classList.remove('fa-sort-up');
+              arrowNodeTmp.classList.remove('fa-sort-down');
+              arrowNodeTmp.classList.add('fa-sort');
+            }
           });
 
-          head.querySelector('.sort-arrow').classList.remove('fa-sort');
-
-          if (descFlag) {
-            head.querySelector('.sort-arrow').classList.remove('fa-sort-up');
-            head.querySelector('.sort-arrow').classList.add('fa-sort-down');
-          } else {
-            head.querySelector('.sort-arrow').classList.remove('fa-sort-down');
-            head.querySelector('.sort-arrow').classList.add('fa-sort-up');
+          const arrowNodeTmp = headNode.querySelector('.sort-arrow');
+          if (arrowNodeTmp) {
+            arrowNodeTmp.classList.remove('fa-sort');
+            if (descFlag) {
+              arrowNodeTmp.classList.remove('fa-sort-up');
+              arrowNodeTmp.classList.add('fa-sort-down');
+            } else {
+              arrowNodeTmp.classList.remove('fa-sort-down');
+              arrowNodeTmp.classList.add('fa-sort-up');
+            }
           }
 
           data.sort((a, b) => {
             const aValue = a.dataset[dataSortValueString] || '';
             const bValue = b.dataset[dataSortValueString] || '';
 
-            aFormatted = parserConfig.format(aValue);
-            bFormatted = parserConfig.format(bValue);
+            const aFormatted = parserConfig.format(aValue);
+            const bFormatted = parserConfig.format(bValue);
 
             if (parserConfig.type === 'text') {
               return descFlag ? (bFormatted < aFormatted ? -1 : 1) : aFormatted < bFormatted ? -1 : 1;
             } else {
-              return descFlag ? bFormatted - aFormatted : aFormatted - bFormatted;
+              return descFlag ? (bFormatted as number) - (aFormatted as number) : (aFormatted as number) - (bFormatted as number);
             }
           });
 
           parentNode.innerHTML = '';
-          data.forEach((data) => {
-            parentNode.append(data);
+          data.forEach((node: HTMLElement) => {
+            parentNode.append(node);
           });
 
           descFlag = !descFlag;
@@ -163,4 +167,15 @@ class Sorter extends Module {
 
     return Faze.Helpers.DataParsers.find((cellParser: DataParser) => cellParser.id === parserCounts[0].id);
   }
+
+  /**
+   * Инициализация модуля по data атрибутам
+   *
+   * @param node DOM элемент на который нужно инициализировать плагин
+   */
+  static initializeByDataAttributes(node: HTMLElement): void {
+    new Sorter(node);
+  }
 }
+
+export default Sorter;

@@ -95,10 +95,10 @@ interface Config {
   delayToClose?: number;
   additionalParams?: string;
   callbacks: {
-    beforeSuccess?: (parts: ModalParts) => void,
-    success?: (parts: ModalParts) => void,
-    close?: (parts: ModalParts) => void,
-    error?: (parts: ModalParts) => void,
+    beforeSuccess?: (parts: ModalParts) => void;
+    success?: (parts: ModalParts) => void;
+    close?: (parts: ModalParts) => void;
+    error?: (parts: ModalParts) => void;
   };
   buttons?: Buttons;
 }
@@ -278,16 +278,15 @@ class Modal {
         const params = JSON.parse(this.config.additionalParams || '{}');
 
         // Проходимся по всем ключам для добавления в форму
-        Object.keys(params)
-          .forEach((param: string) => {
-            // Создаём новый "hidden" инпут и вставляем его в форму
-            const hiddenNode = document.createElement('input');
-            hiddenNode.type = 'hidden';
-            hiddenNode.name = param;
-            hiddenNode.value = params[param];
+        Object.keys(params).forEach((param: string) => {
+          // Создаём новый "hidden" инпут и вставляем его в форму
+          const hiddenNode = document.createElement('input');
+          hiddenNode.type = 'hidden';
+          hiddenNode.name = param;
+          hiddenNode.value = params[param];
 
-            formNode.appendChild(hiddenNode);
-          });
+          formNode.appendChild(hiddenNode);
+        });
       } catch (e) {
         console.error(`Неправильный формат дополнительных переменных переданных в модальное окно!\nТребуется JSON объект!\n${e}`);
       }
@@ -485,7 +484,7 @@ class Modal {
       });
       return await response.text();
     } else {
-      return await this.config.html || '';
+      return (await this.config.html) || '';
     }
   }
 
@@ -640,8 +639,8 @@ class Modal {
       startMousePosition.y = event.clientY;
 
       // Рассчет новой позиции окна
-      this.modalParts.fullNode.style.left = `${(this.modalParts.fullNode.offsetLeft - endMousePosition.x)}px`;
-      this.modalParts.fullNode.style.top = `${(this.modalParts.fullNode.offsetTop - endMousePosition.y)}px`;
+      this.modalParts.fullNode.style.left = `${this.modalParts.fullNode.offsetLeft - endMousePosition.x}px`;
+      this.modalParts.fullNode.style.top = `${this.modalParts.fullNode.offsetTop - endMousePosition.y}px`;
     };
 
     /**
@@ -696,6 +695,7 @@ class Modal {
         evented: false,
         draggable: callerNode.dataset.fazeModalDraggable === 'true',
         resizable: callerNode.dataset.fazeModalResizable === 'true',
+        overlay: (callerNode.dataset.fazeModalOverlay || 'true') === 'true',
         wrapper: (callerNode.dataset.fazeModalWrapper || 'true') === 'true',
         url: callerNode.dataset.fazeModalUrl || '',
         class: callerNode.dataset.fazeModalClass || '',

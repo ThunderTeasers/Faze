@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
-<button data-faze="modal" data-faze-modal-html=".form-order">
-  12312313123
-</button>
-<div class="form-order" style="display:none">
-  <form action="/">
-    <input type="text" name="test">
-  </form>
-</div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+    <style>
+      .faze-modal {
+        border: 1px solid #000;
+      }
+    </style>
+  </head>
+  <body>
+    <button data-faze="modal" data-faze-modal-html=".form-order" data-faze-modal-wrapper="false" data-faze-modal-draggable="true">12312313123</button>
+    <div class="form-order" style="display: none">
+      <form action="/">
+        <input type="text" name="test" />
+      </form>
+    </div>
+  </body>
 </html>

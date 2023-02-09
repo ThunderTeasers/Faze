@@ -21,6 +21,7 @@ import Logger from '../../Core/Logger';
  *   callbacks
  *     created  - пользовательский метод, исполняющийся при успешном создании дропдауна
  *     opened   - пользовательский метод, исполняющийся при открытии дропдауна
+ *     closed   - пользовательский метод, исполняющийся при закрытии дропдауна
  */
 interface Config {
   positionTopOffset: number;
@@ -28,6 +29,7 @@ interface Config {
   callbacks: {
     created?: (data: CallbackData) => void;
     opened?: (data: CallbackData) => void;
+    closed?: (data: CallbackData) => void;
   };
 }
 
@@ -84,6 +86,7 @@ class Dropdown {
       callbacks: {
         created: undefined,
         opened: undefined,
+        closed: undefined,
       },
     };
 
@@ -114,7 +117,7 @@ class Dropdown {
     let topOffset: number = this.title.offsetHeight + this.config.positionTopOffset;
     if (this.config.strictPosition) {
       const callerRect: DOMRect = this.node.getBoundingClientRect();
-      const {documentElement} = document;
+      const { documentElement } = document;
 
       if (documentElement) {
         topOffset += (window.pageYOffset || documentElement.scrollTop) + callerRect.top;
@@ -163,6 +166,18 @@ class Dropdown {
             this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
           }
         }
+      } else {
+        // Вызываем пользовательский метод
+        if (typeof this.config.callbacks.closed === 'function') {
+          try {
+            this.config.callbacks.closed({
+              title: this.title,
+              body: this.body,
+            });
+          } catch (error) {
+            this.logger.error(`Ошибка исполнения пользовательского метода "closed": ${error}`);
+          }
+        }
       }
     });
 
@@ -172,6 +187,18 @@ class Dropdown {
       if (path) {
         if (!path.find((element: HTMLElement) => element === this.node)) {
           this.node.classList.remove('faze-active');
+
+          // Вызываем пользовательский метод
+          if (typeof this.config.callbacks.closed === 'function') {
+            try {
+              this.config.callbacks.closed({
+                title: this.title,
+                body: this.body,
+              });
+            } catch (error) {
+              this.logger.error(`Ошибка исполнения пользовательского метода "closed": ${error}`);
+            }
+          }
         }
       }
     });

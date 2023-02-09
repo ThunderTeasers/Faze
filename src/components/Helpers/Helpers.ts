@@ -1449,6 +1449,34 @@ class Helpers {
       });
     });
   }
+
+  /**
+   * Находит и возвращает склонение слова
+   *
+   * @param value {number} Количество
+   * @param words {string[]} Склонения слова
+   * @returns {string} Нужную форму склонения слова
+   */
+  static declOfNum(value: number, words: string[]): string {
+    return words[value % 100 > 4 && value % 100 < 20 ? 2 : [2, 0, 1, 1, 1, 2][value % 10 < 5 ? Math.abs(value) % 10 : 5]];
+  }
+
+  /**
+   * Проверка инпута на выход из границ, указанных в его атрибутах(min, max)
+   *
+   * @param {HTMLInputElement} node DOM элемент инпута который проверяем
+   */
+  static checkInputBounds(node: HTMLInputElement): void {
+    const value: number = parseInt(node.value);
+    const min: number = parseInt(node.min);
+    const max: number = parseInt(node.max);
+
+    if (value > max) {
+      node.value = max.toString();
+    } else if (value < min) {
+      node.value = min.toString();
+    }
+  }
 }
 
 export default Helpers;

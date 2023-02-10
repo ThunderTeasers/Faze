@@ -373,6 +373,7 @@ class Faze {
     Faze.SmartSelect.hotInitialize('smartselect');
     Faze.TableSorter.hotInitialize('tablesorter');
     Faze.Sorter.hotInitialize('sorter');
+    Faze.Slider.hotInitialize('slider');
     Faze.Placeholder.hotInitialize('placeholder');
     Faze.Spoiler.hotInitialize();
     Faze.Carousel2.hotInitialize('carousel2');

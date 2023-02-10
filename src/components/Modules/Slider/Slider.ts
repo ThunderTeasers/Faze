@@ -8,14 +8,13 @@
  */
 
 import './Slider.scss';
-import Logger from '../../Core/Logger';
+import Module from '../../Core/Module';
 
 /**
  * Структура возвращаемого объекта в пользовательском методе
  *
  * Содержит:
- *   title  - заголовок селекта
- *   body   - тело селекта
+ *   values - Текущие значения
  */
 interface CallbackData {
   values: number[];
@@ -39,6 +38,9 @@ interface Config {
   points: number[];
   connect: boolean;
   pointsInPercent: boolean;
+  selectors: {
+    inputs?: string;
+  };
   callbacks: {
     created?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
@@ -49,18 +51,12 @@ interface Config {
 /**
  * Класс слайдера
  */
-class Slider {
-  // DOM элемент селекта
-  readonly node: HTMLElement;
-
-  // Конфиг с настройками
-  readonly config: Config;
-
-  // Помощник для логирования
-  readonly logger: Logger;
-
+class Slider extends Module {
   // DOM элементы ползунков
-  readonly pointsNodes: HTMLElement[];
+  pointsNodes: HTMLElement[];
+
+  // DOM элементы инпутов
+  inputsNodes: HTMLInputElement[];
 
   // Размер ползунка
   pointSize: number;
@@ -87,7 +83,10 @@ class Slider {
       points,
       range: [parseInt(node.dataset.fazeSliderMin || '0', 10), parseInt(node.dataset.fazeSliderMax || '100', 10)],
       connect: true,
-      pointsInPercent: node.dataset.fazeSliderPointsInPercent === 'true',
+      pointsInPercent: false,
+      selectors: {
+        inputs: undefined,
+      },
       callbacks: {
         created: undefined,
         changed: undefined,
@@ -95,9 +94,19 @@ class Slider {
       },
     };
 
-    this.config = Object.assign(defaultConfig, config);
-    this.node = node;
-    this.logger = new Logger('Модуль Faze.Slider:');
+    // Инициализируем базовый класс
+    super({
+      node,
+      config: Object.assign(defaultConfig, config),
+      name: 'Slider',
+    });
+  }
+
+  /**
+   * Инициализация
+   */
+  protected initialize(): void {
+    super.initialize();
 
     // Проверка конфига
     this.checkConfig();
@@ -105,26 +114,21 @@ class Slider {
     // Инициализация переменных
     this.ratio = this.node.getBoundingClientRect().width / (this.config.range[1] - this.config.range[0]);
     this.pointsNodes = [];
+    this.inputsNodes = [];
     this.pointSize = 10;
     this.connectNode = null;
 
-    // Инициализация
-    this.initialize();
-
-    // Навешивание событий
-    this.bind();
-  }
-
-  /**
-   * Инициализация
-   */
-  initialize(): void {
     // Простановка класса, если этого не было сделано руками
     this.node.classList.add('faze-slider');
 
     // Инициализируем соединительную полоску, если необходимо
     if (this.config.connect) {
       this.createConnect();
+    }
+
+    // Инициализируем инпуты, если необходимо
+    if (this.config.selectors.inputs) {
+      this.initializeInputs();
     }
 
     // Инициализируем ползунки
@@ -165,11 +169,25 @@ class Slider {
   }
 
   /**
-   * Инициализация ползунков
+   * Инициализация инпутов для вывода значений ползунков
    */
-  initializePoints(): void {
+  private initializeInputs(): void {
+    this.config.selectors.inputs.split(',').forEach((selector: string) => {
+      const inputNode: HTMLInputElement | null = document.querySelector<HTMLInputElement>(selector);
+      if (inputNode) {
+        this.inputsNodes.push(inputNode);
+      }
+    });
+  }
+
+  /**
+   * Инициализация ползунков
+   *
+   * @private
+   */
+  private initializePoints(): void {
     // Создаем ползунки
-    this.config.points.forEach((point) => {
+    this.config.points.forEach((point: number) => {
       this.createPoint(point);
     });
   }
@@ -177,7 +195,9 @@ class Slider {
   /**
    * Навешивание событий
    */
-  bind(): void {
+  protected bind(): void {
+    super.bind();
+
     this.bindPoints();
   }
 
@@ -362,6 +382,11 @@ class Slider {
 
     // Рассчет новой позиции скролбара
     pointNode.style.left = `${tmpPosition}px`;
+
+    // Если указаны селекторы инпутов, то обновляем их
+    if (this.config.selectors.inputs) {
+      this.updateInputs();
+    }
   }
 
   /**
@@ -404,15 +429,19 @@ class Slider {
 
   /**
    * Проверка конфига на кооректность
+   *
+   * @private
    */
-  checkConfig(): void {
+  private checkConfig(): void {
     this.checkRange();
   }
 
   /**
    * Проверка диапазона
+   *
+   * @private
    */
-  checkRange(): void {
+  private checkRange(): void {
     // Если не задан диапазон
     if (!this.config.range) {
       return this.logger.error('Не задан диапазон значений для слайдера!');
@@ -422,6 +451,19 @@ class Slider {
     if (this.config.range.length !== 2) {
       return this.logger.error('Необходимо задать два значения в поле "range"!');
     }
+  }
+
+  /**
+   * Обновление значений инпутов, если указаны их селекторы
+   *
+   * @private
+   */
+  private updateInputs(): void {
+    this.getValues().forEach((value: number, index: number) => {
+      if (this.inputsNodes[index]) {
+        this.inputsNodes[index].value = value.toString();
+      }
+    });
   }
 
   /**
@@ -524,6 +566,23 @@ class Slider {
 
     // Сброс значения
     this.setValue(index, this.config.points[index], this.config.pointsInPercent);
+  }
+
+  /**
+   * Инициализация модуля по data атрибутам
+   *
+   * @param node - DOM элемент на который нужно инициализировать плагин
+   */
+  static initializeByDataAttributes(node: HTMLElement): void {
+    new Slider(node, {
+      points: node.dataset.fazeSliderPoints?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
+      range: node.dataset.fazeSliderRange?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
+      connect: (node.dataset.fazeSliderConnect || 'true') === 'true',
+      selectors: {
+        inputs: node.dataset.fazeSliderSelectorsInputs,
+      },
+      pointsInPercent: (node.dataset.fazeSliderPointsOnPercent || 'false') === 'true',
+    });
   }
 }
 

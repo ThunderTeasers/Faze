@@ -176,6 +176,9 @@ class Slider extends Module {
       const inputNode: HTMLInputElement | null = document.querySelector<HTMLInputElement>(selector);
       if (inputNode) {
         this.inputsNodes.push(inputNode);
+
+        // Проставляем начальные значения
+        inputNode.value = this.config.range[inputNode.dataset.fazeSliderInput || 0];
       }
     });
   }

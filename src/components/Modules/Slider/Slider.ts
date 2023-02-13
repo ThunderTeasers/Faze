@@ -67,21 +67,11 @@ class Slider extends Module {
   // Отношение ширины слайдера и его возможного максимального значения
   ratio: number;
 
-  constructor(node: HTMLElement | null, config: Partial<Config>) {
-    if (!node) {
-      throw new Error('Не задан объект слайдера!');
-    }
-
-    // Инициализация переменных из конфига
-    let points: number[] = [];
-    if (node && node.dataset.fazeSliderPoints) {
-      points = node.dataset.fazeSliderPoints.split(',').map((point) => parseInt(point, 10));
-    }
-
+  constructor(node: HTMLElement, config: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
-      points,
-      range: [parseInt(node.dataset.fazeSliderMin || '0', 10), parseInt(node.dataset.fazeSliderMax || '100', 10)],
+      points: [0, 100],
+      range: [0, 100],
       connect: true,
       pointsInPercent: false,
       selectors: {
@@ -577,9 +567,11 @@ class Slider extends Module {
    * @param node - DOM элемент на который нужно инициализировать плагин
    */
   static initializeByDataAttributes(node: HTMLElement): void {
+    const range: string | undefined = node.dataset.fazeSliderRange || node.dataset.fazeSliderPoints;
+
     new Slider(node, {
-      points: node.dataset.fazeSliderPoints?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
-      range: node.dataset.fazeSliderRange?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
+      points: range?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
+      range: range?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
       connect: (node.dataset.fazeSliderConnect || 'true') === 'true',
       selectors: {
         inputs: node.dataset.fazeSliderSelectorsInputs,

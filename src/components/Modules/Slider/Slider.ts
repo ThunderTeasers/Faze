@@ -521,7 +521,7 @@ class Slider extends Module {
       const ratio = (this.node.getBoundingClientRect().width - this.pointSize * this.pointsNodes.length) / (this.config.range[1] - this.config.range[0]);
 
       // Считаем значение всех, кроме последнего
-      let value = Math.round(parseFloat((pointNode.offsetLeft / ratio).toString())) + this.config.range[0];
+      let value: number = Math.round(parseFloat((pointNode.offsetLeft / ratio).toString())) + this.config.range[0];
 
       // Для последнего ползунка необходимо добавить значение равное половине его ширины
       if (i === this.pointsNodes.length - 1 && this.pointsNodes.length > 1) {

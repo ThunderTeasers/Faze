@@ -176,8 +176,10 @@ class Filter {
     }
 
     // Инициализация переменных
-    this.buttonSubmitNode = this.node.querySelector(`${this.config.selectors.form} [type="submit"]`);
     this.formNode = document.querySelector(this.config.selectors.form);
+    if (this.formNode) {
+      this.buttonSubmitNode = this.formNode.querySelector(`${this.config.selectors.form} [type="submit"]`);
+    }
     this.itemsHolderNode = document.querySelector(this.config.selectors.itemsHolder);
     this.disablePresetQuery = this.node.dataset.fazeFilterQueryDisable !== undefined;
     this.presetQuery = this.node.dataset.fazeFilterQuery;
@@ -260,8 +262,7 @@ class Filter {
 
         // Собираем вручную строку запроса из FormData т.к. Edge и другие отсталые браузеры, даже имея официалиьную поддержку
         // URLSearchParams не имеют возможности создать её через передачу параметра FormData в конструкторе.
-        const formDataQuery: string = [...formData.entries()].map((entry) => `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(<any>entry[1])}`)
-          .join('&');
+        const formDataQuery: string = [...formData.entries()].map((entry) => `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(<any>entry[1])}`).join('&');
 
         // Парсим данные формы
         const formDataURLString: URLSearchParams = new URLSearchParams(formDataQuery);
@@ -303,7 +304,7 @@ class Filter {
           if (this.node.dataset.fazeFilterReload && this.node.dataset.fazeFilterReload === 'true') {
             this.formNode?.submit();
           } else {
-            fetch(urlForRequest, {credentials: 'same-origin'})
+            fetch(urlForRequest, { credentials: 'same-origin' })
               .then((response: Response) => response.text())
               .then((response: string) => {
                 // Парсинг ответа от сервера
@@ -337,16 +338,15 @@ class Filter {
 
                 // Если используем API то получаем ссылку из Plarson
                 if (this.config.useAPI) {
-                  this.getURL(urlForHistory, this.cleanPath)
-                    .then((data) => {
-                      // Обновление строки в браузере
-                      if (this.config.updateQuery) {
-                        window.history.pushState({}, '', data.url);
-                      }
+                  this.getURL(urlForHistory, this.cleanPath).then((data) => {
+                    // Обновление строки в браузере
+                    if (this.config.updateQuery) {
+                      window.history.pushState({}, '', data.url);
+                    }
 
-                      // Действия выполняемые после фильтрации
-                      this.afterFilterActions(response, responseHTML, data.query);
-                    });
+                    // Действия выполняемые после фильтрации
+                    this.afterFilterActions(response, responseHTML, data.query);
+                  });
                 } else {
                   // Обновление строки в браузере
                   if (this.config.updateQuery) {
@@ -377,14 +377,13 @@ class Filter {
    * @private
    */
   private bindSubmitAfterChange(): void {
-    this.formNode?.querySelectorAll<HTMLInputElement>('input:not([type="hidden"])')
-      .forEach((inputNode: HTMLInputElement) => {
-        if (['checkbox', 'radio'].includes(inputNode.type)) {
-          inputNode.addEventListener('change', () => {
-            this.updateFilter();
-          });
-        }
-      });
+    this.formNode?.querySelectorAll<HTMLInputElement>('input:not([type="hidden"])').forEach((inputNode: HTMLInputElement) => {
+      if (['checkbox', 'radio'].includes(inputNode.type)) {
+        inputNode.addEventListener('change', () => {
+          this.updateFilter();
+        });
+      }
+    });
   }
 
   /**
@@ -403,12 +402,12 @@ class Filter {
       pathname = pathname.replace(/offset=\d+\//gi, '');
     }
 
-    const response = await fetch(`${pathname}?${params.toString()}`, {credentials: 'same-origin'});
+    const response = await fetch(`${pathname}?${params.toString()}`, { credentials: 'same-origin' });
     const data = await response.json();
 
     return {
       url: data.scheme_uri_path_query,
-      query: data.query_string
+      query: data.query_string,
     };
   }
 
@@ -483,22 +482,21 @@ class Filter {
     if (this.formNode) {
       const inputFields = ['text', 'number', 'date', 'phone', 'email', 'datetime', 'textarea'];
 
-      this.formNode.querySelectorAll<HTMLInputElement>(`input[type="${type}"], select`)
-        .forEach((foundNode: HTMLInputElement) => {
-          const foundNodeName = foundNode.name;
-          const foundNodeValue = foundNode.value;
+      this.formNode.querySelectorAll<HTMLInputElement>(`input[type="${type}"], select`).forEach((foundNode: HTMLInputElement) => {
+        const foundNodeName = foundNode.name;
+        const foundNodeValue = foundNode.value;
 
-          const values: string[] = this.params.getAll(foundNodeName);
-          if (values.includes(foundNodeValue)) {
-            if (typeof callback === 'function') {
-              callback(foundNode);
-            }
-          } else if (inputFields.includes(type) && values.length > 0) {
-            if (typeof callback === 'function') {
-              callback(foundNode, values[0]);
-            }
+        const values: string[] = this.params.getAll(foundNodeName);
+        if (values.includes(foundNodeValue)) {
+          if (typeof callback === 'function') {
+            callback(foundNode);
           }
-        });
+        } else if (inputFields.includes(type) && values.length > 0) {
+          if (typeof callback === 'function') {
+            callback(foundNode, values[0]);
+          }
+        }
+      });
     }
   }
 
@@ -585,10 +583,9 @@ class Filter {
       if (cookieValue) {
         // Если в значении присутствует разделитель, то это сборная строка из чекбоксов, её надо разобрать
         if (cookieValue.includes(this.config.cookie.delimiter)) {
-          cookieValue.split(this.config.cookie.delimiter)
-            .forEach((paramValue: string) => {
-              this.params.append(storedParamName, decodeURIComponent(paramValue));
-            });
+          cookieValue.split(this.config.cookie.delimiter).forEach((paramValue: string) => {
+            this.params.append(storedParamName, decodeURIComponent(paramValue));
+          });
         } else {
           // Иначе просто задаем нужное значение
           this.params.append(storedParamName, decodeURIComponent(cookieValue));
@@ -656,7 +653,7 @@ class Filter {
    */
   updateFilter(): void {
     if (this.formNode) {
-      this.formNode.dispatchEvent(new Event('submit', {cancelable: true}));
+      this.formNode.dispatchEvent(new Event('submit', { cancelable: true }));
     }
   }
 
@@ -694,10 +691,9 @@ class Filter {
       Filter.initializeByDataAttributes(filterNode);
     });
 
-    document.querySelectorAll<HTMLElement>('[data-faze~="filter"]')
-      .forEach((filterNode: HTMLElement) => {
-        Filter.initializeByDataAttributes(filterNode);
-      });
+    document.querySelectorAll<HTMLElement>('[data-faze~="filter"]').forEach((filterNode: HTMLElement) => {
+      Filter.initializeByDataAttributes(filterNode);
+    });
   }
 }
 

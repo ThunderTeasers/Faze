@@ -101,8 +101,10 @@ class Slider extends Module {
     // Проверка конфига
     this.checkConfig();
 
+    // Рассчитываем относительную величину
+    this.recalculateRatio();
+
     // Инициализация переменных
-    this.ratio = this.node.getBoundingClientRect().width / (this.config.range[1] - this.config.range[0]);
     this.pointsNodes = [];
     this.inputsNodes = [];
     this.pointSize = 10;
@@ -131,12 +133,9 @@ class Slider extends Module {
 
     // Вызываем пользовательскую функцию
     if (typeof this.config.callbacks.created === 'function') {
-      // Собираем значения
-      const values = this.getValues();
-
       try {
         this.config.callbacks.created({
-          values,
+          values: this.getValues(),
         });
       } catch (error) {
         return this.logger.error(`Ошибка исполнения пользовательского метода "created", дословно: ${error}!`);
@@ -168,7 +167,7 @@ class Slider extends Module {
         this.inputsNodes.push(inputNode);
 
         // Проставляем начальные значения
-        inputNode.value = this.config.range[inputNode.dataset.fazeSliderInput || 0];
+        inputNode.value = this.config.points[inputNode.dataset.fazeSliderInput || 0];
       }
     });
   }
@@ -231,12 +230,9 @@ class Slider extends Module {
 
         // Вызываем пользовательскую функцию
         if (typeof this.config.callbacks.changed === 'function') {
-          // Собираем значения
-          const values = this.getValues();
-
           try {
             this.config.callbacks.changed({
-              values,
+              values: this.getValues(),
             });
           } catch (error) {
             return this.logger.error(`Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`);
@@ -261,12 +257,9 @@ class Slider extends Module {
 
         // Вызываем пользовательскую функцию
         if (typeof this.config.callbacks.stopped === 'function') {
-          // Собираем значения
-          const values = this.getValues();
-
           try {
             this.config.callbacks.stopped({
-              values,
+              values: this.getValues(),
             });
           } catch (error) {
             return this.logger.error(`Ошибка исполнения пользовательского метода "stopped", дословно: ${error}!`);
@@ -393,7 +386,7 @@ class Slider extends Module {
     pointNode.className = 'faze-pointer';
 
     // Обычный рассчет позиции
-    let left = position * this.ratio;
+    let left = -((this.node.getBoundingClientRect().width * (this.config.range[0] - position)) / (this.config.range[1] - this.config.range[0]));
 
     // Рассчет позиции если необходимо считать через проценты
     if (this.config.pointsInPercent) {
@@ -568,9 +561,10 @@ class Slider extends Module {
    */
   static initializeByDataAttributes(node: HTMLElement): void {
     const range: string | undefined = node.dataset.fazeSliderRange || node.dataset.fazeSliderPoints;
+    const points: string | undefined = node.dataset.fazeSliderPoints || node.dataset.fazeSliderRange;
 
     new Slider(node, {
-      points: range?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
+      points: points?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
       range: range?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
       connect: (node.dataset.fazeSliderConnect || 'true') === 'true',
       selectors: {

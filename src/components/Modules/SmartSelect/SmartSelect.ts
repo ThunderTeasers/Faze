@@ -45,6 +45,18 @@ interface Item {
 }
 
 /**
+ * Структура возвращаемого объекта в пользовательском методе
+ *
+ * Содержит:
+ *   node - DOM элемент модуля
+ *   body - данные
+ */
+interface CallbackData {
+  node: HTMLInputElement;
+  data: object;
+}
+
+/**
  * Структура конфига умного селекта
  *
  * Содержит:
@@ -57,6 +69,9 @@ interface Config {
   fixed: boolean;
   minLength: number;
   headers?: object;
+  callbacks: {
+    selected?: (activeTabData: CallbackData) => void;
+  };
 }
 
 class SmartSelect extends Module {
@@ -86,6 +101,9 @@ class SmartSelect extends Module {
       fixed: false,
       minLength: 3,
       headers: undefined,
+      callbacks: {
+        selected: undefined,
+      },
     };
 
     // Инициализируем базовый класс
@@ -187,6 +205,18 @@ class SmartSelect extends Module {
           if (foundItem) {
             (<HTMLInputElement>this.node).value = foundItem.node.textContent || '';
             this.close();
+          }
+
+          // Вызываем пользовательский метод
+          if (typeof this.config.callbacks.selected === 'function') {
+            try {
+              this.config.callbacks.selected({
+                node: this.node,
+                data: foundItem.data,
+              });
+            } catch (error) {
+              this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
+            }
           }
 
           break;
@@ -423,6 +453,9 @@ class SmartSelect extends Module {
    */
   public close(): void {
     this.itemsNode.classList.remove('faze-active');
+
+    // Сбрасываем индекс выбранного элемента
+    this.currentIndex = -1;
   }
 
   /**

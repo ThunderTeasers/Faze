@@ -34,11 +34,11 @@ class URL {
   /**
    * Добавление параметра существующему URL
    *
+   * @param url{string} URL к которому добавляем параметр
    * @param name{string} Имя параметра
    * @param value{string} Значение параметра
-   * @param url{string} URL к которому добавляем параметр
    */
-  static addParamToURL(name: string, value: string, url: string): string {
+  static addParamToURL(url: string, name: string, value: string): string {
     let result: string = url;
 
     if (url.includes('?')) {

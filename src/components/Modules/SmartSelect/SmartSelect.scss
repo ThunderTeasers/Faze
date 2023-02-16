@@ -11,7 +11,7 @@
   left: 0;
 
   display: none;
-  max-height: 300px;
+  max-height: 330px;
 
   background-color: #fff;
 
@@ -32,5 +32,27 @@
   // Открыто
   &.faze-active {
     display: block;
+  }
+
+  // Если нужно базовое оформление
+  &[data-faze-styles] {
+    padding: 5px;
+    border: 1px solid #aaa;
+
+    // Элемент
+    .faze-smartsearch-item {
+      padding: 5px 10px;
+
+      // При наведении или активности
+      &.faze-active,
+      &:hover {
+        background-color: #ccc;
+      }
+
+      // Граница
+      &:not(:last-child) {
+        border-bottom: 1px solid #ccc;
+      }
+    }
   }
 }

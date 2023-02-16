@@ -21,6 +21,18 @@ enum API {
 }
 
 /**
+ * Структура кэша
+ *
+ * Содержит:
+ *   query - текст запроса
+ *   data - данные от сервера
+ */
+interface QueryCache {
+  query: string;
+  data: any[];
+}
+
+/**
  * Структура конфига умного селекта
  *
  * Содержит:
@@ -41,6 +53,9 @@ class SmartSelect extends Module {
 
   // DOM элементы опций
   private itemsNodes: HTMLDivElement[];
+
+  // Кэш запросов
+  private cache: QueryCache[];
 
   /**
    * Конструктор
@@ -73,6 +88,7 @@ class SmartSelect extends Module {
     super.initialize();
 
     this.itemsNodes = [];
+    this.cache = [];
     (<HTMLInputElement>this.node).autocomplete = 'off';
   }
 
@@ -148,9 +164,30 @@ class SmartSelect extends Module {
           return;
         }
 
-        const items = await this.request();
+        // Текст запроса
+        const query: string = (<HTMLInputElement>this.node).value;
+
+        // Проверяем есть ли такой запрос в кэше
+        const cache: QueryCache | undefined = this.cache.find((c) => c.query === query);
+
+        // Данные
+        let data: any[];
+
+        // Если есть, то берём его данные из кэша, если нет, то отправляем на сервер
+        if (cache) {
+          data = cache.data;
+        } else {
+          data = await this.request(query);
+
+          // Добавляем новую запись в кэш
+          this.cache.push({
+            query,
+            data,
+          });
+        }
+
         this.clearItems();
-        this.buildItems(items);
+        this.buildItems(data);
         this.bindSelectOption();
       }, 500);
     });
@@ -159,14 +196,16 @@ class SmartSelect extends Module {
   /**
    * Отправка запроса на сервер
    *
+   * @param {string} query Текст запроса
+   *
    * @private
    */
-  private async request(): Promise<object[]> {
+  private async request(query: string): Promise<object[]> {
     let data: object[];
 
     switch (this.config.api) {
       case API.DaData:
-        data = await this.requestDaData();
+        data = await this.requestDaData(query);
         break;
       default:
         data = [];
@@ -179,11 +218,13 @@ class SmartSelect extends Module {
   /**
    * Получаем данные DaData, они изначально находятся в удобном для нас формате
    *
+   * @param {string} query Текст запроса
+   *
    * @returns Данные с сервера DaData
    *
    * @private
    */
-  private async requestDaData(): Promise<object[]> {
+  private async requestDaData(query: string): Promise<object[]> {
     const request = await fetch(`https://suggestions.dadata.ru/suggestions/api/4_1/rs/${this.config.url}`, {
       method: 'POST',
       mode: 'cors',
@@ -193,7 +234,7 @@ class SmartSelect extends Module {
         Authorization: 'Token 510641ac81338d1f60e41e59c787e6df689d4553',
       },
       body: JSON.stringify({
-        query: (<HTMLInputElement>this.node).value,
+        query,
       }),
     });
 

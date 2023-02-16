@@ -12,6 +12,11 @@ import './SmartSelect.scss';
 import Module from '../../Core/Module';
 import Faze from '../../Core/Faze';
 
+enum API {
+  Plarson,
+  DaData,
+}
+
 /**
  * Структура конфига умного селекта
  *
@@ -20,11 +25,17 @@ import Faze from '../../Core/Faze';
  *   tableName - имя таблицы в Plarson
  */
 interface Config {
-  url?: string;
-  tableName?: string;
+  api: API;
+  url: string;
   fixed: boolean;
   minLength: number;
+  headers?: object;
 }
+
+// interface Cache {
+//   value: string;
+//   data: object;
+// }
 
 class SmartSelect extends Module {
   // DOM элемент выпадающего списка селекта
@@ -33,13 +44,20 @@ class SmartSelect extends Module {
   // DOM элементы опций
   private itemsNodes: HTMLDivElement[];
 
+  /**
+   * Конструктор
+   *
+   * @param node Главный DOM элемент модуля
+   * @param config Настройки модуля
+   */
   constructor(node?: HTMLElement, config?: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
-      url: undefined,
-      tableName: undefined,
+      api: API.Plarson,
+      url: '',
       fixed: false,
       minLength: 3,
+      headers: undefined,
     };
 
     // Инициализируем базовый класс
@@ -126,25 +144,16 @@ class SmartSelect extends Module {
     Faze.Helpers.addEventListeners(this.node, ['keyup', 'focus'], () => {
       clearTimeout(inputTimer);
 
-      inputTimer = window.setTimeout(() => {
+      inputTimer = window.setTimeout(async () => {
         if ((<HTMLInputElement>this.node).value.length < this.config.minLength) {
           this.clearItems();
           return;
         }
 
-        this.request()
-          .then((rawItems: string) => {
-            let items: any[] = [];
-            try {
-              items = JSON.parse(rawItems);
-            } catch {
-              this.logger.error('Ошибка парсинга JSON!');
-            }
-
-            this.clearItems();
-            this.buildItems(items);
-            this.bindSelectOption();
-          });
+        const items = await this.request();
+        this.clearItems();
+        this.buildItems(items);
+        this.bindSelectOption();
       }, 500);
     });
   }
@@ -154,9 +163,49 @@ class SmartSelect extends Module {
    *
    * @private
    */
-  private async request(): Promise<string> {
-    const request = await fetch(Faze.URL.addParamToURL(`${this.config.tableName}_chr_name`, (<HTMLInputElement>this.node).value, this.config.url));
-    return request.text();
+  private async request(): Promise<object[]> {
+    let data: object[];
+
+    switch (this.config.api) {
+      case API.DaData:
+        data = await this.requestDaData();
+        break;
+      default:
+        data = [];
+        break;
+    }
+
+    return data;
+  }
+
+  /**
+   * Получаем данные DaData, они изначально находятся в удобном для нас формате
+   *
+   * @returns Данные с сервера DaData
+   *
+   * @private
+   */
+  private async requestDaData(): Promise<object[]> {
+    const request = await fetch(`https://suggestions.dadata.ru/suggestions/api/4_1/rs/${this.config.url}`, {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: 'Token 510641ac81338d1f60e41e59c787e6df689d4553',
+      },
+      body: JSON.stringify({
+        query: (<HTMLInputElement>this.node).value,
+      }),
+    });
+
+    // Получаем данные
+    const data = await request.json();
+    if ('suggestions' in data) {
+      return data.suggestions;
+    }
+
+    return [];
   }
 
   /**
@@ -212,27 +261,30 @@ class SmartSelect extends Module {
    * @private
    */
   private buildItems(items: any[]): void {
-    let isOpen = false;
+    let canOpen = false;
+
+    // Временно ставим, что у всех API поле "value", т.к. сейчас только одно DaData
+    let field = 'value';
 
     items.forEach((item: any) => {
-      // Не добавляем элемент если он такой же, как и введенное значение
-      if ((<HTMLInputElement>this.node).value === item[`${this.config.tableName}_chr_name`]) {
+      // Не добавляем элемент если он такой же, как и введенное значение или нет такого поля в ответе
+      if (!(field in item) || (<HTMLInputElement>this.node).value === item.value) {
         return;
       }
 
       const itemNode = document.createElement('div');
       itemNode.className = 'faze-smartsearch-item';
-      itemNode.textContent = item[`${this.config.tableName}_chr_name`];
+      itemNode.textContent = item[field];
       this.itemsNodes.push(itemNode);
 
       this.itemsNode.appendChild(itemNode);
 
       // Ставим на открытие, если добавили хоть один элемент
-      isOpen = true;
+      canOpen = true;
     });
 
     // Открытие выпадающего списка, если есть варианты
-    if (isOpen) {
+    if (canOpen) {
       this.open();
     }
   }
@@ -257,9 +309,18 @@ class SmartSelect extends Module {
    * @param node - DOM элемент на который нужно инициализировать плагин
    */
   static initializeByDataAttributes(node: HTMLElement): void {
+    let api = API.Plarson;
+    switch (node.dataset.fazeSmartselectApi) {
+      case 'DaData':
+        api = API.DaData;
+        break;
+      default:
+        api = API.Plarson;
+    }
+
     new SmartSelect(node, {
-      url: node.dataset.fazeSmartselectUrl,
-      tableName: node.dataset.fazeSmartselectTableName,
+      api,
+      url: node.dataset.fazeSmartselectUrl || '',
       fixed: (node.dataset.fazeSmartselectFixed || 'false') === 'true',
       minLength: parseInt(node.dataset.fazeSmartselectMinLength || '3', 10),
     });

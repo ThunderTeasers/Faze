@@ -12,6 +12,9 @@ import './SmartSelect.scss';
 import Module from '../../Core/Module';
 import Faze from '../../Core/Faze';
 
+/**
+ * Список доступных API для работы
+ */
 enum API {
   Plarson,
   DaData,
@@ -31,11 +34,6 @@ interface Config {
   minLength: number;
   headers?: object;
 }
-
-// interface Cache {
-//   value: string;
-//   data: object;
-// }
 
 class SmartSelect extends Module {
   // DOM элемент выпадающего списка селекта
@@ -309,6 +307,7 @@ class SmartSelect extends Module {
    * @param node - DOM элемент на который нужно инициализировать плагин
    */
   static initializeByDataAttributes(node: HTMLElement): void {
+    // Получаем API
     let api = API.Plarson;
     switch (node.dataset.fazeSmartselectApi) {
       case 'DaData':

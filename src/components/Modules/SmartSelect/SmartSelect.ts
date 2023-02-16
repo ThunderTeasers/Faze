@@ -33,6 +33,18 @@ interface QueryCache {
 }
 
 /**
+ * Структура элемента для выбора
+ *
+ * Содержит:
+ *   node - DOM элемент себя
+ *   data - данные
+ */
+interface Item {
+  node: HTMLDivElement;
+  data: object;
+}
+
+/**
  * Структура конфига умного селекта
  *
  * Содержит:
@@ -52,10 +64,13 @@ class SmartSelect extends Module {
   private itemsNode: HTMLDivElement;
 
   // DOM элементы опций
-  private itemsNodes: HTMLDivElement[];
+  private items: Item[];
 
   // Кэш запросов
   private cache: QueryCache[];
+
+  // Индекс выбранного элемента
+  private currentIndex: number;
 
   /**
    * Конструктор
@@ -87,7 +102,8 @@ class SmartSelect extends Module {
   initialize(): void {
     super.initialize();
 
-    this.itemsNodes = [];
+    this.currentIndex = -1;
+    this.items = [];
     this.cache = [];
     (<HTMLInputElement>this.node).autocomplete = 'off';
   }
@@ -100,6 +116,7 @@ class SmartSelect extends Module {
 
     this.bindCloseOnClickOutside();
     this.handleInput();
+    this.bindKeyboardControl();
   }
 
   /**
@@ -121,16 +138,68 @@ class SmartSelect extends Module {
    * @private
    */
   private bindSelectOption(): void {
-    this.itemsNodes.forEach((itemNode: HTMLDivElement) => {
-      itemNode.addEventListener('click', (event: MouseEvent) => {
+    this.items.forEach((item: Item) => {
+      item.node.addEventListener('click', (event: MouseEvent) => {
         event.preventDefault();
 
         // Присваиваем выбранное значение
-        (<HTMLInputElement>this.node).value = itemNode.textContent || '';
+        (<HTMLInputElement>this.node).value = item.node.textContent || '';
 
         // Закрываем выпадающий список
         this.close();
       });
+    });
+  }
+
+  /**
+   * Навешивание событий управления выбором через клавиатуру
+   */
+  private bindKeyboardControl(): void {
+    this.node.addEventListener('keyup', (event: KeyboardEvent) => {
+      switch (event.code) {
+        case 'ArrowUp':
+          event.preventDefault();
+
+          this.currentIndex--;
+          if (this.currentIndex < 0) {
+            this.currentIndex = this.items.length - 1;
+          }
+
+          this.updateActiveItem();
+
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+
+          this.currentIndex++;
+          if (this.currentIndex > this.items.length - 1) {
+            this.currentIndex = 0;
+          }
+
+          this.updateActiveItem();
+
+          break;
+        case 'Enter':
+          event.preventDefault();
+
+          // Ищем элемент по текущему индексу, если находим то выбираем его
+          const foundItem = this.items[this.currentIndex];
+          if (foundItem) {
+            (<HTMLInputElement>this.node).value = foundItem.node.textContent || '';
+            this.close();
+          }
+
+          break;
+      }
+    });
+  }
+
+  /**
+   * Обновление выбранного элемента
+   */
+  private updateActiveItem(): void {
+    this.items.forEach((item, index) => {
+      item.node.classList.toggle('faze-active', index === this.currentIndex);
     });
   }
 
@@ -155,7 +224,13 @@ class SmartSelect extends Module {
    */
   private handleInput(): void {
     let inputTimer: number;
-    Faze.Helpers.addEventListeners(this.node, ['keyup', 'focus'], () => {
+    Faze.Helpers.addEventListeners(this.node, ['keyup', 'focus'], (event: KeyboardEvent) => {
+      if (['ArrowUp', 'ArrowDown', 'Enter'].includes(event.code)) {
+        return;
+      }
+
+      console.log(123);
+
       clearTimeout(inputTimer);
 
       inputTimer = window.setTimeout(async () => {
@@ -269,6 +344,11 @@ class SmartSelect extends Module {
     this.itemsNode = document.createElement('div');
     this.itemsNode.className = 'faze-smartsearch-items';
 
+    // Ставим атрибут если он есть на инпуте
+    if ('fazeStyles' in this.node.dataset) {
+      this.itemsNode.dataset.fazeStyles = '';
+    }
+
     if (this.config.fixed) {
       document.body.appendChild(this.itemsNode);
     } else {
@@ -283,10 +363,10 @@ class SmartSelect extends Module {
    */
   private clearItems(): void {
     // Очищаем все данные
-    this.itemsNodes.forEach((itemNode: HTMLDivElement) => {
-      itemNode.remove();
+    this.items.forEach((item: Item) => {
+      item.node.remove();
     });
-    this.itemsNodes = [];
+    this.items = [];
 
     // Закрываем выпадающий список
     this.close();
@@ -299,22 +379,25 @@ class SmartSelect extends Module {
    *
    * @private
    */
-  private buildItems(items: any[]): void {
+  private buildItems(data: any[]): void {
     let canOpen = false;
 
     // Временно ставим, что у всех API поле "value", т.к. сейчас только одно DaData
     let field = 'value';
 
-    items.forEach((item: any) => {
+    data.forEach((row: any) => {
       // Не добавляем элемент если он такой же, как и введенное значение или нет такого поля в ответе
-      if (!(field in item) || (<HTMLInputElement>this.node).value === item.value) {
+      if (!(field in row) || (<HTMLInputElement>this.node).value === row.value) {
         return;
       }
 
       const itemNode = document.createElement('div');
       itemNode.className = 'faze-smartsearch-item';
-      itemNode.textContent = item[field];
-      this.itemsNodes.push(itemNode);
+      itemNode.textContent = row[field];
+      this.items.push({
+        node: itemNode,
+        data: row,
+      });
 
       this.itemsNode.appendChild(itemNode);
 

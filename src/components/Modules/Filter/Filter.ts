@@ -186,7 +186,7 @@ class Filter {
     this.cleanPath = this.node.dataset.fazeFilterCleanPath;
 
     if (this.config.showTotal && this.formNode) {
-      this.totalNode = this.node.querySelector(this.config.selectors.total);
+      this.totalNode = document.querySelector(this.config.selectors.total);
     }
 
     this.initialize();

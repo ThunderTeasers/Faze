@@ -161,6 +161,25 @@ class Spoiler {
   }
 
   /**
+   * Открытие спойлера
+   */
+  open() {
+    this.node.classList.add('faze-active');
+
+    // Вызываем пользовательский метод
+    if (typeof this.config.callbacks.opened === 'function') {
+      try {
+        this.config.callbacks.opened({
+          title: this.titleNode,
+          body: this.bodyNode,
+        });
+      } catch (error) {
+        this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
+      }
+    }
+  }
+
+  /**
    * Инициализация модуля по data атрибутам
    */
   static hotInitialize(): void {

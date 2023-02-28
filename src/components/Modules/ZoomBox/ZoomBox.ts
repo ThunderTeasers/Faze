@@ -144,7 +144,7 @@ class ZoomBox {
    */
   async initialize(): Promise<void> {
     // Загружаем полное изображение
-    const {imageNode, size} = await this.getFullImageSize(this.callerNode.dataset.fazeZoomboxImage || '');
+    const { imageNode, size } = await this.getFullImageSize(this.callerNode.dataset.fazeZoomboxImage || '');
 
     // Т.к. изображение уже получено, сразу добавляем его в общий объект с данными
     this.wrapperData.imageNode = imageNode;
@@ -243,17 +243,16 @@ class ZoomBox {
       }
 
       // Изменяем текущую активную миниатюру, для возвращения в неё после закрытия
-      this.change(this.currentIndex)
-        .then(() => {
-          // Вызываем пользовательскую функцию
-          if (typeof this.config.callbacks.afterChanged === 'function') {
-            try {
-              this.config.callbacks.afterChanged();
-            } catch (error) {
-              console.error('Ошибка исполнения пользовательского метода "afterChanged":', error);
-            }
+      this.change(this.currentIndex).then(() => {
+        // Вызываем пользовательскую функцию
+        if (typeof this.config.callbacks.afterChanged === 'function') {
+          try {
+            this.config.callbacks.afterChanged();
+          } catch (error) {
+            console.error('Ошибка исполнения пользовательского метода "afterChanged":', error);
           }
-        });
+        }
+      });
     });
 
     // Предыдущая
@@ -274,17 +273,16 @@ class ZoomBox {
       }
 
       // Изменяем текущую активную миниатюру, для возвращения в неё после закрытия
-      this.change(this.currentIndex)
-        .then(() => {
-          // Вызываем пользовательскую функцию
-          if (typeof this.config.callbacks.afterChanged === 'function') {
-            try {
-              this.config.callbacks.afterChanged();
-            } catch (error) {
-              console.error('Ошибка исполнения пользовательского метода "afterChanged":', error);
-            }
+      this.change(this.currentIndex).then(() => {
+        // Вызываем пользовательскую функцию
+        if (typeof this.config.callbacks.afterChanged === 'function') {
+          try {
+            this.config.callbacks.afterChanged();
+          } catch (error) {
+            console.error('Ошибка исполнения пользовательского метода "afterChanged":', error);
           }
-        });
+        }
+      });
     });
   }
 
@@ -297,7 +295,7 @@ class ZoomBox {
     this.changeActiveThumbnail(index);
 
     // Получаем новое изображение
-    const {imageNode, size} = await this.getFullImageSize(this.callerNode.dataset.fazeZoomboxImage || '');
+    const { imageNode, size } = await this.getFullImageSize(this.callerNode.dataset.fazeZoomboxImage || '');
 
     // Изменяем изображение
     if (this.wrapperData.imageNode) {
@@ -375,7 +373,7 @@ class ZoomBox {
     this.buildCaption();
 
     // Записываем текущее положение и размеры миниатюры
-    this.currentThumbnailPositionAndSize = Faze.Helpers.getElementPositionAndSize(this.callerNode, {width: 12, height: 12}, {x: 6, y: 6});
+    this.currentThumbnailPositionAndSize = Faze.Helpers.getElementPositionAndSize(this.callerNode, { width: 12, height: 12 }, { x: 6, y: 6 });
 
     // Добавляем враппер на страницу
     document.body.appendChild(wrapperNode);
@@ -415,16 +413,16 @@ class ZoomBox {
     // Если по какой то причине враппер не создан до этого момента, возвращаем пустой результат
     if (!this.wrapperData.node) {
       return {
-        position: {x: 0, y: 0},
-        size: {width: 0, height: 0},
+        position: { x: 0, y: 0 },
+        size: { width: 0, height: 0 },
       };
     }
 
     // Финальные размеры картинки
-    const finalSize: FazeSize = {width: 0, height: 0};
+    const finalSize: FazeSize = { width: 0, height: 0 };
 
     // Финальное положение картинки
-    const finalPosition: FazePosition = {x: 0, y: 0};
+    const finalPosition: FazePosition = { x: 0, y: 0 };
 
     // Отступы у body страницы
     const bodyPadding: FazeSize = {
@@ -447,12 +445,12 @@ class ZoomBox {
       // картинки, высота точно влезет
       if (size.width / size.height > this.viewport.width / this.viewport.height) {
         finalSize.width = Math.min(this.viewport.width, size.width);
-        finalSize.height = finalSize.width * size.height / size.width;
+        finalSize.height = (finalSize.width * size.height) / size.width;
       } else {
         // Картинка сплюснута по ширине относительно вьюпорта, т.е. страница вытянута в длину сильнее картинки значит ограничиваем высоту
         // картинки, ширина точно влезет
         finalSize.height = Math.min(this.viewport.height, size.height);
-        finalSize.width = finalSize.height * size.width / size.height;
+        finalSize.width = (finalSize.height * size.width) / size.height;
       }
     }
 
@@ -617,12 +615,12 @@ class ZoomBox {
    * @param source - Путь до изображения
    * @returns{Promise<FazeSize>} - Промис возвращающий размеры изображения(ширина, высота)
    */
-  private getFullImageSize(source: string): Promise<{ imageNode: HTMLImageElement, size: FazeSize }> {
+  private getFullImageSize(source: string): Promise<{ imageNode: HTMLImageElement; size: FazeSize }> {
     return new Promise((resolve, reject) => {
       const image = new Image();
       image.src = source;
       image.className = 'faze-zoombox-image';
-      image.onload = () => resolve({imageNode: image, size: {width: image.width, height: image.height}});
+      image.onload = () => resolve({ imageNode: image, size: { width: image.width, height: image.height } });
       image.onerror = reject;
     });
   }
@@ -638,7 +636,7 @@ class ZoomBox {
 
     Faze.on('click', '[data-faze~="zoombox"]', (event: Event, callerNode: HTMLElement) => {
       const group: string | undefined = callerNode.dataset.fazeZoomboxGroup;
-      const align: string = callerNode.dataset.fazeZoomboxAlign || 'self';
+      const align: string = callerNode.dataset.fazeZoomboxAlign || 'center';
       let size: FazeSize | undefined;
       if (callerNode.dataset.fazeZoomboxWidth && callerNode.dataset.fazeZoomboxHeight) {
         size = {

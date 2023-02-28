@@ -100,6 +100,10 @@ module.exports = (env) => {
         template: './src/tests/views/sorter.html',
       }),
       new HtmlWebpackPlugin({
+        filename: 'zoombox.html',
+        template: './src/tests/views/zoombox.html',
+      }),
+      new HtmlWebpackPlugin({
         template: './src/index.html',
       }),
       new webpack.HotModuleReplacementPlugin(),

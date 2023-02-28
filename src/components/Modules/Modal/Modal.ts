@@ -93,7 +93,7 @@ interface Config {
   resizable: boolean;
   wrapper: boolean;
   delayToClose?: number;
-  additionalParams?: string;
+  additionalParams: any;
   callbacks: {
     beforeSuccess?: (parts: ModalParts) => void;
     success?: (parts: ModalParts) => void;
@@ -158,7 +158,7 @@ class Modal {
       resizable: false,
       wrapper: true,
       delayToClose: 0,
-      additionalParams: undefined,
+      additionalParams: {},
       callbacks: {
         beforeSuccess: undefined,
         success: undefined,
@@ -274,16 +274,13 @@ class Modal {
     if (formNode) {
       // Пытаемся распарсить JSON с параметрами
       try {
-        // Парсим
-        const params = JSON.parse(this.config.additionalParams || '{}');
-
         // Проходимся по всем ключам для добавления в форму
-        Object.keys(params).forEach((param: string) => {
+        Object.keys(this.config.additionalParams).forEach((param: string) => {
           // Создаём новый "hidden" инпут и вставляем его в форму
           const hiddenNode = document.createElement('input');
           hiddenNode.type = 'hidden';
           hiddenNode.name = param;
-          hiddenNode.value = params[param];
+          hiddenNode.value = this.config.additionalParams[param];
 
           formNode.appendChild(hiddenNode);
         });
@@ -699,7 +696,7 @@ class Modal {
         wrapper: (callerNode.dataset.fazeModalWrapper || 'true') === 'true',
         url: callerNode.dataset.fazeModalUrl || '',
         class: callerNode.dataset.fazeModalClass || '',
-        additionalParams: callerNode.dataset.fazeModalAdditionalParams || '{}',
+        additionalParams: Faze.Helpers.parseJSON(callerNode.dataset.fazeModalAdditionalParams || '{}'),
       });
     });
   }

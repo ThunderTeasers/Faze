@@ -53,6 +53,22 @@ class URL {
 
     return result;
   }
+
+  /**
+   * Добавление параметра существующему URL
+   *
+   * @param url{string} URL к которому добавляем параметр
+   * @param params{object} Параметры в формате {name: value}
+   */
+  static addParamsToURL(url: string, params: any): string {
+    let result: string = url;
+
+    Object.keys(params).forEach((key: string) => {
+      result = this.addParamToURL(result, key, params[key]);
+    });
+
+    return result;
+  }
 }
 
 export default URL;

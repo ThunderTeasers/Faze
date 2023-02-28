@@ -60,15 +60,18 @@ interface CallbackData {
  * Структура конфига умного селекта
  *
  * Содержит:
+ *   api - используемое API
  *   url - адрес для запросов к серверу
- *   tableName - имя таблицы в Plarson
+ *   fixed - закреплена ли выпадающая часть за инпутом
+ *   field - искомое поле в ответе для вывода
+ *   minLength - минимальная длина для начала поиска
  */
 interface Config {
   api: API;
   url: string;
   fixed: boolean;
+  field: string;
   minLength: number;
-  headers?: object;
   callbacks: {
     selected?: (activeTabData: CallbackData) => void;
   };
@@ -99,8 +102,8 @@ class SmartSelect extends Module {
       api: API.Plarson,
       url: '',
       fixed: false,
+      field: 'field',
       minLength: 3,
-      headers: undefined,
       callbacks: {
         selected: undefined,
       },
@@ -259,8 +262,6 @@ class SmartSelect extends Module {
         return;
       }
 
-      console.log(123);
-
       clearTimeout(inputTimer);
 
       inputTimer = window.setTimeout(async () => {
@@ -312,12 +313,24 @@ class SmartSelect extends Module {
       case API.DaData:
         data = await this.requestDaData(query);
         break;
+      case API.Plarson:
+        data = await this.requestPlarson(query);
+        break;
       default:
         data = [];
         break;
     }
 
     return data;
+  }
+
+  /**
+   *
+   * @param {string} query Текст запроса
+   */
+  private async requestPlarson(query: string): Promise<object[]> {
+    const response = await fetch(`${this.config.url}${query}`);
+    return response.json();
   }
 
   /**
@@ -330,7 +343,7 @@ class SmartSelect extends Module {
    * @private
    */
   private async requestDaData(query: string): Promise<object[]> {
-    const request = await fetch(`https://suggestions.dadata.ru/suggestions/api/4_1/rs/${this.config.url}`, {
+    const response = await fetch(`https://suggestions.dadata.ru/suggestions/api/4_1/rs/${this.config.url}`, {
       method: 'POST',
       mode: 'cors',
       headers: {
@@ -344,7 +357,7 @@ class SmartSelect extends Module {
     });
 
     // Получаем данные
-    const data = await request.json();
+    const data = await response.json();
     if ('suggestions' in data) {
       return data.suggestions;
     }
@@ -410,20 +423,21 @@ class SmartSelect extends Module {
    * @private
    */
   private buildItems(data: any[]): void {
+    // Нужно ли открывать дропдаун
     let canOpen = false;
 
-    // Временно ставим, что у всех API поле "value", т.к. сейчас только одно DaData
-    let field = 'value';
-
     data.forEach((row: any) => {
+      console.log(this.config.field);
+
       // Не добавляем элемент если он такой же, как и введенное значение или нет такого поля в ответе
-      if (!(field in row) || (<HTMLInputElement>this.node).value === row.value) {
+      if (!(this.config.field in row)) {
         return;
       }
 
+      // Собираем элемент
       const itemNode = document.createElement('div');
       itemNode.className = 'faze-smartsearch-item';
-      itemNode.textContent = row[field];
+      itemNode.textContent = row[this.config.field];
       this.items.push({
         node: itemNode,
         data: row,
@@ -466,8 +480,8 @@ class SmartSelect extends Module {
   static initializeByDataAttributes(node: HTMLElement): void {
     // Получаем API
     let api = API.Plarson;
-    switch (node.dataset.fazeSmartselectApi) {
-      case 'DaData':
+    switch (node.dataset.fazeSmartselectApi?.toLowerCase()) {
+      case 'dadata':
         api = API.DaData;
         break;
       default:
@@ -477,6 +491,7 @@ class SmartSelect extends Module {
     new SmartSelect(node, {
       api,
       url: node.dataset.fazeSmartselectUrl || '',
+      field: node.dataset.fazeSmartselectField || 'field',
       fixed: (node.dataset.fazeSmartselectFixed || 'false') === 'true',
       minLength: parseInt(node.dataset.fazeSmartselectMinLength || '3', 10),
     });

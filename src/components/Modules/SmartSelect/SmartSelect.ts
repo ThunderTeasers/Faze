@@ -223,6 +223,11 @@ class SmartSelect extends Module {
           }
 
           break;
+        case 'Escape':
+          event.preventDefault();
+
+          this.close();
+          break;
       }
     });
   }
@@ -244,10 +249,10 @@ class SmartSelect extends Module {
   private calculateFixed(): void {
     const rect = this.node.getBoundingClientRect();
 
-    this.itemsNode.style.position = 'fixed';
-    this.itemsNode.style.top = `${rect.top + rect.height}px`;
-    this.itemsNode.style.left = `${rect.left}px`;
-    this.itemsNode.style.width = `${rect.width}px`;
+    this.itemsNode.style.position = 'absolute';
+    this.itemsNode.style.top = `${rect.bottom + window.scrollY}px`;
+    this.itemsNode.style.left = `${rect.left + window.scrollX}px`;
+    this.itemsNode.style.minWidth = `${rect.width}px`;
   }
 
   /**
@@ -258,7 +263,7 @@ class SmartSelect extends Module {
   private handleInput(): void {
     let inputTimer: number;
     Faze.Helpers.addEventListeners(this.node, ['keyup', 'focus'], (event: KeyboardEvent) => {
-      if (['ArrowUp', 'ArrowDown', 'Enter'].includes(event.code)) {
+      if (['ArrowUp', 'ArrowDown', 'Enter', 'Escape'].includes(event.code)) {
         return;
       }
 
@@ -290,6 +295,11 @@ class SmartSelect extends Module {
             query,
             data,
           });
+        }
+
+        // Пересчитываем позицию
+        if (this.config.fixed) {
+          this.calculateFixed();
         }
 
         this.clearItems();
@@ -427,8 +437,6 @@ class SmartSelect extends Module {
     let canOpen = false;
 
     data.forEach((row: any) => {
-      console.log(this.config.field);
-
       // Не добавляем элемент если он такой же, как и введенное значение или нет такого поля в ответе
       if (!(this.config.field in row)) {
         return;

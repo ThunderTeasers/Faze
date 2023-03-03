@@ -69,6 +69,7 @@ interface Config {
   selectors: {
     arrowLeft?: string;
     arrowRight?: string;
+    counter?: string;
   };
   callbacks: {
     created?: (data: CallbackData) => void;
@@ -219,6 +220,7 @@ class Carousel {
       selectors: {
         arrowLeft: undefined,
         arrowRight: undefined,
+        counter: undefined,
       },
       callbacks: {
         created: undefined,
@@ -293,7 +295,14 @@ class Carousel {
 
     // Для счетчика
     if (this.config.counter) {
-      this.counterNode = document.createElement('div');
+      if (this.config.selectors.counter) {
+        const counterNode = document.querySelector<HTMLElement>(this.config.selectors.counter);
+        if (counterNode) {
+          this.counterNode = counterNode;
+        }
+      } else {
+        this.counterNode = document.createElement('div');
+      }
     }
 
     // Время работы анимации
@@ -782,10 +791,12 @@ class Carousel {
     this.changeCounter();
 
     // Если у карусели есть стрелки, то вставляем между них
-    if (this.config.arrows) {
-      this.arrowsNode.insertBefore(this.counterNode, this.arrowsNodes.right);
-    } else {
-      this.controlsNode.appendChild(this.counterNode);
+    if (!this.config.selectors.counter) {
+      if (this.config.arrows) {
+        this.arrowsNode.insertBefore(this.counterNode, this.arrowsNodes.right);
+      } else {
+        this.controlsNode.appendChild(this.counterNode);
+      }
     }
   }
 
@@ -1265,6 +1276,7 @@ class Carousel {
       selectors: {
         arrowLeft: carouselNode.dataset.fazeCarouselSelectorsArrowLeft,
         arrowRight: carouselNode.dataset.fazeCarouselSelectorsArrowRight,
+        selectors: carouselNode.dataset.fazeCarouselSelectorsCounter,
       },
     });
   }

@@ -36,7 +36,6 @@
 
   // Если нужно базовое оформление
   &[data-faze-styles] {
-    padding: 5px;
     border: 1px solid #aaa;
 
     // Элемент
@@ -47,11 +46,6 @@
       &.faze-active,
       &:hover {
         background-color: #ccc;
-      }
-
-      // Граница
-      &:not(:last-child) {
-        border-bottom: 1px solid #ccc;
       }
     }
   }

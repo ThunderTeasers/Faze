@@ -72,6 +72,7 @@ interface Config {
   fixed: boolean;
   field: string;
   minLength: number;
+  parts?: object;
   callbacks: {
     selected?: (activeTabData: CallbackData) => void;
   };
@@ -104,6 +105,7 @@ class SmartSelect extends Module {
       fixed: false,
       field: 'field',
       minLength: 3,
+      parts: undefined,
       callbacks: {
         selected: undefined,
       },
@@ -176,6 +178,12 @@ class SmartSelect extends Module {
    * Навешивание событий управления выбором через клавиатуру
    */
   private bindKeyboardControl(): void {
+    this.node.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (event.code === 'Enter') {
+        event.preventDefault();
+      }
+    });
+
     this.node.addEventListener('keyup', (event: KeyboardEvent) => {
       switch (event.code) {
         case 'ArrowUp':
@@ -363,6 +371,7 @@ class SmartSelect extends Module {
       },
       body: JSON.stringify({
         query,
+        parts: this.config.parts,
       }),
     });
 
@@ -496,8 +505,15 @@ class SmartSelect extends Module {
         api = API.Plarson;
     }
 
+    // Получаем доп. параметры
+    let parts: object | undefined;
+    if (node.dataset.fazeSmartselectParts) {
+      parts = Faze.Helpers.parseJSON(node.dataset.fazeSmartselectParts);
+    }
+
     new SmartSelect(node, {
       api,
+      parts,
       url: node.dataset.fazeSmartselectUrl || '',
       field: node.dataset.fazeSmartselectField || 'field',
       fixed: (node.dataset.fazeSmartselectFixed || 'false') === 'true',

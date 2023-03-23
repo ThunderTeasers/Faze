@@ -168,6 +168,18 @@ class SmartSelect extends Module {
         // Присваиваем выбранное значение
         (<HTMLInputElement>this.node).value = item.node.textContent || '';
 
+        // Вызываем пользовательский метод
+        if (typeof this.config.callbacks.selected === 'function') {
+          try {
+            this.config.callbacks.selected({
+              node: this.node,
+              data: item.data,
+            });
+          } catch (error) {
+            this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
+          }
+        }
+
         // Закрываем выпадающий список
         this.close();
       });

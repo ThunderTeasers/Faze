@@ -1276,7 +1276,7 @@ class Carousel {
       selectors: {
         arrowLeft: carouselNode.dataset.fazeCarouselSelectorsArrowLeft,
         arrowRight: carouselNode.dataset.fazeCarouselSelectorsArrowRight,
-        selectors: carouselNode.dataset.fazeCarouselSelectorsCounter,
+        counter: carouselNode.dataset.fazeCarouselSelectorsCounter,
       },
     });
   }

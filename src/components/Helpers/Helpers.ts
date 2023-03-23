@@ -391,7 +391,7 @@ class Helpers {
   static mobileMask(input: HTMLInputElement): void {
     let value: string = '';
 
-    input.addEventListener('focus', (event: FocusEvent) => {
+    input.addEventListener('focus', () => {
       // Проверка на пустую строку, если это так и пользователь нажимает не backspace то добавляется начало телефона
       if (value.length === 0) {
         value += '+7 (';
@@ -591,6 +591,19 @@ class Helpers {
   }
 
   /**
+   * Ищет значение в объекте по указаному пути
+   *
+   * @param obj Объект в котором ищем путь
+   * @param path Путь до значения
+   * @param initial Значение по умолчанию, если не нашли по пути искомое
+   *
+   * @returns Искомое значение, либо значение по умолчанию
+   */
+  static resolvePath(obj: object, path: string, initial: any): object {
+    return path.split('.').reduce((o: any, p) => (o ? o[p] : initial), obj);
+  }
+
+  /**
    * Удаление массивов из объекта
    *
    * @param target - объект в котором удаляем
@@ -618,7 +631,7 @@ class Helpers {
    * @param target      - объект в который сливаем
    * @param sources     - сливаемый объект
    */
-  static mergeDeep(arraysReplace: boolean = false, target: any, ...sources: any[]): any {
+  static mergeDeep(arraysReplace: boolean, target: any, ...sources: any[]): any {
     if (!sources.length) return target;
     const source = sources.shift();
 
@@ -699,7 +712,9 @@ class Helpers {
    * @param value      - значение для вставки в итоговый объект по так же переданному ключу
    * @param arrayGroup - группа для слияния нескольких пар ключ-значение в один объект при сборке массива объектов
    */
-  static objectFromString(jsonObject: any = {}, stringData: string, key: string, value: string, arrayGroup = 'default'): object {
+  static objectFromString(jsonObject: any, stringData: string, key: string, value: string, arrayGroup = 'default'): object {
+    jsonObject ||= {};
+
     // Разбиваем строку на токены, при этом фильтруя на пустоту токена, т.к. если мы пытаемся разделить пустую строку, "split" вернет
     // массив у которого 1 пустой элемент, а это некорректно в данном случае.
     const objectTokens: string[] = stringData.split('.').filter((token) => token.length !== 0);
@@ -1049,45 +1064,6 @@ class Helpers {
     };
 
     /**
-     * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
-     *
-     * @param event - событие мыши
-     */
-    const dragMouseDown = (event: MouseEvent) => {
-      if (!options.node) {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      // Получаем начальную позицию DOM элемента
-      startPosition = {
-        x: parseInt(options.node.style.left, 10),
-        y: parseInt(options.node.style.top, 10),
-      };
-
-      // Проставляем класс, что двигаем элемент
-      options.node.classList.add('faze-drag-active');
-
-      // Получение позиции курсора при нажатии на элемент
-      startMousePosition.x = event.clientX;
-      startMousePosition.y = event.clientY;
-
-      // Вызываем пользовательскую функцию
-      if (options.callbacks && 'beforeDrag' in options.callbacks && typeof options.callbacks.beforeDrag === 'function') {
-        try {
-          options.callbacks.beforeDrag();
-        } catch (error) {
-          console.error('Ошибка исполнения пользовательского метода "beforeDrag":', error);
-        }
-      }
-
-      document.addEventListener('mouseup', endDragElement);
-      document.addEventListener('mousemove', elementDrag);
-    };
-
-    /**
      * Функция перетаскивания модального окна.
      * Тут идет расчет координат и они присваиваются окну через стили "top" и "left", окно в таком случае естественно должно иметь
      * позиционирование "absolute"
@@ -1150,6 +1126,45 @@ class Helpers {
           console.error('Ошибка исполнения пользовательского метода "afterDrag":', error);
         }
       }
+    };
+
+    /**
+     * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
+     *
+     * @param event - событие мыши
+     */
+    const dragMouseDown = (event: MouseEvent) => {
+      if (!options.node) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      // Получаем начальную позицию DOM элемента
+      startPosition = {
+        x: parseInt(options.node.style.left, 10),
+        y: parseInt(options.node.style.top, 10),
+      };
+
+      // Проставляем класс, что двигаем элемент
+      options.node.classList.add('faze-drag-active');
+
+      // Получение позиции курсора при нажатии на элемент
+      startMousePosition.x = event.clientX;
+      startMousePosition.y = event.clientY;
+
+      // Вызываем пользовательскую функцию
+      if (options.callbacks && 'beforeDrag' in options.callbacks && typeof options.callbacks.beforeDrag === 'function') {
+        try {
+          options.callbacks.beforeDrag();
+        } catch (error) {
+          console.error('Ошибка исполнения пользовательского метода "beforeDrag":', error);
+        }
+      }
+
+      document.addEventListener('mouseup', endDragElement);
+      document.addEventListener('mousemove', elementDrag);
     };
 
     // Навешиваем событие перетаскивания на элемент

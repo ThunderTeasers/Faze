@@ -446,15 +446,15 @@ class SmartSelect extends Module {
     let canOpen = false;
 
     data.forEach((row: any) => {
-      // Не добавляем элемент если он такой же, как и введенное значение или нет такого поля в ответе
-      if (!(this.config.field in row)) {
+      const value = Faze.Helpers.resolvePath(row, this.config.field);
+      if (!value) {
         return;
       }
 
       // Собираем элемент
       const itemNode = document.createElement('div');
       itemNode.className = 'faze-smartsearch-item';
-      itemNode.textContent = row[this.config.field];
+      itemNode.textContent = value;
       this.items.push({
         node: itemNode,
         data: row,

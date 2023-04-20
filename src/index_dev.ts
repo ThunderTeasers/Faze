@@ -292,3 +292,17 @@ Faze.add({
     });
   },
 });
+
+// Тест Faze.SmartSelect
+Faze.add({
+  pluginName: 'Faze.SmartSelect Test',
+  condition: document.querySelectorAll('.js-smartselect').length > 0,
+  callback: () => {
+    new Faze.SmartSelect(document.querySelector('.js-smartselect'), {
+      api: 'dadata',
+      url: 'suggest/fio',
+      field: 'value',
+      fixed: true,
+    });
+  },
+});

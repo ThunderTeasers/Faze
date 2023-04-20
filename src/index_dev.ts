@@ -303,6 +303,11 @@ Faze.add({
       url: 'suggest/fio',
       field: 'value',
       fixed: true,
+      callbacks: {
+        option: (data: any) => {
+          return `${data.value} ${data.data.gender}`;
+        },
+      },
     });
   },
 });

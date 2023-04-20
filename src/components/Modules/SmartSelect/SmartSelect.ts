@@ -377,6 +377,14 @@ class SmartSelect extends Module {
    * @private
    */
   private async requestDaData(query: string): Promise<object[]> {
+    let body = {
+      query,
+    };
+
+    if (this.config.parts) {
+      body = Object.assign(body, this.config.parts);
+    }
+
     const response = await fetch(`https://suggestions.dadata.ru/suggestions/api/4_1/rs/${this.config.url}`, {
       method: 'POST',
       mode: 'cors',
@@ -385,10 +393,7 @@ class SmartSelect extends Module {
         Accept: 'application/json',
         Authorization: 'Token 510641ac81338d1f60e41e59c787e6df689d4553',
       },
-      body: JSON.stringify({
-        query,
-        parts: this.config.parts,
-      }),
+      body: JSON.stringify(body),
     });
 
     // Получаем данные
@@ -462,12 +467,15 @@ class SmartSelect extends Module {
     let canOpen = false;
 
     data.forEach((row: any) => {
-      const value = Faze.Helpers.resolvePath(row, this.config.field);
+      let value = Faze.Helpers.resolvePath(row, this.config.field);
       if (!value) {
         return;
       }
 
-      console.log(row);
+      // Если задана пользовательская функция смены текста в <option> то выполняем её
+      if (typeof this.config.callbacks.option === 'function') {
+        value = this.config.callbacks.option(row);
+      }
 
       // Собираем элемент
       const itemNode = document.createElement('div');
@@ -511,7 +519,7 @@ class SmartSelect extends Module {
    * Корректировка переданного параметра API
    */
   private fixAPI(): void {
-    switch (this.config.api) {
+    switch (this.config.api.toLowerCase()) {
       case 'dadata':
         this.config.api = API.DaData;
         break;

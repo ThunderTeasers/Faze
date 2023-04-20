@@ -90,8 +90,7 @@ class Tab extends Module {
     let key: string;
 
     // Открытие тел табов если у шапки задан класс "faze-active"
-    const alreadyActiveTabNode: HTMLElement | undefined = Array.from(this.headersNodes)
-      .find(headerNode => headerNode.classList.contains('faze-active'));
+    const alreadyActiveTabNode: HTMLElement | undefined = Array.from(this.headersNodes).find((headerNode) => headerNode.classList.contains('faze-active'));
     if (alreadyActiveTabNode) {
       key = alreadyActiveTabNode.dataset.fazeTabHead || alreadyActiveTabNode.dataset.fazeTabBody || '';
     } else {
@@ -129,12 +128,10 @@ class Tab extends Module {
     const className = this.className ? `, ${this.className}` : '';
 
     // Получаем шапки
-    this.headersNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-header, [data-faze-tab="header"], [data-faze-tab-head]'))
-      .filter((headerNode: HTMLElement) => headerNode.closest(`.faze-tabs, [data-faze~="tab"] ${className}`) === this.node);
+    this.headersNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-header, [data-faze-tab="header"], [data-faze-tab-head]')).filter((headerNode: HTMLElement) => headerNode.closest(`.faze-tabs, [data-faze~="tab"] ${className}`) === this.node);
 
     // Получаем тела
-    this.bodiesNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-body, [data-faze-tab="body"], [data-faze-tab-body]:not([data-faze-tab="header"]):not(.faze-tab-header)'))
-      .filter((bodyNode: HTMLElement) => bodyNode.closest(`.faze-tabs, [data-faze~="tab"] ${className}`) === this.node);
+    this.bodiesNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-body, [data-faze-tab="body"], [data-faze-tab-body]:not([data-faze-tab="header"]):not(.faze-tab-header)')).filter((bodyNode: HTMLElement) => bodyNode.closest(`.faze-tabs, [data-faze~="tab"] ${className}`) === this.node);
 
     // Удаляем пустые табы
     if (this.config.removeEmpty) {
@@ -211,12 +208,20 @@ class Tab extends Module {
    * @private
    */
   private checkAndRemoveEmptyTabs() {
+    // Проверяем, есть ли тела у шапок в принцип и, если нет, то удаляем шапку
+    this.headersNodes.forEach((headerNode) => {
+      const body = this.bodiesNodes.find((bodyNode) => bodyNode.dataset.fazeTabBody === headerNode.dataset.fazeTabBody);
+      if (!body) {
+        headerNode.remove();
+      }
+    });
+
+    // Проверяем пустые ли тела у шапок
     this.bodiesNodes.forEach((bodyNode: HTMLElement) => {
       // Проверяем, если тело таба пустое
       if (bodyNode.textContent?.trim() === '') {
         // То скрываем и шапку и само тело
-        const headerNode: HTMLElement | undefined = this.headersNodes.find((tmpHeaderNode: HTMLElement) => tmpHeaderNode.dataset.fazeTabBody === bodyNode.dataset.fazeTabBody
-          || tmpHeaderNode.dataset.fazeTabHead === bodyNode.dataset.fazeTabBody);
+        const headerNode: HTMLElement | undefined = this.headersNodes.find((tmpHeaderNode: HTMLElement) => tmpHeaderNode.dataset.fazeTabBody === bodyNode.dataset.fazeTabBody || tmpHeaderNode.dataset.fazeTabHead === bodyNode.dataset.fazeTabBody);
         if (headerNode) {
           headerNode.remove();
         }

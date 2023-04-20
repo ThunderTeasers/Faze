@@ -16,8 +16,8 @@ import Faze from '../../Core/Faze';
  * Список доступных API для работы
  */
 enum API {
-  Plarson,
-  DaData,
+  Plarson = 'Plarson',
+  DaData = 'DaData',
 }
 
 /**
@@ -75,6 +75,7 @@ interface Config {
   parts?: object;
   callbacks: {
     selected?: (activeTabData: CallbackData) => void;
+    option?: (activeTabData: CallbackData) => void;
   };
 }
 
@@ -124,6 +125,9 @@ class SmartSelect extends Module {
    */
   initialize(): void {
     super.initialize();
+
+    // Корректировка переданного параметра API
+    this.fixAPI();
 
     this.currentIndex = -1;
     this.items = [];
@@ -463,6 +467,8 @@ class SmartSelect extends Module {
         return;
       }
 
+      console.log(row);
+
       // Собираем элемент
       const itemNode = document.createElement('div');
       itemNode.className = 'faze-smartsearch-item';
@@ -499,6 +505,19 @@ class SmartSelect extends Module {
 
     // Сбрасываем индекс выбранного элемента
     this.currentIndex = -1;
+  }
+
+  /**
+   * Корректировка переданного параметра API
+   */
+  private fixAPI(): void {
+    switch (this.config.api) {
+      case 'dadata':
+        this.config.api = API.DaData;
+        break;
+      default:
+        this.config.api = API.Plarson;
+    }
   }
 
   /**

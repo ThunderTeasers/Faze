@@ -431,7 +431,10 @@ class Helpers {
    * @param options - настройки
    */
   static showNotification(message: string, options: NotificationOptions): void {
-    const { className = '', isNested = true, time = 3000, backgroundColor = '#00b938' } = options;
+    const className = options?.className || '';
+    const isNested = options?.isNested || true;
+    const time = options?.time || 3000;
+    const backgroundColor = options?.backgroundColor || '#00b938';
 
     // DOM элемент обертки для информационнах сообщений, она нужна для того, чтобы сообщения шли друг под другом, если их несколько
     let notificationWrapperNode: HTMLDivElement | null = document.querySelector('.faze-notification-wrapper');

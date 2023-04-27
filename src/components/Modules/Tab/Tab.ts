@@ -210,7 +210,7 @@ class Tab extends Module {
   private checkAndRemoveEmptyTabs() {
     // Проверяем, есть ли тела у шапок в принцип и, если нет, то удаляем шапку
     this.headersNodes.forEach((headerNode) => {
-      const body = this.bodiesNodes.find((bodyNode) => bodyNode.dataset.fazeTabBody === headerNode.dataset.fazeTabBody);
+      const body = this.bodiesNodes.find((bodyNode) => bodyNode.dataset.fazeTabBody === headerNode.dataset.fazeTabBody || bodyNode.dataset.fazeTabBody === headerNode.dataset.fazeTabHead);
       if (!body) {
         headerNode.remove();
       }

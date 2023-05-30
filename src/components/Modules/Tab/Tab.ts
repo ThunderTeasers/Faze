@@ -31,13 +31,16 @@ interface CallbackData {
  *   headerActiveClass - CSS класс активного таба
  *   useHash - использовать ли window.location.hash при переключении и инициализации
  *   removeEmpty - удалять ли пустые табы с их шапками
+ *   maxBodies - максимальное количество тел которые нужно показывать
  *   callbacks
  *     changed - пользовательская функция, исполняющаяся после изменения таба
  */
 interface Config {
   headerActiveClass?: string;
+  bodyActiveType: string;
   useHash: boolean;
   removeEmpty: boolean;
+  maxBodies: number;
   callbacks: {
     changed?: (activeTabData: CallbackData) => void;
   };
@@ -63,8 +66,10 @@ class Tab extends Module {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       headerActiveClass: undefined,
+      bodyActiveType: 'block',
       useHash: false,
       removeEmpty: false,
+      maxBodies: 1,
       callbacks: {
         changed: undefined,
       },
@@ -171,16 +176,21 @@ class Tab extends Module {
     // Получаем все ключи для выбора нужных тел, т.к. их может быть несколько через пробел
     const keys = key.split(' ');
 
+    // Количество уже показанных тел
+    let shownBodies = 0;
+
     // Активируем тела
     this.bodiesNodes.forEach((bodyNode: HTMLElement) => {
       const isActive = keys.includes(bodyNode.dataset.fazeTabBody || '');
 
-      bodyNode.style.display = isActive ? 'block' : 'none';
+      bodyNode.style.display = isActive && shownBodies < this.config.maxBodies ? this.config.bodyActiveType : 'none';
       bodyNode.classList.toggle('faze-active', isActive);
 
       // Берём активное тело
       if (isActive) {
         activeBodyNode = bodyNode;
+
+        shownBodies++;
       }
     });
 
@@ -239,8 +249,10 @@ class Tab extends Module {
   static initializeByDataAttributes(node: HTMLElement): void {
     new Tab(node, {
       headerActiveClass: node.dataset.fazeTabHeaderActiveClass,
+      bodyActiveType: node.dataset.fazeTabBodyActiveType || 'block',
       useHash: (node.dataset.fazeTabUseHash || 'false') === 'true',
       removeEmpty: (node.dataset.fazeTabRemoveEmpty || 'false') === 'true',
+      maxBodies: parseInt(node.dataset.fazeTabMaxBodies || '1', 10),
     });
   }
 }

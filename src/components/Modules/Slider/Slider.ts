@@ -58,6 +58,9 @@ class Slider extends Module {
   // DOM элементы инпутов
   inputsNodes: HTMLInputElement[];
 
+  // Ширина слайдера
+  sliderWidth: number;
+
   // Размер ползунка
   pointSize: number;
 
@@ -109,6 +112,7 @@ class Slider extends Module {
     this.inputsNodes = [];
     this.pointSize = 10;
     this.connectNode = null;
+    this.sliderWidth = this.node.getBoundingClientRect().width;
 
     // Простановка класса, если этого не было сделано руками
     this.node.classList.add('faze-slider');
@@ -318,11 +322,11 @@ class Slider extends Module {
 
       // Если только один ползунок, тогда считаем от левого края до него, если несколько то между первым и последним
       if (this.pointsNodes.length === 1) {
-        this.connectNode.style.width = `${this.pointsNodes[0].offsetLeft}px`;
+        this.connectNode.style.width = `${this.calculateSizeInPercent(this.pointsNodes[0].offsetLeft)}%`;
         this.connectNode.style.left = '0';
       } else {
-        this.connectNode.style.width = `${connectWidth}px`;
-        this.connectNode.style.left = `${this.pointsNodes[0].offsetLeft + halfPointWidth}px`;
+        this.connectNode.style.width = `${this.calculateSizeInPercent(connectWidth + halfPointWidth, false)}%`;
+        this.connectNode.style.left = `${this.calculateSizeInPercent(this.pointsNodes[0].offsetLeft + halfPointWidth, false)}%`;
       }
     }
   }
@@ -367,7 +371,7 @@ class Slider extends Module {
     }
 
     // Рассчет новой позиции скролбара
-    pointNode.style.left = `${tmpPosition}px`;
+    pointNode.style.left = `${(tmpPosition * 100) / sliderWidth}%`;
 
     // Если указаны селекторы инпутов, то обновляем их
     if (this.config.selectors.inputs) {
@@ -378,22 +382,18 @@ class Slider extends Module {
   /**
    * Создание ползунка
    *
-   * @param position - его положение на слайдере
+   * @param position Значение ползунка
    */
   createPoint(position: number): void {
     // Создаем DOM элемент ползунка
     const pointNode = document.createElement('div');
     pointNode.className = 'faze-pointer';
 
-    // Обычный рассчет позиции
-    let left = -((this.node.getBoundingClientRect().width * (this.config.range[0] - position)) / (this.config.range[1] - this.config.range[0]));
+    // Ширина всего слайдера
+    // const sliderWidth = this.node.getBoundingClientRect().width;
 
-    // Рассчет позиции если необходимо считать через проценты
-    if (this.config.pointsInPercent) {
-      left = (this.node.getBoundingClientRect().width * position) / 100;
-    }
-
-    pointNode.style.left = `${left}px`;
+    // Проставляем позицию ползунка
+    pointNode.style.left = `${this.calculatePercent(position)}%`;
 
     // Добавляем его в общий массив
     this.pointsNodes.push(pointNode);
@@ -401,16 +401,42 @@ class Slider extends Module {
     // Добавляем его в код страницы
     this.node.appendChild(pointNode);
 
-    // Ширина всего слайдера
-    const sliderWidth = this.node.getBoundingClientRect().width;
-
     // Размер ползунка
     this.pointSize = pointNode.getBoundingClientRect().width;
 
     // Ограничение для последнего ползунка
-    if (pointNode.offsetLeft >= sliderWidth - this.pointSize) {
-      pointNode.style.left = `${sliderWidth - this.pointSize}px`;
+    if (pointNode.offsetLeft >= this.sliderWidth - this.pointSize) {
+      pointNode.style.left = `${this.calculateSizeInPercent(this.pointSize)}%`;
     }
+
+    (pointNode as any).fazeOffset = pointNode.style.left;
+  }
+
+  /**
+   * Рассчёт процентов заданного размера относительна общей ширины слайдера
+   *
+   * @param value Значение от которого считаем процент
+   *
+   * @returns Процент относительно ширины слайдера
+   */
+  private calculateSizeInPercent(value: number, isInvert = true): number {
+    let result = (100 * value) / this.sliderWidth;
+    if (isInvert) {
+      result = 100 - result;
+    }
+
+    return result;
+  }
+
+  /**
+   * Рассчёт процента сдвига ползунка относительно слайдера
+   *
+   * @param value Значение от которого считаем процент
+   *
+   * @returns Процент сдвига ползунка
+   */
+  private calculatePercent(value: number): number {
+    return (-((this.sliderWidth * (this.config.range[0] - value)) / (this.config.range[1] - this.config.range[0])) * 100) / this.sliderWidth;
   }
 
   /**

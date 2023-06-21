@@ -64,6 +64,7 @@ interface CallbackData {
  *   url - адрес для запросов к серверу
  *   fixed - закреплена ли выпадающая часть за инпутом
  *   field - искомое поле в ответе для вывода
+ *   limit - количество выводимых опций
  *   minLength - минимальная длина для начала поиска
  */
 interface Config {
@@ -71,6 +72,7 @@ interface Config {
   url: string;
   fixed: boolean;
   field: string;
+  limit: number;
   minLength: number;
   parts?: object;
   callbacks: {
@@ -105,6 +107,7 @@ class SmartSelect extends Module {
       url: '',
       fixed: false,
       field: 'field',
+      limit: 10,
       minLength: 3,
       parts: undefined,
       callbacks: {
@@ -466,7 +469,7 @@ class SmartSelect extends Module {
     // Нужно ли открывать дропдаун
     let canOpen = false;
 
-    data.forEach((row: any) => {
+    data.slice(0, this.config.limit).forEach((row: any) => {
       let value = Faze.Helpers.resolvePath(row, this.config.field);
       if (!value) {
         return;
@@ -556,6 +559,7 @@ class SmartSelect extends Module {
       url: node.dataset.fazeSmartselectUrl || '',
       field: node.dataset.fazeSmartselectField || 'field',
       fixed: (node.dataset.fazeSmartselectFixed || 'false') === 'true',
+      limit: parseInt(node.dataset.fazeSmartselectLimit || '10', 10),
       minLength: parseInt(node.dataset.fazeSmartselectMinLength || '3', 10),
     });
   }

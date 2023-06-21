@@ -302,6 +302,7 @@ Faze.add({
       api: 'dadata',
       url: 'suggest/fio',
       field: 'value',
+      limit: 5,
       fixed: true,
       callbacks: {
         option: (data: any) => {

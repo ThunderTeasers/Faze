@@ -471,13 +471,12 @@ class SmartSelect extends Module {
 
     data.slice(0, this.config.limit).forEach((row: any) => {
       let value = Faze.Helpers.resolvePath(row, this.config.field);
-      if (!value) {
-        return;
-      }
 
       // Если задана пользовательская функция смены текста в <option> то выполняем её
       if (typeof this.config.callbacks.option === 'function') {
         value = this.config.callbacks.option(row);
+      } else if (!value) {
+        return;
       }
 
       // Собираем элемент

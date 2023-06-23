@@ -308,6 +308,9 @@ Faze.add({
         option: (data: any) => {
           return `${data.value} ${data.data.gender}`;
         },
+        entered: (data: any) => {
+          console.log(data.data);
+        },
       },
     });
   },

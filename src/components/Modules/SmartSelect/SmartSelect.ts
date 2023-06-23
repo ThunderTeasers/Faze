@@ -77,6 +77,7 @@ interface Config {
   parts?: object;
   callbacks: {
     selected?: (activeTabData: CallbackData) => void;
+    entered?: (activeTabData: CallbackData) => void;
     option?: (activeTabData: CallbackData) => void;
   };
 }
@@ -112,6 +113,7 @@ class SmartSelect extends Module {
       parts: undefined,
       callbacks: {
         selected: undefined,
+        entered: undefined,
       },
     };
 
@@ -194,6 +196,29 @@ class SmartSelect extends Module {
   }
 
   /**
+   * Навешивание событий на выделение опции из выпадающего списка
+   *
+   * @private
+   */
+  private bindEnterOption(): void {
+    this.items.forEach((item: Item) => {
+      item.node.addEventListener('mouseenter', () => {
+        // Вызываем пользовательский метод
+        if (typeof this.config.callbacks.entered === 'function') {
+          try {
+            this.config.callbacks.entered({
+              node: this.node,
+              data: item.data,
+            });
+          } catch (error) {
+            this.logger.error(`Ошибка исполнения пользовательского метода "entered": ${error}`);
+          }
+        }
+      });
+    });
+  }
+
+  /**
    * Навешивание событий управления выбором через клавиатуру
    */
   private bindKeyboardControl(): void {
@@ -264,7 +289,23 @@ class SmartSelect extends Module {
    */
   private updateActiveItem(): void {
     this.items.forEach((item, index) => {
-      item.node.classList.toggle('faze-active', index === this.currentIndex);
+      if (index === this.currentIndex) {
+        item.node.classList.add('faze-active');
+
+        // Вызываем пользовательский метод
+        if (typeof this.config.callbacks.entered === 'function') {
+          try {
+            this.config.callbacks.entered({
+              node: this.node,
+              data: item.data,
+            });
+          } catch (error) {
+            this.logger.error(`Ошибка исполнения пользовательского метода "entered": ${error}`);
+          }
+        }
+      } else {
+        item.node.classList.remove('faze-active');
+      }
     });
   }
 
@@ -332,6 +373,7 @@ class SmartSelect extends Module {
         this.clearItems();
         this.buildItems(data);
         this.bindSelectOption();
+        this.bindEnterOption();
       }, 500);
     });
   }
@@ -515,6 +557,25 @@ class SmartSelect extends Module {
 
     // Сбрасываем индекс выбранного элемента
     this.currentIndex = -1;
+  }
+
+  /**
+   * Заменяем значение ссылки
+   *
+   * @param url{string} Значение которое меняем
+   */
+  public setUrl(url: string): void {
+    // Сбрасываем кеш
+    this.cache = [];
+
+    this.config.url = url;
+  }
+
+  /**
+   * Очищаем кеш
+   */
+  public clearCache(): void {
+    this.cache = [];
   }
 
   /**

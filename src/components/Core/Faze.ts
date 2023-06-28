@@ -19,6 +19,7 @@ import Logger from './Logger';
  */
 import Modal from '../Modules/Modal/Modal';
 import Helpers from '../Helpers/Helpers';
+import Events from './Events';
 import Constants from '../Core/Constants';
 import URL from '../Helpers/URL';
 import DOM from '../Helpers/DOM';
@@ -124,6 +125,7 @@ class Faze {
   static ZoomBox: any = ZoomBox;
   static Gallery: any = Gallery;
   static Helpers: any = Helpers;
+  static Events: any = Events;
   static Constants: any = Constants;
   static TableSorter: any = TableSorter;
   static Sorter: any = Sorter;
@@ -192,7 +194,7 @@ class Faze {
     const currentPlugins: InnerPluginsData = {};
 
     // Зарезервированные имена
-    const predefinedNames: string[] = ['Plugin', 'Module', 'Zoom', 'Look', 'ZoomBox', 'TableSorter', 'Tooltip', 'Carousel', 'Page', 'Gallery', 'SmartSelect', 'Form', 'Spoiler', 'Select', 'Scroll', 'Tab', 'Dropdown', 'Slider', 'Steps', 'Helpers', 'Constants', 'URL', 'Observer', 'Modal', 'Filter', 'REST', 'Logger'];
+    const predefinedNames: string[] = ['Plugin', 'Module', 'Zoom', 'Look', 'ZoomBox', 'TableSorter', 'Tooltip', 'Carousel', 'Page', 'Gallery', 'SmartSelect', 'Form', 'Spoiler', 'Select', 'Scroll', 'Tab', 'Dropdown', 'Slider', 'Steps', 'Events', 'Helpers', 'Constants', 'URL', 'Observer', 'Modal', 'Filter', 'REST', 'Logger'];
 
     // Проверка на ошибки
     if (!config) {

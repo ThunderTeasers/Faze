@@ -10,7 +10,7 @@ class Events {
    * @param callback Пользовательская функция исполняющаяся после события
    * @param isPreventDefault Нужно ли делать "preventDefault()" у события
    */
-  static click(node: HTMLElement, callback: (event: Event) => void, isPreventDefault: boolean = true) {
+  static click(node: HTMLElement, callback: (event: Event) => void, isPreventDefault: boolean = true): void {
     if (!node) {
       return;
     }

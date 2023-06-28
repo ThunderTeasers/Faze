@@ -10,7 +10,7 @@ class Events {
    * @param callback Пользовательская функция исполняющаяся после события
    * @param isPreventDefault Нужно ли делать "preventDefault()" у события
    */
-  static click(nodeOrSelector: HTMLElement | string, callback: (event: Event) => void, isPreventDefault: boolean = true): void {
+  static click(nodeOrSelector: HTMLElement | string, callback: (event: Event, node: HTMLElement | null) => void, isPreventDefault: boolean = true): void {
     // Проверяем, является ли переданный параметр строкой, если да,
     // то ищём соответствующий DOM элемент по селектору, если нет, используем напрямую
     let node: HTMLElement | null;
@@ -33,7 +33,7 @@ class Events {
 
       // Исполняем пользовательскую функцию
       if (typeof callback === 'function') {
-        callback(event);
+        callback(event, node);
       }
     });
   }

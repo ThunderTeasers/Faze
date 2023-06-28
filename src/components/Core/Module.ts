@@ -66,7 +66,7 @@ abstract class Module {
 
     // Вычисляем CSS селектор класса
     const classNameTmp = data.node?.className;
-    this.className = classNameTmp ? `.${classNameTmp.replace(' ', '.')}` : undefined;
+    this.className = classNameTmp ? `.${classNameTmp.trim().replace(' ', '.')}` : undefined;
 
     // Вызываем стандартные методы
     this.initialize();

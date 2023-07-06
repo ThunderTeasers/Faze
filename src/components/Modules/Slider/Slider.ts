@@ -58,9 +58,6 @@ class Slider extends Module {
   // DOM элементы инпутов
   inputsNodes: HTMLInputElement[];
 
-  // Ширина слайдера
-  sliderWidth: number;
-
   // Размер ползунка
   pointSize: number;
 
@@ -112,7 +109,6 @@ class Slider extends Module {
     this.inputsNodes = [];
     this.pointSize = 10;
     this.connectNode = null;
-    this.sliderWidth = this.node.getBoundingClientRect().width;
 
     // Простановка класса, если этого не было сделано руками
     this.node.classList.add('faze-slider');
@@ -322,7 +318,9 @@ class Slider extends Module {
 
       // Если только один ползунок, тогда считаем от левого края до него, если несколько то между первым и последним
       if (this.pointsNodes.length === 1) {
-        this.connectNode.style.width = `${this.calculateSizeInPercent(this.pointsNodes[0].offsetLeft)}%`;
+        console.log(this.pointsNodes[0].offsetLeft);
+
+        this.connectNode.style.width = `${this.calculateSizeInPercent(this.pointsNodes[0].offsetLeft + halfPointWidth, false)}%`;
         this.connectNode.style.left = '0';
       } else {
         this.connectNode.style.width = `${this.calculateSizeInPercent(connectWidth + halfPointWidth, false)}%`;
@@ -405,7 +403,7 @@ class Slider extends Module {
     this.pointSize = pointNode.getBoundingClientRect().width;
 
     // Ограничение для последнего ползунка
-    if (pointNode.offsetLeft >= this.sliderWidth - this.pointSize) {
+    if (pointNode.offsetLeft >= this.node.getBoundingClientRect().width - this.pointSize) {
       pointNode.style.left = `${this.calculateSizeInPercent(this.pointSize)}%`;
     }
 
@@ -420,7 +418,7 @@ class Slider extends Module {
    * @returns Процент относительно ширины слайдера
    */
   private calculateSizeInPercent(value: number, isInvert = true): number {
-    let result = (100 * value) / this.sliderWidth;
+    let result = (100 * value) / this.node.getBoundingClientRect().width;
     if (isInvert) {
       result = 100 - result;
     }
@@ -436,7 +434,7 @@ class Slider extends Module {
    * @returns Процент сдвига ползунка
    */
   private calculatePercent(value: number): number {
-    return (-((this.sliderWidth * (this.config.range[0] - value)) / (this.config.range[1] - this.config.range[0])) * 100) / this.sliderWidth;
+    return (-((this.node.getBoundingClientRect().width * (this.config.range[0] - value)) / (this.config.range[1] - this.config.range[0])) * 100) / this.node.getBoundingClientRect().width;
   }
 
   /**

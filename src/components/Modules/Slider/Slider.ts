@@ -191,12 +191,26 @@ class Slider extends Module {
     super.bind();
 
     this.bindPoints();
+    this.bindInputChange();
+  }
+
+  /**
+   * Навешивание события на изменение инпута
+   */
+  private bindInputChange() {
+    this.inputsNodes.forEach((inputNode, index) => {
+      inputNode.addEventListener('keyup', () => {
+        this.setValue(index, parseInt(inputNode.value, 10));
+      });
+    });
   }
 
   /**
    * Навешивание событий перетаскивания мышкой и пальцем на ползунки
+   *
+   * @private
    */
-  bindPoints(): void {
+  private bindPoints(): void {
     this.pointsNodes.forEach((pointNode, i) => {
       // Начальная позиция мыши
       let startMousePosition = 0;
@@ -338,7 +352,7 @@ class Slider extends Module {
    * @param position      - новое значение ползунка
    * @param index         - индекс ползунка
    */
-  move(pointNode: HTMLElement, nextPointNode: HTMLElement, prevPointNode: HTMLElement, position: number, index: number) {
+  move(pointNode: HTMLElement, nextPointNode: HTMLElement, prevPointNode: HTMLElement, position: number, index: number, needToUpdateInputs: boolean = true) {
     let tmpPosition = position;
 
     // Ширина всего слайдера
@@ -372,7 +386,7 @@ class Slider extends Module {
     pointNode.style.left = `${(tmpPosition * 100) / sliderWidth}%`;
 
     // Если указаны селекторы инпутов, то обновляем их
-    if (this.config.selectors.inputs) {
+    if (this.config.selectors.inputs && needToUpdateInputs) {
       this.updateInputs();
     }
   }
@@ -386,9 +400,6 @@ class Slider extends Module {
     // Создаем DOM элемент ползунка
     const pointNode = document.createElement('div');
     pointNode.className = 'faze-pointer';
-
-    // Ширина всего слайдера
-    // const sliderWidth = this.node.getBoundingClientRect().width;
 
     // Проставляем позицию ползунка
     pointNode.style.left = `${this.calculatePercent(position)}%`;
@@ -510,7 +521,7 @@ class Slider extends Module {
       }
 
       // Передвигаем ползунок на нужное место
-      this.move(pointNode, nextPointNode, prevPointNode, left, index);
+      this.move(pointNode, nextPointNode, prevPointNode, left, index, false);
     }
 
     // Пересчёт соединительной полосы

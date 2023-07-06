@@ -332,8 +332,6 @@ class Slider extends Module {
 
       // Если только один ползунок, тогда считаем от левого края до него, если несколько то между первым и последним
       if (this.pointsNodes.length === 1) {
-        console.log(this.pointsNodes[0].offsetLeft);
-
         this.connectNode.style.width = `${this.calculateSizeInPercent(this.pointsNodes[0].offsetLeft + halfPointWidth, false)}%`;
         this.connectNode.style.left = '0';
       } else {

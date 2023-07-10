@@ -201,6 +201,17 @@ class Slider extends Module {
     this.inputsNodes.forEach((inputNode, index) => {
       inputNode.addEventListener('keyup', () => {
         this.setValue(index, parseInt(inputNode.value, 10));
+
+        // Вызываем пользовательскую функцию
+        if (typeof this.config.callbacks.changed === 'function') {
+          try {
+            this.config.callbacks.changed({
+              values: this.getValues(),
+            });
+          } catch (error) {
+            return this.logger.error(`Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`);
+          }
+        }
       });
     });
   }

@@ -28,6 +28,7 @@ interface CallbackData {
  *   points   - координаты ползунков на слайдере
  *   connect  - флаг, указывающий на то, нужно ли заполнять пространство между точками или нет
  *   pointsInPercent - флиг, указывающий на то, нужно ли делать первичный просчет расположения ползунков в процентах или нет
+ *   changeDelay - время задержки отправки события "changed" в миллисекундах
  *   callbacks
  *     created  - пользовательская функция, исполняющийся при успешном создании спойлера
  *     changed  - пользовательская функция, исполняющийся при изменении видимости спойлера
@@ -38,6 +39,7 @@ interface Config {
   points: number[];
   connect: boolean;
   pointsInPercent: boolean;
+  changeDelay: number;
   selectors: {
     inputs?: string;
   };
@@ -74,6 +76,7 @@ class Slider extends Module {
       range: [0, 100],
       connect: true,
       pointsInPercent: false,
+      changeDelay: 1000,
       selectors: {
         inputs: undefined,
       },
@@ -199,19 +202,24 @@ class Slider extends Module {
    */
   private bindInputChange() {
     this.inputsNodes.forEach((inputNode, index) => {
+      let timeout: number;
+
       inputNode.addEventListener('keyup', () => {
         this.setValue(index, parseInt(inputNode.value, 10));
 
-        // Вызываем пользовательскую функцию
-        if (typeof this.config.callbacks.changed === 'function') {
-          try {
-            this.config.callbacks.changed({
-              values: this.getValues(),
-            });
-          } catch (error) {
-            return this.logger.error(`Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`);
+        window.clearTimeout(timeout);
+        timeout = window.setTimeout(() => {
+          // Вызываем пользовательскую функцию
+          if (typeof this.config.callbacks.changed === 'function') {
+            try {
+              this.config.callbacks.changed({
+                values: this.getValues(),
+              });
+            } catch (error) {
+              return this.logger.error(`Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`);
+            }
           }
-        }
+        }, this.config.changeDelay);
       });
     });
   }
@@ -611,6 +619,7 @@ class Slider extends Module {
       points: points?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
       range: range?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
       connect: (node.dataset.fazeSliderConnect || 'true') === 'true',
+      changeDelay: parseInt(node.dataset.fazeChangeDelay || '1000', 10),
       selectors: {
         inputs: node.dataset.fazeSliderSelectorsInputs,
       },

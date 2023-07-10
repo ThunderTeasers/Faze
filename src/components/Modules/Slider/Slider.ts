@@ -27,7 +27,6 @@ interface CallbackData {
  *   range    - диапазон значений слайдера
  *   points   - координаты ползунков на слайдере
  *   connect  - флаг, указывающий на то, нужно ли заполнять пространство между точками или нет
- *   pointsInPercent - флиг, указывающий на то, нужно ли делать первичный просчет расположения ползунков в процентах или нет
  *   changeDelay - время задержки отправки события "changed" в миллисекундах
  *   callbacks
  *     created  - пользовательская функция, исполняющийся при успешном создании спойлера
@@ -38,7 +37,6 @@ interface Config {
   range: number[];
   points: number[];
   connect: boolean;
-  pointsInPercent: boolean;
   changeDelay: number;
   selectors: {
     inputs?: string;
@@ -75,7 +73,6 @@ class Slider extends Module {
       points: [0, 100],
       range: [0, 100],
       connect: true,
-      pointsInPercent: false,
       changeDelay: 1000,
       selectors: {
         inputs: undefined,
@@ -509,9 +506,8 @@ class Slider extends Module {
    *
    * @param index     - индекс ползунка
    * @param value     - значение
-   * @param inPercent - значение в процентах или нет
    */
-  setValue(index: number, value: number, inPercent: boolean = false): void {
+  setValue(index: number, value: number): void {
     // DOM элемент ползунка
     const pointNode = this.pointsNodes[index];
     if (pointNode) {
@@ -532,11 +528,6 @@ class Slider extends Module {
       // Обычный рассчет позиции
       let left = position * this.ratio;
 
-      // Рассчет позиции если необходимо считать через проценты
-      if (inPercent) {
-        left = (this.node.getBoundingClientRect().width * value) / 100;
-      }
-
       // Передвигаем ползунок на нужное место
       this.move(pointNode, nextPointNode, prevPointNode, left, index, false);
     }
@@ -551,9 +542,9 @@ class Slider extends Module {
    * @param values - массив значений, где индекс значения равен индексу точки
    * @param inPercent - значение в процентах или нет
    */
-  setValues(values: number[], inPercent: boolean = false): void {
+  setValues(values: number[]): void {
     values.forEach((value, i) => {
-      this.setValue(i, value, inPercent);
+      this.setValue(i, value);
     });
   }
 
@@ -588,7 +579,7 @@ class Slider extends Module {
    * Сброс слайдера в первоначальное положение
    */
   reset(): void {
-    this.setValues(this.config.points, this.config.pointsInPercent);
+    this.setValues(this.config.points);
   }
 
   /**
@@ -603,7 +594,7 @@ class Slider extends Module {
     }
 
     // Сброс значения
-    this.setValue(index, this.config.points[index], this.config.pointsInPercent);
+    this.setValue(index, this.config.points[index]);
   }
 
   /**
@@ -623,7 +614,6 @@ class Slider extends Module {
       selectors: {
         inputs: node.dataset.fazeSliderSelectorsInputs,
       },
-      pointsInPercent: (node.dataset.fazeSliderPointsOnPercent || 'false') === 'true',
     });
   }
 }

@@ -112,18 +112,25 @@ Faze.add({
   pluginName: 'TestSlider',
   condition: document.querySelectorAll('.js-slider2').length > 0,
   callback: () => {
-    new Faze.Slider(document.querySelector('.js-slider2'), {
+    const slider = new Faze.Slider(document.querySelector('.js-slider2'), {
       points: [1000],
       range: [0, 2000],
       selectors: {
         inputs: '.js-slider-point3',
       },
       callbacks: {
-        changed: (data: any) => {
-          console.log(data.values);
+        changed: () => {
+          console.log(123);
         },
       },
     });
+
+    const resetNode = document.querySelector('.js-reset');
+    if (resetNode) {
+      resetNode.addEventListener('click', () => {
+        slider.reset();
+      });
+    }
   },
 });
 

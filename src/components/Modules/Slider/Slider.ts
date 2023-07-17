@@ -104,6 +104,9 @@ class Slider extends Module {
     // Проверка конфига
     this.checkConfig();
 
+    // Рассчитываем относительную величину
+    this.recalculateRatio();
+
     // Инициализация переменных
     this.pointsNodes = [];
     this.inputsNodes = [];
@@ -373,6 +376,7 @@ class Slider extends Module {
     // Ширина всего слайдера
     const sliderWidth = this.node.getBoundingClientRect().width;
 
+    // Флаги для определения уперся ли ползунок в другого
     let isCollideNext = false;
     let isCollidePrev = false;
 
@@ -411,10 +415,11 @@ class Slider extends Module {
       pointWidthFactor = this.pointSize;
     }
 
+    // Если ползунок упёрся в другого, то дополнительно просчитываем их ширину для совпадения значений
     if (isCollideNext) {
       pointWidthFactor = this.pointSize * 2;
     } else if (isCollidePrev) {
-      pointWidthFactor = -this.pointSize * 2;
+      pointWidthFactor = -this.pointSize;
     }
 
     const valueWidth = this.config.range[1] - this.config.range[0];
@@ -552,7 +557,7 @@ class Slider extends Module {
       }
 
       // Передвигаем ползунок на нужное место
-      this.move(pointNode, nextPointNode, prevPointNode, position, index, false);
+      this.move(pointNode, nextPointNode, prevPointNode, position * this.ratio, index, false);
 
       // Если указаны селекторы инпутов, то обновляем их
       if (this.config.selectors.inputs) {
@@ -581,6 +586,13 @@ class Slider extends Module {
    */
   getValues(): number[] {
     return this.values;
+  }
+
+  /**
+   * Перерасчёт модификатора движения
+   */
+  recalculateRatio(): void {
+    this.ratio = this.node.getBoundingClientRect().width / (this.config.range[1] - this.config.range[0]);
   }
 
   /**

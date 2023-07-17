@@ -104,9 +104,6 @@ class Slider extends Module {
     // Проверка конфига
     this.checkConfig();
 
-    // Рассчитываем относительную величину
-    this.recalculateRatio();
-
     // Инициализация переменных
     this.pointsNodes = [];
     this.inputsNodes = [];
@@ -555,7 +552,12 @@ class Slider extends Module {
       }
 
       // Передвигаем ползунок на нужное место
-      this.move(pointNode, nextPointNode, prevPointNode, position * this.ratio, index, false);
+      this.move(pointNode, nextPointNode, prevPointNode, position, index, false);
+
+      // Если указаны селекторы инпутов, то обновляем их
+      if (this.config.selectors.inputs) {
+        this.updateInputs();
+      }
     }
 
     // Пересчёт соединительной полосы
@@ -579,35 +581,13 @@ class Slider extends Module {
    */
   getValues(): number[] {
     return this.values;
-
-    return this.pointsNodes.map((pointNode, i) => {
-      // Считаем коэффициент сдвига учитывая размер ползунков
-      const ratio = (this.node.getBoundingClientRect().width - this.pointSize * this.pointsNodes.length) / (this.config.range[1] - this.config.range[0]);
-
-      // Считаем значение всех, кроме последнего
-      let value: number = Math.round(parseFloat((pointNode.offsetLeft / ratio).toString())) + this.config.range[0];
-
-      // Для последнего ползунка необходимо добавить значение равное половине его ширины
-      if (i === this.pointsNodes.length - 1 && this.pointsNodes.length > 1) {
-        value += Math.round(parseFloat(((pointNode.getBoundingClientRect().width - this.pointSize * this.pointsNodes.length) / ratio).toString()));
-      }
-
-      return value;
-    });
-  }
-
-  /**
-   * Перерасчёт модификатора движения
-   */
-  recalculateRatio(): void {
-    this.ratio = this.node.getBoundingClientRect().width / (this.config.range[1] - this.config.range[0]);
   }
 
   /**
    * Сброс слайдера в первоначальное положение
    */
   reset(): void {
-    this.setValues(this.config.points);
+    this.setValues(this.config.range);
   }
 
   /**

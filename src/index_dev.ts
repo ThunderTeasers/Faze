@@ -119,8 +119,8 @@ Faze.add({
         inputs: '.js-slider-point1,.js-slider-point2',
       },
       // callbacks: {
-      //   changed: () => {
-      //     console.log(123);
+      //   changed: (data: any) => {
+      //     console.log(data.values);
       //   },
       // },
     });

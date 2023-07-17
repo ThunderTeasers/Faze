@@ -380,6 +380,9 @@ class Slider extends Module {
     let isCollideNext = false;
     let isCollidePrev = false;
 
+    // Насколько нужно сдвигать значение для корректного пересчёта конкретного ползунка
+    let pointWidthFactor = 0;
+
     // Проверка на заезд дальше следующего ползунка
     if (nextPointNode) {
       if (tmpPosition >= nextPointNode.offsetLeft - this.pointSize) {
@@ -405,12 +408,17 @@ class Slider extends Module {
       tmpPosition = 0;
     } else if (position >= sliderWidth - this.pointSize) {
       tmpPosition = sliderWidth - this.pointSize;
+
+      // Если ползунок один, то у него по умолчанию есть сдвиг к правому краю
+      if (this.config.points.length === 1) {
+        pointWidthFactor = this.pointSize;
+      }
     }
 
     // Рассчет новой позиции скролбара
     pointNode.style.left = `${(tmpPosition * 100) / sliderWidth}%`;
 
-    let pointWidthFactor = 0;
+    // Если это не первый ползунок, то стандартный сдвиг равен его ширине
     if (index !== 0) {
       pointWidthFactor = this.pointSize;
     }
@@ -422,8 +430,8 @@ class Slider extends Module {
       pointWidthFactor = -this.pointSize;
     }
 
-    const valueWidth = this.config.range[1] - this.config.range[0];
-    this.values[index] = Math.min(Math.max(0, Math.round(((tmpPosition + pointWidthFactor) * valueWidth) / sliderWidth)), this.config.range[1]);
+    // Расчёт финального значения
+    this.values[index] = this.config.range[0] + Math.round(((tmpPosition + pointWidthFactor) * (this.config.range[1] - this.config.range[0])) / sliderWidth);
 
     // Если указаны селекторы инпутов, то обновляем их
     if (this.config.selectors.inputs && needToUpdateInputs) {

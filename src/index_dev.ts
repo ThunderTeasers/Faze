@@ -110,11 +110,11 @@ Faze.add({
 // Тесты слайдера
 Faze.add({
   pluginName: 'TestSlider',
-  condition: document.querySelectorAll('.js-slider1').length > 0,
+  condition: document.querySelectorAll('.js-slider2').length > 0,
   callback: () => {
     const slider = new Faze.Slider(document.querySelector('.js-slider1'), {
-      points: [0, 4000],
-      range: [0, 4000],
+      points: [25000, 40000],
+      range: [20000, 40000],
       selectors: {
         inputs: '.js-slider-point1,.js-slider-point2',
       },

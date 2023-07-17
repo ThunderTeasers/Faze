@@ -165,13 +165,13 @@ class Slider extends Module {
    * Инициализация инпутов для вывода значений ползунков
    */
   private initializeInputs(): void {
-    this.config.selectors.inputs.split(',').forEach((selector: string) => {
+    this.config.selectors.inputs.split(',').forEach((selector: string, index: number) => {
       const inputNode: HTMLInputElement | null = document.querySelector<HTMLInputElement>(selector);
       if (inputNode) {
         this.inputsNodes.push(inputNode);
 
         // Проставляем начальные значения
-        inputNode.value = this.config.points[inputNode.dataset.fazeSliderInput || 0];
+        inputNode.value = this.config.points[index];
       }
     });
   }

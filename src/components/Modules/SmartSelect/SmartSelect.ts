@@ -572,6 +572,18 @@ class SmartSelect extends Module {
   }
 
   /**
+   * Заменяем значение параметров
+   *
+   * @param parts{object} Значение которое меняем
+   */
+  public setParts(parts: object): void {
+    // Сбрасываем кеш
+    this.cache = [];
+
+    this.config.parts = parts;
+  }
+
+  /**
    * Очищаем кеш
    */
   public clearCache(): void {

@@ -64,6 +64,9 @@ class Slider extends Module {
   // DOM элемент соединительной полоски
   connectNode: HTMLElement | null;
 
+  // Значения слайдера
+  values: number[];
+
   // Отношение ширины слайдера и его возможного максимального значения
   ratio: number;
 
@@ -109,6 +112,7 @@ class Slider extends Module {
     this.inputsNodes = [];
     this.pointSize = 10;
     this.connectNode = null;
+    this.values = this.config.points;
 
     // Простановка класса, если этого не было сделано руками
     this.node.classList.add('faze-slider');
@@ -372,13 +376,16 @@ class Slider extends Module {
     // Ширина всего слайдера
     const sliderWidth = this.node.getBoundingClientRect().width;
 
-    // Половина ширины ползунка
-    const pointWidth = pointNode.getBoundingClientRect().width;
+    let isCollideNext = false;
+    let isCollidePrev = false;
 
     // Проверка на заезд дальше следующего ползунка
     if (nextPointNode) {
       if (tmpPosition >= nextPointNode.offsetLeft - this.pointSize) {
         tmpPosition = nextPointNode.offsetLeft - this.pointSize;
+        isCollideNext = true;
+      } else {
+        isCollideNext = false;
       }
     }
 
@@ -386,18 +393,35 @@ class Slider extends Module {
     if (prevPointNode && index !== 0 && this.pointsNodes.length > 1) {
       if (tmpPosition <= prevPointNode.offsetLeft + this.pointSize) {
         tmpPosition = prevPointNode.offsetLeft + this.pointSize;
+        isCollidePrev = true;
+      } else {
+        isCollidePrev = false;
       }
     }
 
     // Проверки на выход из границ
     if (tmpPosition <= 0) {
       tmpPosition = 0;
-    } else if (position >= sliderWidth - pointWidth) {
-      tmpPosition = sliderWidth - pointWidth;
+    } else if (position >= sliderWidth - this.pointSize) {
+      tmpPosition = sliderWidth - this.pointSize;
     }
 
     // Рассчет новой позиции скролбара
     pointNode.style.left = `${(tmpPosition * 100) / sliderWidth}%`;
+
+    let pointWidthFactor = 0;
+    if (index !== 0) {
+      pointWidthFactor = this.pointSize;
+    }
+
+    if (isCollideNext) {
+      pointWidthFactor = this.pointSize * 2;
+    } else if (isCollidePrev) {
+      pointWidthFactor = -this.pointSize * 2;
+    }
+
+    const valueWidth = this.config.range[1] - this.config.range[0];
+    this.values[index] = Math.min(Math.max(0, Math.round(((tmpPosition + pointWidthFactor) * valueWidth) / sliderWidth)), this.config.range[1]);
 
     // Если указаны селекторы инпутов, то обновляем их
     if (this.config.selectors.inputs && needToUpdateInputs) {
@@ -459,7 +483,9 @@ class Slider extends Module {
    * @returns Процент сдвига ползунка
    */
   private calculatePercent(value: number): number {
-    return (-((this.node.getBoundingClientRect().width * (this.config.range[0] - value)) / (this.config.range[1] - this.config.range[0])) * 100) / this.node.getBoundingClientRect().width;
+    const sliderWidth = this.node.getBoundingClientRect().width - 32;
+
+    return (-((sliderWidth * (this.config.range[0] - value)) / (this.config.range[1] - this.config.range[0])) * 100) / sliderWidth;
   }
 
   /**
@@ -510,7 +536,7 @@ class Slider extends Module {
   setValue(index: number, value: number): void {
     // DOM элемент ползунка
     const pointNode = this.pointsNodes[index];
-    if (pointNode) {
+    if (pointNode && index >= 0 && index < this.values.length) {
       // DOM элемент следующего ползунка
       const nextPointNode = <HTMLElement>pointNode.nextSibling;
 
@@ -520,16 +546,16 @@ class Slider extends Module {
       // Высчитываем значение, необходимо отнять минимальное значение т.к. оно принимается за начало отсчета
       let position = value - this.config.range[0];
 
+      // Обновляем значение
+      this.values[index] = value;
+
       // Ограничиваем выход в минус
       if (position <= 0) {
         position = 0;
       }
 
-      // Обычный рассчет позиции
-      let left = position * this.ratio;
-
       // Передвигаем ползунок на нужное место
-      this.move(pointNode, nextPointNode, prevPointNode, left, index, false);
+      this.move(pointNode, nextPointNode, prevPointNode, position * this.ratio, index, false);
     }
 
     // Пересчёт соединительной полосы
@@ -543,8 +569,8 @@ class Slider extends Module {
    * @param inPercent - значение в процентах или нет
    */
   setValues(values: number[]): void {
-    values.forEach((value, i) => {
-      this.setValue(i, value);
+    values.forEach((value, index) => {
+      this.setValue(index, value);
     });
   }
 
@@ -552,6 +578,8 @@ class Slider extends Module {
    * Получение значений ползунков
    */
   getValues(): number[] {
+    return this.values;
+
     return this.pointsNodes.map((pointNode, i) => {
       // Считаем коэффициент сдвига учитывая размер ползунков
       const ratio = (this.node.getBoundingClientRect().width - this.pointSize * this.pointsNodes.length) / (this.config.range[1] - this.config.range[0]);

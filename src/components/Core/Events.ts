@@ -58,7 +58,7 @@ class Events {
    * @param callback Пользовательская функция исполняющаяся после события
    * @param isPreventDefault Нужно ли делать "preventDefault()" у события
    */
-  static forEach(type: string, nodesOrSelector: HTMLElement[] | string, callback: (event: Event, node: HTMLElement | null) => void, isPreventDefault: boolean = true): void {
+  static forEach(type: string, nodesOrSelector: HTMLElement[] | string, callback: (event: Event, node: HTMLElement | null, index: number) => void, isPreventDefault: boolean = true): void {
     // Проверяем, является ли переданный параметр строкой, если да,
     // то ищём соответствующий DOM элемент по селектору, если нет, используем напрямую
     let nodes: HTMLElement[];
@@ -74,8 +74,8 @@ class Events {
     }
 
     // Навешиваем события на все элементы в массиве
-    nodes.forEach((node) => {
-      this.listener(type, node, callback, isPreventDefault);
+    nodes.forEach((node, index) => {
+      this.listener(type, node, (event: Event, nodeEl: HTMLElement | null) => callback(event, nodeEl, index), isPreventDefault);
     });
   }
 }

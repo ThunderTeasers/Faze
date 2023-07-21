@@ -6,11 +6,23 @@ class Events {
   /**
    * Навешивание событие клика на DOM элемент со всеми проверками
    *
-   * @param node DOM элемент на который навешиваем событие
+   * @param nodeOrSelector DOM элемент на который навешиваем событие или его CSS селектор
    * @param callback Пользовательская функция исполняющаяся после события
    * @param isPreventDefault Нужно ли делать "preventDefault()" у события
    */
   static click(nodeOrSelector: HTMLElement | string, callback: (event: Event, node: HTMLElement | null) => void, isPreventDefault: boolean = true): void {
+    this.listener('click', nodeOrSelector, callback, isPreventDefault);
+  }
+
+  /**
+   * Навешивание событие на DOM элемент со всеми проверками
+   *
+   * @param type Тип события
+   * @param nodeOrSelector DOM элемент на который навешиваем событие или его CSS селектор
+   * @param callback Пользовательская функция исполняющаяся после события
+   * @param isPreventDefault Нужно ли делать "preventDefault()" у события
+   */
+  static listener(type: string, nodeOrSelector: HTMLElement | string, callback: (event: Event, node: HTMLElement | null) => void, isPreventDefault: boolean = true): void {
     // Проверяем, является ли переданный параметр строкой, если да,
     // то ищём соответствующий DOM элемент по селектору, если нет, используем напрямую
     let node: HTMLElement | null;
@@ -26,7 +38,7 @@ class Events {
     }
 
     // Навешиваем событие
-    node.addEventListener('click', (event) => {
+    node.addEventListener(type, (event) => {
       if (isPreventDefault) {
         event.preventDefault();
       }

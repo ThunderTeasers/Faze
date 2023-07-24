@@ -5,11 +5,13 @@ import Module from '../../Core/Module';
  *
  * Содержит:
  *   url - ссылка, где содержатся данные модуля для их загрузки в плейсхолдер
+ *   offset - при каком максимальном сдвиге вьюпорта начинать загружать блок
  *   callbacks
  *     loaded - пользовательская функция, исполняющаяся после загрузки контента
  */
 interface Config {
   url: string;
+  offset: number;
   callbacks: {
     loaded?: () => void;
   };
@@ -36,6 +38,7 @@ class Placeholder extends Module {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       url: '',
+      offset: 100,
       callbacks: {
         loaded: undefined,
       },
@@ -86,6 +89,7 @@ class Placeholder extends Module {
   static initializeByDataAttributes(node: HTMLElement): void {
     new Placeholder(node, {
       url: node.dataset.fazePlaceholderUrl,
+      offset: parseInt(node.dataset.fazePlaceholderOffset || '100', 10),
     });
   }
 }

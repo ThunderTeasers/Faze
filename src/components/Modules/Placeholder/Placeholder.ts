@@ -1,3 +1,4 @@
+import Faze from '../../Core/Faze';
 import Module from '../../Core/Module';
 
 /**
@@ -6,12 +7,14 @@ import Module from '../../Core/Module';
  * Содержит:
  *   url - ссылка, где содержатся данные модуля для их загрузки в плейсхолдер
  *   offset - при каком максимальном сдвиге вьюпорта начинать загружать блок
+ *   delay - задержка при загрузке
  *   callbacks
  *     loaded - пользовательская функция, исполняющаяся после загрузки контента
  */
 interface Config {
   url: string;
   offset: number;
+  delay: number;
   callbacks: {
     loaded?: () => void;
   };
@@ -28,6 +31,9 @@ class Placeholder extends Module {
   // Конфиг с настройками
   readonly config: Config;
 
+  // Загружен ли контент
+  isLoaded: boolean;
+
   /**
    * Конструктор
    *
@@ -39,6 +45,7 @@ class Placeholder extends Module {
     const defaultConfig: Config = {
       url: '',
       offset: 100,
+      delay: 0,
       callbacks: {
         loaded: undefined,
       },
@@ -58,20 +65,31 @@ class Placeholder extends Module {
   protected initialize(): void {
     super.initialize();
 
-    fetch(`${this.config.url}${this.config.url.includes('?') ? '&' : '?'}ajax=true`)
-      .then((responce) => responce.text())
-      .then((data) => {
-        this.node.innerHTML = data;
+    this.isLoaded = false;
+  }
 
-        // Вызываем пользовательский метод
-        if (typeof this.config.callbacks.loaded === 'function') {
-          try {
-            this.config.callbacks.loaded();
-          } catch (error) {
-            console.error(`Ошибка исполнения пользовательского метода "loaded": ${error}`);
+  /**
+   * Загрузка HTML на страницу
+   *
+   * @private
+   */
+  private load(): void {
+    setTimeout(() => {
+      fetch(`${this.config.url}${this.config.url.includes('?') ? '&' : '?'}ajax=true`)
+        .then((responce: Response) => responce.text())
+        .then((data: string) => {
+          this.node.innerHTML = data;
+
+          // Вызываем пользовательский метод
+          if (typeof this.config.callbacks.loaded === 'function') {
+            try {
+              this.config.callbacks.loaded();
+            } catch (error) {
+              console.error(`Ошибка исполнения пользовательского метода "loaded": ${error}`);
+            }
           }
-        }
-      });
+        });
+    }, this.config.delay);
   }
 
   /**
@@ -79,6 +97,22 @@ class Placeholder extends Module {
    */
   protected bind(): void {
     super.bind();
+
+    this.bindLoad();
+  }
+
+  /**
+   * Навешивание событий на загрузку
+   *
+   * @private
+   */
+  private bindLoad(): void {
+    Faze.Helpers.addEventListeners(window, ['scroll', 'resize'], () => {
+      if (Faze.Helpers.isElementInViewport(this.node, this.config.offset) && !this.isLoaded) {
+        this.isLoaded = true;
+        this.load();
+      }
+    });
   }
 
   /**
@@ -89,7 +123,8 @@ class Placeholder extends Module {
   static initializeByDataAttributes(node: HTMLElement): void {
     new Placeholder(node, {
       url: node.dataset.fazePlaceholderUrl,
-      offset: parseInt(node.dataset.fazePlaceholderOffset || '100', 10),
+      offset: parseInt(node.dataset.fazePlaceholderOffset || '0', 10),
+      delay: parseInt(node.dataset.fazePlaceholderDelay || '0', 10),
     });
   }
 }

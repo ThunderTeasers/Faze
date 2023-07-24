@@ -1,3 +1,4 @@
+import './Placeholder.scss';
 import Faze from '../../Core/Faze';
 import Module from '../../Core/Module';
 
@@ -65,6 +66,8 @@ class Placeholder extends Module {
   protected initialize(): void {
     super.initialize();
 
+    this.node.classList.add('faze-placeholder-loading');
+
     this.isLoaded = false;
   }
 
@@ -79,6 +82,7 @@ class Placeholder extends Module {
         .then((responce: Response) => responce.text())
         .then((data: string) => {
           this.node.innerHTML = data;
+          this.node.classList.remove('faze-placeholder-loading');
 
           // Вызываем пользовательский метод
           if (typeof this.config.callbacks.loaded === 'function') {

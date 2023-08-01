@@ -152,6 +152,8 @@ class Faze {
   static Observer: any = new Observer();
   static REST: any = REST;
 
+  static FAZE_RESOLUTION_MOBILE: number = 768;
+
   // Версии
   static Versions: Version;
 

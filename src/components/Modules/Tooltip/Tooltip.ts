@@ -32,6 +32,11 @@ interface Config {
   class: string;
   event: string;
   dynamicUpdate: boolean;
+  resolution?: {
+    mobile?: {
+      side?: string;
+    };
+  };
   callbacks: {
     opened?: () => void;
   };
@@ -50,8 +55,12 @@ class Tooltip {
   // Конфиг с настройками
   readonly config: Config;
 
+  side: string;
+
   // DOM элемент для отрисовки тултипа
   readonly tooltipNode: HTMLDivElement;
+
+  readonly resolutions: MediaQueryList[];
 
   constructor(node: HTMLElement | null, config: Partial<Config>) {
     if (!node) {
@@ -60,6 +69,8 @@ class Tooltip {
 
     // Инициализация логгера
     this.logger = new Logger('Модуль Faze.Tooltip:');
+
+    this.resolutions = [window.matchMedia('(max-width: 768px)')];
 
     // Проверка на двойную инициализацию
     if (node.classList.contains('faze-tooltip-initialized')) {
@@ -75,6 +86,7 @@ class Tooltip {
       class: '',
       event: 'mouseenter',
       dynamicUpdate: false,
+      resolution: undefined,
       callbacks: {
         opened: undefined,
       },
@@ -82,8 +94,10 @@ class Tooltip {
 
     this.config = Object.assign(defaultConfig, config);
 
+    this.side = this.config.side;
+
     // Проверка на то, что сторона задана правильно
-    if (!['top', 'bottom', 'right', 'left'].includes(this.config.side)) {
+    if (!['top', 'bottom', 'right', 'left'].includes(this.side)) {
       this.logger.error('Параметр "side" задан верно! Корректные значения: "top", "right", "bottom", "left".');
     }
 
@@ -93,6 +107,7 @@ class Tooltip {
 
     this.initialize();
     this.bind();
+    this.handleResolution();
   }
 
   /**
@@ -100,7 +115,7 @@ class Tooltip {
    */
   initialize(): void {
     this.node.classList.add('faze-tooltip-initialized');
-    this.tooltipNode.className = `faze-tooltip faze-tooltip-${this.config.side} ${this.config.class}`;
+    this.tooltipNode.className = `faze-tooltip faze-tooltip-${this.side} ${this.config.class}`;
     this.tooltipNode.style.visibility = 'hidden';
     this.tooltipNode.innerHTML = this.config.text || this.node.dataset.fazeTooltipText || this.node.title || '';
   }
@@ -135,6 +150,27 @@ class Tooltip {
         this.toggle();
       });
     }
+  }
+
+  /**
+   * Отслеживаем изменение разрешения экрана и в соответствии с этим изменяем параметры
+   */
+  private handleResolution() {
+    this.checkResolution();
+
+    this.resolutions.forEach((mql) => {
+      mql.addEventListener('change', this.checkResolution.bind(this));
+    });
+  }
+
+  private checkResolution() {
+    this.resolutions.forEach((mql) => {
+      if (mql.matches && this.config.resolution?.mobile?.side) {
+        this.setSide(this.config.resolution.mobile.side);
+      } else {
+        this.setSide(this.config.side);
+      }
+    });
   }
 
   /**
@@ -199,6 +235,16 @@ class Tooltip {
   }
 
   /**
+   * Изменяем сторону отображения
+   *
+   * @param side Сторона отображения на которую меняем
+   */
+  setSide(side: string): void {
+    this.side = side;
+    this.tooltipNode.className = `faze-tooltip faze-tooltip-${side} ${this.config.class}`;
+  }
+
+  /**
    * Рассчет позиции и размеров тултипа
    */
   private calculatePositionAndSize(): void {
@@ -210,7 +256,7 @@ class Tooltip {
     const offsetHorizontal = callerRect.width / 2 + tooltipRect.width / 2 + this.config.margin;
     const offsetVertical = callerRect.height / 2 + tooltipRect.height / 2 + this.config.margin;
 
-    const {documentElement} = document;
+    const { documentElement } = document;
     let left = 0;
     let top = 0;
     if (documentElement) {
@@ -223,7 +269,7 @@ class Tooltip {
     let centerY = callerRect.top + callerRect.height / 2 - tooltipRect.height / 2 + top;
 
     // Применение отступа в зависимости от стороны
-    switch (this.config.side) {
+    switch (this.side) {
       case 'top':
         centerY -= offsetVertical;
         break;
@@ -256,6 +302,11 @@ class Tooltip {
       class: tooltipNode.dataset.fazeTooltipClass || '',
       event: tooltipNode.dataset.fazeTooltipEvent || 'mouseenter',
       dynamicUpdate: tooltipNode.dataset.fazeTooltipDynamicUpdate === 'true',
+      resolution: {
+        mobile: {
+          side: tooltipNode.dataset.fazeTooltipSideMobile || 'bottom',
+        },
+      },
     });
   }
 

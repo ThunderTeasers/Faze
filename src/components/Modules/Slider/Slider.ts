@@ -206,10 +206,10 @@ class Slider extends Module {
       let timeout: number;
 
       inputNode.addEventListener('keyup', () => {
-        this.setValue(index, parseInt(inputNode.value, 10));
-
         window.clearTimeout(timeout);
         timeout = window.setTimeout(() => {
+          this.setValue(index, parseInt(inputNode.value, 10));
+
           // Вызываем пользовательскую функцию
           if (typeof this.config.callbacks.changed === 'function') {
             try {

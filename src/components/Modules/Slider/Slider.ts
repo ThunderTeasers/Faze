@@ -206,10 +206,10 @@ class Slider extends Module {
       let timeout: number;
 
       inputNode.addEventListener('keyup', () => {
+        this.setValue(index, parseInt(inputNode.value, 10));
+
         window.clearTimeout(timeout);
         timeout = window.setTimeout(() => {
-          this.setValue(index, parseInt(inputNode.value, 10));
-
           // Вызываем пользовательскую функцию
           if (typeof this.config.callbacks.changed === 'function') {
             try {
@@ -235,7 +235,7 @@ class Slider extends Module {
       // Начальная позиция мыши
       let startMousePosition = 0;
 
-      // КОнечная позиция мыши
+      // Конечная позиция мыши
       let endMousePosition = 0;
 
       // DOM элемент следующего ползунка
@@ -255,7 +255,7 @@ class Slider extends Module {
         startMousePosition = event.clientX || (event.touches ? event.touches[0].clientX : 0);
 
         // Передвижение ползунка
-        this.move(pointNode, nextPointNode, prevPointNode, pointNode.offsetLeft - endMousePosition, i);
+        this.move(pointNode, nextPointNode, prevPointNode, pointNode.offsetLeft - endMousePosition, i, true, true);
 
         // Просчёт положения и размера соединительной полоски
         if (this.config.connect) {
@@ -337,28 +337,30 @@ class Slider extends Module {
    * Расчет положения и ширины соединительной полоски
    */
   calculateConnect(): void {
-    if (this.connectNode) {
-      // Ширина - это расстояние между самыми крайними точками
-      const width = this.pointsNodes[this.pointsNodes.length - 1].offsetLeft - this.pointsNodes[0].offsetLeft;
+    setTimeout(() => {
+      if (this.connectNode) {
+        // Ширина - это расстояние между самыми крайними точками
+        const width = this.pointsNodes[this.pointsNodes.length - 1].offsetLeft - this.pointsNodes[0].offsetLeft;
 
-      // Половина ширины ползунка
-      const halfPointWidth = this.pointsNodes[0].getBoundingClientRect().width / 2;
+        // Половина ширины ползунка
+        const halfPointWidth = this.pointsNodes[0].getBoundingClientRect().width / 2;
 
-      // Проверка чтобы размер линии не ушел в минус
-      let connectWidth = width - halfPointWidth;
-      if (connectWidth < 0) {
-        connectWidth = 0;
+        // Проверка чтобы размер линии не ушел в минус
+        let connectWidth = width - halfPointWidth;
+        if (connectWidth < 0) {
+          connectWidth = 0;
+        }
+
+        // Если только один ползунок, тогда считаем от левого края до него, если несколько то между первым и последним
+        if (this.pointsNodes.length === 1) {
+          this.connectNode.style.width = `${this.calculateSizeInPercent(this.pointsNodes[0].offsetLeft + halfPointWidth, false)}%`;
+          this.connectNode.style.left = '0';
+        } else {
+          this.connectNode.style.width = `${this.calculateSizeInPercent(connectWidth + halfPointWidth, false)}%`;
+          this.connectNode.style.left = `${this.calculateSizeInPercent(this.pointsNodes[0].offsetLeft + halfPointWidth, false)}%`;
+        }
       }
-
-      // Если только один ползунок, тогда считаем от левого края до него, если несколько то между первым и последним
-      if (this.pointsNodes.length === 1) {
-        this.connectNode.style.width = `${this.calculateSizeInPercent(this.pointsNodes[0].offsetLeft + halfPointWidth, false)}%`;
-        this.connectNode.style.left = '0';
-      } else {
-        this.connectNode.style.width = `${this.calculateSizeInPercent(connectWidth + halfPointWidth, false)}%`;
-        this.connectNode.style.left = `${this.calculateSizeInPercent(this.pointsNodes[0].offsetLeft + halfPointWidth, false)}%`;
-      }
-    }
+    }, 0);
   }
 
   /**
@@ -370,7 +372,7 @@ class Slider extends Module {
    * @param position      - новое значение ползунка
    * @param index         - индекс ползунка
    */
-  move(pointNode: HTMLElement, nextPointNode: HTMLElement, prevPointNode: HTMLElement, position: number, index: number, needToUpdateInputs: boolean = true) {
+  move(pointNode: HTMLElement, nextPointNode: HTMLElement, prevPointNode: HTMLElement, position: number, index: number, needToUpdateInputs: boolean = true, needToCorrect: boolean = false) {
     let tmpPosition = position;
 
     // Ширина всего слайдера
@@ -431,7 +433,9 @@ class Slider extends Module {
     }
 
     // Расчёт финального значения
-    this.values[index] = this.config.range[0] + Math.round(((tmpPosition + pointWidthFactor) * (this.config.range[1] - this.config.range[0])) / sliderWidth);
+    if (needToCorrect) {
+      this.values[index] = this.config.range[0] + Math.round(((tmpPosition + pointWidthFactor) * (this.config.range[1] - this.config.range[0])) / sliderWidth);
+    }
 
     // Если указаны селекторы инпутов, то обновляем их
     if (this.config.selectors.inputs && needToUpdateInputs) {
@@ -462,11 +466,11 @@ class Slider extends Module {
     this.pointSize = pointNode.getBoundingClientRect().width;
 
     // Ограничение для последнего ползунка
-    if (pointNode.offsetLeft >= this.node.getBoundingClientRect().width - this.pointSize) {
-      pointNode.style.left = `${this.calculateSizeInPercent(this.pointSize)}%`;
-    }
-
-    (pointNode as any).fazeOffset = pointNode.style.left;
+    setTimeout(() => {
+      if (pointNode.offsetLeft >= this.node.getBoundingClientRect().width - this.pointSize) {
+        pointNode.style.left = `${this.calculateSizeInPercent(this.pointSize)}%`;
+      }
+    }, 0);
   }
 
   /**

@@ -221,6 +221,9 @@ class Filter {
     // Восстанавливаем заданые значения
     this.restoreFilteredInputs();
 
+    // Обновление количества выбранных фильтров
+    this.updateTotalSelected();
+
     // Выполняем пользовательскую фукнции
     if (typeof this.config.callbacks.created === 'function') {
       try {
@@ -418,6 +421,27 @@ class Filter {
   }
 
   /**
+   * Обновление количества выбранных фильтров
+   *
+   * @private
+   */
+  updateTotalSelected() {
+    this.totalSelected = Array.from(this.params)
+      .filter((param) => param[1] && param[1] !== '')
+      .map((param) => param[0])
+      .filter((value, index, array) => array.indexOf(value) === index)
+      .reduce((acc, cur) => {
+        const node = this.formNode?.querySelector(`[name="${cur}"]:not([type="hidden"])`);
+
+        if (node) {
+          return acc + 1;
+        } else {
+          return acc;
+        }
+      }, 0);
+  }
+
+  /**
    * Исполнение пользовательской функции
    *
    * @param response     - текст ответа
@@ -435,6 +459,9 @@ class Filter {
 
     // Обновляем хранимые параметры
     this.updateSearchParams(query);
+
+    // Обновление количества выбранных фильтров
+    this.updateTotalSelected();
 
     // Сохраняем указанные значения в cookie
     this.saveStoredParams();
@@ -515,8 +542,6 @@ class Filter {
   private restoreFilteredTextFields(): void {
     this.restoreFilteredInput('text', (textNode: HTMLInputElement, value?: string) => {
       textNode.value = value || textNode.value || '';
-
-      this.totalSelected++;
     });
   }
 
@@ -528,8 +553,6 @@ class Filter {
   private restoreFilteredNumberFields(): void {
     this.restoreFilteredInput('number', (textNode: HTMLInputElement, value?: string) => {
       textNode.value = value || textNode.value || '';
-
-      this.totalSelected++;
     });
   }
 
@@ -541,8 +564,6 @@ class Filter {
   private restoreFilteredCheckboxes(): void {
     this.restoreFilteredInput('checkbox', (checkboxNode: HTMLInputElement) => {
       checkboxNode.checked = true;
-
-      this.totalSelected++;
     });
   }
 
@@ -554,8 +575,6 @@ class Filter {
   private restoreFilteredRadioButtons(): void {
     this.restoreFilteredInput('radio', (radioNode: HTMLInputElement) => {
       radioNode.checked = true;
-
-      this.totalSelected++;
     });
   }
 

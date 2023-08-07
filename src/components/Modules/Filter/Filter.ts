@@ -493,7 +493,7 @@ class Filter {
         const foundNodeName = foundNode.name;
         const foundNodeValue = foundNode.value;
 
-        const values: string[] = this.params.getAll(foundNodeName);
+        const values: string[] = this.params.getAll(foundNodeName).filter((value) => value !== '');
         if (values.includes(foundNodeValue)) {
           if (typeof callback === 'function') {
             callback(foundNode);

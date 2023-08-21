@@ -1424,7 +1424,7 @@ class Helpers {
    * @return{object} Готовый JS объект
    */
   static parseJSON(text?: string): object {
-    if (!text || text.trim() === '') {
+    if (!text || text.trim() === '' || text === 'null' || text === 'undefined') {
       return {};
     }
 

@@ -41,7 +41,7 @@ import Zoom from '../Modules/Zoom/Zoom';
 import ZoomBox from '../Modules/ZoomBox/ZoomBox';
 import Look from '../Modules/Look/Look';
 import Scroll from '../Modules/Scroll/Scroll';
-import Form from '../Modules/Form/Form';
+import Form from '../Helpers/Form';
 import Page from '../Modules/Page/Page';
 import Filter from '../Modules/Filter/Filter';
 import Spoiler from '../Modules/Spoiler/Spoiler';
@@ -149,7 +149,7 @@ class Faze {
   static Steps: any = Steps;
   static LazyImage: any = LazyImage;
   static LazyImageController: any = new LazyImageController();
-  static Observer: any = new Observer();
+  static Observer: Observer = new Observer();
   static REST: any = REST;
 
   static FAZE_RESOLUTION_MOBILE: number = 768;

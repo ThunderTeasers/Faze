@@ -1,5 +1,6 @@
 import Faze from './components/Core/Faze';
 import Helpers from './components/Helpers/Helpers';
+import Form from './components/Helpers/Form';
 
 // Навешивание общих события ядра
 Faze.bind();
@@ -9,6 +10,8 @@ Faze.hotInitialize();
 
 // Инициализация помощников
 Helpers.initialize();
+Form.initialize();
+Form.watch();
 
 // @ts-ignore
 window.Faze = Faze;

@@ -90,3 +90,12 @@
 .faze-drag-active {
   cursor: move;
 }
+
+// Загрузка файла
+.faze-file-input {
+  .faze-file-input-file {
+    position: absolute;
+    left: -9999px;
+    visibility: hidden;
+  }
+}

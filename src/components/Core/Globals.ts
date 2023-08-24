@@ -6,19 +6,8 @@
  */
 
 class Globals {
-  /**
-   * Инициализация
-   */
-  static initialize() {
-    Globals.initializeScrollbarWidth();
-  }
-
-  /**
-   * Инициализация ширины скроллбара браузера
-   */
-  private static initializeScrollbarWidth() {
-    document.documentElement.style.setProperty('--faze-scrollbar-width', (window.innerWidth - document.documentElement.clientWidth).toString());
-  }
+  // Ширина скроллбара браузера
+  static readonly SCROLLBAR_WIDTH: number = window.innerWidth - document.documentElement.clientWidth;
 }
 
 export default Globals;

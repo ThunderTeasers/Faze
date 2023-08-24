@@ -19,6 +19,7 @@ import Logger from './Logger';
  */
 import Modal from '../Modules/Modal/Modal';
 import Helpers from '../Helpers/Helpers';
+import Globals from '../Core/Globals';
 import Events from './Events';
 import Constants from '../Core/Constants';
 import URL from '../Helpers/URL';
@@ -116,6 +117,7 @@ class Faze {
   static plugins: PluginsData = {};
 
   // Резервирование статических переменных под заводские плагины
+  static Globals: any = Globals;
   static Carousel: any = Carousel;
   static Carousel2: any = Carousel2;
   static Tooltip: any = Tooltip;

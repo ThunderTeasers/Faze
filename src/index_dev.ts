@@ -1,7 +1,6 @@
 import Faze from './components/Core/Faze';
 import Helpers from './components/Helpers/Helpers';
 import Shortcuts from './components/Core/Shortcuts';
-import Globals from './components/Core/Globals';
 import Form from './components/Helpers/Form';
 
 // Навешивание общих события ядра
@@ -17,7 +16,6 @@ Form.watch();
 
 // Инициализация полезных сокращений
 Shortcuts.initialize();
-Globals.initialize();
 
 // @ts-ignore
 window.Faze = Faze;

@@ -524,7 +524,7 @@ class SmartSelect extends Module {
       // Собираем элемент
       const itemNode = document.createElement('div');
       itemNode.className = 'faze-smartsearch-item';
-      itemNode.textContent = value;
+      itemNode.innerHTML = value;
       this.items.push({
         node: itemNode,
         data: row,

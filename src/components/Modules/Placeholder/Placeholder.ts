@@ -26,12 +26,6 @@ interface Config {
  *
  */
 class Placeholder extends Module {
-  // DOM элемент селекта
-  readonly node: HTMLElement;
-
-  // Конфиг с настройками
-  readonly config: Config;
-
   // Загружен ли контент
   isLoaded: boolean;
 

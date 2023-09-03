@@ -74,6 +74,7 @@ interface Config {
   field: string;
   limit: number;
   minLength: number;
+  class?: string;
   parts?: object;
   callbacks: {
     selected?: (activeTabData: CallbackData) => void;
@@ -110,6 +111,7 @@ class SmartSelect extends Module {
       field: 'field',
       limit: 10,
       minLength: 3,
+      class: undefined,
       parts: undefined,
       callbacks: {
         selected: undefined,
@@ -339,7 +341,6 @@ class SmartSelect extends Module {
 
       inputTimer = window.setTimeout(async () => {
         if ((<HTMLInputElement>this.node).value.length < this.config.minLength) {
-          this.clearItems();
           return;
         }
 
@@ -365,15 +366,23 @@ class SmartSelect extends Module {
           });
         }
 
-        // Пересчитываем позицию
-        if (this.config.fixed) {
-          this.calculateFixed();
-        }
+        // Если есть данные, то выводим их
+        if (data.length > 0) {
+          this.close();
 
-        this.clearItems();
-        this.buildItems(data);
-        this.bindSelectOption();
-        this.bindEnterOption();
+          this.buildWrapper();
+          this.buildItems(data);
+          this.bindSelectOption();
+          this.bindEnterOption();
+
+          // Пересчитываем позицию
+          if (this.config.fixed) {
+            this.calculateFixed();
+          }
+
+          // Теперь открываем
+          this.open();
+        }
       }, 500);
     });
   }
@@ -451,26 +460,13 @@ class SmartSelect extends Module {
   }
 
   /**
-   * Построение необходимых DOM элементов
-   *
-   * @protected
-   */
-  protected build(): void {
-    this.buildWrapper();
-
-    if (this.config.fixed) {
-      this.calculateFixed();
-    }
-  }
-
-  /**
    * Создание обёртки для элементов
    *
    * @private
    */
   private buildWrapper(): void {
     this.itemsNode = document.createElement('div');
-    this.itemsNode.className = 'faze-smartsearch-items';
+    this.itemsNode.className = `faze-smartsearch-items ${this.config.class || ''}`;
 
     // Ставим атрибут если он есть на инпуте
     if ('fazeStyles' in this.node.dataset) {
@@ -487,9 +483,8 @@ class SmartSelect extends Module {
   /**
    * Очистка элементов
    *
-   * @private
    */
-  private clearItems(): void {
+  clearItems(): void {
     // Очищаем все данные
     this.items.forEach((item: Item) => {
       item.node.remove();
@@ -508,9 +503,6 @@ class SmartSelect extends Module {
    * @private
    */
   private buildItems(data: any[]): void {
-    // Нужно ли открывать дропдаун
-    let canOpen = false;
-
     data.slice(0, this.config.limit).forEach((row: any) => {
       let value = Faze.Helpers.resolvePath(row, this.config.field);
 
@@ -531,15 +523,7 @@ class SmartSelect extends Module {
       });
 
       this.itemsNode.appendChild(itemNode);
-
-      // Ставим на открытие, если добавили хоть один элемент
-      canOpen = true;
     });
-
-    // Открытие выпадающего списка, если есть варианты
-    if (canOpen) {
-      this.open();
-    }
   }
 
   /**
@@ -553,10 +537,13 @@ class SmartSelect extends Module {
    * Закрытие выпадающего списка вариантов
    */
   public close(): void {
-    this.itemsNode.classList.remove('faze-active');
+    if (this.itemsNode) {
+      this.itemsNode.remove();
+    }
 
     // Сбрасываем индекс выбранного элемента
     this.currentIndex = -1;
+    this.items = [];
   }
 
   /**
@@ -631,6 +618,7 @@ class SmartSelect extends Module {
       url: node.dataset.fazeSmartselectUrl || '',
       field: node.dataset.fazeSmartselectField || 'field',
       fixed: (node.dataset.fazeSmartselectFixed || 'false') === 'true',
+      class: node.dataset.fazeSmartselectClass,
       limit: parseInt(node.dataset.fazeSmartselectLimit || '10', 10),
       minLength: parseInt(node.dataset.fazeSmartselectMinLength || '3', 10),
     });

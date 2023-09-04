@@ -25,6 +25,10 @@
     <script>
       setTimeout(() => {
         new Faze.Carousel(document.querySelector('.carousel-test'), {
+          animation: {
+            type: 'slide',
+            time: 1000,
+          },
           counter: true,
           selectors: {
             counter: '.counter',

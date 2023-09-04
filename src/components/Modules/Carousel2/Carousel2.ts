@@ -931,20 +931,10 @@ class Carousel2 extends Module {
 
         // Изменяем сдвиг относительно направления
         this.offset += direction === FazeCarouselMoveDirection.Forward ? -this.slideWidth : this.slideWidth;
-        if (Math.abs(this.offset) > totalWidth) {
+        if (Math.abs(this.offset) >= totalWidth) {
           this.offset = 0;
-        }
-
-        this.slidesNodes.forEach((slideNode: HTMLElement, slideIndex: number) => {
-          if (slideIndex + 1 < this.index) {
-            slideNode.style.transform = `translate(${totalWidth}px, 0)`;
-          }
-        });
-
-        if (this.index === 0) {
-          this.slidesNodes.forEach((slideNode: HTMLElement) => {
-            slideNode.style.transform = '';
-          });
+        } else if (this.offset > 0) {
+          this.offset = -totalWidth + this.slideWidth;
         }
 
         this.itemsHolderNode.style.transform = `translate(${this.offset}px, 0)`;

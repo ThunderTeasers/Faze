@@ -176,6 +176,9 @@ class Carousel2 extends Module {
   // Текущий индекс слайда
   private index: number;
 
+  // Счётчик для сдвига слайдов
+  private counter: number;
+
   // Сдвиг карусели при прокрутке
   private offset: number;
 
@@ -191,8 +194,11 @@ class Carousel2 extends Module {
   // Конец касания пальца
   private touchEnd: FazePosition;
 
+  // Нужно ли сбросить CSS анимацию
+  private isNeedTransitionReset: boolean;
+
   // CSS стиль для плавности
-  private translation: string;
+  private transition: string;
 
   // Общая ширина слайдера
   private totalWidth: number;
@@ -256,8 +262,10 @@ class Carousel2 extends Module {
     this.controlsNode = document.createElement('div');
     this.index = 0;
     this.offset = 0;
+    this.counter = 0;
     this.isIdle = true;
-    this.translation = 'transform 0.3s ease-in-out';
+    this.isNeedTransitionReset = false;
+    this.transition = 'transform 0.3s ease-in-out';
 
     this.touchStart = {
       x: 0,
@@ -283,7 +291,7 @@ class Carousel2 extends Module {
     // Проставляем необходимые классы
     this.node.classList.add(`faze-animation-${this.config.animation.type}`, `faze-direction-${this.config.animation.direction}`);
     this.itemsHolderNode.className = 'faze-carousel-holder';
-    this.itemsHolderNode.style.transition = this.translation;
+    this.itemsHolderNode.style.transition = this.transition;
 
     // Инициализируем слайды
     this.initializeSlides();
@@ -385,6 +393,8 @@ class Carousel2 extends Module {
    */
   bind(): void {
     super.bind();
+
+    this.bindTransition();
 
     // Навешиваем события на переключения слайдов по нажатии на элементы пагинации
     if (this.config.pages) {
@@ -521,7 +531,7 @@ class Carousel2 extends Module {
     }
 
     // Возвращаем CSS анимацию
-    this.itemsHolderNode.style.transition = this.translation;
+    this.itemsHolderNode.style.transition = this.transition;
 
     // Получаем координаты касания/нажатия
     this.touchEnd = Faze.Helpers.getMouseOrTouchPosition(event);
@@ -558,6 +568,8 @@ class Carousel2 extends Module {
 
   /**
    * Навешивание событий для отслеживания жестов
+   *
+   * @private
    */
   private bindGestures(): void {
     // Флаг показывающий нажатие, для отслеживания движения внутри
@@ -693,7 +705,9 @@ class Carousel2 extends Module {
   next(): void {
     if (this.isIdle) {
       this.index += 1;
+      this.counter += 1;
       this.checkIndex();
+      this.checkCounter();
 
       // Меняем слайд
       this.updateSlides(FazeCarouselMoveDirection.Forward);
@@ -706,7 +720,9 @@ class Carousel2 extends Module {
   prev(): void {
     if (this.isIdle) {
       this.index -= 1;
+      this.counter -= 1;
       this.checkIndex();
+      this.checkCounter();
 
       // Меняем слайд
       this.updateSlides(FazeCarouselMoveDirection.Backward);
@@ -752,7 +768,18 @@ class Carousel2 extends Module {
   }
 
   /**
-   * Обновление индекса
+   * Проверка счётчика
+   */
+  private checkCounter(): void {
+    if (this.counter > this.totalSlides - 1) {
+      this.counter = 0;
+    } else if (this.counter <= -this.totalSlides) {
+      this.counter = 0;
+    }
+  }
+
+  /**
+   * Проверка индекса
    *
    * @private
    */
@@ -831,7 +858,7 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private updateSlides(direction: FazeCarouselMoveDirection, amount: number = 1): void {
+  private async updateSlides(direction: FazeCarouselMoveDirection, amount: number = 1): Promise<void> {
     // Вызываем пользовательскую функцию "beforeChanged"
     this.beforeChangeCallbackCall(direction);
 
@@ -877,10 +904,20 @@ class Carousel2 extends Module {
 
         // Изменяем сдвиг относительно направления
         this.offset += (direction === FazeCarouselMoveDirection.Forward ? -this.slideWidth : this.slideWidth) * amount;
-        this.updateOffset();
+        await this.updateOffset();
 
         // Карусель снова свободна
         this.isIdle = true;
+
+        this.slidesNodes.forEach((slideNode, index) => {
+          let offset = 0;
+
+          if (index < this.counter - 1) {
+            offset = this.totalWidth;
+          }
+
+          slideNode.style.transform = `translate(${offset}px, 0)`;
+        });
 
         // Изменение состояний элементов управления
         this.changeControls();
@@ -903,14 +940,48 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private updateOffset(): void {
-    if (Math.abs(this.offset) >= this.totalWidth) {
-      this.offset = 0;
-    } else if (this.offset > 0) {
-      this.offset = -this.totalWidth + this.slideWidth;
-    }
+  private updateOffset(): Promise<void> {
+    return new Promise(async (resolve) => {
+      if (Math.abs(this.offset) >= this.totalWidth) {
+        this.itemsHolderNode.style.transform = `translate(${this.offset}px, 0)`;
+        this.isNeedTransitionReset = true;
+        this.offset = 0;
 
-    this.itemsHolderNode.style.transform = `translate(${this.offset}px, 0)`;
+        setTimeout(async () => {
+          resolve();
+        }, 300);
+      } else if (this.offset > 0) {
+        this.isNeedTransitionReset = true;
+        this.offset = -this.totalWidth + this.slideWidth;
+        this.itemsHolderNode.style.transform = `translate(${this.offset}px, 0)`;
+      } else {
+        this.itemsHolderNode.style.transform = `translate(${this.offset}px, 0)`;
+      }
+
+      setTimeout(() => {
+        resolve();
+      }, 300);
+    });
+  }
+
+  bindTransition() {
+    Faze.Events.listener('transitionend', this.itemsHolderNode, () => {
+      if (this.isNeedTransitionReset) {
+        this.setTransition(true);
+        this.itemsHolderNode.style.transform = `translate(${this.offset}px, 0)`;
+        setTimeout(() => {
+          this.setTransition();
+        });
+      }
+      this.isNeedTransitionReset = false;
+    });
+  }
+
+  setTransition(isClean: boolean = false): Promise<void> {
+    return new Promise((resolve) => {
+      this.itemsHolderNode.classList.toggle('faze-notransition', isClean);
+      resolve();
+    });
   }
 
   private updateAfterChangeSlide(nextSlide: HTMLElement): void {

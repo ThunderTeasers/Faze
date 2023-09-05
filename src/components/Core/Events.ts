@@ -22,7 +22,7 @@ class Events {
    * @param callback Пользовательская функция исполняющаяся после события
    * @param isPreventDefault Нужно ли делать "preventDefault()" у события
    */
-  static listener(type: string, nodeOrSelector: HTMLElement | string, callback: (event: Event, node: HTMLElement | null) => void, isPreventDefault: boolean = true): void {
+  static listener(types: string | string[], nodeOrSelector: HTMLElement | string, callback: (event: Event, node: HTMLElement | null) => void, isPreventDefault: boolean = true): void {
     // Проверяем, является ли переданный параметр строкой, если да,
     // то ищём соответствующий DOM элемент по селектору, если нет, используем напрямую
     let node: HTMLElement | null;
@@ -32,21 +32,23 @@ class Events {
       node = nodeOrSelector;
     }
 
-    // Проверка на существование DOM элемента
-    if (!node) {
-      return;
+    // Если это не массив, то превращаем в него
+    if (!Array.isArray(types)) {
+      types = [types];
     }
 
     // Навешиваем событие
-    node.addEventListener(type, (event) => {
-      if (isPreventDefault) {
-        event.preventDefault();
-      }
+    types.forEach((type: string) => {
+      node?.addEventListener(type, (event) => {
+        if (isPreventDefault) {
+          event.preventDefault();
+        }
 
-      // Исполняем пользовательскую функцию
-      if (typeof callback === 'function') {
-        callback(event, node);
-      }
+        // Исполняем пользовательскую функцию
+        if (typeof callback === 'function') {
+          callback(event, node);
+        }
+      });
     });
   }
 

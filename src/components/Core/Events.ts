@@ -6,9 +6,9 @@ class Events {
   /**
    * Навешивание событие клика на DOM элемент со всеми проверками
    *
-   * @param nodeOrSelector DOM элемент на который навешиваем событие или его CSS селектор
-   * @param callback Пользовательская функция исполняющаяся после события
-   * @param isPreventDefault Нужно ли делать "preventDefault()" у события
+   * @param {HTMLElement | string} nodeOrSelector DOM элемент на который навешиваем событие или его CSS селектор
+   * @param {(event: Event, node: HTMLElement | null)} callback Пользовательская функция исполняющаяся после события
+   * @param {boolean} isPreventDefault Нужно ли делать "preventDefault()" у события
    */
   static click(nodeOrSelector: HTMLElement | string, callback: (event: Event, node: HTMLElement | null) => void, isPreventDefault: boolean = true): void {
     this.listener('click', nodeOrSelector, callback, isPreventDefault);
@@ -17,10 +17,10 @@ class Events {
   /**
    * Навешивание событие на DOM элемент со всеми проверками
    *
-   * @param type Тип события
-   * @param nodeOrSelector DOM элемент на который навешиваем событие или его CSS селектор
-   * @param callback Пользовательская функция исполняющаяся после события
-   * @param isPreventDefault Нужно ли делать "preventDefault()" у события
+   * @param {string | string[]} types Типы события
+   * @param {HTMLElement | string} nodeOrSelector DOM элемент на который навешиваем событие или его CSS селектор
+   * @param {(event: Event, node: HTMLElement | null)} callback Пользовательская функция исполняющаяся после события
+   * @param {boolean} isPreventDefault Нужно ли делать "preventDefault()" у события
    */
   static listener(types: string | string[], nodeOrSelector: HTMLElement | string, callback: (event: Event, node: HTMLElement | null) => void, isPreventDefault: boolean = true): void {
     // Проверяем, является ли переданный параметр строкой, если да,
@@ -55,12 +55,12 @@ class Events {
   /**
    * Навешивание событие на массив DOM элементов со всеми проверками
    *
-   * @param type Тип события
-   * @param nodesOrSelector DOM элементы на которые навешиваем событие или его CSS селектор
-   * @param callback Пользовательская функция исполняющаяся после события
-   * @param isPreventDefault Нужно ли делать "preventDefault()" у события
+   * @param {string | string[]} types Тип события
+   * @param {HTMLElement | string} nodesOrSelector DOM элементы на которые навешиваем событие или его CSS селектор
+   * @param {(event: Event, node: HTMLElement | null)} callback Пользовательская функция исполняющаяся после события
+   * @param {boolean} isPreventDefault Нужно ли делать "preventDefault()" у события
    */
-  static forEach(type: string, nodesOrSelector: HTMLElement[] | string, callback: (event: Event, node: HTMLElement | null, index: number) => void, isPreventDefault: boolean = true): void {
+  static forEach(types: string | string, nodesOrSelector: HTMLElement[] | string, callback: (event: Event, node: HTMLElement | null, index: number) => void, isPreventDefault: boolean = true): void {
     // Проверяем, является ли переданный параметр строкой, если да,
     // то ищём соответствующий DOM элемент по селектору, если нет, используем напрямую
     let nodes: HTMLElement[];
@@ -77,7 +77,7 @@ class Events {
 
     // Навешиваем события на все элементы в массиве
     nodes.forEach((node, index) => {
-      this.listener(type, node, (event: Event, nodeEl: HTMLElement | null) => callback(event, nodeEl, index), isPreventDefault);
+      this.listener(types, node, (event: Event, nodeEl: HTMLElement | null) => callback(event, nodeEl, index), isPreventDefault);
     });
   }
 }

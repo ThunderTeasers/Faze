@@ -520,6 +520,7 @@ class Carousel2 extends Module {
       return;
     }
 
+    // Возвращаем CSS анимацию
     this.itemsHolderNode.style.transition = this.translation;
 
     // Получаем координаты касания/нажатия

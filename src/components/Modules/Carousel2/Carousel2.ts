@@ -191,6 +191,12 @@ class Carousel2 extends Module {
   // Конец касания пальца
   private touchEnd: FazePosition;
 
+  // CSS стиль для плавности
+  private translation: string;
+
+  // Общая ширина слайдера
+  private totalWidth: number;
+
   // Ширина слайда
   private slideWidth: number;
 
@@ -251,6 +257,7 @@ class Carousel2 extends Module {
     this.index = 0;
     this.offset = 0;
     this.isIdle = true;
+    this.translation = 'transform 0.3s ease-in-out';
 
     this.touchStart = {
       x: 0,
@@ -276,6 +283,7 @@ class Carousel2 extends Module {
     // Проставляем необходимые классы
     this.node.classList.add(`faze-animation-${this.config.animation.type}`, `faze-direction-${this.config.animation.direction}`);
     this.itemsHolderNode.className = 'faze-carousel-holder';
+    this.itemsHolderNode.style.transition = this.translation;
 
     // Инициализируем слайды
     this.initializeSlides();
@@ -390,8 +398,7 @@ class Carousel2 extends Module {
 
     // Если анимация слайдов и разрешены движения мышью, то навешиваем
     if (this.config.animation.type === 'slide') {
-      this.bindMouseGestures();
-      this.bindTouchGestures();
+      this.bindGestures();
     }
   }
 
@@ -440,13 +447,22 @@ class Carousel2 extends Module {
    * Отслеживание события нажатия пальцем или мышью на область карусели
    *
    * @param event{MouseEvent | TouchEvent} Событие нажатия мышью или пальцем
+   * @param isDown{boolean} Было ли события нажатия до этого момента, если нет, то метод не выполняется
    *
    * @private
    */
-  private mouseOrTouchDown(event: MouseEvent | TouchEvent) {
+  private mouseOrTouchDown(event: MouseEvent | TouchEvent, isDown: boolean) {
+    // Если мы выводили мышку из окна браузера, то "isDown" останется в положении "true"
+    // и мы должны вернуть его в таком же виде, чтобы сработали эвенты на отпускание мыши
+    if (isDown) {
+      return true;
+    }
+
     if (Faze.Helpers.isMouseOver(event, this.node).contains && !Faze.Helpers.isMouseOverlapsNode(event, this.controlsNode) && this.isIdle) {
       // Отключаем стандартное перетаскивание
       event.preventDefault();
+
+      this.itemsHolderNode.style.transition = '';
 
       // Получаем координаты касания/нажатия
       this.touchStart = Faze.Helpers.getMouseOrTouchPosition(event);
@@ -478,14 +494,14 @@ class Carousel2 extends Module {
     this.touchEnd = Faze.Helpers.getMouseOrTouchPosition(event);
 
     // Вычисляем сдвиг и двигаем весь враппер на это число вбок
-    const offset = -(this.touchStart.x - this.touchEnd.x);
-    this.itemsHolderNode.style.left = `${offset - this.slideWidth}px`;
+    const offset = -(this.touchStart.x - this.touchEnd.x) + this.offset;
+    this.itemsHolderNode.style.transform = `translate(${offset}px, 0)`;
 
     // Проверяем выход за границы
-    if (parseInt(this.itemsHolderNode.style.left, 10) >= 0) {
-      this.itemsHolderNode.style.left = '0';
-    } else if (parseInt(this.itemsHolderNode.style.left, 10) <= -(this.slideWidth * 2)) {
-      this.itemsHolderNode.style.left = `-${this.slideWidth * 2}px`;
+    if (offset > 0) {
+      this.itemsHolderNode.style.transform = 'translate(0, 0)';
+    } else if (offset < -(this.totalWidth - this.slideWidth)) {
+      this.itemsHolderNode.style.transform = `translate(${-(this.totalWidth - this.slideWidth)}px, 0)`;
     }
   }
 
@@ -504,6 +520,8 @@ class Carousel2 extends Module {
       return;
     }
 
+    this.itemsHolderNode.style.transition = this.translation;
+
     // Получаем координаты касания/нажатия
     this.touchEnd = Faze.Helpers.getMouseOrTouchPosition(event);
 
@@ -512,135 +530,64 @@ class Carousel2 extends Module {
 
     // Производим работу с перетаскиванием
     // Если сдвинуто влево больше чем на пол слайда, то активируем следующий слайд
-    if (offset < -(this.slideWidth / 2)) {
-      Faze.Animations.smoothBetween(
-        -(Math.abs(offset) + this.slideWidth),
-        -(this.slideWidth * 2),
-        this.config.animation.time,
-        (value: number) => {
-          this.itemsHolderNode.style.left = `${value}px`;
-        },
-        () => {
-          // Увеличиваем и проверяем текущий индекс
-          this.index += 1;
-          this.checkIndexBounds();
+    if (offset < -(this.slideWidth / 2) && offset + this.offset > -(this.totalWidth - this.slideWidth)) {
+      this.offset -= this.slideWidth;
 
-          // Производим остаточные действия для корректного переключения слайда
-          this.updateAfterChangeSlide(this.slidesNodes[this.index]);
+      // Обновляем индекс
+      this.index += 1;
+      this.checkIndex();
+    } else if (offset > this.slideWidth / 2 && offset + this.offset < 0) {
+      this.offset += this.slideWidth;
 
-          // Обнуляем сдвиг для продолжения корректной работы
-          this.itemsHolderNode.style.left = '0';
-
-          // Карусель снова бездействует
-          this.isIdle = true;
-        },
-      );
-    } else if (offset > this.slideWidth / 2) {
-      Faze.Animations.smoothBetween(
-        -(this.slideWidth - Math.abs(offset)),
-        0,
-        this.config.animation.time,
-        (value: number) => {
-          this.itemsHolderNode.style.left = `${value}px`;
-        },
-        () => {
-          // Уменьшаем и проверяем текущий индекс
-          this.index -= 1;
-          this.checkIndexBounds();
-
-          // Производим остаточные действия для корректного переключения слайда
-          this.updateAfterChangeSlide(this.slidesNodes[this.index - 1]);
-
-          // Обнуляем сдвиг для продолжения корректной работы
-          this.itemsHolderNode.style.left = '0';
-
-          // Карусель снова бездействует
-          this.isIdle = true;
-        },
-      );
-    } else {
-      // Плавно двигаем в изначальное положение
-      if (offset < 0) {
-        // Анимируем
-        Faze.Animations.smoothBetween(
-          -Math.abs(offset),
-          0,
-          this.config.animation.time,
-          (value: number) => {
-            this.itemsHolderNode.style.left = `${value}px`;
-          },
-          () => {
-            // Карусель снова бездействует
-            this.isIdle = true;
-          },
-        );
-      } else {
-        // Анимируем
-        Faze.Animations.smoothBetween(
-          -(-Math.abs(offset) + this.slideWidth),
-          -this.slideWidth,
-          this.config.animation.time,
-          (value: number) => {
-            this.itemsHolderNode.style.left = `${value}px`;
-          },
-          () => {
-            // Обнуляем сдвиг для продолжения корректной работы
-            this.itemsHolderNode.style.left = '0';
-
-            // Карусель снова бездействует
-            this.isIdle = true;
-          },
-        );
-      }
+      // Обновляем индекс
+      this.index -= 1;
+      this.checkIndex();
     }
+
+    this.updateOffset();
+    this.isIdle = true;
+
+    // Изменение состояний элементов управления
+    this.changeControls();
   }
 
   /**
-   * Навешивание событий для отслеживания жестов мышкой
+   * Навешивание событий для отслеживания жестов
    */
-  private bindMouseGestures(): void {
+  private bindGestures(): void {
     // Флаг показывающий нажатие, для отслеживания движения внутри
     let isDown = false;
 
     // При нажатии на враппер для слайдов ставим флаг, что можно отслеживать движение
-    document.body.addEventListener('mousedown', (event: MouseEvent) => {
-      isDown = this.mouseOrTouchDown(event);
-    });
+    Faze.Events.listener(
+      ['mousedown', 'touchstart'],
+      document.body,
+      (event: MouseEvent) => {
+        isDown = this.mouseOrTouchDown(event, isDown);
+      },
+      false,
+    );
 
     // Отслеживаем движение, если находимся внутри враппера слайдов
-    document.body.addEventListener('mousemove', (event: MouseEvent) => {
-      this.mouseOrTouchMove(event, isDown);
-    });
+    Faze.Events.listener(
+      ['mousemove', 'touchmove'],
+      document.body,
+      (event: MouseEvent) => {
+        this.mouseOrTouchMove(event, isDown);
+      },
+      false,
+    );
 
     // Убираем флаг нажатия в любом случае при отпускании мыши
-    document.body.addEventListener('mouseup', (event: MouseEvent) => {
-      this.mouseOrTouchUp(event, isDown);
-      isDown = false;
-    });
-  }
-
-  /**
-   * Навешивание событий для отслеживания жестов пальцем
-   */
-  private bindTouchGestures(): void {
-    // Флаг показывающий нажатие, для отслеживания движения внутри
-    let isDown = false;
-
-    // При нажатии на враппер для слайдов ставим флаг, что можно отслеживать движение
-    document.body.addEventListener('touchstart', (event: TouchEvent) => {
-      isDown = this.mouseOrTouchDown(event);
-    });
-
-    // Отслеживаем движение, если находимся внутри враппера слайдов
-    document.body.addEventListener('touchmove', (event: TouchEvent) => {
-      this.mouseOrTouchMove(event, isDown);
-    });
-
-    // Убираем флаг нажатия в любом случае при отпускании мыши
-    document.body.addEventListener('touchend', (event: TouchEvent) => {
-      this.mouseOrTouchUp(event, isDown);
-      isDown = false;
-    });
+    Faze.Events.listener(
+      ['mouseup', 'touchend'],
+      document.body,
+      (event: MouseEvent) => {
+        this.mouseOrTouchUp(event, isDown);
+        isDown = false;
+      },
+      false,
+    );
   }
 
   /**
@@ -741,9 +688,7 @@ class Carousel2 extends Module {
   next(): void {
     if (this.isIdle) {
       this.index += 1;
-      if (this.index >= this.totalSlides) {
-        this.index = Math.max(this.index - this.totalSlides, 0);
-      }
+      this.checkIndex();
 
       // Меняем слайд
       this.updateSlides(FazeCarouselMoveDirection.Forward);
@@ -756,9 +701,7 @@ class Carousel2 extends Module {
   prev(): void {
     if (this.isIdle) {
       this.index -= 1;
-      if (this.index < 0) {
-        this.index = Math.min(this.totalSlides - Math.abs(this.index), this.totalSlides - 1);
-      }
+      this.checkIndex();
 
       // Меняем слайд
       this.updateSlides(FazeCarouselMoveDirection.Backward);
@@ -801,6 +744,19 @@ class Carousel2 extends Module {
 
     // Применяем изменения
     this.updateSlides(direction, amount);
+  }
+
+  /**
+   * Обновление индекса
+   *
+   * @private
+   */
+  private checkIndex(): void {
+    if (this.index >= this.totalSlides) {
+      this.index = Math.max(this.index - this.totalSlides, 0);
+    } else if (this.index < 0) {
+      this.index = Math.min(this.totalSlides - Math.abs(this.index), this.totalSlides - 1);
+    }
   }
 
   /**
@@ -863,19 +819,6 @@ class Carousel2 extends Module {
   }
 
   /**
-   * Корректировка индекса
-   *
-   * @private
-   */
-  private checkIndexBounds(): void {
-    if (this.index > this.totalSlides - 1) {
-      this.index = 0;
-    } else if (this.index < 0) {
-      this.index = this.totalSlides - 1;
-    }
-  }
-
-  /**
    * Изменение текущего слайда
    *
    * @param direction{FazeCarouselMoveDirection} Направление движения
@@ -927,17 +870,9 @@ class Carousel2 extends Module {
         // Следующий слайд
         nextSlide = this.slidesNodes[amount];
 
-        const totalWidth = this.slideWidth * this.totalSlides;
-
         // Изменяем сдвиг относительно направления
         this.offset += direction === FazeCarouselMoveDirection.Forward ? -this.slideWidth : this.slideWidth;
-        if (Math.abs(this.offset) >= totalWidth) {
-          this.offset = 0;
-        } else if (this.offset > 0) {
-          this.offset = -totalWidth + this.slideWidth;
-        }
-
-        this.itemsHolderNode.style.transform = `translate(${this.offset}px, 0)`;
+        this.updateOffset();
 
         // Карусель снова свободна
         this.isIdle = true;
@@ -952,6 +887,25 @@ class Carousel2 extends Module {
       default:
         break;
     }
+
+    if (0) {
+      this.updateAfterChangeSlide({} as any);
+    }
+  }
+
+  /**
+   * Обновление сдвига карусели
+   *
+   * @private
+   */
+  private updateOffset(): void {
+    if (Math.abs(this.offset) >= this.totalWidth) {
+      this.offset = 0;
+    } else if (this.offset > 0) {
+      this.offset = -this.totalWidth + this.slideWidth;
+    }
+
+    this.itemsHolderNode.style.transform = `translate(${this.offset}px, 0)`;
   }
 
   private updateAfterChangeSlide(nextSlide: HTMLElement): void {
@@ -1018,6 +972,7 @@ class Carousel2 extends Module {
    */
   private updateCurrentSlideSizes(): void {
     this.slideWidth = this.currentSlide.getBoundingClientRect().width;
+    this.totalWidth = this.slideWidth * this.totalSlides;
     // this.slideHeight = this.currentSlide.getBoundingClientRect().height;
   }
 

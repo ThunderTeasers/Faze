@@ -63,10 +63,6 @@
 
     overflow: hidden;
 
-    & > .faze-carousel-holder {
-      transition: transform 0.3s ease-in-out;
-    }
-
     // Горизонтальная прокрутка
     &.faze-direction-horizontal {
       & > .faze-carousel-holder {

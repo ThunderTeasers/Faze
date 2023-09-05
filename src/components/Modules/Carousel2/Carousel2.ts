@@ -544,8 +544,12 @@ class Carousel2 extends Module {
       this.checkIndex();
     }
 
+    // Изменяем положение
     this.updateOffset();
     this.isIdle = true;
+
+    // Активируем текущий слайд
+    Faze.Helpers.activateItem(this.slidesNodes, this.index, 'faze-active');
 
     // Изменение состояний элементов управления
     this.changeControls();

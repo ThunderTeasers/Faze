@@ -876,7 +876,7 @@ class Carousel2 extends Module {
         nextSlide = this.slidesNodes[amount];
 
         // Изменяем сдвиг относительно направления
-        this.offset += direction === FazeCarouselMoveDirection.Forward ? -this.slideWidth : this.slideWidth;
+        this.offset += (direction === FazeCarouselMoveDirection.Forward ? -this.slideWidth : this.slideWidth) * amount;
         this.updateOffset();
 
         // Карусель снова свободна

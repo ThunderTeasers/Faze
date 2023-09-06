@@ -394,8 +394,6 @@ class Carousel2 extends Module {
   bind(): void {
     super.bind();
 
-    this.bindTransition();
-
     // Навешиваем события на переключения слайдов по нажатии на элементы пагинации
     if (this.config.pages) {
       this.bindPagination();
@@ -508,8 +506,9 @@ class Carousel2 extends Module {
     this.itemsHolderNode.style.transform = `translate(${offset}px, 0)`;
 
     // Проверяем выход за границы
-    if (offset > 0) {
-      this.itemsHolderNode.style.transform = 'translate(0, 0)';
+    if (offset > this.offset + this.slideWidth) {
+      console.log(this.offset + this.slideWidth);
+      this.itemsHolderNode.style.transform = `translate(${this.offset + this.slideWidth}, 0)`;
     } else if (offset < -(this.totalWidth - this.slideWidth)) {
       this.itemsHolderNode.style.transform = `translate(${-(this.totalWidth - this.slideWidth)}px, 0)`;
     }
@@ -903,21 +902,10 @@ class Carousel2 extends Module {
         nextSlide = this.slidesNodes[amount];
 
         // Изменяем сдвиг относительно направления
-        this.offset += (direction === FazeCarouselMoveDirection.Forward ? -this.slideWidth : this.slideWidth) * amount;
+        this.offset = -(this.index * this.slideWidth);
         await this.updateOffset();
-
-        // Карусель снова свободна
-        this.isIdle = true;
-
-        this.slidesNodes.forEach((slideNode, index) => {
-          let offset = 0;
-
-          if (index < this.counter - 1) {
-            offset = this.totalWidth;
-          }
-
-          slideNode.style.transform = `translate(${offset}px, 0)`;
-        });
+        this.updateSlidesOffset();
+        await this.resetOffset();
 
         // Изменение состояний элементов управления
         this.changeControls();
@@ -935,53 +923,70 @@ class Carousel2 extends Module {
     }
   }
 
+  private updateSlidesOffset(): void {
+    this.slidesNodes.forEach((slideNode, index) => {
+      let offset = 0;
+
+      if (index < this.counter - 1) {
+        offset = this.totalWidth;
+      }
+
+      slideNode.style.transform = `translate(${offset}px, 0)`;
+    });
+  }
+
   /**
    * Обновление сдвига карусели
    *
    * @private
    */
-  private updateOffset(): Promise<void> {
-    return new Promise(async (resolve) => {
-      if (Math.abs(this.offset) >= this.totalWidth) {
-        this.itemsHolderNode.style.transform = `translate(${this.offset}px, 0)`;
-        this.isNeedTransitionReset = true;
-        this.offset = 0;
+  private async updateOffset(): Promise<void> {
+    if (this.offset === 0) {
+      this.offset = -this.totalWidth;
+      this.isNeedTransitionReset = true;
+      await this.moveSlide();
+    } else {
+      await this.moveSlide();
+    }
 
-        setTimeout(async () => {
+    return;
+  }
+
+  async resetOffset() {
+    if (this.isNeedTransitionReset) {
+      this.setTransition(true);
+      this.offset = 0;
+      await this.moveSlide(true);
+      this.setTransition();
+
+      // Карусель снова свободна
+      this.isIdle = true;
+
+      this.isNeedTransitionReset = false;
+    } else {
+      // Карусель снова свободна
+      this.isIdle = true;
+    }
+  }
+
+  moveSlide(isImmediate: boolean = false): Promise<void> {
+    return new Promise((resolve) => {
+      this.itemsHolderNode.style.transform = `translate(${this.offset}px, 0)`;
+
+      if (isImmediate) {
+        resolve();
+      } else {
+        setTimeout(() => {
           resolve();
         }, 300);
-      } else if (this.offset > 0) {
-        this.isNeedTransitionReset = true;
-        this.offset = -this.totalWidth + this.slideWidth;
-        this.itemsHolderNode.style.transform = `translate(${this.offset}px, 0)`;
-      } else {
-        this.itemsHolderNode.style.transform = `translate(${this.offset}px, 0)`;
       }
-
-      setTimeout(() => {
-        resolve();
-      }, 300);
     });
   }
 
-  bindTransition() {
-    Faze.Events.listener('transitionend', this.itemsHolderNode, () => {
-      if (this.isNeedTransitionReset) {
-        this.setTransition(true);
-        this.itemsHolderNode.style.transform = `translate(${this.offset}px, 0)`;
-        setTimeout(() => {
-          this.setTransition();
-        });
-      }
-      this.isNeedTransitionReset = false;
-    });
-  }
-
-  setTransition(isClean: boolean = false): Promise<void> {
-    return new Promise((resolve) => {
-      this.itemsHolderNode.classList.toggle('faze-notransition', isClean);
-      resolve();
-    });
+  setTransition(isClean: boolean = false): void {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    this.itemsHolderNode.offsetHeight;
+    this.itemsHolderNode.classList.toggle('faze-notransition', isClean);
   }
 
   private updateAfterChangeSlide(nextSlide: HTMLElement): void {

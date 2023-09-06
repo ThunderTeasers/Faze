@@ -194,9 +194,6 @@ class Carousel2 extends Module {
   // Конец касания пальца
   private touchEnd: FazePosition;
 
-  // Нужно ли сбросить CSS анимацию
-  private isNeedTransitionReset: boolean;
-
   // CSS стиль для плавности
   private transition: string;
 
@@ -264,7 +261,6 @@ class Carousel2 extends Module {
     this.offset = 0;
     this.counter = 0;
     this.isIdle = true;
-    this.isNeedTransitionReset = false;
     this.transition = 'transform 0.3s ease-in-out';
 
     this.touchStart = {
@@ -546,16 +542,20 @@ class Carousel2 extends Module {
       // Обновляем индекс
       this.index += 1;
       this.checkIndex();
+
+      // Изменяем положение
+      this.updateOffset(FazeCarouselMoveDirection.Forward);
     } else if (offset > this.slideWidth / 2 && offset + this.offset < 0) {
       this.offset += this.slideWidth;
 
       // Обновляем индекс
       this.index -= 1;
       this.checkIndex();
+
+      // Изменяем положение
+      this.updateOffset(FazeCarouselMoveDirection.Backward);
     }
 
-    // Изменяем положение
-    this.updateOffset();
     this.isIdle = true;
 
     // Активируем текущий слайд
@@ -902,10 +902,13 @@ class Carousel2 extends Module {
         nextSlide = this.slidesNodes[amount];
 
         // Изменяем сдвиг относительно направления
-        this.offset = -(this.index * this.slideWidth);
-        await this.updateOffset();
-        this.updateSlidesOffset();
-        await this.resetOffset();
+        if (this.counter >= 0) {
+          this.offset = -(this.index * this.slideWidth);
+        } else {
+          this.offset = (this.totalSlides - this.index) * this.slideWidth;
+        }
+
+        await this.updateOffset(direction);
 
         // Изменение состояний элементов управления
         this.changeControls();
@@ -929,6 +932,8 @@ class Carousel2 extends Module {
 
       if (index < this.counter - 1) {
         offset = this.totalWidth;
+      } else if (index > this.slidesNodes.length + this.counter - 2) {
+        offset = -this.totalWidth;
       }
 
       slideNode.style.transform = `translate(${offset}px, 0)`;
@@ -940,33 +945,42 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private async updateOffset(): Promise<void> {
-    if (this.offset === 0) {
-      this.offset = -this.totalWidth;
-      this.isNeedTransitionReset = true;
-      await this.moveSlide();
-    } else {
-      await this.moveSlide();
-    }
+  private async updateOffset(direction: FazeCarouselMoveDirection): Promise<void> {
+    this.updateSlidesOffset();
 
-    return;
-  }
-
-  async resetOffset() {
-    if (this.isNeedTransitionReset) {
+    if (direction === FazeCarouselMoveDirection.Forward && this.counter === 0) {
+      this.offset = this.slideWidth;
       this.setTransition(true);
-      this.offset = 0;
       await this.moveSlide(true);
       this.setTransition();
-
-      // Карусель снова свободна
-      this.isIdle = true;
-
-      this.isNeedTransitionReset = false;
+      this.offset = 0;
+    } else if (direction === FazeCarouselMoveDirection.Backward && this.counter === -1) {
+      this.offset = 0;
+      this.setTransition(true);
+      await this.moveSlide(true);
+      this.setTransition();
+      this.offset = this.slideWidth;
+    } else if (direction === FazeCarouselMoveDirection.Backward && this.counter === 0) {
+      this.offset = -this.slideWidth;
+      this.setTransition(true);
+      await this.moveSlide(true);
+      this.setTransition();
+      this.offset = 0;
     } else {
-      // Карусель снова свободна
-      this.isIdle = true;
+      this.updateSlidesOffset();
     }
+
+    await this.moveSlide();
+
+    // Карусель снова свободна
+    this.isIdle = true;
+  }
+
+  async resetOffset(): Promise<void> {
+    this.setTransition(true);
+    this.offset = 0;
+    await this.moveSlide(true);
+    this.setTransition();
   }
 
   moveSlide(isImmediate: boolean = false): Promise<void> {

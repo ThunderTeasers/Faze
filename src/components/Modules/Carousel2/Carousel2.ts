@@ -924,6 +924,11 @@ class Carousel2 extends Module {
     }
   }
 
+  /**
+   * Обновление сдвига слайдов
+   *
+   * @private
+   */
   private updateSlidesOffset(): void {
     this.slidesNodes.forEach((slideNode, index) => {
       let offset = 0;

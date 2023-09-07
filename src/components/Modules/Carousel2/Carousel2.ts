@@ -537,23 +537,23 @@ class Carousel2 extends Module {
     // Производим работу с перетаскиванием
     // Если сдвинуто влево больше чем на пол слайда, то активируем следующий слайд
     if (offset < -(this.slideWidth / 2) && offset + this.offset > -(this.totalWidth - this.slideWidth)) {
-      this.offset -= this.slideWidth;
-
       // Обновляем индекс
       this.index += 1;
+      this.counter += 1;
       this.checkIndex();
+      this.checkCounter();
 
-      // Изменяем положение
-      this.updateOffset(FazeCarouselMoveDirection.Forward);
+      // Меняем слайд
+      this.updateSlides(FazeCarouselMoveDirection.Forward, 1);
     } else if (offset > this.slideWidth / 2 && offset + this.offset < 0) {
-      this.offset += this.slideWidth;
-
       // Обновляем индекс
       this.index -= 1;
+      this.counter -= 1;
       this.checkIndex();
+      this.checkCounter();
 
-      // Изменяем положение
-      this.updateOffset(FazeCarouselMoveDirection.Backward);
+      // Меняем слайд
+      this.updateSlides(FazeCarouselMoveDirection.Backward, 1);
     }
 
     this.isIdle = true;
@@ -976,14 +976,14 @@ class Carousel2 extends Module {
     this.isIdle = true;
   }
 
-  async resetOffset(): Promise<void> {
-    this.setTransition(true);
-    this.offset = 0;
-    await this.moveSlide(true);
-    this.setTransition();
-  }
-
-  moveSlide(isImmediate: boolean = false): Promise<void> {
+  /**
+   * Сдвигаем слайдер
+   *
+   * @param {boolean} isImmediate Нужно ли мгновенное перемещение
+   *
+   * @private
+   */
+  private moveSlide(isImmediate: boolean = false): Promise<void> {
     return new Promise((resolve) => {
       this.itemsHolderNode.style.transform = `translate(${this.offset}px, 0)`;
 
@@ -997,10 +997,17 @@ class Carousel2 extends Module {
     });
   }
 
-  setTransition(isClean: boolean = false): void {
+  /**
+   * Задаём анимацию для карусели
+   *
+   * @param {boolean} isClean Очищать ли анимацию
+   *
+   * @private
+   */
+  private setTransition(isClean: boolean = false): void {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     this.itemsHolderNode.offsetHeight;
-    this.itemsHolderNode.classList.toggle('faze-notransition', isClean);
+    this.itemsHolderNode.style.transition = isClean ? '' : this.transition;
   }
 
   private updateAfterChangeSlide(nextSlide: HTMLElement): void {

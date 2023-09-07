@@ -520,7 +520,7 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private mouseOrTouchUp(event: MouseEvent | TouchEvent, isDown: boolean): void {
+  private async mouseOrTouchUp(event: MouseEvent | TouchEvent, isDown: boolean): Promise<void> {
     if (!isDown) {
       return;
     }
@@ -555,8 +555,10 @@ class Carousel2 extends Module {
       // Меняем слайд
       this.updateSlides(FazeCarouselMoveDirection.Backward, 1);
     } else {
-      // Оставляем слайд на месте, для этого вызываем функцию смены слайдов указав, что нужно передвигать 0 слайдов
-      this.updateSlides(FazeCarouselMoveDirection.Forward, 0);
+      // Возвращаем слайд в исходное состояние и после этого разрешаем дальнейшее взаимодействие
+      await this.moveSlide();
+
+      this.isIdle = true;
     }
   }
 

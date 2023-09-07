@@ -554,15 +554,10 @@ class Carousel2 extends Module {
 
       // Меняем слайд
       this.updateSlides(FazeCarouselMoveDirection.Backward, 1);
+    } else {
+      // Оставляем слайд на месте, для этого вызываем функцию смены слайдов указав, что нужно передвигать 0 слайдов
+      this.updateSlides(FazeCarouselMoveDirection.Forward, 0);
     }
-
-    this.isIdle = true;
-
-    // Активируем текущий слайд
-    Faze.Helpers.activateItem(this.slidesNodes, this.index, 'faze-active');
-
-    // Изменение состояний элементов управления
-    this.changeControls();
   }
 
   /**
@@ -900,6 +895,9 @@ class Carousel2 extends Module {
       case 'slide':
         // Следующий слайд
         nextSlide = this.slidesNodes[amount];
+
+        // Активируем текущий слайд
+        Faze.Helpers.activateItem(this.slidesNodes, this.index, 'faze-active');
 
         // Изменяем сдвиг относительно направления
         if (this.counter >= 0) {

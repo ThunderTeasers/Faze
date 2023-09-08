@@ -503,10 +503,9 @@ class Carousel2 extends Module {
 
     // Проверяем выход за границы
     if (offset > this.offset + this.slideWidth) {
-      console.log(this.offset + this.slideWidth);
       this.itemsHolderNode.style.transform = `translate(${this.offset + this.slideWidth}, 0)`;
-    } else if (offset < -(this.totalWidth - this.slideWidth)) {
-      this.itemsHolderNode.style.transform = `translate(${-(this.totalWidth - this.slideWidth)}px, 0)`;
+    } else if (offset < this.offset - this.slideWidth) {
+      this.itemsHolderNode.style.transform = `translate(${this.offset - this.slideWidth}px, 0)`;
     }
   }
 

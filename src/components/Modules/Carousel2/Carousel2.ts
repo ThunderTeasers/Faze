@@ -536,26 +536,41 @@ class Carousel2 extends Module {
     // Вычисляем сдвиг и двигаем весь враппер на это число вбок
     const offset = -(this.touchStart.x - this.touchEnd.x);
 
+    // Нужно ли замораживать сдвиг
+    let isFreeze = false;
+
     // Производим работу с перетаскиванием
     // Если сдвинуто влево больше чем на пол слайда, то активируем следующий слайд
-    if (offset < -(this.slideWidth / 2) && offset + this.offset > -(this.totalWidth - this.slideWidth)) {
+    if (offset < -(this.slideWidth / 2)) {
       // Обновляем индекс
       this.index += 1;
       this.counter += 1;
       this.checkIndex();
       this.checkCounter();
 
+      // Если это крайние слайды с переходом
+      if (this.counter === 0) {
+        isFreeze = true;
+        this.offset = offset;
+      }
+
       // Меняем слайд
-      this.updateSlides(FazeCarouselMoveDirection.Forward, 1);
-    } else if (offset > this.slideWidth / 2 && offset + this.offset < 0) {
+      this.updateSlides(FazeCarouselMoveDirection.Forward, 1, isFreeze);
+    } else if (offset > this.slideWidth / 2) {
       // Обновляем индекс
       this.index -= 1;
       this.counter -= 1;
       this.checkIndex();
       this.checkCounter();
 
+      // Если это крайние слайды с переходом
+      if (this.counter === 0 || this.counter === -1) {
+        isFreeze = true;
+        this.offset = offset;
+      }
+
       // Меняем слайд
-      this.updateSlides(FazeCarouselMoveDirection.Backward, 1);
+      this.updateSlides(FazeCarouselMoveDirection.Backward, 1, isFreeze);
     } else {
       // Возвращаем слайд в исходное состояние и после этого разрешаем дальнейшее взаимодействие
       await this.moveSlide();
@@ -856,7 +871,7 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private async updateSlides(direction: FazeCarouselMoveDirection, amount: number = 1): Promise<void> {
+  private async updateSlides(direction: FazeCarouselMoveDirection, amount: number = 1, isFreeze: boolean = false): Promise<void> {
     // Вызываем пользовательскую функцию "beforeChanged"
     this.beforeChangeCallbackCall(direction);
 
@@ -904,19 +919,24 @@ class Carousel2 extends Module {
         Faze.Helpers.activateItem(this.slidesNodes, this.index, 'faze-active');
 
         // Изменяем сдвиг относительно направления
-        if (this.counter >= 0) {
-          this.offset = -(this.index * this.slideWidth);
-        } else {
-          this.offset = (this.totalSlides - this.index) * this.slideWidth;
+        if (!isFreeze) {
+          if (this.counter >= 0) {
+            this.offset = -(this.index * this.slideWidth);
+          } else {
+            this.offset = (this.totalSlides - this.index) * this.slideWidth;
+          }
         }
 
-        await this.updateOffset(direction);
+        await this.updateOffset(direction, isFreeze);
 
         // Изменение состояний элементов управления
         this.changeControls();
 
         // Вызываем пользовательскую функцию
         this.changeCallbackCall(direction);
+
+        // Карусель снова свободна
+        this.isIdle = true;
 
         break;
       default:
@@ -952,23 +972,36 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private async updateOffset(direction: FazeCarouselMoveDirection): Promise<void> {
+  private async updateOffset(direction: FazeCarouselMoveDirection, isFreeze: boolean = false): Promise<void> {
     this.updateSlidesOffset();
 
     if (direction === FazeCarouselMoveDirection.Forward && this.counter === 0) {
-      this.offset = this.slideWidth;
+      if (!isFreeze) {
+        this.offset = this.slideWidth;
+      } else {
+        this.offset += this.slideWidth;
+      }
+
       this.setTransition(true);
       await this.moveSlide(true);
       this.setTransition();
       this.offset = 0;
     } else if (direction === FazeCarouselMoveDirection.Backward && this.counter === -1) {
-      this.offset = 0;
+      if (!isFreeze) {
+        this.offset = 0;
+      }
+
       this.setTransition(true);
       await this.moveSlide(true);
       this.setTransition();
       this.offset = this.slideWidth;
     } else if (direction === FazeCarouselMoveDirection.Backward && this.counter === 0) {
-      this.offset = -this.slideWidth;
+      if (!isFreeze) {
+        this.offset = -this.slideWidth;
+      } else {
+        this.offset -= this.slideWidth;
+      }
+
       this.setTransition(true);
       await this.moveSlide(true);
       this.setTransition();
@@ -978,9 +1011,6 @@ class Carousel2 extends Module {
     }
 
     await this.moveSlide();
-
-    // Карусель снова свободна
-    this.isIdle = true;
   }
 
   /**

@@ -411,17 +411,15 @@ class Carousel2 extends Module {
 
   /**
    * Навешивание событий на нажитие по страницам пагинации слайдов для их переключения
+   *
+   * @private
    */
   private bindPagination(): void {
-    this.pagesNodes.forEach((page: HTMLElement) => {
-      page.addEventListener('click', (event: Event) => {
-        event.preventDefault();
-
-        const index = page.dataset.fazeIndex;
-        if (index) {
-          this.change(parseInt(index, 10));
-        }
-      });
+    Faze.Events.forEach('click', this.pagesNodes, (event: MouseEvent, pageNode: HTMLElement) => {
+      const index: string | undefined = pageNode.dataset.fazeIndex;
+      if (index) {
+        this.change(parseInt(index, 10));
+      }
     });
   }
 

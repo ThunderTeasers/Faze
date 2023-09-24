@@ -767,8 +767,10 @@ class Carousel2 extends Module {
     let amount;
     if (index > this.index) {
       amount = index - this.index;
+      this.counter += amount;
     } else {
       amount = Math.abs(this.index - index);
+      this.counter -= amount;
     }
 
     // Присваиваем текущий индекс
@@ -925,7 +927,7 @@ class Carousel2 extends Module {
           }
         }
 
-        await this.updateOffset(direction, isFreeze);
+        await this.updateOffset(direction, amount, isFreeze);
 
         // Изменение состояний элементов управления
         this.changeControls();
@@ -951,14 +953,14 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private updateSlidesOffset(): void {
+  private updateSlidesOffset(amount: number = 1): void {
     this.slidesNodes.forEach((slideNode, index) => {
       let offset = 0;
 
       if (index < this.counter - 1) {
-        offset = this.totalWidth;
+        offset = this.totalWidth * amount;
       } else if (index > this.slidesNodes.length + this.counter - 2) {
-        offset = -this.totalWidth;
+        offset = -this.totalWidth * amount;
       }
 
       slideNode.style.transform = `translate(${offset}px, 0)`;
@@ -970,14 +972,14 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private async updateOffset(direction: FazeCarouselMoveDirection, isFreeze: boolean = false): Promise<void> {
-    this.updateSlidesOffset();
+  private async updateOffset(direction: FazeCarouselMoveDirection, amount: number = 1, isFreeze: boolean = false): Promise<void> {
+    this.updateSlidesOffset(amount);
 
     if (direction === FazeCarouselMoveDirection.Forward && this.counter === 0) {
       if (!isFreeze) {
-        this.offset = this.slideWidth;
+        this.offset = this.slideWidth * amount;
       } else {
-        this.offset += this.slideWidth;
+        this.offset += this.slideWidth * amount;
       }
 
       this.setTransition(true);
@@ -992,12 +994,12 @@ class Carousel2 extends Module {
       this.setTransition(true);
       await this.moveSlide(true);
       this.setTransition();
-      this.offset = this.slideWidth;
+      this.offset = this.slideWidth * amount;
     } else if (direction === FazeCarouselMoveDirection.Backward && this.counter === 0) {
       if (!isFreeze) {
-        this.offset = -this.slideWidth;
+        this.offset = -this.slideWidth * amount;
       } else {
-        this.offset -= this.slideWidth;
+        this.offset -= this.slideWidth * amount;
       }
 
       this.setTransition(true);
@@ -1005,7 +1007,7 @@ class Carousel2 extends Module {
       this.setTransition();
       this.offset = 0;
     } else {
-      this.updateSlidesOffset();
+      this.updateSlidesOffset(amount);
     }
 
     await this.moveSlide();

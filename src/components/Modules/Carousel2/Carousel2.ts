@@ -90,7 +90,11 @@ interface Config {
   stopOnHover: boolean;
   amountPerSlide: number;
   mouseMove: boolean;
+  touchMove: boolean;
   disallowRanges: FazeDisallowRange[];
+  templates: {
+    page: string;
+  };
   animation: {
     type: string;
     time: number;
@@ -99,11 +103,13 @@ interface Config {
   selectors: {
     arrowLeft?: string;
     arrowRight?: string;
+    counter?: string;
   };
   callbacks: {
     created?: (data: CallbackData) => void;
     beforeChanged?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
+    afterChanged?: (data: CallbackData) => void;
   };
 }
 
@@ -218,8 +224,12 @@ class Carousel2 extends Module {
       useSlideFullSize: false,
       stopOnHover: false,
       mouseMove: false,
+      touchMove: false,
       amountPerSlide: 1,
       disallowRanges: [],
+      templates: {
+        page: '',
+      },
       animation: {
         type: 'fade',
         time: 1000,
@@ -228,11 +238,13 @@ class Carousel2 extends Module {
       selectors: {
         arrowLeft: undefined,
         arrowRight: undefined,
+        counter: undefined,
       },
       callbacks: {
         created: undefined,
         beforeChanged: undefined,
         changed: undefined,
+        afterChanged: undefined,
       },
     };
 
@@ -273,13 +285,11 @@ class Carousel2 extends Module {
       y: 0,
     };
 
-    if (this.config.pages) {
-      this.pagesNode = document.createElement('div');
-    }
+    // Для пагинации
+    this.initializePagination();
 
-    if (this.config.counter) {
-      this.counterNode = document.createElement('div');
-    }
+    // Для счётчика
+    this.initializeCounter();
 
     // ===========================================
     // Инициализация работы модуля
@@ -329,6 +339,17 @@ class Carousel2 extends Module {
   }
 
   /**
+   * Инициализация пагинации
+   *
+   * @private
+   */
+  private initializePagination() {
+    if (this.config.pages) {
+      this.pagesNode = document.createElement('div');
+    }
+  }
+
+  /**
    * Инициализация слайдов и добавления их в враппер
    *
    * @private
@@ -350,6 +371,25 @@ class Carousel2 extends Module {
       // Перевещаем слайд в родителя
       this.itemsHolderNode.appendChild(slideNode);
     });
+  }
+
+  /**
+   * Инициализация счётчика
+   *
+   * @private
+   */
+  private initializeCounter() {
+    // Для счетчика
+    if (this.config.counter) {
+      if (this.config.selectors.counter) {
+        const counterNode = document.querySelector<HTMLElement>(this.config.selectors.counter);
+        if (counterNode) {
+          this.counterNode = counterNode;
+        }
+      } else {
+        this.counterNode = document.createElement('div');
+      }
+    }
   }
 
   /**
@@ -415,6 +455,8 @@ class Carousel2 extends Module {
    * @private
    */
   private bindPagination(): void {
+    return;
+
     Faze.Events.forEach('click', this.pagesNodes, (event: MouseEvent, pageNode: HTMLElement) => {
       const index: string | undefined = pageNode.dataset.fazeIndex;
       if (index) {
@@ -662,7 +704,7 @@ class Carousel2 extends Module {
     this.changeCounter();
 
     // Если у карусели есть стрелки, то вставляем между них
-    if (this.config.arrows) {
+    if (this.config.arrows && !(this.config.selectors.arrowLeft && this.config.selectors.arrowRight)) {
       this.arrowsNode.insertBefore(this.counterNode, this.arrowsNodes.right);
     } else {
       this.controlsNode.appendChild(this.counterNode);
@@ -1130,12 +1172,19 @@ class Carousel2 extends Module {
       infinite: (node.dataset.fazeCarouselInfinite || 'true') === 'true',
       useSlideFullSize: (node.dataset.fazeCarouselUseSlideFullSize || 'false') === 'true',
       stopOnHover: (node.dataset.fazeCarouselStopOnHover || 'false') === 'true',
+      mouseMove: (node.dataset.fazeCarouselMouseMove || 'false') === 'true',
+      touchMove: (node.dataset.fazeCarouselTouchMove || 'false') === 'true',
       amountPerSlide: parseInt(node.dataset.fazeCarouselAmountPerSlide || '1', 10),
       disallowRanges: JSON.parse(node.dataset.fazeCarouselDisallowRanges || '[]'),
       animation: {
         type: node.dataset.fazeCarouselAnimationType || 'fade',
-        time: parseInt(node.dataset.fazeCarouselAnimationTime || '500', 10),
+        time: parseInt(node.dataset.fazeCarouselAnimationTime || '1000', 10),
         direction: node.dataset.fazeCarouselAnimationDirection || 'horizontal',
+      },
+      selectors: {
+        arrowLeft: node.dataset.fazeCarouselSelectorsArrowLeft,
+        arrowRight: node.dataset.fazeCarouselSelectorsArrowRight,
+        counter: node.dataset.fazeCarouselSelectorsCounter,
       },
     });
   }

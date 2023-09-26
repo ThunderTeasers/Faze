@@ -54,12 +54,6 @@ import LazyImageController from '../Modules/LazyImage/LazyImageController';
 import REST from '../Modules/REST/REST';
 import Observer from './Observer';
 
-// Версии
-export enum Version {
-  FAZE_1,
-  FAZE_2,
-}
-
 /**
  * Структура конфигурации плагина при его инициализации
  *
@@ -190,9 +184,6 @@ class Faze {
   static REST: any = REST;
 
   static FAZE_RESOLUTION_MOBILE: number = 768;
-
-  // Версии
-  static Versions: Version;
 
   constructor() {
     // Инициализация логгера
@@ -351,55 +342,6 @@ class Faze {
    */
   static remove(name: string): void {
     delete Faze.plugins[name];
-  }
-
-  /**
-   * Парсинг и получение версии фреймворка в нужном формате(enum) из строки
-   *
-   * @param{string | null} versionString Строка с версией
-   *
-   * @return{Version} Версия в формате Faze
-   *
-   * @private
-   */
-  private static parseVersion(versionString: string | null): Version {
-    let version: Version = Version.FAZE_1;
-    switch (versionString) {
-      case '1':
-        version = Version.FAZE_1;
-        break;
-      case '2':
-        version = Version.FAZE_2;
-        break;
-      default:
-        version = Version.FAZE_1;
-    }
-
-    return version;
-  }
-
-  /**
-   * Получение нужной версии фреймворка
-   *
-   * @return{Version} Версия фреймворка
-   */
-  static getVersion(): Version {
-    // Путь к файлу, для получения GET параметров
-    const src = (<HTMLScriptElement>document.currentScript)?.src;
-
-    // Итоговая версия
-    let version: Version = Version.FAZE_1;
-
-    // "search" строка пути к файлу
-    const search = src.split('?');
-
-    // Если есть GET параметры, то определяем версию
-    if (search[1]) {
-      const params = new URLSearchParams(search[1]);
-      version = Faze.parseVersion(params.get('version'));
-    }
-
-    return version;
   }
 
   /**

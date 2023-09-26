@@ -343,7 +343,7 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private initializePagination() {
+  private initializePagination(): void {
     if (this.config.pages) {
       this.pagesNode = document.createElement('div');
     }
@@ -378,7 +378,7 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private initializeCounter() {
+  private initializeCounter(): void {
     // Для счетчика
     if (this.config.counter) {
       if (this.config.selectors.counter) {
@@ -494,7 +494,7 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private mouseOrTouchDown(event: MouseEvent | TouchEvent, isDown: boolean) {
+  private mouseOrTouchDown(event: MouseEvent | TouchEvent, isDown: boolean): boolean {
     // Если мы выводили мышку из окна браузера, то "isDown" останется в положении "true"
     // и мы должны вернуть его в таком же виде, чтобы сработали эвенты на отпускание мыши
     if (isDown) {
@@ -659,7 +659,7 @@ class Carousel2 extends Module {
   /**
    * Построение необходимых DOM элементов
    */
-  build() {
+  build(): void {
     super.build();
 
     this.buildControls();
@@ -1158,7 +1158,7 @@ class Carousel2 extends Module {
    *
    * @param node DOM элемент на который нужно инициализировать плагин
    */
-  static initializeByDataAttributes(node: HTMLElement) {
+  static initializeByDataAttributes(node: HTMLElement): void {
     new Carousel2(node, {
       autoplay: (node.dataset.fazeCarouselAutoplay || 'false') === 'true',
       counter: (node.dataset.fazeCarouselCounter || 'false') === 'true',

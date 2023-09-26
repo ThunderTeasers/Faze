@@ -108,7 +108,7 @@ Faze.add({
       mouseMove: false,
       // amountPerSlide: 2,
       animation: {
-        type: 'slide',
+        type: 'fade',
         time: 1000,
         direction: 'horizontal',
       },

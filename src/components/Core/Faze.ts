@@ -118,40 +118,75 @@ class Faze {
 
   // Резервирование статических переменных под заводские плагины
   static Globals: any = Globals;
+
   static Carousel: any = Carousel;
+
   static Carousel2: any = Carousel2;
+
   static Tooltip: any = Tooltip;
+
   static Modal: any = Modal;
+
   static Tab: any = Tab;
+
   static Zoom: any = Zoom;
+
   static ZoomBox: any = ZoomBox;
+
   static Gallery: any = Gallery;
+
   static Helpers: any = Helpers;
+
   static Events: any = Events;
+
   static Constants: any = Constants;
+
   static TableSorter: any = TableSorter;
+
   static Sorter: any = Sorter;
+
   static URL: any = URL;
+
   static DOM: any = DOM;
+
   static Date: any = Date;
+
   static ThumbGallery: any = ThumbGallery;
+
   static Animations: any = Animations;
+
   static Placeholder: any = Placeholder;
+
   static Scroll: any = Scroll;
+
   static Spoiler: any = Spoiler;
+
   static Page: any = Page;
+
   static Form: any = Form;
+
   static Filter: any = Filter;
+
   static Drag: any = Drag;
+
   static Dropdown: any = Dropdown;
+
   static Select: any = Select;
+
   static Look: any = Look;
+
   static SmartSelect: any = SmartSelect;
+
   static Slider: any = Slider;
+
   static Steps: any = Steps;
+
   static LazyImage: any = LazyImage;
+
   static LazyImageController: any = new LazyImageController();
+
   static Observer: Observer = new Observer();
+
   static REST: any = REST;
 
   static FAZE_RESOLUTION_MOBILE: number = 768;

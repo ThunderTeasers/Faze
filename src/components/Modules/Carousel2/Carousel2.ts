@@ -980,10 +980,6 @@ class Carousel2 extends Module {
       default:
         break;
     }
-
-    if (0) {
-      this.updateAfterChangeSlide({} as any);
-    }
   }
 
   /**
@@ -1083,28 +1079,6 @@ class Carousel2 extends Module {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     this.itemsHolderNode.offsetHeight;
     this.itemsHolderNode.style.transition = isClean ? '' : this.transition;
-  }
-
-  private updateAfterChangeSlide(nextSlide: HTMLElement): void {
-    // Проставляем класс активного слайда
-    nextSlide.classList.add('faze-active');
-
-    // Переопределяем текущий слайд
-    this.currentSlide = nextSlide;
-
-    // Обновление размеров текущего слайда
-    this.updateCurrentSlideSizes();
-
-    // Снова получаем все слайды, т.к. при анимации "slide" DOM элементы слайдов перемещаются внутри родителя, что в свою очередь
-    // говорит о том, что изначальный массив this.slidesNodes будет содержать неправельные ссылки на элемент когда мы обращаемся
-    // по индексу, например [0]
-    this.slidesNodes = <HTMLElement[]>Array.from(this.itemsHolderNode.children);
-
-    // Карусель снова свободна
-    this.isIdle = true;
-
-    // Изменение состояний элементов управления
-    this.changeControls();
   }
 
   /**

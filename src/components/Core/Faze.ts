@@ -107,6 +107,9 @@ class Faze {
   // Помощник для логирования
   private static logger: Logger;
 
+  // Версия
+  static VERSION: number;
+
   // Переменная, содержащая в себе всю информацию о плагинах, а так же их тела для дальнейшего исполнения
   static plugins: PluginsData = {};
 

@@ -51,6 +51,10 @@ abstract class Module {
     // Получаем имя плагина
     this.name = data.name;
 
+    if (this.name === 'Carousel2') {
+      this.name = 'Carousel';
+    }
+
     // Инициализация логгера
     this.logger = new Logger(`Модуль Faze.${this.name}:`);
 

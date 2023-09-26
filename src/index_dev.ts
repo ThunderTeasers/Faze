@@ -4,6 +4,8 @@ import Shortcuts from './components/Core/Shortcuts';
 import Globals from './components/Core/Globals';
 import Form from './components/Helpers/Form';
 
+Faze.VERSION = 2;
+
 // Навешивание общих события ядра
 Faze.bind();
 
@@ -21,10 +23,6 @@ Globals.initialize();
 
 // @ts-ignore
 window.Faze = Faze;
-
-if (Faze.getVersion() === 1 || true) {
-  // Faze.Carousel = Faze.Carousel2;
-}
 
 // Faze.Helpers.setElementStyle(document.querySelector('[name="product_chr_search"]'), {width: '123px'});
 // Faze.Helpers.setElementAttributes(document.querySelector('[name="product_chr_search"]'), {width: '123px'});

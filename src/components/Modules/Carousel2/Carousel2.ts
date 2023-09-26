@@ -472,18 +472,14 @@ class Carousel2 extends Module {
    */
   private bindArrows(): void {
     // Стрелка влево
-    this.arrowsNodes.left.addEventListener('click', (event: Event) => {
-      event.preventDefault();
-
+    Faze.Events.click(this.arrowsNodes.left, () => {
       if (!this.arrowsNodes.left.classList.contains('faze-disabled')) {
         this.prev();
       }
     });
 
     // Стрелка вправо
-    this.arrowsNodes.right.addEventListener('click', (event: Event) => {
-      event.preventDefault();
-
+    Faze.Events.click(this.arrowsNodes.right, () => {
       if (!this.arrowsNodes.right.classList.contains('faze-disabled')) {
         this.next();
       }

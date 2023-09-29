@@ -67,6 +67,7 @@ interface CallbackData {
  *   stopOnHover - флаг остановки ли при наведении
  *   amountPerSlide - количества слайдов перелистываемых за один раз
  *   mouseMove - можно ли двигать слайды курсором
+ *   offsetChange - % ширины слайда который нужно передвинуть пальцем/мышкой, чтобы произошло изменение
  *   animation
  *     type     - тип анимации, может быть: 'slide', 'fade'
  *     time     - длительность анимации в миллисекундах
@@ -91,6 +92,7 @@ interface Config {
   amountPerSlide: number;
   mouseMove: boolean;
   touchMove: boolean;
+  offsetChange: number;
   disallowRanges: FazeDisallowRange[];
   templates: {
     page: string;
@@ -225,6 +227,7 @@ class Carousel2 extends Module {
       stopOnHover: false,
       mouseMove: false,
       touchMove: false,
+      offsetChange: 50,
       amountPerSlide: 1,
       disallowRanges: [],
       templates: {
@@ -575,9 +578,12 @@ class Carousel2 extends Module {
     // Нужно ли замораживать сдвиг
     let isFreeze = false;
 
+    // На какое количество достаточно сдвинуть слайд для изменения
+    const offsetChange = this.slideWidth * (this.config.offsetChange / 100);
+
     // Производим работу с перетаскиванием
     // Если сдвинуто влево больше чем на пол слайда, то активируем следующий слайд
-    if (offset < -(this.slideWidth / 2)) {
+    if (offset < -offsetChange) {
       // Обновляем индекс
       this.index += 1;
       this.counter += 1;
@@ -592,7 +598,7 @@ class Carousel2 extends Module {
 
       // Меняем слайд
       this.updateSlides(FazeCarouselMoveDirection.Forward, 1, isFreeze);
-    } else if (offset > this.slideWidth / 2) {
+    } else if (offset > offsetChange) {
       // Обновляем индекс
       this.index -= 1;
       this.counter -= 1;
@@ -1146,6 +1152,7 @@ class Carousel2 extends Module {
       touchMove: (node.dataset.fazeCarouselTouchMove || 'false') === 'true',
       amountPerSlide: parseInt(node.dataset.fazeCarouselAmountPerSlide || '1', 10),
       disallowRanges: JSON.parse(node.dataset.fazeCarouselDisallowRanges || '[]'),
+      offsetChange: parseInt(node.dataset.fazeCarouselOffsetChange || '50', 10),
       animation: {
         type: node.dataset.fazeCarouselAnimationType || 'fade',
         time: parseInt(node.dataset.fazeCarouselAnimationTime || '1000', 10),

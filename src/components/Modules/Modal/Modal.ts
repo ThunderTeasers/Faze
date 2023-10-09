@@ -342,6 +342,10 @@ class Modal {
    * Закрытие модального окна
    */
   close(): void {
+    if (!this.modalParts || !this.modalParts.fullNode) {
+      return;
+    }
+
     document.body.classList.remove('faze-modal-opened');
 
     // Сначала навешивается класс, а потом через указанное время удаляем окно со страницы, это нужно для того чтобы анимация

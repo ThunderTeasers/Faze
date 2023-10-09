@@ -479,9 +479,10 @@ class Modal {
       const response = await fetch(this.config.url, {
         credentials: 'same-origin',
       });
-      return await response.text();
+      const data = await response.text();
+      return data;
     } else {
-      return (await this.config.html) || '';
+      return this.config.html || '';
     }
   }
 

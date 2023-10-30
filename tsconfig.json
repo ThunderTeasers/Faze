@@ -4,7 +4,7 @@
     "strictNullChecks": true,
     "lib": ["dom", "dom.iterable", "esnext"],
     "module": "es6",
-    "target": "es6",
+    "target": "ES2021",
     "downlevelIteration": true,
     "sourceMap": true,
     "forceConsistentCasingInFileNames": true,

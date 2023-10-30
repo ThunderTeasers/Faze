@@ -170,22 +170,26 @@ class Slider extends Module {
    * @private
    */
   private initializeInputDescriptors() {
+    // Проходимся по всем доступным полям ввода
     this.inputsNodes.forEach((inputNode: HTMLInputElement, index: number) => {
+      // Получаем стандартный дескриптор для поля ввода
       const descriptor: PropertyDescriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value') || {};
       if (descriptor) {
         const inputSetter = descriptor.set;
 
+        // Применяем "наш" дескриптор для изменения значения
         descriptor.set = (val: string) => {
           Object.defineProperty(inputNode, 'value', { set: inputSetter });
-          inputNode.value = val;
 
+          // Изменяем значение
+          inputNode.value = val;
           this.setValue(index, parseFloat(val));
 
-          //changing back to custom setter
+          // Возвращяем как было
           Object.defineProperty(inputNode, 'value', descriptor);
         };
 
-        //Last add the new "value" descriptor to the $input element
+        // В любом случае возвращаем стандартный для предотвращения ошибок
         Object.defineProperty(inputNode, 'value', descriptor);
       }
     });

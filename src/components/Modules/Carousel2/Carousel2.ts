@@ -622,6 +622,34 @@ class Carousel2 extends Module {
   }
 
   /**
+   * Возвращает действия разрешенные для взаимодействия при помощи жестов
+   *
+   * @returns [actionsStart, actionsMove, actionsEnd], где "actionsStart" - начальные действия, "actionsMove" - действия при движении, "actionsEnd" - конечные действия
+   */
+  private getGesturesActions() {
+    // Действия
+    const actionsStart = [];
+    const actionsMove = [];
+    const actionsEnd = [];
+
+    // Если разрешено двигать мышкой
+    if (this.config.mouseMove) {
+      actionsStart.push('mousedown');
+      actionsMove.push('mousemove');
+      actionsEnd.push('mouseup');
+    }
+
+    // Если разрешено двигать пальцем
+    if (this.config.touchMove) {
+      actionsStart.push('touchstart');
+      actionsMove.push('touchmove');
+      actionsEnd.push('touchend');
+    }
+
+    return [actionsStart, actionsMove, actionsEnd];
+  }
+
+  /**
    * Навешивание событий для отслеживания жестов
    *
    * @private
@@ -630,9 +658,12 @@ class Carousel2 extends Module {
     // Флаг показывающий нажатие, для отслеживания движения внутри
     let isDown = false;
 
+    // Получаем разрешенные действия
+    const [actionsStart, actionsMove, actionsEnd] = this.getGesturesActions();
+
     // При нажатии на враппер для слайдов ставим флаг, что можно отслеживать движение
     Faze.Events.listener(
-      ['mousedown', 'touchstart'],
+      actionsStart,
       document.body,
       (event: MouseEvent) => {
         isDown = this.mouseOrTouchDown(event, isDown);
@@ -642,7 +673,7 @@ class Carousel2 extends Module {
 
     // Отслеживаем движение, если находимся внутри враппера слайдов
     Faze.Events.listener(
-      ['mousemove', 'touchmove'],
+      actionsMove,
       document.body,
       (event: MouseEvent) => {
         this.mouseOrTouchMove(event, isDown);
@@ -652,7 +683,7 @@ class Carousel2 extends Module {
 
     // Убираем флаг нажатия в любом случае при отпускании мыши
     Faze.Events.listener(
-      ['mouseup', 'touchend'],
+      actionsEnd,
       document.body,
       (event: MouseEvent) => {
         this.mouseOrTouchUp(event, isDown);

@@ -130,6 +130,9 @@ class Slider extends Module {
     // Инициализируем ползунки
     this.initializePoints();
 
+    // Инициализация дескрипторов полей ввода для отслеживания изменений
+    this.initializeInputDescriptors();
+
     // Делаем просчёт позиции и размера полоски после инициализации точек
     if (this.config.connect) {
       this.calculateConnect();
@@ -159,6 +162,33 @@ class Slider extends Module {
 
     // Инициализация
     new Slider(this.node, newConfig);
+  }
+
+  /**
+   * Инициализация дескрипторов полей ввода для отслеживания изменений
+   *
+   * @private
+   */
+  private initializeInputDescriptors() {
+    this.inputsNodes.forEach((inputNode: HTMLInputElement, index: number) => {
+      const descriptor: PropertyDescriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value') || {};
+      if (descriptor) {
+        const inputSetter = descriptor.set;
+
+        descriptor.set = (val: string) => {
+          Object.defineProperty(inputNode, 'value', { set: inputSetter });
+          inputNode.value = val;
+
+          this.setValue(index, parseFloat(val));
+
+          //changing back to custom setter
+          Object.defineProperty(inputNode, 'value', descriptor);
+        };
+
+        //Last add the new "value" descriptor to the $input element
+        Object.defineProperty(inputNode, 'value', descriptor);
+      }
+    });
   }
 
   /**
@@ -551,6 +581,11 @@ class Slider extends Module {
     // DOM элемент ползунка
     const pointNode = this.pointsNodes[index];
     if (pointNode && index >= 0 && index < this.values.length) {
+      // Проверка на срабатывание, даже если это не нужно
+      if (this.values[index] === value) {
+        return;
+      }
+
       // DOM элемент следующего ползунка
       const nextPointNode = <HTMLElement>pointNode.nextSibling;
 

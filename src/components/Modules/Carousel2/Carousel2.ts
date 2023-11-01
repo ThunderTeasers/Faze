@@ -1159,7 +1159,11 @@ class Carousel2 extends Module {
    * @private
    */
   private updateCurrentSlideSizes(): void {
-    this.slideWidth = this.currentSlide.getBoundingClientRect().width;
+    // Стили слайда
+    const style: CSSStyleDeclaration = window.getComputedStyle(this.currentSlide);
+
+    // Расчёт корректных размеров
+    this.slideWidth = this.currentSlide.offsetWidth + parseFloat(style.marginLeft || '0') + parseFloat(style.marginRight || '0');
     this.totalWidth = this.slideWidth * this.totalSlides;
     // this.slideHeight = this.currentSlide.getBoundingClientRect().height;
   }

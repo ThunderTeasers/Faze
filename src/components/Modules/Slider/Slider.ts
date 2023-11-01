@@ -471,6 +471,13 @@ class Slider extends Module {
       this.values[index] = this.config.range[0] + Math.round(((tmpPosition + pointWidthFactor) * (this.config.range[1] - this.config.range[0])) / sliderWidth);
     }
 
+    // Ставим ограничение
+    if (this.values.length === 2) {
+      if (this.values[0] > this.values[1]) {
+        this.values[0] = this.values[1];
+      }
+    }
+
     // Если указаны селекторы инпутов, то обновляем их
     if (this.config.selectors.inputs && needToUpdateInputs) {
       this.updateInputs();

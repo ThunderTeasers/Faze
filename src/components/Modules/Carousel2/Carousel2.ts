@@ -94,6 +94,7 @@ interface Config {
   touchMove: boolean;
   offsetChange: number;
   disallowRanges: FazeDisallowRange[];
+  minAmount: number;
   templates: {
     page: string;
   };
@@ -229,6 +230,7 @@ class Carousel2 extends Module {
       touchMove: false,
       offsetChange: 50,
       amountPerSlide: 1,
+      minAmount: 1,
       disallowRanges: [],
       templates: {
         page: '',
@@ -277,6 +279,11 @@ class Carousel2 extends Module {
     this.counter = 0;
     this.isIdle = true;
     this.transition = 'transform 0.3s ease-in-out';
+
+    // Проверка на минимальное количество
+    if (this.totalSlides < this.config.minAmount) {
+      return;
+    }
 
     this.touchStart = {
       x: 0,
@@ -434,6 +441,11 @@ class Carousel2 extends Module {
    * Навешивание событий
    */
   bind(): void {
+    // Проверка на минимальное количество
+    if (this.totalSlides < this.config.minAmount) {
+      return;
+    }
+
     super.bind();
 
     // Навешиваем события на переключения слайдов по нажатии на элементы пагинации
@@ -697,6 +709,11 @@ class Carousel2 extends Module {
    * Построение необходимых DOM элементов
    */
   build(): void {
+    // Проверка на минимальное количество
+    if (this.totalSlides < this.config.minAmount) {
+      return;
+    }
+
     super.build();
 
     this.buildControls();
@@ -1186,6 +1203,7 @@ class Carousel2 extends Module {
       mouseMove: (node.dataset.fazeCarouselMouseMove || 'false') === 'true',
       touchMove: (node.dataset.fazeCarouselTouchMove || 'false') === 'true',
       amountPerSlide: parseInt(node.dataset.fazeCarouselAmountPerSlide || '1', 10),
+      minAmount: parseInt(node.dataset.fazeCarouselMinAmount || '1', 10),
       disallowRanges: JSON.parse(node.dataset.fazeCarouselDisallowRanges || '[]'),
       offsetChange: parseInt(node.dataset.fazeCarouselOffsetChange || '50', 10),
       animation: {

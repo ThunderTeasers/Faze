@@ -252,6 +252,11 @@ class REST {
       formData.append(jsonRealName, JSON.stringify(jsonObject));
     }
 
+    // Проставляем значения для выключенных чекбоксов
+    formNode.querySelectorAll<HTMLInputElement>(`[data-faze-restapi-disabled-value][type="checkbox"]:not(:checked)`).forEach((inputNode: HTMLInputElement) => {
+      formData.append(inputNode.name, (inputNode as any).dataset.fazeRestapiDisabledValue);
+    });
+
     // Вычисляем URL для отправки запроса
     const url: string = formNode.getAttribute('action') || window.location.href;
 

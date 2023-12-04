@@ -97,7 +97,7 @@ Faze.add({
   condition: document.querySelectorAll('.js-carousel-test1').length > 0,
   callback: () => {
     new Faze.Carousel2(document.querySelector('.js-carousel-test1'), {
-      autoplay: false,
+      autoplay: true,
       pages: true,
       arrows: true,
       counter: true,

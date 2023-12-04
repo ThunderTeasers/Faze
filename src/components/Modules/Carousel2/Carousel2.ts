@@ -462,6 +462,26 @@ class Carousel2 extends Module {
     if (this.config.animation.type === 'slide') {
       this.bindGestures();
     }
+
+    // Если есть автоматическое воспроизведение, включаем его
+    if (this.config.autoplay) {
+      this.bindAutoplay();
+    }
+  }
+
+  /**
+   * Навешивание событий на автоматическую смену слайдов
+   *
+   * @private
+   */
+  private bindAutoplay() {
+    console.log(this.config.duration);
+
+    window.setInterval(() => {
+      console.log(123);
+
+      this.next();
+    }, this.config.duration);
   }
 
   /**

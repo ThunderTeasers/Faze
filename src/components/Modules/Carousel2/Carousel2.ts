@@ -536,7 +536,7 @@ class Carousel2 extends Module {
       return true;
     }
 
-    if (Faze.Helpers.isMouseOver(event, this.node).contains && !Faze.Helpers.isMouseOverlapsNode(event, this.controlsNode) && this.isIdle) {
+    if (Faze.Helpers.isMouseOver(event, this.node).contains && !Faze.Helpers.isMouseOverlapsNode(event, this.controlsNode) && event.composedPath().some((node: any) => 'classList' in node && node.classList.contains('faze-item')) && this.isIdle) {
       // Отключаем стандартное перетаскивание
       event.preventDefault();
 

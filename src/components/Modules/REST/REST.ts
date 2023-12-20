@@ -305,6 +305,15 @@ class REST {
           }
         }
       }
+
+      // Выполняем цели яндекса
+      if (formNode.dataset.fazeRestapiFormYandex && 'ym' in window) {
+        try {
+          eval(formNode.dataset.fazeRestapiFormYandex);
+        } catch (error) {
+          console.log(`Ошибка выполнения функции целей Яндекса: ${error}`);
+        }
+      }
     };
 
     // Добавляем специальное поле для обхода защиты от спама

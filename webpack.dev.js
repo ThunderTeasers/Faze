@@ -108,6 +108,10 @@ module.exports = (env) => {
         template: './src/tests/views/placeholder.html',
       }),
       new HtmlWebpackPlugin({
+        filename: 'lazyload.html',
+        template: './src/tests/views/lazyload.html',
+      }),
+      new HtmlWebpackPlugin({
         template: './src/index.html',
       }),
       new webpack.HotModuleReplacementPlugin(),

@@ -15,11 +15,14 @@ import Module from '../../Core/Module';
  * Содержит:
  *   url - ссылка для загрузки данных
  *   offset - сдвиг в пикселях когда нужно загружать изображения начиная от нижней границы вьюпорта
+ *   evented - исполнять ли сразу или ждать вызова метода
+ *   reload - нужно ли перезагружать каждый раз при вызове метода "load"
  */
 interface Config {
   url?: string;
   offset: number;
   evented: boolean;
+  reload: boolean;
 }
 
 /**
@@ -41,6 +44,7 @@ class LazyLoad extends Module {
       url: undefined,
       offset: 100,
       evented: true,
+      reload: false,
     };
 
     // Инициализируем базовый класс
@@ -92,6 +96,11 @@ class LazyLoad extends Module {
    * Загрузка модуля
    */
   async load(): Promise<void> {
+    // Если перезагружать не нужно, выходим из метода
+    if (!this.config.reload) {
+      return;
+    }
+
     this.isLoaded = true;
 
     const response = await fetch(this.config.url);

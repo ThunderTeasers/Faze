@@ -19,15 +19,38 @@
 .faze-lazyload:not([data-faze-lazyload-loaded='true']) {
   position: relative;
 
-  display: flex;
-  flex-wrap: wrap;
-
   overflow: hidden;
 
   // Плейсхолдер
   .faze-lazyload-placeholder {
-    border-radius: 10px;
+    width: 100%;
+    height: 16px;
+
+    border-radius: 8px;
     background-color: #ced4da;
+
+    // Большой
+    &.faze-lazyload-placeholder-big {
+      height: 32px;
+    }
+
+    // Изображение
+    &.faze-lazyload-placeholder-picture {
+      height: 160px;
+    }
+
+    // Изображение
+    &.faze-lazyload-placeholder-avatar {
+      width: 64px;
+      height: 64px;
+
+      border-radius: 50%;
+    }
+
+    // Отступ
+    & + .faze-lazyload-placeholder {
+      margin-top: 16px;
+    }
   }
 
   // Блик

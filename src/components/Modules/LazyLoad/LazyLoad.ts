@@ -29,6 +29,12 @@ class LazyLoad extends Module {
   // Загружен ли модуль
   isLoaded: boolean;
 
+  /**
+   * Стандартный конструктор
+   *
+   * @param node DOM элемент с которым работаем
+   * @param config Настройки
+   */
   constructor(node: HTMLElement, config: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {

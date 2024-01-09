@@ -49,6 +49,7 @@ import Spoiler from '../Modules/Spoiler/Spoiler';
 import Gallery from '../Modules/Gallery/Gallery';
 import Slider from '../Modules/Slider/Slider';
 import Steps from '../Modules/Steps/Steps';
+import LazyLoad from '../Modules/LazyLoad/LazyLoad';
 import LazyImage from '../Modules/LazyImage/LazyImage';
 import LazyImageController from '../Modules/LazyImage/LazyImageController';
 import REST from '../Modules/REST/REST';
@@ -177,6 +178,8 @@ class Faze {
   static Slider: any = Slider;
 
   static Steps: any = Steps;
+
+  static LazyLoad: any = LazyLoad;
 
   static LazyImage: any = LazyImage;
 
@@ -373,6 +376,7 @@ class Faze {
     Faze.Steps.hotInitialize();
     Faze.Drag.hotInitialize();
     Faze.Dropdown.hotInitialize();
+    Faze.LazyLoad.hotInitialize();
     Faze.LazyImage.hotInitialize();
   }
 }

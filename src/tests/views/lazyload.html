@@ -4,10 +4,21 @@
 <head>
   <meta charset="UTF-8" />
   <title>Title</title>
+
+  <style>
+    .faze-lazyload-placeholder {
+      width: 200px;
+      height: 50px;
+    }
+  </style>
 </head>
 
 <body>
-  <div data-faze="lazyload" data-faze-lazyload-url="/" data-faze-lazyload-offset="100"></div>
+  <!-- <div style="height:1500px"></div> -->
+  <div class="lazyload-test" data-faze="1lazyload"
+    data-faze-lazyload-url="https://www.admos-gifts.ru/?show=420889&mime=txt" data-faze-lazyload-offset="100">
+    <div class="faze-lazyload-placeholder"></div>
+  </div>
 </body>
 
 </html>

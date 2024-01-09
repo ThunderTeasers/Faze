@@ -91,6 +91,20 @@ Faze.add({
   },
 });
 
+// Тест загрузки
+Faze.add({
+  pluginName: 'LazyLoadTest',
+  condition: document.querySelectorAll('.lazyload-test').length > 0,
+  callback: () => {
+    new Faze.LazyLoad(document.querySelector('.lazyload-test'), {
+      evented: false,
+      url: 'https://www.admos-gifts.ru/?show=420889&mime=txt',
+    });
+
+    // a.load();
+  },
+});
+
 // Тесты карусели
 Faze.add({
   pluginName: 'TestCarousel',

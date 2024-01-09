@@ -97,7 +97,7 @@ class LazyLoad extends Module {
    */
   async load(): Promise<void> {
     // Если перезагружать не нужно, выходим из метода
-    if (!this.config.reload) {
+    if (!this.config.reload && this.isLoaded) {
       return;
     }
 

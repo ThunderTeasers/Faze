@@ -475,11 +475,7 @@ class Carousel2 extends Module {
    * @private
    */
   private bindAutoplay() {
-    console.log(this.config.duration);
-
     window.setInterval(() => {
-      console.log(123);
-
       this.next();
     }, this.config.duration);
   }
@@ -490,7 +486,7 @@ class Carousel2 extends Module {
    * @private
    */
   private bindPagination(): void {
-    return;
+    // return;
 
     Faze.Events.forEach('click', this.pagesNodes, (event: MouseEvent, pageNode: HTMLElement) => {
       const index: string | undefined = pageNode.dataset.fazeIndex;

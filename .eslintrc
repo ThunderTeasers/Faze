@@ -1,9 +1,7 @@
 {
   "extends": "airbnb-typescript/base",
   "parserOptions": {
-    "project": [
-      "./tsconfig.json"
-    ]
+    "project": ["./tsconfig.json"]
   },
   "rules": {
     "no-param-reassign": "off",
@@ -20,7 +18,7 @@
     "max-len": [
       "error",
       {
-        "code": 200,
+        "code": 300,
         "tabWidth": 2
       }
     ]

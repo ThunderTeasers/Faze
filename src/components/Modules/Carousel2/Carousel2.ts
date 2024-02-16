@@ -448,6 +448,9 @@ class Carousel2 extends Module {
 
     super.bind();
 
+    // Навешиваем события на ресайз браузера
+    this.bindResize();
+
     // Навешиваем события на переключения слайдов по нажатии на элементы пагинации
     if (this.config.pages) {
       this.bindPagination();
@@ -470,6 +473,18 @@ class Carousel2 extends Module {
   }
 
   /**
+   * Навешиваем события на ресайз браузера
+   *
+   * @private
+   */
+  private bindResize() {
+    Faze.Events.listener('resize', window, () => {
+      this.updateCurrentSlideSizes();
+      this.updateSlidesOffset();
+    });
+  }
+
+  /**
    * Навешивание событий на автоматическую смену слайдов
    *
    * @private
@@ -486,8 +501,6 @@ class Carousel2 extends Module {
    * @private
    */
   private bindPagination(): void {
-    // return;
-
     Faze.Events.forEach('click', this.pagesNodes, (event: MouseEvent, pageNode: HTMLElement) => {
       const index: string | undefined = pageNode.dataset.fazeIndex;
       if (index) {

@@ -230,7 +230,7 @@ class Carousel2 extends Module {
       touchMove: false,
       offsetChange: 50,
       amountPerSlide: 1,
-      minAmount: 1,
+      minAmount: 2,
       disallowRanges: [],
       templates: {
         page: '',
@@ -1061,6 +1061,8 @@ class Carousel2 extends Module {
     this.slidesNodes.forEach((slideNode, index) => {
       let offset = 0;
 
+      amount = 1;
+
       if (index < this.counter - 1) {
         offset = this.totalWidth * amount;
       } else if (index > this.slidesNodes.length + this.counter - 2) {
@@ -1077,7 +1079,9 @@ class Carousel2 extends Module {
    * @private
    */
   private async updateOffset(direction: FazeCarouselMoveDirection, amount: number = 1, isFreeze: boolean = false): Promise<void> {
-    this.updateSlidesOffset(amount);
+    if (amount === 1) {
+      this.updateSlidesOffset(amount);
+    }
 
     if (direction === FazeCarouselMoveDirection.Forward && this.counter === 0) {
       if (!isFreeze) {
@@ -1110,11 +1114,13 @@ class Carousel2 extends Module {
       await this.moveSlide(true);
       this.setTransition();
       this.offset = 0;
-    } else {
-      this.updateSlidesOffset(amount);
     }
 
     await this.moveSlide();
+
+    if (amount > 1) {
+      this.updateSlidesOffset(amount);
+    }
   }
 
   /**
@@ -1219,7 +1225,7 @@ class Carousel2 extends Module {
       mouseMove: (node.dataset.fazeCarouselMouseMove || 'false') === 'true',
       touchMove: (node.dataset.fazeCarouselTouchMove || 'false') === 'true',
       amountPerSlide: parseInt(node.dataset.fazeCarouselAmountPerSlide || '1', 10),
-      minAmount: parseInt(node.dataset.fazeCarouselMinAmount || '1', 10),
+      minAmount: parseInt(node.dataset.fazeCarouselMinAmount || '2', 10),
       disallowRanges: JSON.parse(node.dataset.fazeCarouselDisallowRanges || '[]'),
       offsetChange: parseInt(node.dataset.fazeCarouselOffsetChange || '50', 10),
       animation: {

@@ -380,8 +380,10 @@ class SmartSelect extends Module {
             this.calculateFixed();
           }
 
-          // Теперь открываем
-          this.open();
+          // Теперь открываем, если есть данные
+          if (this.items.length !== 0) {
+            this.open();
+          }
         }
       }, 500);
     });

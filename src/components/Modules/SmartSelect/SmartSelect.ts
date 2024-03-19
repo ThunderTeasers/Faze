@@ -509,7 +509,10 @@ class SmartSelect extends Module {
       // Если задана пользовательская функция смены текста в <option> то выполняем её
       if (typeof this.config.callbacks.option === 'function') {
         value = this.config.callbacks.option(row);
-      } else if (!value) {
+      }
+
+      // Если не задано, то выходим
+      if (!value) {
         return;
       }
 

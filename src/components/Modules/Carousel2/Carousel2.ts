@@ -215,6 +215,9 @@ class Carousel2 extends Module {
   // Высота слайда
   // private slideHeight: number;
 
+  // Нужно ли инициализировать модуль
+  private isNeedToInitialize: boolean;
+
   constructor(node?: HTMLElement, config?: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
@@ -279,9 +282,13 @@ class Carousel2 extends Module {
     this.counter = 0;
     this.isIdle = true;
     this.transition = 'transform 0.3s ease-in-out';
+    this.isNeedToInitialize = !(this.totalSlides < this.config.minAmount);
+
+    // Инициализируем стрелки
+    this.initializeArrows();
 
     // Проверка на минимальное количество
-    if (this.totalSlides < this.config.minAmount) {
+    if (!this.isNeedToInitialize) {
       return;
     }
 
@@ -311,9 +318,6 @@ class Carousel2 extends Module {
 
     // Инициализируем слайды
     this.initializeSlides();
-
-    // Инициализируем стрелки
-    this.initializeArrows();
 
     // Добавляем враппер слайдов в карусель
     this.node.appendChild(this.itemsHolderNode);
@@ -421,6 +425,11 @@ class Carousel2 extends Module {
 
         // Если нашли кастомные стрелки, то задаём их
         if (arrowLeftNode && arrowRightNode) {
+          if (!this.isNeedToInitialize) {
+            arrowLeftNode.style.display = 'none';
+            arrowRightNode.style.display = 'none';
+          }
+
           this.arrowsNodes = {
             left: arrowLeftNode,
             right: arrowRightNode,
@@ -442,7 +451,7 @@ class Carousel2 extends Module {
    */
   bind(): void {
     // Проверка на минимальное количество
-    if (this.totalSlides < this.config.minAmount) {
+    if (!this.isNeedToInitialize) {
       return;
     }
 
@@ -739,7 +748,7 @@ class Carousel2 extends Module {
    */
   build(): void {
     // Проверка на минимальное количество
-    if (this.totalSlides < this.config.minAmount) {
+    if (!this.isNeedToInitialize) {
       return;
     }
 

@@ -10,7 +10,7 @@ class Events {
    * @param {(event: Event, node: HTMLElement | null)} callback Пользовательская функция исполняющаяся после события
    * @param {boolean} isPreventDefault Нужно ли делать "preventDefault()" у события
    */
-  static click(nodeOrSelector: HTMLElement | string, callback: (event: Event, node: HTMLElement | null) => void, isPreventDefault: boolean = true): void {
+  static click(nodeOrSelector: HTMLElement | HTMLElement[] | string, callback: (event: Event, node: HTMLElement | null) => void, isPreventDefault: boolean = true): void {
     this.listener('click', nodeOrSelector, callback, isPreventDefault);
   }
 
@@ -18,18 +18,21 @@ class Events {
    * Навешивание событие на DOM элемент со всеми проверками
    *
    * @param {string | string[]} types Типы события
-   * @param {HTMLElement | string} nodeOrSelector DOM элемент на который навешиваем событие или его CSS селектор
-   * @param {(event: Event, node: HTMLElement | null)} callback Пользовательская функция исполняющаяся после события
+   * @param {HTMLElement | HTMLElement[] | string} nodeOrSelector DOM элемент(ы) на который навешиваем событие или его CSS селектор
+   * @param {(event: Event, node: HTMLElement | null, nodes: HTMLElement[] | null, index: number)} callback Пользовательская функция исполняющаяся после события
    * @param {boolean} isPreventDefault Нужно ли делать "preventDefault()" у события
    */
-  static listener(types: string | string[], nodeOrSelector: HTMLElement | string, callback: (event: Event, node: HTMLElement | null) => void, isPreventDefault: boolean = true): void {
+  static listener(types: string | string[], nodeOrSelector: HTMLElement | HTMLElement[] | string, callback: (event: Event, node: HTMLElement | null, nodes: HTMLElement[] | null, index: number) => void, isPreventDefault: boolean = true): void {
     // Проверяем, является ли переданный параметр строкой, если да,
-    // то ищём соответствующий DOM элемент по селектору, если нет, используем напрямую
-    let node: HTMLElement | null;
+    // то ищём соответствующий DOM элемент по селектору, если нет,
+    // проверяем массив ли это и действуем в соответствии с этим
+    let nodes: HTMLElement[];
     if (typeof nodeOrSelector === 'string' || nodeOrSelector instanceof String) {
-      node = document.querySelector(nodeOrSelector as string);
+      nodes = [...document.querySelectorAll<HTMLElement>(nodeOrSelector as string)];
+    } else if (Array.isArray(nodeOrSelector) || nodeOrSelector instanceof NodeList) {
+      nodes = [...(nodeOrSelector as HTMLElement[])];
     } else {
-      node = nodeOrSelector;
+      nodes = [nodeOrSelector];
     }
 
     // Если это не массив, то превращаем в него
@@ -39,15 +42,17 @@ class Events {
 
     // Навешиваем событие
     types.forEach((type: string) => {
-      node?.addEventListener(type, (event) => {
-        if (isPreventDefault) {
-          event.preventDefault();
-        }
+      nodes.forEach((node: HTMLElement, index: number) => {
+        node?.addEventListener(type, (event) => {
+          if (isPreventDefault) {
+            event.preventDefault();
+          }
 
-        // Исполняем пользовательскую функцию
-        if (typeof callback === 'function') {
-          callback(event, node);
-        }
+          // Исполняем пользовательскую функцию
+          if (typeof callback === 'function') {
+            callback(event, node, nodes, index);
+          }
+        });
       });
     });
   }

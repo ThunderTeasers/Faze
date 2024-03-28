@@ -199,9 +199,7 @@ class Modal {
    */
   bind(): void {
     if (this.config.evented) {
-      this.node.addEventListener(this.config.event, (event) => {
-        event.preventDefault();
-
+      Faze.Events.listener(this.config.event, this.node, () => {
         this.create();
       });
     } else {

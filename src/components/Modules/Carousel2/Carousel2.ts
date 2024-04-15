@@ -281,7 +281,7 @@ class Carousel2 extends Module {
     this.offset = 0;
     this.counter = 0;
     this.isIdle = true;
-    this.transition = 'transform 0.3s ease-in-out';
+    this.transition = `transform ${this.config.animation.time / 1000}s ease-in-out`;
     this.isNeedToInitialize = !(this.totalSlides < this.config.minAmount);
 
     // Инициализируем стрелки
@@ -1161,7 +1161,7 @@ class Carousel2 extends Module {
       } else {
         setTimeout(() => {
           resolve();
-        }, 300);
+        }, this.config.animation.time);
       }
     });
   }

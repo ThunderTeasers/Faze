@@ -121,7 +121,7 @@ Faze.add({
       offsetChange: 20,
       animation: {
         type: 'slide',
-        time: 1000,
+        time: 5000,
         direction: 'horizontal',
       },
     });

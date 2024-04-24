@@ -56,6 +56,9 @@ class Tab extends Module {
   // DOM элементы тел табов
   bodiesNodes: HTMLElement[];
 
+  // Содержат ли заголовки табов текущий хэш на странице
+  containsHash: boolean;
+
   /**
    * Стандартный конструктор
    *
@@ -92,6 +95,10 @@ class Tab extends Module {
     // Инициализация шапок и тел табов
     this.initializeTabs();
 
+    // Проверяем содержат ли заголовки табов текущий хэш
+    this.containsHash = this.headersNodes.some((headerNode) => headerNode.dataset.fazeTabBody === window.location.hash.substring(1) || headerNode.dataset.fazeTabHead === window.location.hash.substring(1));
+
+    // Текущий ключ
     let key: string;
 
     // Открытие тел табов если у шапки задан класс "faze-active"
@@ -103,12 +110,12 @@ class Tab extends Module {
     }
 
     // Открытие таба если есть hash и его разрешено использовать
-    if (this.config.useHash && window.location.hash) {
+    if (this.config.useHash && window.location.hash && this.containsHash) {
       key = window.location.hash.substring(1);
     }
 
     // Активация первой вкладки по умолчанию
-    this.activateTab(key);
+    this.activateTab(key, true);
   }
 
   /**
@@ -124,6 +131,19 @@ class Tab extends Module {
         this.activateTab(header.dataset.fazeTabHead || header.dataset.fazeTabBody || '');
       });
     });
+
+    this.bindHashChange();
+  }
+
+  /**
+   * Навешивание событий на изменение хэша
+   *
+   * @private
+   */
+  private bindHashChange() {
+    window.addEventListener('hashchange', () => {
+      this.activateTab(window.location.hash.substring(1));
+    });
   }
 
   /**
@@ -136,7 +156,9 @@ class Tab extends Module {
     this.headersNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-header, [data-faze-tab="header"], [data-faze-tab-head]')).filter((headerNode: HTMLElement) => headerNode.closest(`.faze-tabs, [data-faze~="tab"] ${className}`) === this.node);
 
     // Получаем тела
-    this.bodiesNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-body, [data-faze-tab="body"], [data-faze-tab-body]:not([data-faze-tab="header"]):not(.faze-tab-header)')).filter((bodyNode: HTMLElement) => bodyNode.closest(`.faze-tabs, [data-faze~="tab"] ${className}`) === this.node);
+    this.bodiesNodes = Array.from(this.node.querySelectorAll<HTMLElement>('.faze-tab-body, [data-faze-tab="body"], [data-faze-tab-body]:not([data-faze-tab="header"]):not(.faze-tab-header)')).filter(
+      (bodyNode: HTMLElement) => bodyNode.closest(`.faze-tabs, [data-faze~="tab"] ${className}`) === this.node
+    );
 
     // Удаляем пустые табы
     if (this.config.removeEmpty) {
@@ -148,8 +170,13 @@ class Tab extends Module {
    * Активация таба, посредством проставления активному телу и шапке класс 'active' и убирая его у всех остальных
    *
    * @param key{string} - ключ в data атрибутах по которому ищем шапку и тело
+   * @param isFirstTime{boolean} - первый ли раз запускаем данную функцию
    */
-  activateTab(key: string): void {
+  activateTab(key: string, isFirstTime: boolean = false): void {
+    if (!this.headersNodes.some((headerNode) => key === headerNode.dataset.fazeTabBody || key === headerNode.dataset.fazeTabHead)) {
+      return;
+    }
+
     // Активные DOM Элементы таба
     let activeHeadNode: HTMLElement | undefined;
     let activeBodyNode: HTMLElement | undefined;
@@ -195,7 +222,7 @@ class Tab extends Module {
     });
 
     // Прописываем hash если необходимо
-    if (this.config.useHash) {
+    if (this.config.useHash && !isFirstTime) {
       window.location.hash = key;
     }
 

@@ -28,6 +28,7 @@ import Date from './Date';
 import Animations from '../Animations/Animations';
 import Placeholder from '../Modules/Placeholder/Placeholder';
 import Tooltip from '../Modules/Tooltip/Tooltip';
+import Tour from '../Modules/Tour/Tour';
 import Tab from '../Modules/Tab/Tab';
 import Drag from '../Modules/Drag/Drag';
 import Dropdown from '../Modules/Dropdown/Dropdown';
@@ -122,6 +123,8 @@ class Faze {
   static Carousel2: any = Carousel2;
 
   static Tooltip: any = Tooltip;
+
+  static Tour: any = Tour;
 
   static Modal: any = Modal;
 
@@ -230,7 +233,37 @@ class Faze {
     const currentPlugins: InnerPluginsData = {};
 
     // Зарезервированные имена
-    const predefinedNames: string[] = ['Plugin', 'Module', 'Zoom', 'Look', 'ZoomBox', 'TableSorter', 'Tooltip', 'Carousel', 'Page', 'Gallery', 'SmartSelect', 'Form', 'Spoiler', 'Select', 'Scroll', 'Tab', 'Dropdown', 'Slider', 'Steps', 'Events', 'Helpers', 'Constants', 'URL', 'Observer', 'Modal', 'Filter', 'REST', 'Logger'];
+    const predefinedNames: string[] = [
+      'Plugin',
+      'Module',
+      'Zoom',
+      'Look',
+      'ZoomBox',
+      'TableSorter',
+      'Tooltip',
+      'Tour',
+      'Carousel',
+      'Page',
+      'Gallery',
+      'SmartSelect',
+      'Form',
+      'Spoiler',
+      'Select',
+      'Scroll',
+      'Tab',
+      'Dropdown',
+      'Slider',
+      'Steps',
+      'Events',
+      'Helpers',
+      'Constants',
+      'URL',
+      'Observer',
+      'Modal',
+      'Filter',
+      'REST',
+      'Logger',
+    ];
 
     // Проверка на ошибки
     if (!config) {
@@ -368,6 +401,7 @@ class Faze {
     Faze.Carousel2.hotInitialize('carousel2');
     Faze.Carousel.hotInitialize();
     Faze.Tooltip.hotInitialize();
+    Faze.Tour.hotInitialize('tour');
     Faze.Zoom.hotInitialize();
     Faze.ZoomBox.hotInitialize();
     Faze.Select.hotInitialize();

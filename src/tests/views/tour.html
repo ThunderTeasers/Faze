@@ -3,11 +3,38 @@
   <head>
     <meta charset="UTF-8" />
     <title>Тестирование модуля Tour</title>
+    <style>
+      .step1 {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+      }
+
+      .step2 {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+      }
+
+      .step3 {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+      }
+
+      .step4 {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+      }
+    </style>
   </head>
   <body>
-    <div class="step1">Подсказка 1</div>
-    <div class="step2">Подсказка 2</div>
-    <div class="step3">Подсказка 3</div>
-    <div class="step4">Подсказка 4</div>
+    <div data-faze="tour" data-faze-tour-group="test">
+      <div class="step1" data-faze-tour-step="test" data-faze-tour-step-text="Test 1" data-faze-tour-step-index="4">Подсказка 1</div>
+      <div class="step2" data-faze-tour-step="test" data-faze-tour-step-text="Test 2" data-faze-tour-step-index="3">Подсказка 2</div>
+      <div class="step3" data-faze-tour-step="test" data-faze-tour-step-text="Test 3" data-faze-tour-step-index="2">Подсказка 3</div>
+      <div class="step4" data-faze-tour-step="test" data-faze-tour-step-text="Test 4" data-faze-tour-step-index="1">Подсказка 4</div>
+    </div>
   </body>
 </html>

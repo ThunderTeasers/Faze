@@ -781,7 +781,7 @@ class Helpers {
     calculateSides: { vertical: boolean; horizontal: boolean } = {
       vertical: false,
       horizontal: false,
-    },
+    }
   ): MouseOverResult {
     // DOMRect текущего элемента
     const itemRect = itemNode.getBoundingClientRect();
@@ -926,7 +926,7 @@ class Helpers {
    * @param styles      - стили создаваемого DOM элемента
    * @param parent      - родитель создаваемого DOM элемента
    */
-  static createElement(tag: string, attributes?: FazeObject, styles?: FazeObject, parent?: HTMLElement): HTMLElement {
+  static createElement(tag: string, attributes?: FazeObject, styles?: FazeObject, parent?: HTMLElement, className?: string): HTMLElement {
     // Создаем DOM элемент
     const node = document.createElement(tag);
 
@@ -938,6 +938,10 @@ class Helpers {
     // Если есть стили, присваиваем их
     if (styles) {
       this.setElementStyle(node, styles);
+    }
+
+    if (className) {
+      node.className = className;
     }
 
     // Если задан родитель, сразу добавляем созданный элемент в него
@@ -961,7 +965,7 @@ class Helpers {
     offset: FazePosition = {
       x: 0,
       y: 0,
-    },
+    }
   ): FazePosition {
     // Возвращаемый объект
     const position = {
@@ -1002,7 +1006,7 @@ class Helpers {
     positionOffset: FazePosition = {
       x: 0,
       y: 0,
-    },
+    }
   ): FazePositionAndSize {
     return {
       size: {

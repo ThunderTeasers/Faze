@@ -3,7 +3,7 @@
  *
  * Плагин представляет из себя возможность создания многоступенчатого интерфейса с кнопками "Вперёд" и "Назад"
  *
- * Автор: Ерохин Максим, plarson.ru
+ * Автор: Ерохин Максим
  * Дата: 02.11.2019
  */
 
@@ -211,10 +211,9 @@ class Steps {
           let isValid = true;
 
           // Проверка на валидность инпутов на шаге
-          bodyNode.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('input:not([type="checkbox"]):not([type="radio"]), textarea, select')
-            .forEach((inputNode: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => {
-              isValid = inputNode.reportValidity();
-            });
+          bodyNode.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('input:not([type="checkbox"]):not([type="radio"]), textarea, select').forEach((inputNode: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => {
+            isValid = inputNode.reportValidity();
+          });
 
           // Если шаг валиден, идем дальше
           if (isValid) {

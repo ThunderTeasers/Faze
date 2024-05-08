@@ -1,7 +1,7 @@
 /**
  * Плагин карусели
  *
- * Автор: Ерохин Максим, plarson.ru
+ * Автор: Ерохин Максим
  * Дата: 29.09.2018
  * Документация: https://github.com/ThunderTeasers/Faze/wiki/%D0%9C%D0%BE%D0%B4%D1%83%D0%BB%D1%8C-Carousel
  */
@@ -718,7 +718,7 @@ class Carousel2 extends Module {
       (event: MouseEvent) => {
         isDown = this.mouseOrTouchDown(event, isDown);
       },
-      false,
+      false
     );
 
     // Отслеживаем движение, если находимся внутри враппера слайдов
@@ -728,7 +728,7 @@ class Carousel2 extends Module {
       (event: MouseEvent) => {
         this.mouseOrTouchMove(event, isDown);
       },
-      false,
+      false
     );
 
     // Убираем флаг нажатия в любом случае при отпускании мыши
@@ -739,7 +739,7 @@ class Carousel2 extends Module {
         this.mouseOrTouchUp(event, isDown);
         isDown = false;
       },
-      false,
+      false
     );
   }
 

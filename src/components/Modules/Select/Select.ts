@@ -3,7 +3,7 @@
  *
  * Селект представляет из себя стандартный селект, но с дополнительным функционалом + с возможностью стилизации
  *
- * Автор: Ерохин Максим, plarson.ru
+ * Автор: Ерохин Максим
  * Дата: 26.09.2018
  * Документация: https://github.com/ThunderTeasers/Faze/wiki/%D0%9C%D0%BE%D0%B4%D1%83%D0%BB%D1%8C-Select
  */
@@ -28,9 +28,9 @@ interface Config {
   default: boolean;
   positionTopOffset: number;
   callbacks: {
-    created?: (data: CallbackData) => void,
-    changed?: (data: CallbackData) => void,
-    opened?: (data: CallbackData) => void,
+    created?: (data: CallbackData) => void;
+    changed?: (data: CallbackData) => void;
+    opened?: (data: CallbackData) => void;
   };
 }
 
@@ -105,7 +105,7 @@ class Select {
       },
     };
 
-    this.config = {...defaultConfig, ...config};
+    this.config = { ...defaultConfig, ...config };
     this.node = node;
 
     // Инициализация переменных
@@ -277,8 +277,7 @@ class Select {
     }
 
     // Ищем нужную опцию
-    const optionNode = Array.from(this.optionsNodes)
-      .find(option => option.dataset.fazeSelectValue === value || option.textContent === value);
+    const optionNode = Array.from(this.optionsNodes).find((option) => option.dataset.fazeSelectValue === value || option.textContent === value);
 
     // Если нет такой опции
     if (!optionNode) {

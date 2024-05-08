@@ -1,7 +1,7 @@
 /**
  * Плагин перетаскивания элементов
  *
- * Автор: Ерохин Максим, plarson.ru
+ * Автор: Ерохин Максим
  * Дата: 19.12.2019
  */
 
@@ -90,7 +90,7 @@ class Drag {
     this.logger = new Logger('Модуль Faze.Drag:');
 
     // Проверка на двойную инициализацию
-    const foundNode = this.nodes.find(node => node.classList.contains('faze-drag-initialized'));
+    const foundNode = this.nodes.find((node) => node.classList.contains('faze-drag-initialized'));
     if (foundNode) {
       if (!foundNode.dataset.fazeDragGroup) {
         this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', foundNode);
@@ -298,10 +298,10 @@ class Drag {
       draggedItemNode.dataset.fazeDragItemPositionY = y.toString();
 
       Array.from(this.itemsNodes)
-        .filter(itemNode => !itemNode.classList.contains('faze-drag-item-moving'))
+        .filter((itemNode) => !itemNode.classList.contains('faze-drag-item-moving'))
         .forEach((itemNode: HTMLElement) => {
           // Получаем результаты наведения на элемент мышкой
-          const mouseOverResult = Faze.Helpers.isMouseOver(event, itemNode, {horizontal: true, vertical: true});
+          const mouseOverResult = Faze.Helpers.isMouseOver(event, itemNode, { horizontal: true, vertical: true });
 
           if (itemNode.parentNode) {
             if (this.config.direction === SideDirection.horizontal) {

@@ -3,7 +3,7 @@
  *
  * Предоставляет возможность автоматической инициализации плагинов по data атрибутам при динамическом создании DOM элементов на странице
  *
- * Автор: Ерохин Максим, plarson.ru
+ * Автор: Ерохин Максим
  * Дата: 03.05.2019
  */
 
@@ -116,8 +116,7 @@ class Observer {
    */
   private call(listener: ListenerBySelector | ListenerByNode, node: HTMLElement) {
     if ('alreadyExistedNodes' in listener) {
-      if (!Array.from(listener.alreadyExistedNodes)
-        .includes(node)) {
+      if (!Array.from(listener.alreadyExistedNodes).includes(node)) {
         if (typeof listener.callback === 'function') {
           try {
             // Вызываем пользовательскую функцию
@@ -163,12 +162,11 @@ class Observer {
           const tmpNode = document.querySelector(listener.selector);
           if (tmpNode && tmpNode.contains(mutationRecord.target)) {
             // Ищем элемент, который попадает под слушателя
-            const found = listener.alreadyExistedNodes.find(node => node.matches(listener.selector));
+            const found = listener.alreadyExistedNodes.find((node) => node.matches(listener.selector));
             if (found) {
               listener.callback(found);
             }
           }
-
         });
       } else {
         // Проходимся по всем добавленным DOM элементам
@@ -182,10 +180,9 @@ class Observer {
               }
 
               // Ищем в добавленном DOM элементе детей с необходимыми нам селекторами и на них мешаем метод
-              addedNode.querySelectorAll(listener.selector)
-                .forEach((node: HTMLElement) => {
-                  this.call(listener, node);
-                });
+              addedNode.querySelectorAll(listener.selector).forEach((node: HTMLElement) => {
+                this.call(listener, node);
+              });
             });
           }
         });

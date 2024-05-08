@@ -4,7 +4,7 @@
  * Сам модуль представляет из себя обертку, которая навешивается на DOM элемент содержащий элементы, снизу создается кнопка, при нажатии
  * на которую в него будут добавляться новые, динамически подгруженные, элементы.
  *
- * Автор: Ерохин Максим, plarson.ru
+ * Автор: Ерохин Максим
  * Дата: 01.10.2018
  *
  *
@@ -233,11 +233,11 @@ class Page {
       const url: string = `${basePath}${basePath.includes('?') ? '&' : '?'}${this.params.toString()}`;
 
       // Получение новых элементов
-      fetch(url, {credentials: 'same-origin'})
+      fetch(url, { credentials: 'same-origin' })
         .then((response: Response) => response.text())
         .then((response: string) => {
           // Парсинг ответа
-          const responseHTML: Document = (new DOMParser()).parseFromString(response, 'text/html');
+          const responseHTML: Document = new DOMParser().parseFromString(response, 'text/html');
 
           // DOM элементы загруженных объектов
           const loadedItemNodes: NodeListOf<HTMLElement> = responseHTML.querySelectorAll(this.config.selectors.items);

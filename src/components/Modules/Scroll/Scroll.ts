@@ -4,7 +4,7 @@
  * Скрол представляет из себя область, в которую помещается исходный элемент и, если он не влезает в данную область, то появляется скрол
  * бар, и возможность скролить эту область колесиком мыши.
  *
- * Автор: Ерохин Максим, plarson.ru
+ * Автор: Ерохин Максим
  * Дата: 30.09.2018
  *
  *
@@ -206,7 +206,7 @@ class Scroll {
         this.node.style.top = `${positionY}px`;
 
         // Задаем позицию вертикальному скрол бару
-        this.scrollBarVerticalNode.style.top = `${Math.abs(this.scrollVerticalHeightInPercents / 100 * positionY)}px`;
+        this.scrollBarVerticalNode.style.top = `${Math.abs((this.scrollVerticalHeightInPercents / 100) * positionY)}px`;
       }
     });
   }
@@ -232,7 +232,7 @@ class Scroll {
     let endTouchPosition: number = 0;
 
     // DOM элемент полосы прокрутки
-    const scrollbarNode: HTMLDivElement = (direction === Direction.Horizontal ? this.scrollBarHorizontalNode : this.scrollBarVerticalNode);
+    const scrollbarNode: HTMLDivElement = direction === Direction.Horizontal ? this.scrollBarHorizontalNode : this.scrollBarVerticalNode;
 
     /**
      * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
@@ -241,7 +241,7 @@ class Scroll {
      */
     const dragTouchDown = (event: TouchEvent) => {
       // Получение пальца при нажатии на элемент
-      startTouchPosition = (direction === Direction.Horizontal ? event.touches[0].clientX : event.touches[0].clientY);
+      startTouchPosition = direction === Direction.Horizontal ? event.touches[0].clientX : event.touches[0].clientY;
 
       // Выключаем плавную прокрутку при движении мышкой
       scrollbarNode.style.transition = '';
@@ -262,7 +262,7 @@ class Scroll {
 
       // Рассчет новой позиции пальца
       endTouchPosition = startTouchPosition - (direction === Direction.Horizontal ? event.touches[0].clientX : event.touches[0].clientY);
-      startTouchPosition = (direction === Direction.Horizontal ? event.touches[0].clientX : event.touches[0].clientY);
+      startTouchPosition = direction === Direction.Horizontal ? event.touches[0].clientX : event.touches[0].clientY;
 
       let position = 0;
       if (direction === Direction.Horizontal) {
@@ -286,10 +286,10 @@ class Scroll {
       // Рассчет новой позиции скролбара и задаем позицию вертикальному скрол бару
       if (direction === Direction.Horizontal) {
         this.node.style.left = `${position}px`;
-        scrollbarNode.style.left = `${-parseInt(this.node.style.left || '', 10) * this.scrollHorizontalWidthInPercents / 100}px`;
+        scrollbarNode.style.left = `${(-parseInt(this.node.style.left || '', 10) * this.scrollHorizontalWidthInPercents) / 100}px`;
       } else {
         this.node.style.top = `${position}px`;
-        scrollbarNode.style.top = `${-parseInt(this.node.style.top || '', 10) * this.scrollVerticalHeightInPercents / 100}px`;
+        scrollbarNode.style.top = `${(-parseInt(this.node.style.top || '', 10) * this.scrollVerticalHeightInPercents) / 100}px`;
       }
     };
 
@@ -330,7 +330,7 @@ class Scroll {
     let endMousePosition: number = 0;
 
     // DOM элемент полосы прокрутки
-    const scrollbarNode: HTMLDivElement = (direction === Direction.Horizontal ? this.scrollBarHorizontalNode : this.scrollBarVerticalNode);
+    const scrollbarNode: HTMLDivElement = direction === Direction.Horizontal ? this.scrollBarHorizontalNode : this.scrollBarVerticalNode;
 
     /**
      * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
@@ -374,7 +374,7 @@ class Scroll {
 
       // Рассчет новой позиции курсора
       endMousePosition = startMousePosition - (direction === Direction.Horizontal ? event.clientX : event.clientY);
-      startMousePosition = (direction === Direction.Horizontal ? event.clientX : event.clientY);
+      startMousePosition = direction === Direction.Horizontal ? event.clientX : event.clientY;
 
       let maxPosition = 0;
       if (direction === Direction.Horizontal) {
@@ -393,10 +393,10 @@ class Scroll {
       // Рассчет новой позиции скролбара и задаем позицию вертикальному скрол бару
       if (direction === Direction.Horizontal) {
         scrollbarNode.style.left = `${position}px`;
-        this.node.style.left = `${-parseInt(scrollbarNode.style.left, 10) / this.scrollHorizontalWidthInPercents * 100}px`;
+        this.node.style.left = `${(-parseInt(scrollbarNode.style.left, 10) / this.scrollHorizontalWidthInPercents) * 100}px`;
       } else {
         scrollbarNode.style.top = `${position}px`;
-        this.node.style.top = `${-parseInt(scrollbarNode.style.top, 10) / this.scrollVerticalHeightInPercents * 100}px`;
+        this.node.style.top = `${(-parseInt(scrollbarNode.style.top, 10) / this.scrollVerticalHeightInPercents) * 100}px`;
       }
     };
 

@@ -6,7 +6,7 @@
  * Сам по себе класс не работает, т.к. были бы слишком большие проблемы с оптимизацией при навешивании для каждого изображения эвента на
  * скролл окна, для этого создан класс помощник, а именно LazyImageController, который выполняет организационную работу.
  *
- * Автор: Ерохин Максим, plarson.ru
+ * Автор: Ерохин Максим
  * Дата: 24.07.2019
  */
 
@@ -97,7 +97,7 @@ class LazyImage {
    * Проверка видимо ли изображение на экране
    */
   isVisible(): boolean {
-    return ((window.scrollY + window.innerHeight + this.config.offset) > this.node.offsetTop) && (this.node.offsetParent !== null);
+    return window.scrollY + window.innerHeight + this.config.offset > this.node.offsetTop && this.node.offsetParent !== null;
   }
 
   /**
@@ -106,11 +106,13 @@ class LazyImage {
    * @param lazyImageNode - DOM элемент на который нужно инициализировать плагин
    */
   static initializeByDataAttributes(lazyImageNode: HTMLElement): void {
-    Faze.LazyImageController.add(new Faze.LazyImage(lazyImageNode, {
-      offset: parseInt(lazyImageNode.dataset.fazeLazy_imageOffset || '0', 10),
-      width: lazyImageNode.dataset.fazeLazy_imageWidth ? parseInt(lazyImageNode.dataset.fazeLazy_imageWidth || '0', 10) : null,
-      height: lazyImageNode.dataset.fazeLazy_imageHeight ? parseInt(lazyImageNode.dataset.fazeLazy_imageHeight || '0', 10) : null,
-    }));
+    Faze.LazyImageController.add(
+      new Faze.LazyImage(lazyImageNode, {
+        offset: parseInt(lazyImageNode.dataset.fazeLazy_imageOffset || '0', 10),
+        width: lazyImageNode.dataset.fazeLazy_imageWidth ? parseInt(lazyImageNode.dataset.fazeLazy_imageWidth || '0', 10) : null,
+        height: lazyImageNode.dataset.fazeLazy_imageHeight ? parseInt(lazyImageNode.dataset.fazeLazy_imageHeight || '0', 10) : null,
+      })
+    );
   }
 
   /**

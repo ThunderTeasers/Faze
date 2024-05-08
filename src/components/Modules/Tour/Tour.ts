@@ -126,6 +126,7 @@ class Tour extends Module {
     // Создаём элементы управления и взаимодействия для окна подсказки
     const hintNode: HTMLElement = Faze.Helpers.createElement('div', {}, {}, this._hintWrapperNode, 'faze-tour-hint');
     const btnCloseNode: HTMLButtonElement = Faze.Helpers.createElement('button', {}, {}, hintNode, 'faze-tour-hint-btn-close');
+    btnCloseNode.textContent = '×';
     const bodyNode: HTMLElement = Faze.Helpers.createElement('main', {}, {}, hintNode, 'faze-tour-hint-body');
     const footerNode: HTMLElement = Faze.Helpers.createElement('footer', {}, {}, hintNode, 'faze-tour-hint-footer');
     const btnPrevNode: HTMLButtonElement = Faze.Helpers.createElement('button', {}, {}, footerNode, 'faze-tour-hint-btn-prev');

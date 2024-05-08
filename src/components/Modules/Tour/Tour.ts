@@ -195,6 +195,18 @@ class Tour extends Module {
   protected bind(): void {
     this.bindNextButton();
     this.bindPrevButton();
+    this.bindCloseButton();
+  }
+
+  /**
+   * Навешивание событий на кнопку закрытия
+   *
+   * @private
+   */
+  private bindCloseButton(): void {
+    Faze.Events.click(this._hintData.btnCloseNode, () => {
+      this.close();
+    });
   }
 
   /**

@@ -183,6 +183,9 @@ class Tour extends Module {
       if (this._index >= this._stepsData.length - 1) {
         this._hintData.btnNextNode.textContent = 'Завершить';
       }
+
+      // Если это первый слайд, то скрываем кнопку "Назад"
+      this._hintData.btnPrevNode.classList.toggle('faze-hidden', this._index === 0);
     }
   }
 

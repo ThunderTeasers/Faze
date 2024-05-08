@@ -182,6 +182,8 @@ class Tour extends Module {
       // Если это последний слайд, меняем надпись
       if (this._index >= this._stepsData.length - 1) {
         this._hintData.btnNextNode.textContent = 'Завершить';
+      } else {
+        this._hintData.btnNextNode.textContent = 'Следующая';
       }
 
       // Если это первый слайд, то скрываем кнопку "Назад"

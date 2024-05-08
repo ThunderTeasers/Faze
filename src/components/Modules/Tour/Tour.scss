@@ -66,6 +66,11 @@
       background: none;
       border-radius: 0;
 
+      // Иконка
+      &:before {
+        content: '\00d7';
+      }
+
       // При наведении
       &:hover {
         cursor: pointer;

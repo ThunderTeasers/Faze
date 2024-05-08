@@ -100,7 +100,7 @@ class Tour extends Module {
     super.initialize();
 
     // Инициализируем переменные
-    this._index = 1;
+    this._index = 0;
 
     this.initializeSteps();
     this.buildHint();
@@ -191,6 +191,7 @@ class Tour extends Module {
    */
   protected bind(): void {
     this.bindNextButton();
+    this.bindPrevButton();
   }
 
   /**
@@ -203,6 +204,18 @@ class Tour extends Module {
         this.changeStep();
       } else {
         this.close();
+      }
+    });
+  }
+
+  /**
+   * Навешивание событий на переключение шага назад
+   */
+  private bindPrevButton(): void {
+    Faze.Events.click(this._hintData.btnPrevNode, () => {
+      if (this._index > 0) {
+        this._index--;
+        this.changeStep();
       }
     });
   }

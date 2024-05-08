@@ -5,6 +5,22 @@
  * Дата: 12.11.2018
  */
 
+:root {
+  // Цвета
+  --faze-color-primary: #2563eb;
+  --faze-color-primary-dark: #1d53c7;
+  --faze-color-white: #fff;
+  --faze-color-black: #000;
+  --faze-color-text: #424242;
+  --faze-color-hover: #e7e7e7;
+  --faze-color-base: #f4f4f4;
+  --faze-color-border: #bdbdbd;
+  --faze-color-overlay: rgba(33, 33, 33, 0.5);
+
+  // Границы
+  --faze-border-radius: 5px;
+}
+
 * {
   outline: none;
   box-sizing: border-box;

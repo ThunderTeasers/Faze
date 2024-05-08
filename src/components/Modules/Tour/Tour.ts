@@ -10,6 +10,7 @@
 
 import './Tour.scss';
 import Module from '../../Core/Module';
+import Faze from '../../Core/Faze';
 
 /**
  * Структура возвращаемого объекта в пользовательском методе
@@ -25,6 +26,15 @@ interface StepData {
   index: number;
   text: string;
   side: 'left' | 'right' | 'bottom' | 'top';
+  node: HTMLElement;
+}
+
+interface HintData {
+  node: HTMLElement;
+  btnCloseNode: HTMLButtonElement;
+  bodyNode: HTMLElement;
+  btnNextNode: HTMLButtonElement;
+  btnPrevNode: HTMLButtonElement;
 }
 
 /**
@@ -37,6 +47,7 @@ interface StepData {
  */
 interface Config {
   group: string;
+  padding: number;
   callbacks: {
     changed?: (activeTabData: CallbackData) => void;
   };
@@ -49,6 +60,15 @@ class Tour extends Module {
   // Данные шагов
   private _stepsData: StepData[];
 
+  // DOM элемент обертки подсказки
+  private _hintWrapperNode: HTMLDivElement;
+
+  // DOM элемент подсказки
+  private _hintData: HintData;
+
+  // Текущий шаг
+  private _index: number;
+
   /**
    * Стандартный конструктор
    *
@@ -59,6 +79,7 @@ class Tour extends Module {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       group: 'default',
+      padding: 10,
       callbacks: {
         changed: undefined,
       },
@@ -78,9 +99,49 @@ class Tour extends Module {
   protected initialize(): void {
     super.initialize();
 
-    this.initializeSteps();
+    // Инициализируем переменные
+    this._index = 1;
 
-    console.log(this._stepsData);
+    this.initializeSteps();
+    this.buildHint();
+
+    this.changeStep();
+  }
+
+  /**
+   * Закрытие подсказок
+   */
+  private close(): void {
+    // Удаляем всё, что связано с модулем
+    this._hintWrapperNode.remove();
+  }
+
+  /**
+   * Генерация HTML кода для подсказки
+   */
+  private buildHint(): void {
+    this._hintWrapperNode = document.createElement('div');
+    this._hintWrapperNode.className = 'faze-tour-hint-wrapper';
+
+    // Создаём элементы управления и взаимодействия для окна подсказки
+    const hintNode: HTMLElement = Faze.Helpers.createElement('div', {}, {}, this._hintWrapperNode, 'faze-tour-hint');
+    const btnCloseNode: HTMLButtonElement = Faze.Helpers.createElement('button', {}, {}, hintNode, 'faze-tour-hint-btn-close');
+    const bodyNode: HTMLElement = Faze.Helpers.createElement('main', {}, {}, hintNode, 'faze-tour-hint-body');
+    const footerNode: HTMLElement = Faze.Helpers.createElement('footer', {}, {}, hintNode, 'faze-tour-hint-footer');
+    const btnPrevNode: HTMLButtonElement = Faze.Helpers.createElement('button', {}, {}, footerNode, 'faze-tour-hint-btn-prev');
+    btnPrevNode.textContent = 'Предыдущая';
+    const btnNextNode: HTMLButtonElement = Faze.Helpers.createElement('button', {}, {}, footerNode, 'faze-tour-hint-btn-next');
+    btnNextNode.textContent = 'Следующая';
+    this._hintData = {
+      node: hintNode,
+      btnCloseNode,
+      bodyNode,
+      btnNextNode,
+      btnPrevNode,
+    };
+
+    // Добавляем всё на страницу
+    document.body.appendChild(this._hintWrapperNode);
   }
 
   /**
@@ -96,15 +157,55 @@ class Tour extends Module {
             index: parseInt(stepNode.dataset.fazeTourStepIndex || index.toString(), 10),
             text: stepNode.dataset.fazeTourStepText || '',
             side: stepNode.dataset.fazeTourStepSide || 'right',
+            node: stepNode,
           } as StepData)
       )
       .sort((stepA, stepB) => stepA.index - stepB.index);
   }
 
   /**
+   * Изменение текущего шага
+   */
+  private changeStep(): void {
+    const stepData = this._stepsData[this._index];
+    if (stepData) {
+      // Позицианируем подсвеченую область
+      this._hintWrapperNode.style.top = `${stepData.node.offsetTop - this.config.padding}px`;
+      this._hintWrapperNode.style.left = `${stepData.node.offsetLeft - this.config.padding}px`;
+      this._hintWrapperNode.style.width = `${stepData.node.offsetWidth + this.config.padding * 2}px`;
+      this._hintWrapperNode.style.height = `${stepData.node.offsetHeight + this.config.padding * 2}px`;
+
+      // Настраиваем подсказку
+      this._hintData.node.className = `faze-tour-hint faze-tour-hint-side-${stepData.side}`;
+      this._hintData.bodyNode.innerHTML = stepData.text;
+
+      // Если это последний слайд, меняем надпись
+      if (this._index >= this._stepsData.length - 1) {
+        this._hintData.btnNextNode.textContent = 'Завершить';
+      }
+    }
+  }
+
+  /**
    * Навешивание событий
    */
-  protected bind(): void {}
+  protected bind(): void {
+    this.bindNextButton();
+  }
+
+  /**
+   * Навешивание событий на переключение шага вперед
+   */
+  private bindNextButton(): void {
+    Faze.Events.click(this._hintData.btnNextNode, () => {
+      if (this._index < this._stepsData.length - 1) {
+        this._index++;
+        this.changeStep();
+      } else {
+        this.close();
+      }
+    });
+  }
 
   /**
    * Инициализация модуля по data атрибутам
@@ -114,6 +215,7 @@ class Tour extends Module {
   static initializeByDataAttributes(node: HTMLElement): void {
     new Tour(node, {
       group: node.dataset.fazeTourGroup,
+      padding: parseInt(node.dataset.fazeTourPadding || '10', 10),
     });
   }
 }

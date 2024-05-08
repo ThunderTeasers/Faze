@@ -142,5 +142,17 @@
       top: 0;
       left: calc(100% + 10px);
     }
+
+    // Подсказка сверху
+    &.faze-tour-hint-side-top {
+      left: 0;
+      bottom: calc(100% + 10px);
+    }
+
+    // Подсказка снизу
+    &.faze-tour-hint-side-bottom {
+      left: 0;
+      top: calc(100% + 10px);
+    }
   }
 }

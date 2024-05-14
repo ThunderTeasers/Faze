@@ -84,6 +84,8 @@
 
     // Подвал
     .faze-tour-hint-footer {
+      position: relative;
+
       display: flex;
       flex-direction: row;
       align-items: center;
@@ -127,6 +129,43 @@
           cursor: pointer;
 
           background: var(--faze-color-primary-dark);
+        }
+      }
+
+      // Пагинация
+      .faze-tour-pages {
+        position: absolute;
+        left: 50%;
+        bottom: 60px;
+
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+
+        transform: translateX(-50%);
+
+        // Страница
+        .faze-tour-page {
+          display: block;
+          width: 5px;
+          height: 5px;
+
+          background-color: var(--faze-color-hover);
+          border-radius: 3px;
+
+          transition: width 0.2s ease;
+
+          // Активный элемент
+          &.faze-active {
+            width: 15px;
+
+            background-color: var(--faze-color-border);
+          }
+
+          &:not(:last-child) {
+            margin-right: 4px;
+          }
         }
       }
     }

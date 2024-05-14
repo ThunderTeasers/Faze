@@ -35,6 +35,7 @@ interface HintData {
   bodyNode: HTMLElement;
   btnNextNode: HTMLButtonElement;
   btnPrevNode: HTMLButtonElement;
+  pagesNodes: HTMLDivElement[];
 }
 
 /**
@@ -42,12 +43,15 @@ interface HintData {
  *
  * Содержит:
  *   group - Группа
+ *   padding - Отступы подсказки
+ *   pages - Показывать пагинацию
  *   callbacks
  *     changed - пользовательская функция, исполняющаяся после изменения таба
  */
 interface Config {
   group: string;
   padding: number;
+  pages: boolean;
   callbacks: {
     changed?: (activeTabData: CallbackData) => void;
   };
@@ -79,6 +83,7 @@ class Tour extends Module {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       group: 'default',
+      pages: true,
       padding: 10,
       callbacks: {
         changed: undefined,
@@ -138,7 +143,17 @@ class Tour extends Module {
       bodyNode,
       btnNextNode,
       btnPrevNode,
+      pagesNodes: [],
     };
+
+    // Если есть пагинация
+    if (this.config.pages) {
+      const pagesNode: HTMLDivElement = Faze.Helpers.createElement('div', {}, {}, footerNode, 'faze-tour-pages');
+      this._stepsData.forEach(() => {
+        const pageNode: HTMLDivElement = Faze.Helpers.createElement('div', {}, {}, pagesNode, 'faze-tour-page');
+        this._hintData.pagesNodes?.push(pageNode);
+      });
+    }
 
     // Добавляем всё на страницу
     document.body.appendChild(this._hintWrapperNode);
@@ -161,6 +176,15 @@ class Tour extends Module {
           } as StepData)
       )
       .sort((stepA, stepB) => stepA.index - stepB.index);
+  }
+
+  /**
+   * Изменение пагинации
+   *
+   * @private
+   */
+  private changePagination(): void {
+    Faze.Helpers.activateItem(this._hintData.pagesNodes, this._index, 'faze-active');
   }
 
   /**
@@ -188,7 +212,24 @@ class Tour extends Module {
 
       // Если это первый слайд, то скрываем кнопку "Назад"
       this._hintData.btnPrevNode.classList.toggle('faze-hidden', this._index === 0);
+
+      // Проверка видимости подсказки на экране
+      this.checkHintVisibility();
+
+      // Если есть пагинация, изменяем её активный элемент
+      if (this.config.pages) {
+        this.changePagination();
+      }
     }
+  }
+
+  /**
+   * Проверка видимости подсказки на экране
+   */
+  private checkHintVisibility(): void {
+    // if (!Faze.Helpers.isElementInViewport(this._hintData.btnNextNode)) {
+    //   window.scrollTo(0, parseInt(this._hintWrapperNode.style.top, 10) - 50);
+    // }
   }
 
   /**
@@ -245,6 +286,7 @@ class Tour extends Module {
   static initializeByDataAttributes(node: HTMLElement): void {
     new Tour(node, {
       group: node.dataset.fazeTourGroup,
+      pages: (node.dataset.fazeTourPages || 'true') === 'true',
       padding: parseInt(node.dataset.fazeTourPadding || '10', 10),
     });
   }

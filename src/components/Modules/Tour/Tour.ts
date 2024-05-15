@@ -17,11 +17,15 @@ import Faze from '../../Core/Faze';
  *
  * Содержит:
  *   group - Группа
+ *   node - HTML элемент на который нужно ставить подсказку
+ *   step - данные шага
+ *   hint - данные подсказки
  */
 interface CallbackData {
   group: string;
   node: HTMLElement;
-  hintNode: HTMLElement;
+  step: StepData;
+  hind: HintData;
 }
 
 /**
@@ -76,7 +80,7 @@ interface Config {
   pages: boolean;
   steps: StepData[];
   callbacks: {
-    changed?: (activeTabData: CallbackData) => void;
+    changed?: (data: CallbackData) => void;
   };
 }
 
@@ -219,6 +223,20 @@ class Tour extends Module {
       // Если есть пагинация, изменяем её активный элемент
       if (this.config.pages) {
         this.changePagination();
+      }
+
+      // Выполнение пользовательской функции
+      if (typeof this.config.callbacks.changed === 'function') {
+        try {
+          this.config.callbacks.changed({
+            group: this.config.group,
+            node: this.node,
+            step,
+            hint: this._hintData,
+          });
+        } catch (error) {
+          this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+        }
       }
     }
   }

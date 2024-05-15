@@ -72,7 +72,9 @@ interface HintData {
  *   padding - Отступы подсказки
  *   pages - Показывать пагинацию
  *   callbacks
- *     changed - пользовательская функция, исполняющаяся после изменения таба
+ *     created - пользовательская функция, исполняющаяся после инициализации
+ *     changed - пользовательская функция, исполняющаяся после изменения шага
+ *     closed - пользовательская функция, исполняющаяся после закрытия
  */
 interface Config {
   group: string;
@@ -80,7 +82,9 @@ interface Config {
   pages: boolean;
   steps: StepData[];
   callbacks: {
+    created?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
+    closed?: (data: CallbackData) => void;
   };
 }
 
@@ -111,7 +115,9 @@ class Tour extends Module {
       padding: 10,
       steps: [],
       callbacks: {
+        created: undefined,
         changed: undefined,
+        closed: undefined,
       },
     };
 
@@ -129,6 +135,18 @@ class Tour extends Module {
   protected initialize(): void {
     super.initialize();
 
+    // Выполнение пользовательской функции
+    if (typeof this.config.callbacks.created === 'function') {
+      try {
+        this.config.callbacks.changed({
+          group: this.config.group,
+          node: this.node,
+        });
+      } catch (error) {
+        this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
+      }
+    }
+
     // Инициализируем переменные
     this._index = 0;
 
@@ -142,6 +160,18 @@ class Tour extends Module {
   private close(): void {
     // Удаляем всё, что связано с модулем
     this._hintWrapperNode.remove();
+
+    // Выполнение пользовательской функции
+    if (typeof this.config.callbacks.closed === 'function') {
+      try {
+        this.config.callbacks.changed({
+          group: this.config.group,
+          node: this.node,
+        });
+      } catch (error) {
+        this.logger.error(`Ошибка исполнения пользовательского метода "closed": ${error}`);
+      }
+    }
   }
 
   /**

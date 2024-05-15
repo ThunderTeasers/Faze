@@ -338,7 +338,11 @@ Faze.add({
           side: 'right',
         },
       ],
-      callbacks: {},
+      callbacks: {
+        changed: (data: any) => {
+          console.log(data);
+        },
+      },
     });
   },
 });

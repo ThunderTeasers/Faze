@@ -20,8 +20,19 @@ import Faze from '../../Core/Faze';
  */
 interface CallbackData {
   group: string;
+  node: HTMLElement;
+  hintNode: HTMLElement;
 }
 
+/**
+ * Структура объекта шага
+ *
+ * Содержит:
+ *   index - Индекс шага
+ *   text - Контент подсказки
+ *   side - Сторона где появляется подсказка
+ *   node - HTML элемент куда нужно поставить подсказку
+ */
 interface StepData {
   index: number;
   text: string;
@@ -29,6 +40,17 @@ interface StepData {
   node: HTMLElement;
 }
 
+/**
+ * Структура объекта подсказки
+ *
+ * Содержит:
+ *   node - HTML элемент подсказки
+ *   btnCloseNode - HTML элемент кнопки закрытия
+ *   bodyNode - HTML элемент тела
+ *   btnNextNode - HTML элемент кнопки "Следующая"
+ *   btnPrevNode - HTML элемент кнопки "Предыдущая"
+ *   pagesNodes - HTML элемент пагинации
+ */
 interface HintData {
   node: HTMLElement;
   btnCloseNode: HTMLButtonElement;
@@ -169,17 +191,17 @@ class Tour extends Module {
    * Изменение текущего шага
    */
   private changeStep(): void {
-    const stepData = this.config.steps[this._index];
-    if (stepData) {
+    const step = this.config.steps[this._index];
+    if (step) {
       // Позицианируем подсвеченую область
-      this._hintWrapperNode.style.top = `${stepData.node.offsetTop - this.config.padding}px`;
-      this._hintWrapperNode.style.left = `${stepData.node.offsetLeft - this.config.padding}px`;
-      this._hintWrapperNode.style.width = `${stepData.node.offsetWidth + this.config.padding * 2}px`;
-      this._hintWrapperNode.style.height = `${stepData.node.offsetHeight + this.config.padding * 2}px`;
+      this._hintWrapperNode.style.top = `${step.node.offsetTop - this.config.padding}px`;
+      this._hintWrapperNode.style.left = `${step.node.offsetLeft - this.config.padding}px`;
+      this._hintWrapperNode.style.width = `${step.node.offsetWidth + this.config.padding * 2}px`;
+      this._hintWrapperNode.style.height = `${step.node.offsetHeight + this.config.padding * 2}px`;
 
       // Настраиваем подсказку
-      this._hintData.node.className = `faze-tour-hint faze-tour-hint-side-${stepData.side || 'bottom'}`;
-      this._hintData.bodyNode.innerHTML = stepData.text;
+      this._hintData.node.className = `faze-tour-hint faze-tour-hint-side-${step.side || 'bottom'}`;
+      this._hintData.bodyNode.innerHTML = step.text;
 
       // Если это последний слайд, меняем надпись
       if (this._index >= this.config.steps.length - 1) {

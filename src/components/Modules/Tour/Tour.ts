@@ -249,7 +249,7 @@ class Tour extends Module {
     } else {
       this._hintWrapperNode.classList.add('faze-tour-hint-wrapper-float');
       this._hintWrapperNode.style.top = `${window.innerHeight / 2 - this._hintData.node.clientHeight / 2}px`;
-      this._hintWrapperNode.style.left = `${document.body.clientWidth / 2 - this._hintData.node.clientHeight / 2}px`;
+      this._hintWrapperNode.style.left = `${document.body.clientWidth / 2 - this._hintData.node.clientWidth / 2}px`;
     }
   }
 

@@ -25,7 +25,7 @@
   transition: all 0.2s;
 
   box-shadow: var(--faze-color-overlay) 0px 0px 0px 5000px;
-  border: 1px solid var(--faze-color-black);
+  border: 1px solid var(--faze-color-primary);
   border-radius: var(--faze-border-radius);
 
   // Подсказка
@@ -170,28 +170,78 @@
       }
     }
 
+    // Треугольник
+    &:before {
+      content: '';
+
+      position: absolute;
+
+      width: 0;
+      height: 0;
+    }
+
     // Подсказка слева
     &.faze-tour-hint-side-left {
       top: 0;
       right: calc(100% + 10px);
+
+      // Треугольник
+      &:before {
+        top: 10px;
+        right: -5px;
+
+        border-top: 5px solid transparent;
+        border-left: 5px solid var(--faze-color-white);
+        border-bottom: 5px solid transparent;
+      }
     }
 
     // Подсказка справа
     &.faze-tour-hint-side-right {
       top: 0;
       left: calc(100% + 10px);
+
+      // Треугольник
+      &:before {
+        top: 10px;
+        left: -5px;
+
+        border-top: 5px solid transparent;
+        border-right: 5px solid var(--faze-color-white);
+        border-bottom: 5px solid transparent;
+      }
     }
 
     // Подсказка сверху
     &.faze-tour-hint-side-top {
       left: 0;
       bottom: calc(100% + 10px);
+
+      // Треугольник
+      &:before {
+        left: 10px;
+        bottom: -5px;
+
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid var(--faze-color-white);
+      }
     }
 
     // Подсказка снизу
     &.faze-tour-hint-side-bottom {
       left: 0;
       top: calc(100% + 10px);
+
+      // Треугольник
+      &:before {
+        left: 10px;
+        top: -5px;
+
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 5px solid var(--faze-color-white);
+      }
     }
   }
 }

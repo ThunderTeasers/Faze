@@ -325,6 +325,24 @@ Faze.add({
   },
 });
 
+// Тест Faze.Drag
+Faze.add({
+  pluginName: 'Faze.Tour Test',
+  condition: document.querySelectorAll('.js-tour').length > 0,
+  callback: () => {
+    new Faze.Tour(document.querySelector('.js-tour'), {
+      steps: [
+        {
+          text: '123',
+          node: document.querySelector('.step1'),
+          side: 'right',
+        },
+      ],
+      callbacks: {},
+    });
+  },
+});
+
 // Тест Faze.SmartSelect
 Faze.add({
   pluginName: 'Faze.SmartSelect Test',

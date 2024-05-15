@@ -52,6 +52,7 @@ interface Config {
   group: string;
   padding: number;
   pages: boolean;
+  steps: StepData[];
   callbacks: {
     changed?: (activeTabData: CallbackData) => void;
   };
@@ -61,9 +62,6 @@ interface Config {
  * Класс табов
  */
 class Tour extends Module {
-  // Данные шагов
-  private _stepsData: StepData[];
-
   // DOM элемент обертки подсказки
   private _hintWrapperNode: HTMLDivElement;
 
@@ -85,6 +83,7 @@ class Tour extends Module {
       group: 'default',
       pages: true,
       padding: 10,
+      steps: [],
       callbacks: {
         changed: undefined,
       },
@@ -107,9 +106,7 @@ class Tour extends Module {
     // Инициализируем переменные
     this._index = 0;
 
-    this.initializeSteps();
     this.buildHint();
-
     this.changeStep();
   }
 
@@ -149,7 +146,7 @@ class Tour extends Module {
     // Если есть пагинация
     if (this.config.pages) {
       const pagesNode: HTMLDivElement = Faze.Helpers.createElement('div', {}, {}, footerNode, 'faze-tour-pages');
-      this._stepsData.forEach(() => {
+      this.config.steps.forEach(() => {
         const pageNode: HTMLDivElement = Faze.Helpers.createElement('div', {}, {}, pagesNode, 'faze-tour-page');
         this._hintData.pagesNodes?.push(pageNode);
       });
@@ -157,25 +154,6 @@ class Tour extends Module {
 
     // Добавляем всё на страницу
     document.body.appendChild(this._hintWrapperNode);
-  }
-
-  /**
-   * Инициализация шагов тура для дальнейшей работы
-   *
-   * @private
-   */
-  private initializeSteps(): void {
-    this._stepsData = Array.from(this.node.querySelectorAll<HTMLElement>(`[data-faze-tour-step="${this.config.group}"]`))
-      .map(
-        (stepNode, index) =>
-          ({
-            index: parseInt(stepNode.dataset.fazeTourStepIndex || index.toString(), 10),
-            text: stepNode.dataset.fazeTourStepText || '',
-            side: stepNode.dataset.fazeTourStepSide || 'right',
-            node: stepNode,
-          } as StepData)
-      )
-      .sort((stepA, stepB) => stepA.index - stepB.index);
   }
 
   /**
@@ -191,7 +169,7 @@ class Tour extends Module {
    * Изменение текущего шага
    */
   private changeStep(): void {
-    const stepData = this._stepsData[this._index];
+    const stepData = this.config.steps[this._index];
     if (stepData) {
       // Позицианируем подсвеченую область
       this._hintWrapperNode.style.top = `${stepData.node.offsetTop - this.config.padding}px`;
@@ -200,11 +178,11 @@ class Tour extends Module {
       this._hintWrapperNode.style.height = `${stepData.node.offsetHeight + this.config.padding * 2}px`;
 
       // Настраиваем подсказку
-      this._hintData.node.className = `faze-tour-hint faze-tour-hint-side-${stepData.side}`;
+      this._hintData.node.className = `faze-tour-hint faze-tour-hint-side-${stepData.side || 'bottom'}`;
       this._hintData.bodyNode.innerHTML = stepData.text;
 
       // Если это последний слайд, меняем надпись
-      if (this._index >= this._stepsData.length - 1) {
+      if (this._index >= this.config.steps.length - 1) {
         this._hintData.btnNextNode.textContent = 'Завершить';
       } else {
         this._hintData.btnNextNode.textContent = 'Следующая';
@@ -257,7 +235,7 @@ class Tour extends Module {
    */
   private bindNextButton(): void {
     Faze.Events.click(this._hintData.btnNextNode, () => {
-      if (this._index < this._stepsData.length - 1) {
+      if (this._index < this.config.steps.length - 1) {
         this._index++;
         this.changeStep();
       } else {
@@ -284,8 +262,25 @@ class Tour extends Module {
    * @param node - DOM элемент на который нужно инициализировать плагин
    */
   static initializeByDataAttributes(node: HTMLElement): void {
+    // Группа
+    const group: string = node.dataset.fazeTourGroup || 'default';
+
+    // Шаги
+    const steps: StepData[] = Array.from(node.querySelectorAll<HTMLElement>(`[data-faze-tour-step="${group}"]`))
+      .map(
+        (stepNode, index) =>
+          ({
+            index: parseInt(stepNode.dataset.fazeTourStepIndex || index.toString(), 10),
+            text: stepNode.dataset.fazeTourStepText || '',
+            side: stepNode.dataset.fazeTourStepSide || 'right',
+            node: stepNode,
+          } as StepData)
+      )
+      .sort((stepA, stepB) => stepA.index - stepB.index);
+
     new Tour(node, {
-      group: node.dataset.fazeTourGroup,
+      group,
+      steps,
       pages: (node.dataset.fazeTourPages || 'true') === 'true',
       padding: parseInt(node.dataset.fazeTourPadding || '10', 10),
     });

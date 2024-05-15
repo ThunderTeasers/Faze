@@ -116,6 +116,10 @@ module.exports = (env) => {
         template: './src/tests/views/tour.html',
       }),
       new HtmlWebpackPlugin({
+        filename: 'tour_js.html',
+        template: './src/tests/views/tour_js.html',
+      }),
+      new HtmlWebpackPlugin({
         template: './src/index.html',
       }),
       new webpack.HotModuleReplacementPlugin(),

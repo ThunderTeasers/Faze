@@ -333,6 +333,10 @@ Faze.add({
     new Faze.Tour(document.querySelector('.js-tour'), {
       steps: [
         {
+          title: 'Название',
+          text: 'Окно',
+        },
+        {
           text: '123',
           node: document.querySelector('.step1'),
           side: 'right',

@@ -103,7 +103,13 @@ abstract class Module {
    *
    * @protected
    */
-  protected bind(): void {}
+  protected bind(): void {
+    window.addEventListener('resize', () => {
+      this.resize();
+    });
+  }
+
+  protected resize(): void {}
 
   /**
    * Инициализация модуля по data атрибутам

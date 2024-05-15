@@ -77,8 +77,18 @@
       }
     }
 
+    // Шапка
+    .faze-tour-hint-header {
+      font-weight: bold;
+
+      // Отступы если есть контент
+      &:not(:empty) {
+        padding: 20px 20px 0;
+      }
+    }
+
     // Тело
-    .faze-tour-hint-body {
+    .faze-tour-hint-main {
       padding: 20px 20px 20px;
     }
 
@@ -243,5 +253,10 @@
         border-bottom: 5px solid var(--faze-color-white);
       }
     }
+  }
+
+  // Окно по центру
+  &.faze-tour-hint-wrapper-float {
+    border: none;
   }
 }

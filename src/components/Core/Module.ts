@@ -104,9 +104,11 @@ abstract class Module {
    * @protected
    */
   protected bind(): void {
-    window.addEventListener('resize', () => {
-      this.resize();
-    });
+    if (typeof this.resize === 'function') {
+      window.addEventListener('resize', () => {
+        this.resize();
+      });
+    }
   }
 
   protected resize(): void {}

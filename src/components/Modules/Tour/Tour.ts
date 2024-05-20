@@ -307,9 +307,17 @@ class Tour extends Module {
    * Проверка видимости подсказки на экране
    */
   private checkHintVisibility(): void {
-    // if (!Faze.Helpers.isElementInViewport(this._hintData.btnNextNode)) {
-    //   window.scrollTo(0, parseInt(this._hintWrapperNode.style.top, 10) - 50);
-    // }
+    console.log(this._hintWrapperNode, this._hintWrapperNode.style.top);
+
+    setTimeout(() => {
+      if (!Faze.Helpers.isElementInViewport(this._hintWrapperNode, 0, true)) {
+        window.scrollTo({
+          top: parseInt(this._hintWrapperNode.style.top, 10) - 200,
+          left: 0,
+          behavior: 'smooth',
+        });
+      }
+    }, 500);
   }
 
   /**
@@ -323,6 +331,9 @@ class Tour extends Module {
     this.bindCloseButton();
   }
 
+  /**
+   * Ресайз окна
+   */
   protected resize(): void {
     this.updatePosition();
   }

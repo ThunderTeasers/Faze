@@ -1294,19 +1294,17 @@ class Helpers {
   /**
    * Проверка, находится ли элемент во вьюпорте
    *
-   * @param node{HTMLElement} - DOM элемент который проверяем
-   * @param offset{number} - дополнительный запас
-   * @param enableWhenOnTop{boolean} - возвращаеть "true" если элемент выше вьюпорта
+   * @param {HTMLElement} node - DOM элемент который проверяем
+   * @param {number} offset - дополнительный запас
+   * @param {boolean} enableWhenOnTop - возвращаеть "true" если элемент выше вьюпорта
    *
-   * @return{boolean} - true если элемент находится во вьюпорте
+   * @return {boolean} - true если элемент находится во вьюпорте
    */
   static isElementInViewport(node: HTMLElement, offset: number = 0, enableWhenOnTop: boolean = false): boolean {
-    const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-    const windowWidth = window.innerWidth || document.documentElement.clientWidth;
-    const rect = node.getBoundingClientRect();
+    const rect: DOMRect = node.getBoundingClientRect();
 
-    const vertInView = rect.top - offset <= windowHeight && (enableWhenOnTop ? true : rect.top + rect.height >= 0);
-    const horInView = rect.left - offset <= windowWidth && (enableWhenOnTop ? true : rect.left + rect.width >= 0);
+    const vertInView = rect.top + window.scrollY + offset >= window.scrollY && rect.top + window.scrollY + offset <= window.scrollY + window.innerHeight;
+    const horInView = rect.left + window.scrollX + offset >= window.scrollX && rect.left + window.scrollX + offset <= window.scrollX + window.innerWidth;
 
     return vertInView && horInView;
   }

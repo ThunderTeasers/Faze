@@ -307,8 +307,6 @@ class Tour extends Module {
    * Проверка видимости подсказки на экране
    */
   private checkHintVisibility(): void {
-    console.log(this._hintWrapperNode, this._hintWrapperNode.style.top);
-
     setTimeout(() => {
       if (!Faze.Helpers.isElementInViewport(this._hintWrapperNode, 0, true)) {
         window.scrollTo({

@@ -174,14 +174,8 @@ class Steps {
         this.lockButton(bodyNode);
 
         // Проходимся по всем полям ввода
-        inputsNodes.forEach((inputNode: HTMLInputElement) => {
-          // Навешиваем события на изменения
-          inputNode.addEventListener('keyup', () => {
-            this.bindCheckSteps(bodyNode, inputsNodes);
-          });
-          inputNode.addEventListener('change', () => {
-            this.bindCheckSteps(bodyNode, inputsNodes);
-          });
+        Faze.Events.listener(['keyup', 'change'], inputsNodes, () => {
+          this.bindCheckSteps(bodyNode, inputsNodes);
         });
       }
     });
@@ -366,6 +360,11 @@ class Steps {
     const parentNode: HTMLElement | Document = inputsNodes[0].closest<HTMLElement>('.faze-steps-body') || document;
 
     inputsNodes.forEach((inputNode) => {
+      // Проверка, чтобы исключить невидимые элементы
+      if (!Faze.Helpers.isElementVisible(inputNode)) {
+        return;
+      }
+
       // Проверка, является ли инпут чекбоксом
       const isCheckboxChecked = inputNode.type === 'checkbox' ? Helpers.isCheckboxChecked(inputNode.name, parentNode) : true;
 

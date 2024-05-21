@@ -220,7 +220,9 @@ class Steps {
 
         // Проверка на валидность инпутов на шаге
         bodyNode.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('input:not([type="checkbox"]):not([type="radio"]), textarea, select').forEach((inputNode: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => {
-          isValid = inputNode.reportValidity();
+          if (Faze.Helpers.isElementVisible(inputNode)) {
+            isValid = inputNode.reportValidity();
+          }
         });
 
         // Если шаг валиден, идем дальше

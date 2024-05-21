@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Тестирование модуля Steps</title>
+  </head>
+  <body>
+    <div class="faze-steps" data-faze="steps">
+      <div class="faze-steps-headers">
+        <div class="faze-steps-header">1</div>
+        <div class="faze-steps-header">2</div>
+        <div class="faze-steps-header">3</div>
+      </div>
+      <div class="faze-steps-bodies">
+        <div class="faze-steps-body">
+          Вы хотите продолжить?<br />
+          <label>
+            <input type="radio" name="test" data-faze-steps-path="test1" required />
+            Путь 1
+          </label>
+          <label>
+            <input type="radio" name="test" data-faze-steps-path="test2" required />
+            Путь 2
+          </label>
+          <button class="faze-steps-next">Да.</button>
+        </div>
+        <div class="faze-steps-body">
+          <div class="faze-steps-path" data-faze-steps-path="test1">111</div>
+          <div class="faze-steps-path" data-faze-steps-path="test2">222</div>
+
+          <button class="faze-steps-next">Да!</button>
+          <button class="faze-steps-back">Назад!</button>
+          <button class="faze-steps-finish">Завершить!</button>
+        </div>
+        <div class="faze-steps-body">
+          Точно точно?<br />
+          <button class="faze-steps-finish">Завершить.</button>
+        </div>
+        <div class="faze-steps-body faze-steps-body-finish">Готово!</div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -14,6 +14,7 @@
 
     border-bottom: 0.1rem solid #000;
 
+    // Заголовок
     .faze-steps-header {
       padding: 1rem;
 
@@ -22,6 +23,7 @@
 
       user-select: none;
 
+      // Активный элемент
       &.faze-active {
         background-color: #efefef;
       }
@@ -35,6 +37,17 @@
 
       padding-top: 1rem;
 
+      // По умолчанию скрываем все пути
+      .faze-steps-path {
+        display: none;
+
+        // Если путь выбран, то показываем его
+        &.faze-steps-path-selected {
+          display: block;
+        }
+      }
+
+      // Активный элемент
       &.faze-active {
         display: block;
       }

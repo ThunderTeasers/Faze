@@ -16,11 +16,24 @@ import Helpers from '../../Helpers/Helpers';
  * Структура возвращаемого объекта в пользовательском методе
  *
  * Содержит:
+ *   index - номер шага
  *   bodyNode - DOM элемент тела ступени
  */
 interface CallbackData {
   bodyNode: HTMLElement | null;
   index: number;
+}
+
+/**
+ * Структура возвращаемого объекта в пользовательском методе
+ *
+ * Содержит:
+ *   index - номер шага
+ *   paths - выбранные пути
+ */
+interface StepData {
+  index: number;
+  paths: string[];
 }
 
 /**
@@ -63,6 +76,9 @@ class Steps {
   // DOM элемент тел шагов
   readonly bodiesNodes: NodeListOf<HTMLElement>;
 
+  // Выбранные пути
+  readonly stepsData: StepData[];
+
   // Индекс текущего шага
   currentStepIndex: number;
 
@@ -101,6 +117,7 @@ class Steps {
     this.bodiesNodes = node.querySelectorAll('.faze-steps-body');
 
     this.currentStepIndex = 0;
+    this.stepsData = [];
 
     this.initialize();
     this.bind();
@@ -203,30 +220,60 @@ class Steps {
    */
   private bindButtonsNext(): void {
     this.bodiesNodes.forEach((bodyNode) => {
-      bodyNode.querySelectorAll('.faze-steps-next').forEach((buttonNextNode) => {
-        buttonNextNode.addEventListener('click', (event) => {
-          event.preventDefault();
+      Faze.Events.click(bodyNode.querySelectorAll('.faze-steps-next'), () => {
+        // Валиден ли шаг
+        let isValid = true;
 
-          // Валиден ли шаг
-          let isValid = true;
-
-          // Проверка на валидность инпутов на шаге
-          bodyNode.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('input:not([type="checkbox"]):not([type="radio"]), textarea, select').forEach((inputNode: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => {
-            isValid = inputNode.reportValidity();
-          });
-
-          // Если шаг валиден, идем дальше
-          if (isValid) {
-            this.currentStepIndex += 1;
-            if (this.currentStepIndex > this.bodiesNodes.length) {
-              this.currentStepIndex = this.bodiesNodes.length;
-            }
-
-            this.activateStep(this.currentStepIndex);
-          }
+        // Проверка на валидность инпутов на шаге
+        bodyNode.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('input:not([type="checkbox"]):not([type="radio"]), textarea, select').forEach((inputNode: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => {
+          isValid = inputNode.reportValidity();
         });
+
+        // Если шаг валиден, идем дальше
+        if (isValid) {
+          this.collectData(bodyNode);
+
+          this.currentStepIndex += 1;
+          if (this.currentStepIndex > this.bodiesNodes.length) {
+            this.currentStepIndex = this.bodiesNodes.length;
+          }
+
+          this.activateStep(this.currentStepIndex);
+        }
       });
     });
+  }
+
+  /**
+   * Сбор данных
+   *
+   * @param {HTMLElement} bodyNode DOM элемент тела текущего шага
+   *
+   * @private
+   */
+  private collectData(bodyNode: HTMLElement): void {
+    const stepData: StepData = {
+      index: this.currentStepIndex,
+      paths: this.collectPaths(bodyNode),
+    };
+
+    // Если такой шаг уже был, то перезаписываем данные, если нет, то пушим новые
+    if (this.stepsData[this.currentStepIndex]) {
+      this.stepsData[this.currentStepIndex] = stepData;
+    } else {
+      this.stepsData.push(stepData);
+    }
+  }
+
+  /**
+   * Сбор выбранных путей в шаге
+   *
+   * @param {HTMLElement} bodyNode DOM элемент тела текущего шага
+   *
+   * @private
+   */
+  private collectPaths(bodyNode: HTMLElement): string[] {
+    return Array.from(bodyNode.querySelectorAll<HTMLInputElement>('input[type="radio"][data-faze-steps-path]:checked')).map((inputNode) => inputNode.dataset.fazeStepsPath || '');
   }
 
   /**
@@ -372,6 +419,9 @@ class Steps {
       bodyNode.classList.toggle('faze-active', bodyIndex === index);
     });
 
+    // Активания выбранных ранее путей
+    this.activatePaths(this.bodiesNodes[index]);
+
     // Вызываем пользовательский метод
     if (typeof this.config.callbacks.changed === 'function' && index !== 0) {
       try {
@@ -383,6 +433,23 @@ class Steps {
         console.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
       }
     }
+  }
+
+  /**
+   * Активания выбранных ранее путей
+   *
+   * @param {HTMLElement} bodyNode DOM элемент тела текущего шага
+   *
+   * @private
+   */
+  private activatePaths(bodyNode: HTMLElement): void {
+    this.stepsData.forEach((stepData: StepData) => {
+      stepData.paths.forEach((path: string) => {
+        bodyNode.querySelectorAll<HTMLElement>('.faze-steps-path[data-faze-steps-path]').forEach((foundNode: HTMLElement) => {
+          foundNode.classList.toggle('faze-steps-path-selected', foundNode.dataset.fazeStepsPath === path);
+        });
+      });
+    });
   }
 
   /**

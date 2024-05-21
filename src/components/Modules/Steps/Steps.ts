@@ -277,17 +277,13 @@ class Steps {
    */
   private bindButtonsBack(): void {
     this.bodiesNodes.forEach((bodyNode) => {
-      bodyNode.querySelectorAll('.faze-steps-back').forEach((buttonBackNode) => {
-        buttonBackNode.addEventListener('click', (event) => {
-          event.preventDefault();
+      Faze.Events.click(bodyNode.querySelectorAll('.faze-steps-back'), () => {
+        this.currentStepIndex -= 1;
+        if (this.currentStepIndex < 0) {
+          this.currentStepIndex = 0;
+        }
 
-          this.currentStepIndex -= 1;
-          if (this.currentStepIndex < 0) {
-            this.currentStepIndex = 0;
-          }
-
-          this.activateStep(this.currentStepIndex);
-        });
+        this.activateStep(this.currentStepIndex);
       });
     });
   }

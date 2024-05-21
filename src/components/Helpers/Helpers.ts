@@ -1292,11 +1292,28 @@ class Helpers {
   }
 
   /**
+   * Проверка, видимый ли элемент
+   *
+   * @param {HTMLElement} node DOM элемент который проверяем
+   */
+  static isElementVisible(node: HTMLElement): boolean {
+    if (window.getComputedStyle(node).display === 'none') {
+      return false;
+    } else {
+      if (node.parentNode && node !== document.body) {
+        return this.isElementVisible(node.parentNode as HTMLElement);
+      } else {
+        return true;
+      }
+    }
+  }
+
+  /**
    * Проверка, находится ли элемент во вьюпорте
    *
-   * @param {HTMLElement} node - DOM элемент который проверяем
-   * @param {number} offset - дополнительный запас
-   * @param {boolean} enableWhenOnTop - возвращаеть "true" если элемент выше вьюпорта
+   * @param {HTMLElement} node DOM элемент который проверяем
+   * @param {number} offset Дополнительный запас
+   * @param {boolean} enableWhenOnTop Возвращаеть "true" если элемент выше вьюпорта
    *
    * @return {boolean} - true если элемент находится во вьюпорте
    */

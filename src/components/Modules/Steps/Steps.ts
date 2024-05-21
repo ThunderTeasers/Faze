@@ -295,49 +295,45 @@ class Steps {
    */
   private bindButtonsExit(): void {
     this.bodiesNodes.forEach((bodyNode) => {
-      bodyNode.querySelectorAll('.faze-steps-finish').forEach((buttonFinishNode) => {
-        buttonFinishNode.addEventListener('click', (event) => {
-          event.preventDefault();
-
-          // Вызываем пользовательский метод
-          if (typeof this.config.callbacks.beforeFinished === 'function') {
-            try {
-              this.config.callbacks.beforeFinished({
-                bodyNode: this.bodiesNodes[0],
-                index: this.currentStepIndex,
-              });
-            } catch (error) {
-              this.logger.error(`Ошибка исполнения пользовательского метода "beforeFinished": ${error}`);
-            }
+      Faze.Events.click(bodyNode.querySelectorAll('.faze-steps-finish'), () => {
+        // Вызываем пользовательский метод
+        if (typeof this.config.callbacks.beforeFinished === 'function') {
+          try {
+            this.config.callbacks.beforeFinished({
+              bodyNode: this.bodiesNodes[0],
+              index: this.currentStepIndex,
+            });
+          } catch (error) {
+            this.logger.error(`Ошибка исполнения пользовательского метода "beforeFinished": ${error}`);
           }
+        }
 
-          this.currentStepIndex += 1;
-          this.activateStep(this.bodiesNodes.length - 1);
+        this.currentStepIndex += 1;
+        this.activateStep(this.bodiesNodes.length - 1);
 
-          // Вызываем пользовательский метод
-          if (typeof this.config.callbacks.finished === 'function') {
-            try {
-              this.config.callbacks.finished({
-                bodyNode: this.bodiesNodes[0],
-                index: this.currentStepIndex,
-              });
-            } catch (error) {
-              this.logger.error(`Ошибка исполнения пользовательского метода "finished": ${error}`);
-            }
+        // Вызываем пользовательский метод
+        if (typeof this.config.callbacks.finished === 'function') {
+          try {
+            this.config.callbacks.finished({
+              bodyNode: this.bodiesNodes[0],
+              index: this.currentStepIndex,
+            });
+          } catch (error) {
+            this.logger.error(`Ошибка исполнения пользовательского метода "finished": ${error}`);
           }
+        }
 
-          // Вызываем пользовательский метод
-          if (typeof this.config.callbacks.afterFinished === 'function') {
-            try {
-              this.config.callbacks.afterFinished({
-                bodyNode: this.bodiesNodes[0],
-                index: this.currentStepIndex,
-              });
-            } catch (error) {
-              this.logger.error(`Ошибка исполнения пользовательского метода "afterFinished": ${error}`);
-            }
+        // Вызываем пользовательский метод
+        if (typeof this.config.callbacks.afterFinished === 'function') {
+          try {
+            this.config.callbacks.afterFinished({
+              bodyNode: this.bodiesNodes[0],
+              index: this.currentStepIndex,
+            });
+          } catch (error) {
+            this.logger.error(`Ошибка исполнения пользовательского метода "afterFinished": ${error}`);
           }
-        });
+        }
       });
     });
   }

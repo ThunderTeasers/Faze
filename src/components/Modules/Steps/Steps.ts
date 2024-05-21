@@ -166,7 +166,7 @@ class Steps {
     // Проходимся по всем шагам
     this.bodiesNodes.forEach((bodyNode: HTMLElement) => {
       // DOM элементы полей ввода
-      const inputsNodes: NodeListOf<HTMLInputElement> = bodyNode.querySelectorAll<HTMLInputElement>('input[required], select[required] textarea[required]');
+      const inputsNodes: NodeListOf<HTMLInputElement> = bodyNode.querySelectorAll<HTMLInputElement>('input[required], select[required], textarea[required]');
 
       // Если если поля, то блокируем кнопки перехода
       if (inputsNodes.length > 0) {

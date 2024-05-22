@@ -21,6 +21,7 @@ import Helpers from '../../Helpers/Helpers';
  */
 interface CallbackData {
   bodyNode: HTMLElement | null;
+  data: { [key: string]: string };
   index: number;
 }
 
@@ -78,6 +79,9 @@ class Steps {
 
   // Выбранные пути
   readonly stepsData: StepData[];
+
+  // Выбранные ответы
+  data: { [key: string]: string };
 
   // Индекс текущего шага
   currentStepIndex: number;
@@ -139,6 +143,7 @@ class Steps {
         this.config.callbacks.created({
           bodyNode: this.bodiesNodes[0],
           index: this.currentStepIndex,
+          data: this.data,
         });
       } catch (error) {
         this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
@@ -304,6 +309,7 @@ class Steps {
             this.config.callbacks.beforeFinished({
               bodyNode: this.bodiesNodes[0],
               index: this.currentStepIndex,
+              data: this.data,
             });
           } catch (error) {
             this.logger.error(`Ошибка исполнения пользовательского метода "beforeFinished": ${error}`);
@@ -319,6 +325,7 @@ class Steps {
             this.config.callbacks.finished({
               bodyNode: this.bodiesNodes[0],
               index: this.currentStepIndex,
+              data: this.data,
             });
           } catch (error) {
             this.logger.error(`Ошибка исполнения пользовательского метода "finished": ${error}`);
@@ -331,6 +338,7 @@ class Steps {
             this.config.callbacks.afterFinished({
               bodyNode: this.bodiesNodes[0],
               index: this.currentStepIndex,
+              data: this.data,
             });
           } catch (error) {
             this.logger.error(`Ошибка исполнения пользовательского метода "afterFinished": ${error}`);
@@ -421,6 +429,7 @@ class Steps {
         this.config.callbacks.changed({
           bodyNode: this.bodiesNodes[index],
           index: this.currentStepIndex,
+          data: this.data,
         });
       } catch (error) {
         console.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);

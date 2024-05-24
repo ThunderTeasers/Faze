@@ -21,7 +21,7 @@ import Helpers from '../../Helpers/Helpers';
  */
 interface CallbackData {
   bodyNode: HTMLElement | null;
-  data: { [key: string]: string }[];
+  data: StepData[];
   index: number;
 }
 
@@ -80,9 +80,6 @@ class Steps {
 
   // Выбранные пути
   readonly stepsData: StepData[];
-
-  // Выбранные ответы
-  data: { [key: string]: string }[];
 
   // Индекс текущего шага
   currentStepIndex: number;
@@ -144,7 +141,7 @@ class Steps {
         this.config.callbacks.created({
           bodyNode: this.bodiesNodes[0],
           index: this.currentStepIndex,
-          data: this.data,
+          data: this.stepsData,
         });
       } catch (error) {
         this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
@@ -254,6 +251,7 @@ class Steps {
    * @private
    */
   private collect(bodyNode: HTMLElement): void {
+    // Собираем данные шага
     const stepData: StepData = {
       index: this.currentStepIndex,
       paths: this.collectPaths(bodyNode),
@@ -279,12 +277,10 @@ class Steps {
     // DOM элемент у которого собираем данные
     const stepNode = bodyNode.querySelector('.faze-steps-path.faze-steps-path-selected') || bodyNode;
 
-    const data = Array.from(stepNode.querySelectorAll<HTMLInputElement>('input[type="text"], input[type="email"], input[type="tel"], input[type="password"], select, textarea, input[type="checkbox"]:checked, input[type="radio"]:checked')).map((inputNode) => ({
+    return Array.from(stepNode.querySelectorAll<HTMLInputElement>('input[type="text"], input[type="email"], input[type="tel"], input[type="password"], select, textarea, input[type="checkbox"]:checked, input[type="radio"]:checked')).map((inputNode) => ({
       name: inputNode.dataset.fazeStepsDataName || inputNode.name,
       value: inputNode.value,
     }));
-
-    return data;
   }
 
   /**
@@ -330,7 +326,7 @@ class Steps {
             this.config.callbacks.beforeFinished({
               bodyNode: this.bodiesNodes[0],
               index: this.currentStepIndex,
-              data: this.data,
+              data: this.stepsData,
             });
           } catch (error) {
             this.logger.error(`Ошибка исполнения пользовательского метода "beforeFinished": ${error}`);
@@ -346,7 +342,7 @@ class Steps {
             this.config.callbacks.finished({
               bodyNode: this.bodiesNodes[0],
               index: this.currentStepIndex,
-              data: this.data,
+              data: this.stepsData,
             });
           } catch (error) {
             this.logger.error(`Ошибка исполнения пользовательского метода "finished": ${error}`);
@@ -359,7 +355,7 @@ class Steps {
             this.config.callbacks.afterFinished({
               bodyNode: this.bodiesNodes[0],
               index: this.currentStepIndex,
-              data: this.data,
+              data: this.stepsData,
             });
           } catch (error) {
             this.logger.error(`Ошибка исполнения пользовательского метода "afterFinished": ${error}`);
@@ -450,7 +446,7 @@ class Steps {
         this.config.callbacks.changed({
           bodyNode: this.bodiesNodes[index],
           index: this.currentStepIndex,
-          data: this.data,
+          data: this.stepsData,
         });
       } catch (error) {
         console.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);

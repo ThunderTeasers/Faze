@@ -325,7 +325,7 @@ Faze.add({
   },
 });
 
-// Тест Faze.Drag
+// Тест Faze.Tour
 Faze.add({
   pluginName: 'Faze.Tour Test',
   condition: document.querySelectorAll('.js-tour').length > 0,
@@ -342,6 +342,21 @@ Faze.add({
           side: 'right',
         },
       ],
+      callbacks: {
+        changed: (data: any) => {
+          console.log(data);
+        },
+      },
+    });
+  },
+});
+
+// Тест Faze.Steps
+Faze.add({
+  pluginName: 'Faze.Tour Steps',
+  condition: document.querySelectorAll('.js-steps').length > 0,
+  callback: () => {
+    new Faze.Steps(document.querySelector('.js-steps'), {
       callbacks: {
         changed: (data: any) => {
           console.log(data);

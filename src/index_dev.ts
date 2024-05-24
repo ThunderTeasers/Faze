@@ -358,7 +358,7 @@ Faze.add({
   callback: () => {
     new Faze.Steps(document.querySelector('.js-steps'), {
       callbacks: {
-        changed: (data: any) => {
+        finished: (data: any) => {
           console.log(data);
         },
       },

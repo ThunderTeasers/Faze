@@ -35,7 +35,7 @@ interface CallbackData {
 interface StepData {
   index: number;
   paths: string[];
-  data: { [key: string]: string }[];
+  params: { [key: string]: string }[];
 }
 
 /**
@@ -255,7 +255,7 @@ class Steps {
     const stepData: StepData = {
       index: this.currentStepIndex,
       paths: this.collectPaths(bodyNode),
-      data: this.collectData(bodyNode),
+      params: this.collectData(bodyNode),
     };
 
     // Если такой шаг уже был, то перезаписываем данные, если нет, то пушим новые
@@ -333,6 +333,7 @@ class Steps {
           }
         }
 
+        this.collect(bodyNode);
         this.currentStepIndex += 1;
         this.activateStep(this.bodiesNodes.length - 1);
 

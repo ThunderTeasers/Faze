@@ -21,7 +21,7 @@ import Helpers from '../../Helpers/Helpers';
  */
 interface CallbackData {
   bodyNode: HTMLElement | null;
-  data: { [key: string]: string };
+  data: { [key: string]: string }[];
   index: number;
 }
 
@@ -35,6 +35,7 @@ interface CallbackData {
 interface StepData {
   index: number;
   paths: string[];
+  data: { [key: string]: string }[];
 }
 
 /**
@@ -81,7 +82,7 @@ class Steps {
   readonly stepsData: StepData[];
 
   // Выбранные ответы
-  data: { [key: string]: string };
+  data: { [key: string]: string }[];
 
   // Индекс текущего шага
   currentStepIndex: number;
@@ -232,7 +233,7 @@ class Steps {
 
         // Если шаг валиден, идем дальше
         if (isValid) {
-          this.collectData(bodyNode);
+          this.collect(bodyNode);
 
           this.currentStepIndex += 1;
           if (this.currentStepIndex > this.bodiesNodes.length) {
@@ -246,16 +247,17 @@ class Steps {
   }
 
   /**
-   * Сбор данных
+   * Сбор всего
    *
    * @param {HTMLElement} bodyNode DOM элемент тела текущего шага
    *
    * @private
    */
-  private collectData(bodyNode: HTMLElement): void {
+  private collect(bodyNode: HTMLElement): void {
     const stepData: StepData = {
       index: this.currentStepIndex,
       paths: this.collectPaths(bodyNode),
+      data: this.collectData(bodyNode),
     };
 
     // Если такой шаг уже был, то перезаписываем данные, если нет, то пушим новые
@@ -264,6 +266,25 @@ class Steps {
     } else {
       this.stepsData.push(stepData);
     }
+  }
+
+  /**
+   * Сбор данных
+   *
+   * @param {HTMLElement} bodyNode DOM элемент тела текущего шага
+   *
+   * @private
+   */
+  private collectData(bodyNode: HTMLElement): { [key: string]: string }[] {
+    // DOM элемент у которого собираем данные
+    const stepNode = bodyNode.querySelector('.faze-steps-path.faze-steps-path-selected') || bodyNode;
+
+    const data = Array.from(stepNode.querySelectorAll<HTMLInputElement>('input[type="text"], input[type="email"], input[type="tel"], input[type="password"], select, textarea, input[type="checkbox"]:checked, input[type="radio"]:checked')).map((inputNode) => ({
+      name: inputNode.dataset.fazeStepsDataName || inputNode.name,
+      value: inputNode.value,
+    }));
+
+    return data;
   }
 
   /**

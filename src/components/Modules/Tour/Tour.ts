@@ -360,9 +360,9 @@ class Tour extends Module {
   protected bind(): void {
     super.bind();
 
-    if (this.config.evented) {
-      this.bindCreate();
-    } else {
+    this.bindCreate();
+
+    if (!this.config.evented) {
       this.bindControls();
     }
   }

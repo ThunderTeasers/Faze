@@ -143,6 +143,8 @@ class Tour extends Module {
 
   /**
    * Инициализация
+   *
+   * @protected
    */
   protected initialize(): void {
     super.initialize();
@@ -154,6 +156,8 @@ class Tour extends Module {
 
   /**
    * Создание DOM элементов и начало работы
+   *
+   * @private
    */
   private create() {
     // Выполнение пользовательской функции
@@ -176,7 +180,21 @@ class Tour extends Module {
   }
 
   /**
+   * Навешивание событий на начало работы
+   *
+   * @private
+   */
+  private bindCreate(): void {
+    Faze.Events.click('[data-faze-tour-caller]', () => {
+      this.create();
+      this.bindControls();
+    });
+  }
+
+  /**
    * Закрытие подсказок
+   *
+   * @private
    */
   private close(): void {
     // Удаляем всё, что связано с модулем
@@ -197,6 +215,8 @@ class Tour extends Module {
 
   /**
    * Генерация HTML кода для подсказки
+   *
+   * @private
    */
   private buildHint(): void {
     this._hintWrapperNode = document.createElement('div');
@@ -317,6 +337,8 @@ class Tour extends Module {
 
   /**
    * Проверка видимости подсказки на экране
+   *
+   * @private
    */
   private checkHintVisibility(): void {
     setTimeout(() => {
@@ -332,10 +354,20 @@ class Tour extends Module {
 
   /**
    * Навешивание событий
+   *
+   * @protected
    */
   protected bind(): void {
     super.bind();
 
+    if (this.config.evented) {
+      this.bindCreate();
+    } else {
+      this.bindControls();
+    }
+  }
+
+  private bindControls(): void {
     this.bindNextButton();
     this.bindPrevButton();
     this.bindCloseButton();
@@ -343,6 +375,8 @@ class Tour extends Module {
 
   /**
    * Ресайз окна
+   *
+   * @protected
    */
   protected resize(): void {
     this.updatePosition();
@@ -361,6 +395,8 @@ class Tour extends Module {
 
   /**
    * Навешивание событий на переключение шага вперед
+   *
+   * @private
    */
   private bindNextButton(): void {
     Faze.Events.click(this._hintData.btnNextNode, () => {
@@ -375,6 +411,8 @@ class Tour extends Module {
 
   /**
    * Навешивание событий на переключение шага назад
+   *
+   * @private
    */
   private bindPrevButton(): void {
     Faze.Events.click(this._hintData.btnPrevNode, () => {

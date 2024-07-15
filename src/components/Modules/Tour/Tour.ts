@@ -173,7 +173,7 @@ class Tour extends Module {
     // Выполнение пользовательской функции
     if (typeof this.config.callbacks.closed === 'function') {
       try {
-        this.config.callbacks.changed({
+        this.config.callbacks.closed({
           group: this.config.group,
           node: this.node,
         });

@@ -77,6 +77,7 @@ interface HintData {
  *   group - Группа
  *   padding - Отступы подсказки
  *   pages - Показывать пагинацию
+ *   evented - Начинать ли работу сразу или после определенного ивента
  *   callbacks
  *     created - пользовательская функция, исполняющаяся после инициализации
  *     changed - пользовательская функция, исполняющаяся после изменения шага
@@ -87,6 +88,7 @@ interface Config {
   padding: number;
   pages: boolean;
   steps: StepData[];
+  evented: boolean;
   callbacks: {
     created?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
@@ -123,6 +125,7 @@ class Tour extends Module {
       pages: true,
       padding: 10,
       steps: [],
+      evented: false,
       callbacks: {
         created: undefined,
         changed: undefined,
@@ -144,10 +147,19 @@ class Tour extends Module {
   protected initialize(): void {
     super.initialize();
 
+    if (!this.config.evented) {
+      this.create();
+    }
+  }
+
+  /**
+   * Создание DOM элементов и начало работы
+   */
+  private create() {
     // Выполнение пользовательской функции
     if (typeof this.config.callbacks.created === 'function') {
       try {
-        this.config.callbacks.changed({
+        this.config.callbacks.created({
           group: this.config.group,
           node: this.node,
         });
@@ -399,6 +411,7 @@ class Tour extends Module {
       group,
       steps,
       pages: (node.dataset.fazeTourPages || 'true') === 'true',
+      evented: (node.dataset.fazeTourEvented || 'false') === 'true',
       padding: parseInt(node.dataset.fazeTourPadding || '10', 10),
     });
   }

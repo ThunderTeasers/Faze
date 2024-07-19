@@ -275,14 +275,14 @@ class Tour extends Module {
   private updatePosition(): void {
     if (this._currentStep.node) {
       // Получаем данные о положении элемента
-      const rect: DOMRect = this._currentStep.node.getBoundingClientRect();
+      const rect: FazePositionAndSize = Faze.Helpers.getElementPositionAndSize(this._currentStep.node);
 
       // Позицианируем подсвеченую область
       this._hintWrapperNode.classList.remove('faze-tour-hint-wrapper-float');
-      this._hintWrapperNode.style.top = `${rect.top - this.config.padding}px`;
-      this._hintWrapperNode.style.left = `${rect.left - this.config.padding}px`;
-      this._hintWrapperNode.style.width = `${rect.width + this.config.padding * 2}px`;
-      this._hintWrapperNode.style.height = `${rect.height + this.config.padding * 2}px`;
+      this._hintWrapperNode.style.top = `${rect.position.y - this.config.padding}px`;
+      this._hintWrapperNode.style.left = `${rect.position.x - this.config.padding}px`;
+      this._hintWrapperNode.style.width = `${rect.size.width + this.config.padding * 2}px`;
+      this._hintWrapperNode.style.height = `${rect.size.height + this.config.padding * 2}px`;
     } else {
       this._hintWrapperNode.classList.add('faze-tour-hint-wrapper-float');
       this._hintWrapperNode.style.top = `${window.innerHeight / 2 - this._hintData.node.clientHeight / 2}px`;

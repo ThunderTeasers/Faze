@@ -91,6 +91,7 @@ interface Config {
   evented: boolean;
   callbacks: {
     created?: (data: CallbackData) => void;
+    beforeChanged?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
     closed?: (data: CallbackData) => void;
   };
@@ -128,6 +129,7 @@ class Tour extends Module {
       evented: false,
       callbacks: {
         created: undefined,
+        beforeChanged: undefined,
         changed: undefined,
         closed: undefined,
       },
@@ -272,12 +274,15 @@ class Tour extends Module {
    */
   private updatePosition(): void {
     if (this._currentStep.node) {
+      // Получаем данные о положении элемента
+      const rect: DOMRect = this._currentStep.node.getBoundingClientRect();
+
       // Позицианируем подсвеченую область
       this._hintWrapperNode.classList.remove('faze-tour-hint-wrapper-float');
-      this._hintWrapperNode.style.top = `${this._currentStep.node.offsetTop - this.config.padding}px`;
-      this._hintWrapperNode.style.left = `${this._currentStep.node.offsetLeft - this.config.padding}px`;
-      this._hintWrapperNode.style.width = `${this._currentStep.node.offsetWidth + this.config.padding * 2}px`;
-      this._hintWrapperNode.style.height = `${this._currentStep.node.offsetHeight + this.config.padding * 2}px`;
+      this._hintWrapperNode.style.top = `${rect.top - this.config.padding}px`;
+      this._hintWrapperNode.style.left = `${rect.left - this.config.padding}px`;
+      this._hintWrapperNode.style.width = `${rect.width + this.config.padding * 2}px`;
+      this._hintWrapperNode.style.height = `${rect.height + this.config.padding * 2}px`;
     } else {
       this._hintWrapperNode.classList.add('faze-tour-hint-wrapper-float');
       this._hintWrapperNode.style.top = `${window.innerHeight / 2 - this._hintData.node.clientHeight / 2}px`;
@@ -293,6 +298,20 @@ class Tour extends Module {
   private changeStep(): void {
     this._currentStep = this.config.steps[this._index];
     if (this._currentStep) {
+      // Выполнение пользовательской функции
+      if (typeof this.config.callbacks.beforeChanged === 'function') {
+        try {
+          this.config.callbacks.beforeChanged({
+            group: this.config.group,
+            node: this.node,
+            step: this._currentStep,
+            hint: this._hintData,
+          });
+        } catch (error) {
+          this.logger.error(`Ошибка исполнения пользовательского метода "beforeChanged": ${error}`);
+        }
+      }
+
       // Обновление позиции
       this.updatePosition();
 

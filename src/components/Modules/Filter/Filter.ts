@@ -316,6 +316,10 @@ class Filter {
             fetch(urlForRequest, { credentials: 'same-origin' })
               .then((response: Response) => response.text())
               .then((response: string) => {
+                if (response === '' && this.itemsHolderNode) {
+                  this.itemsHolderNode.innerHTML = '<p class="error">К сожалению, ничего не найдено...</p>';
+                }
+
                 // Парсинг ответа от сервера
                 const responseHTML: Document = new DOMParser().parseFromString(response, 'text/html');
 
@@ -323,7 +327,7 @@ class Filter {
                 const responseNode: HTMLElement | null = responseHTML.querySelector(
                   `.${Array.from(this.node.classList)
                     .filter((className) => className !== 'faze-filter-initialized')
-                    .join('.')}`,
+                    .join('.')}`
                 );
                 if (responseNode) {
                   if (this.itemsHolderNode) {

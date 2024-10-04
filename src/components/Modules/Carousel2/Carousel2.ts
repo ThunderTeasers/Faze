@@ -268,8 +268,6 @@ class Carousel2 extends Module {
    * Инициализация
    */
   initialize(): void {
-    super.initialize();
-
     // ===========================================
     // Инициализация переменных
     // ===========================================
@@ -281,16 +279,20 @@ class Carousel2 extends Module {
     this.offset = 0;
     this.counter = 0;
     this.isIdle = true;
-    this.transition = `transform ${this.config.animation.time / 1000}s ease-in-out`;
+    this.transition = `transform ${
+      this.config.animation.time / 1000
+    }s ease-in-out`;
     this.isNeedToInitialize = !(this.totalSlides < this.config.minAmount);
-
-    // Инициализируем стрелки
-    this.initializeArrows();
 
     // Проверка на минимальное количество
     if (!this.isNeedToInitialize) {
       return;
     }
+
+    super.initialize();
+
+    // Инициализируем стрелки
+    this.initializeArrows();
 
     this.touchStart = {
       x: 0,
@@ -312,7 +314,10 @@ class Carousel2 extends Module {
     // Инициализация работы модуля
     // ===========================================
     // Проставляем необходимые классы
-    this.node.classList.add(`faze-animation-${this.config.animation.type}`, `faze-direction-${this.config.animation.direction}`);
+    this.node.classList.add(
+      `faze-animation-${this.config.animation.type}`,
+      `faze-direction-${this.config.animation.direction}`
+    );
     this.itemsHolderNode.className = 'faze-carousel-holder';
     this.itemsHolderNode.style.transition = this.transition;
 
@@ -347,7 +352,9 @@ class Carousel2 extends Module {
           currentSlideNode: this.slidesNodes[this.index],
         });
       } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
+        this.logger.error(
+          `Ошибка исполнения пользовательского метода "created": ${error}`
+        );
       }
     }
   }
@@ -396,7 +403,9 @@ class Carousel2 extends Module {
     // Для счетчика
     if (this.config.counter) {
       if (this.config.selectors.counter) {
-        const counterNode = document.querySelector<HTMLElement>(this.config.selectors.counter);
+        const counterNode = document.querySelector<HTMLElement>(
+          this.config.selectors.counter
+        );
         if (counterNode) {
           this.counterNode = counterNode;
         }
@@ -420,8 +429,12 @@ class Carousel2 extends Module {
       // Проверка на присутствие кастомных стрелок
       if (this.config.selectors.arrowLeft && this.config.selectors.arrowRight) {
         // DOM элементы стрелок управления
-        const arrowLeftNode = document.querySelector<HTMLElement>(this.config.selectors.arrowLeft);
-        const arrowRightNode = document.querySelector<HTMLElement>(this.config.selectors.arrowRight);
+        const arrowLeftNode = document.querySelector<HTMLElement>(
+          this.config.selectors.arrowLeft
+        );
+        const arrowRightNode = document.querySelector<HTMLElement>(
+          this.config.selectors.arrowRight
+        );
 
         // Если нашли кастомные стрелки, то задаём их
         if (arrowLeftNode && arrowRightNode) {
@@ -510,12 +523,16 @@ class Carousel2 extends Module {
    * @private
    */
   private bindPagination(): void {
-    Faze.Events.forEach('click', this.pagesNodes, (event: MouseEvent, pageNode: HTMLElement) => {
-      const index: string | undefined = pageNode.dataset.fazeIndex;
-      if (index) {
-        this.change(parseInt(index, 10));
+    Faze.Events.forEach(
+      'click',
+      this.pagesNodes,
+      (event: MouseEvent, pageNode: HTMLElement) => {
+        const index: string | undefined = pageNode.dataset.fazeIndex;
+        if (index) {
+          this.change(parseInt(index, 10));
+        }
       }
-    });
+    );
   }
 
   /**
@@ -547,14 +564,27 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private mouseOrTouchDown(event: MouseEvent | TouchEvent, isDown: boolean): boolean {
+  private mouseOrTouchDown(
+    event: MouseEvent | TouchEvent,
+    isDown: boolean
+  ): boolean {
     // Если мы выводили мышку из окна браузера, то "isDown" останется в положении "true"
     // и мы должны вернуть его в таком же виде, чтобы сработали эвенты на отпускание мыши
     if (isDown) {
       return true;
     }
 
-    if (Faze.Helpers.isMouseOver(event, this.node).contains && !Faze.Helpers.isMouseOverlapsNode(event, this.controlsNode) && event.composedPath().some((node: any) => 'classList' in node && node.classList.contains('faze-item')) && this.isIdle) {
+    if (
+      Faze.Helpers.isMouseOver(event, this.node).contains &&
+      !Faze.Helpers.isMouseOverlapsNode(event, this.controlsNode) &&
+      event
+        .composedPath()
+        .some(
+          (node: any) =>
+            'classList' in node && node.classList.contains('faze-item')
+        ) &&
+      this.isIdle
+    ) {
       // Отключаем стандартное перетаскивание
       event.preventDefault();
 
@@ -580,7 +610,10 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private mouseOrTouchMove(event: MouseEvent | TouchEvent, isDown: boolean): void {
+  private mouseOrTouchMove(
+    event: MouseEvent | TouchEvent,
+    isDown: boolean
+  ): void {
     // Если не было нажатия, то не выполняем метод
     if (!isDown) {
       return;
@@ -595,9 +628,13 @@ class Carousel2 extends Module {
 
     // Проверяем выход за границы
     if (offset > this.offset + this.slideWidth) {
-      this.itemsHolderNode.style.transform = `translate(${this.offset + this.slideWidth}px, 0)`;
+      this.itemsHolderNode.style.transform = `translate(${
+        this.offset + this.slideWidth
+      }px, 0)`;
     } else if (offset < this.offset - this.slideWidth) {
-      this.itemsHolderNode.style.transform = `translate(${this.offset - this.slideWidth}px, 0)`;
+      this.itemsHolderNode.style.transform = `translate(${
+        this.offset - this.slideWidth
+      }px, 0)`;
     }
   }
 
@@ -611,7 +648,10 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private async mouseOrTouchUp(event: MouseEvent | TouchEvent, isDown: boolean): Promise<void> {
+  private async mouseOrTouchUp(
+    event: MouseEvent | TouchEvent,
+    isDown: boolean
+  ): Promise<void> {
     if (!isDown) {
       return;
     }
@@ -792,7 +832,10 @@ class Carousel2 extends Module {
     this.changeCounter();
 
     // Если у карусели есть стрелки, то вставляем между них
-    if (this.config.arrows && !(this.config.selectors.arrowLeft && this.config.selectors.arrowRight)) {
+    if (
+      this.config.arrows &&
+      !(this.config.selectors.arrowLeft && this.config.selectors.arrowRight)
+    ) {
       this.arrowsNode.insertBefore(this.counterNode, this.arrowsNodes.right);
     } else {
       this.controlsNode.appendChild(this.counterNode);
@@ -817,7 +860,9 @@ class Carousel2 extends Module {
       pagesHTML += `<div class="faze-page" data-faze-index="${i}"></div>`;
     }
     this.pagesNode.innerHTML = pagesHTML;
-    this.pagesNodes = <HTMLElement[]>Array.from(this.pagesNode.querySelectorAll('.faze-page'));
+    this.pagesNodes = <HTMLElement[]>(
+      Array.from(this.pagesNode.querySelectorAll('.faze-page'))
+    );
     this.controlsNode.appendChild(this.pagesNode);
 
     // Активируем первую по умолчанию
@@ -831,11 +876,15 @@ class Carousel2 extends Module {
     this.arrowsNode.className = 'faze-carousel-arrows';
     this.controlsNode.appendChild(this.arrowsNode);
 
-    if (!(this.config.selectors.arrowLeft && this.config.selectors.arrowRight)) {
-      this.arrowsNodes.left.className = 'faze-carousel-arrow faze-carousel-arrow-prev';
+    if (
+      !(this.config.selectors.arrowLeft && this.config.selectors.arrowRight)
+    ) {
+      this.arrowsNodes.left.className =
+        'faze-carousel-arrow faze-carousel-arrow-prev';
       this.arrowsNode.appendChild(this.arrowsNodes.left);
 
-      this.arrowsNodes.right.className = 'faze-carousel-arrow faze-carousel-arrow-next';
+      this.arrowsNodes.right.className =
+        'faze-carousel-arrow faze-carousel-arrow-next';
       this.arrowsNode.appendChild(this.arrowsNodes.right);
     }
   }
@@ -930,7 +979,10 @@ class Carousel2 extends Module {
     if (this.index >= this.totalSlides) {
       this.index = Math.max(this.index - this.totalSlides, 0);
     } else if (this.index < 0) {
-      this.index = Math.min(this.totalSlides - Math.abs(this.index), this.totalSlides - 1);
+      this.index = Math.min(
+        this.totalSlides - Math.abs(this.index),
+        this.totalSlides - 1
+      );
     }
   }
 
@@ -957,7 +1009,9 @@ class Carousel2 extends Module {
           pagesNode: this.pagesNode,
         });
       } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+        this.logger.error(
+          `Ошибка исполнения пользовательского метода "changed": ${error}`
+        );
       }
     }
   }
@@ -967,10 +1021,16 @@ class Carousel2 extends Module {
    *
    * @param direction{FazeCarouselMoveDirection} Направление карусели
    */
-  private beforeChangeCallbackCall(direction?: FazeCarouselMoveDirection): void {
+  private beforeChangeCallbackCall(
+    direction?: FazeCarouselMoveDirection
+  ): void {
     if (typeof this.config.callbacks.beforeChanged === 'function') {
       // Текущий слайд(по факту он следующий, т.к. изменение уже началось)
-      const currentSlideNode = this.slidesNodes.find((tmpSlideNode) => parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index) || this.slidesNodes[0];
+      const currentSlideNode =
+        this.slidesNodes.find(
+          (tmpSlideNode) =>
+            parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index
+        ) || this.slidesNodes[0];
 
       try {
         this.config.callbacks.beforeChanged({
@@ -988,7 +1048,9 @@ class Carousel2 extends Module {
           pagesNode: this.pagesNode,
         });
       } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+        this.logger.error(
+          `Ошибка исполнения пользовательского метода "changed": ${error}`
+        );
       }
     }
   }
@@ -1001,7 +1063,11 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private async updateSlides(direction: FazeCarouselMoveDirection, amount: number = 1, isFreeze: boolean = false): Promise<void> {
+  private async updateSlides(
+    direction: FazeCarouselMoveDirection,
+    amount: number = 1,
+    isFreeze: boolean = false
+  ): Promise<void> {
     // Вызываем пользовательскую функцию "beforeChanged"
     this.beforeChangeCallbackCall(direction);
 
@@ -1100,7 +1166,11 @@ class Carousel2 extends Module {
    *
    * @private
    */
-  private async updateOffset(direction: FazeCarouselMoveDirection, amount: number = 1, isFreeze: boolean = false): Promise<void> {
+  private async updateOffset(
+    direction: FazeCarouselMoveDirection,
+    amount: number = 1,
+    isFreeze: boolean = false
+  ): Promise<void> {
     if (amount === 1) {
       this.updateSlidesOffset(amount);
     }
@@ -1116,7 +1186,10 @@ class Carousel2 extends Module {
       await this.moveSlide(true);
       this.setTransition();
       this.offset = 0;
-    } else if (direction === FazeCarouselMoveDirection.Backward && this.counter === -1) {
+    } else if (
+      direction === FazeCarouselMoveDirection.Backward &&
+      this.counter === -1
+    ) {
       if (!isFreeze) {
         this.offset = 0;
       }
@@ -1125,7 +1198,10 @@ class Carousel2 extends Module {
       await this.moveSlide(true);
       this.setTransition();
       this.offset = this.slideWidth * amount;
-    } else if (direction === FazeCarouselMoveDirection.Backward && this.counter === 0) {
+    } else if (
+      direction === FazeCarouselMoveDirection.Backward &&
+      this.counter === 0
+    ) {
       if (!isFreeze) {
         this.offset = -this.slideWidth * amount;
       } else {
@@ -1202,7 +1278,11 @@ class Carousel2 extends Module {
    * @private
    */
   private changeCounter(): void {
-    this.counterNode.innerHTML = `<span class="faze-carousel-counter-current">${this.index + 1}</span> / <span class="faze-carousel-counter-total">${this.totalSlides}</span>`;
+    this.counterNode.innerHTML = `<span class="faze-carousel-counter-current">${
+      this.index + 1
+    }</span> / <span class="faze-carousel-counter-total">${
+      this.totalSlides
+    }</span>`;
   }
 
   /**
@@ -1211,7 +1291,11 @@ class Carousel2 extends Module {
    * @private
    */
   private changePagination(): void {
-    Faze.Helpers.activateItem(Array.from(this.pagesNodes), this.index, 'faze-active');
+    Faze.Helpers.activateItem(
+      Array.from(this.pagesNodes),
+      this.index,
+      'faze-active'
+    );
   }
 
   /**
@@ -1221,10 +1305,15 @@ class Carousel2 extends Module {
    */
   private updateCurrentSlideSizes(): void {
     // Стили слайда
-    const style: CSSStyleDeclaration = window.getComputedStyle(this.currentSlide);
+    const style: CSSStyleDeclaration = window.getComputedStyle(
+      this.currentSlide
+    );
 
     // Расчёт корректных размеров
-    this.slideWidth = this.currentSlide.offsetWidth + parseFloat(style.marginLeft || '0') + parseFloat(style.marginRight || '0');
+    this.slideWidth =
+      this.currentSlide.offsetWidth +
+      parseFloat(style.marginLeft || '0') +
+      parseFloat(style.marginRight || '0');
     this.totalWidth = this.slideWidth * this.totalSlides;
     // this.slideHeight = this.currentSlide.getBoundingClientRect().height;
   }
@@ -1242,13 +1331,19 @@ class Carousel2 extends Module {
       arrows: (node.dataset.fazeCarouselArrows || 'true') === 'true',
       duration: parseInt(node.dataset.fazeCarouselDuration || '3000', 10),
       infinite: (node.dataset.fazeCarouselInfinite || 'true') === 'true',
-      useSlideFullSize: (node.dataset.fazeCarouselUseSlideFullSize || 'false') === 'true',
+      useSlideFullSize:
+        (node.dataset.fazeCarouselUseSlideFullSize || 'false') === 'true',
       stopOnHover: (node.dataset.fazeCarouselStopOnHover || 'false') === 'true',
       mouseMove: (node.dataset.fazeCarouselMouseMove || 'false') === 'true',
       touchMove: (node.dataset.fazeCarouselTouchMove || 'false') === 'true',
-      amountPerSlide: parseInt(node.dataset.fazeCarouselAmountPerSlide || '1', 10),
+      amountPerSlide: parseInt(
+        node.dataset.fazeCarouselAmountPerSlide || '1',
+        10
+      ),
       minAmount: parseInt(node.dataset.fazeCarouselMinAmount || '2', 10),
-      disallowRanges: JSON.parse(node.dataset.fazeCarouselDisallowRanges || '[]'),
+      disallowRanges: JSON.parse(
+        node.dataset.fazeCarouselDisallowRanges || '[]'
+      ),
       offsetChange: parseInt(node.dataset.fazeCarouselOffsetChange || '50', 10),
       animation: {
         type: node.dataset.fazeCarouselAnimationType || 'fade',

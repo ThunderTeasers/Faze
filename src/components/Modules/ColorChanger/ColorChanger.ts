@@ -7,6 +7,7 @@
 
 import './ColorChanger.scss';
 import Module from '../../Core/Module';
+import Faze from '../../Core/Faze';
 
 /**
  * Структура возвращаемого объекта в пользовательском методе
@@ -29,13 +30,13 @@ interface CallbackData {
  *
  * Содержит:
  *   changeOnHover - изменять ли цвет при наведении(по умолчанию смена идёт при клике)
- *   shortColors - количество цветов в свёрнутом варианте
+ *   shortShow - количество цветов в свёрнутом варианте
  *   callbacks
  *     changed - пользовательская функция, исполняющаяся после изменения таба
  */
 interface Config {
   changeOnHover: boolean;
-  quantity: number;
+  shortShow: number;
   callbacks: {
     changed?: (data: CallbackData) => void;
   };
@@ -45,6 +46,9 @@ interface Config {
  * Класс переключателя цветов
  */
 class ColorChanger extends Module {
+  // Количество цветов
+  quantity?: number;
+
   /**
    * Стандартный конструктор
    *
@@ -52,10 +56,12 @@ class ColorChanger extends Module {
    * @param config Конфиг модуля
    */
   constructor(node?: HTMLElement, config?: Partial<Config>) {
+    console.log(123);
+
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       changeOnHover: false,
-      quantity: 4,
+      shortShow: 4,
       callbacks: {
         changed: undefined,
       },
@@ -66,6 +72,57 @@ class ColorChanger extends Module {
       node,
       config: Object.assign(defaultConfig, config),
       name: 'ColorChanger',
+    });
+  }
+
+  /**
+   * Инициализация
+   *
+   * @protected
+   */
+  protected initialize(): void {
+    super.initialize();
+
+    this.parse();
+    this.build();
+  }
+
+  /**
+   * Навешивание событий
+   *
+   * @protected
+   */
+  protected bind(): void {
+    super.bind();
+  }
+
+  /**
+   * Парсинг JSON с данными
+   */
+  private parse(): void {
+    const data: any = Faze.Helpers.parseJSON(
+      this.node.dataset.fazeColorchangerData
+    );
+
+    console.log(data);
+  }
+
+  /**
+   * Построение HTML
+   *
+   * @protected
+   */
+  protected build(): void {}
+
+  /**
+   * Инициализация модуля по data атрибутам
+   *
+   * @param node - DOM элемент на который нужно инициализировать плагин
+   */
+  static initializeByDataAttributes(node: HTMLElement): void {
+    new ColorChanger(node, {
+      changeOnHover: (node.dataset.fazeTabUseHash || 'false') === 'true',
+      shortShow: parseInt(node.dataset.fazeTabMaxBodies || '1', 4),
     });
   }
 }

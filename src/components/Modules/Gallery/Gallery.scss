@@ -1,7 +1,7 @@
 /**
  * Стили для плагина галереи
  *
- * Автор: Ерохин Максим, plarson.ru
+ * Автор: Ерохин Максим
  * Дата: 20.10.2018
  */
 
@@ -84,7 +84,8 @@
 
     z-index: 6;
 
-    &:before, &:after {
+    &:before,
+    &:after {
       content: '';
 
       position: absolute;
@@ -167,7 +168,8 @@
   }
 
   // Расположение снизу и сверху
-  &.faze-gallery-wrapper-thumbnails-top, &.faze-gallery-wrapper-thumbnails-bottom {
+  &.faze-gallery-wrapper-thumbnails-top,
+  &.faze-gallery-wrapper-thumbnails-bottom {
     // Список превью
     .faze-gallery-thumbnails {
       left: 50%;
@@ -200,7 +202,8 @@
   }
 
   // Расположение слева и справа
-  &.faze-gallery-wrapper-thumbnails-left, &.faze-gallery-wrapper-thumbnails-right {
+  &.faze-gallery-wrapper-thumbnails-left,
+  &.faze-gallery-wrapper-thumbnails-right {
     // Список превью
     .faze-gallery-thumbnails {
       top: 50%;

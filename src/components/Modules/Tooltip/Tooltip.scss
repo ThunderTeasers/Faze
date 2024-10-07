@@ -1,7 +1,7 @@
 /**
  * Стили для плагина тултипа
  *
- * Автор: Ерохин Максим, plarson.ru
+ * Автор: Ерохин Максим
  * Дата: 23.09.2018
  */
 
@@ -31,7 +31,8 @@
     position: absolute;
   }
 
-  &.faze-tooltip-top, &.faze-tooltip-bottom {
+  &.faze-tooltip-top,
+  &.faze-tooltip-bottom {
     &:before {
       left: 50%;
 
@@ -39,7 +40,8 @@
     }
   }
 
-  &.faze-tooltip-left, &.faze-tooltip-right {
+  &.faze-tooltip-left,
+  &.faze-tooltip-right {
     &:before {
       top: 50%;
 
@@ -89,7 +91,7 @@
 }
 
 // Если появляться по клику, то при наведении показываем указатель
-[data-faze~="tooltip"][data-faze-tooltip-event="click"] {
+[data-faze~='tooltip'][data-faze-tooltip-event='click'] {
   // При наведении
   &:hover {
     cursor: pointer;

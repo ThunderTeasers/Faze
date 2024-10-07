@@ -1,12 +1,14 @@
 /**
  * Стили для плагина спойлера
  *
- * Автор: Ерохин Максим, plarson.ru
+ * Автор: Ерохин Максим
  * Дата: 17.10.2018
  */
 
-.faze-spoiler, [data-faze="spoiler"] {
-  & > .faze-title, & > [data-faze-spoiler="title"] {
+.faze-spoiler,
+[data-faze='spoiler'] {
+  & > .faze-title,
+  & > [data-faze-spoiler='title'] {
     user-select: none;
 
     &:hover {
@@ -14,12 +16,14 @@
     }
   }
 
-  & > .faze-body, & > [data-faze-spoiler="body"] {
+  & > .faze-body,
+  & > [data-faze-spoiler='body'] {
     display: none;
   }
 
   &.faze-active {
-    & > .faze-body, & > [data-faze-spoiler="body"] {
+    & > .faze-body,
+    & > [data-faze-spoiler='body'] {
       display: block;
     }
   }

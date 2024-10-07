@@ -1,7 +1,7 @@
 /**
  * Стили для плагина ленивой загрузки
  *
- * Автор: Ерохин Максим, plarson.ru
+ * Автор: Ерохин Максим
  * Дата: 27.12.2023
  */
 
@@ -66,7 +66,13 @@
     width: 500%;
     margin-left: -250%;
     pointer-events: none;
-    background: linear-gradient(to right, rgba(255, 255, 255, 0) 46%, rgba(255, 255, 255, 0.35) 50%, rgba(255, 255, 255, 0) 54%) 50% 50%;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 46%,
+        rgba(255, 255, 255, 0.35) 50%,
+        rgba(255, 255, 255, 0) 54%
+      )
+      50% 50%;
 
     animation: lazyloadPlaceholder 0.8s linear infinite;
 

@@ -1,13 +1,12 @@
 /**
  * Стили для модуля зумбокс
  *
- * Автор: Ерохин Максим, plarson.ru
+ * Автор: Ерохин Максим
  * Дата: 09.01.2020
  */
 
 // Элементы при нажатии на которые вызываем модуль
 [data-faze-zoombox-image] {
-
   // При наведении
   &:hover {
     cursor: zoom-in;
@@ -117,7 +116,8 @@
     border-radius: 50%;
     background-color: #fff;
 
-    &:before, &:after {
+    &:before,
+    &:after {
       content: '';
 
       position: absolute;

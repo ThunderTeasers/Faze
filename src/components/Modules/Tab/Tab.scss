@@ -1,14 +1,18 @@
 /**
  * Стили для плагина табов
  *
- * Автор: Ерохин Максим, plarson.ru
+ * Автор: Ерохин Максим
  * Дата: 26.09.2018
  */
 
 // Базовые стили для работы
-.faze-tabs, .faze-tab, [data-faze~="tab"] {
+.faze-tabs,
+.faze-tab,
+[data-faze~='tab'] {
   // Тела табов
-  .faze-tab-body, [data-faze-tab="body"], [data-faze-tab-body]:not([data-faze-tab="header"]):not(.faze-tab-header) {
+  .faze-tab-body,
+  [data-faze-tab='body'],
+  [data-faze-tab-body]:not([data-faze-tab='header']):not(.faze-tab-header) {
     display: none;
 
     &:first-of-type {
@@ -18,7 +22,8 @@
 }
 
 // Стили для визуала
-.faze-tabs[data-faze-styles="true"], .faze-tab[data-faze-styles="true"] {
+.faze-tabs[data-faze-styles='true'],
+.faze-tab[data-faze-styles='true'] {
   // Заголовки табов
   .faze-tabs-headers {
     display: flex;
@@ -29,7 +34,9 @@
   }
 
   // Заголовок
-  .faze-tab-header, [data-faze-tab="header"], [data-faze-tab-head] {
+  .faze-tab-header,
+  [data-faze-tab='header'],
+  [data-faze-tab-head] {
     padding: 1rem;
 
     border: 0.1rem solid #000;
@@ -51,7 +58,9 @@
   }
 
   // Тела табов
-  .faze-tab-body, [data-faze-tab="body"], [data-faze-tab-body] {
+  .faze-tab-body,
+  [data-faze-tab='body'],
+  [data-faze-tab-body] {
     padding-top: 1rem;
   }
 }

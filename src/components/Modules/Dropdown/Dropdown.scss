@@ -1,21 +1,24 @@
 /**
  * Стили для плагина дропдауна
  *
- * Автор: Ерохин Максим, plarson.ru
+ * Автор: Ерохин Максим
  * Дата: 26.09.2018
  */
 
 // Базовые стили для работы
-.faze-dropdown, [data-faze="dropdown"] {
+.faze-dropdown,
+[data-faze='dropdown'] {
   // Шапка
-  .faze-title, [data-faze-dropdown="title"] {
+  .faze-title,
+  [data-faze-dropdown='title'] {
     &:hover {
       cursor: pointer;
     }
   }
 
   // Тело
-  .faze-body, [data-faze-dropdown="body"] {
+  .faze-body,
+  [data-faze-dropdown='body'] {
     position: absolute;
 
     display: none;
@@ -26,7 +29,8 @@
   // Активный элемент
   &.faze-active {
     // Тело
-    .faze-body, [data-faze-dropdown="body"] {
+    .faze-body,
+    [data-faze-dropdown='body'] {
       display: block;
     }
   }

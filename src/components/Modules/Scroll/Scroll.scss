@@ -1,7 +1,7 @@
 /**
  * Стили для плагина скрола
  *
- * Автор: Ерохин Максим, plarson.ru
+ * Автор: Ерохин Максим
  * Дата: 29.09.2018
  */
 
@@ -15,7 +15,8 @@
   touch-action: none;
 
   // Общие стили скролов
-  .faze-scroll-vertical, .faze-scroll-horizontal {
+  .faze-scroll-vertical,
+  .faze-scroll-horizontal {
     position: absolute;
 
     display: none;

@@ -44,6 +44,7 @@ import ZoomBox from '../Modules/ZoomBox/ZoomBox';
 import Look from '../Modules/Look/Look';
 import Scroll from '../Modules/Scroll/Scroll';
 import Form from '../Helpers/Form';
+import ColorChanger from '../Modules/ColorChanger/ColorChanger';
 import Page from '../Modules/Page/Page';
 import Filter from '../Modules/Filter/Filter';
 import Spoiler from '../Modules/Spoiler/Spoiler';
@@ -172,6 +173,8 @@ class Faze {
 
   static Dropdown: any = Dropdown;
 
+  static ColorChanger: any = ColorChanger;
+
   static Select: any = Select;
 
   static Look: any = Look;
@@ -263,6 +266,7 @@ class Faze {
       'Filter',
       'REST',
       'Logger',
+      'ColorChanger',
     ];
 
     // Проверка на ошибки
@@ -298,14 +302,18 @@ class Faze {
 
         // Проверка на существование такого модуля, если его не существует, загружаем следующий
         if (!Faze.plugins[pluginName]) {
-          console.error(`Плагин: '${pluginName}' не найден, его конфиг:`, config);
+          console.error(
+            `Плагин: '${pluginName}' не найден, его конфиг:`,
+            config
+          );
           continue;
         }
 
         // Загружаем нужный модуль, если он еще не был загружен
         if (Faze.plugins[pluginName].body === undefined) {
           try {
-            Faze.plugins[pluginName].body = Faze.plugins[pluginName].config.callback;
+            Faze.plugins[pluginName].body =
+              Faze.plugins[pluginName].config.callback;
             Faze.plugins[pluginName].body = Faze.plugins[pluginName].body();
           } catch (e) {
             console.error(`Ошибка в плагине '${pluginName}':`, e);
@@ -328,7 +336,10 @@ class Faze {
             Faze.Observer.watch(config.observableSelector, config.callback);
           }
         } catch (error) {
-          console.error(`Error in plugin "${config.pluginName}", exception:`, error);
+          console.error(
+            `Error in plugin "${config.pluginName}", exception:`,
+            error
+          );
         }
       }
     }
@@ -341,15 +352,21 @@ class Faze {
    * @param childSelector - CSS селектор элемента на который вешаем событие
    * @param callback      - пользовательская функция которая будет исполнена после срабатывания события
    */
-  static on(eventName: string, childSelector: string, callback: (event: Event, child: HTMLElement) => void): void {
+  static on(
+    eventName: string,
+    childSelector: string,
+    callback: (event: Event, child: HTMLElement) => void
+  ): void {
     eventName
       .split(',')
       .map((tmpEventName) => tmpEventName.trim())
       .forEach((tmpEventName: string) => {
         window.addEventListener(tmpEventName, (event: Event) => {
-          const clickedElement: HTMLElement | null = event.target as HTMLElement;
+          const clickedElement: HTMLElement | null =
+            event.target as HTMLElement;
           if (clickedElement) {
-            const matchingChild: HTMLElement | null = clickedElement.closest(childSelector);
+            const matchingChild: HTMLElement | null =
+              clickedElement.closest(childSelector);
             if (matchingChild) {
               callback(event, matchingChild);
             }
@@ -369,7 +386,9 @@ class Faze {
       try {
         callback();
       } catch (error) {
-        this.logger.error(`Модуль Faze.${moduleName}: Ошибка исполнения пользовательского метода "${callback.name}": ${error}`);
+        this.logger.error(
+          `Модуль Faze.${moduleName}: Ошибка исполнения пользовательского метода "${callback.name}": ${error}`
+        );
       }
     }
   }
@@ -391,6 +410,7 @@ class Faze {
     Faze.Gallery.hotInitialize();
     Faze.Page.hotInitialize();
     Faze.Tab.hotInitialize('tab');
+    Faze.ColorChanger.hotInitialize('colorchanger');
     Faze.ThumbGallery.hotInitialize('thumbgallery');
     Faze.SmartSelect.hotInitialize('smartselect');
     Faze.TableSorter.hotInitialize('tablesorter');

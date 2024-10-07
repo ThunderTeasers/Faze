@@ -356,14 +356,6 @@ class REST {
     // Ищем DOM элемент для вывода информационного сообщения
     if (formNode.dataset.fazeRestapiNotification) {
       notificationNode = formNode;
-    }
-    if (
-      formNode.hasAttribute('data-faze-restapi-notification-outside') &&
-      formNode.dataset.fazeRestapiNotificationOutside === 'true'
-    ) {
-      notificationNode = document.querySelector(
-        '[data-faze-restapi-notification]'
-      );
     } else {
       notificationNode = formNode.querySelector(
         '[data-faze-restapi-notification]'

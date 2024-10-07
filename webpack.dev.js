@@ -124,6 +124,10 @@ module.exports = (env) => {
         template: './src/tests/views/steps.html',
       }),
       new HtmlWebpackPlugin({
+        filename: 'colorchanger.html',
+        template: './src/tests/views/colorchanger.html',
+      }),
+      new HtmlWebpackPlugin({
         template: './src/index.html',
       }),
       new webpack.HotModuleReplacementPlugin(),

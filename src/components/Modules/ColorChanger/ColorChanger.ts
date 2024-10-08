@@ -30,13 +30,11 @@ interface CallbackData {
  *
  * Содержит:
  *   changeOnHover - изменять ли цвет при наведении(по умолчанию смена идёт при клике)
- *   preview - количество цветов в свёрнутом варианте
  *   callbacks
  *     changed - пользовательская функция, исполняющаяся после изменения таба
  */
 interface Config {
   changeOnHover: boolean;
-  preview: number;
   perRow: number;
   direction: 'vertical' | 'horizontal';
   callbacks: {
@@ -76,7 +74,6 @@ class ColorChanger extends Module {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       changeOnHover: false,
-      preview: 4,
       perRow: 4,
       direction: 'vertical',
       callbacks: {
@@ -141,7 +138,7 @@ class ColorChanger extends Module {
   protected build(): void {
     if (this.data && Array.isArray(this.data)) {
       // Если цветов больше чем может вывести превью
-      const isMore: boolean = this.data.length > this.config.preview;
+      const isMore: boolean = this.data.length > this.config.perRow;
 
       // Проставляем классы
       this.colorsNode.className = `${this.classPrefix}-colors ${
@@ -183,7 +180,7 @@ class ColorChanger extends Module {
       if (isMore) {
         const moreNode = document.createElement('div');
         moreNode.className = `${this.classPrefix}-more`;
-        moreNode.textContent = `+${this.data.length - this.config.preview + 1}`;
+        moreNode.textContent = `+${this.data.length - this.config.perRow + 1}`;
 
         this.colorsRowNodes[0].appendChild(moreNode);
       }
@@ -301,7 +298,6 @@ class ColorChanger extends Module {
     new ColorChanger(node, {
       changeOnHover:
         (node.dataset.fazeColorchangerChangeOnHover || 'false') === 'true',
-      preview: parseInt(node.dataset.fazeColorchangerPreview || '4', 10),
       perRow: parseInt(node.dataset.fazeColorchangerPerRow || '4', 10),
       direction:
         node.dataset.fazeColorchangerDirection === 'vertical'

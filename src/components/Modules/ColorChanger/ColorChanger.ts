@@ -175,7 +175,7 @@ class ColorChanger extends Module {
       if (this.data.length > this.config.preview - 1) {
         const moreNode = document.createElement('div');
         moreNode.className = `${this.classPrefix}-more`;
-        moreNode.textContent = `+${this.data.length - this.config.preview - 1}`;
+        moreNode.textContent = `+${this.data.length - this.config.preview + 1}`;
 
         this.colorsRowNodes[0].appendChild(moreNode);
       }

@@ -93,7 +93,14 @@ class Helpers {
       id: 'digit',
       is: (text: string) => {
         const DECIMAL = '[\\.,\\s]';
-        const exp = '/(^0$)|(^[+]?0(' + DECIMAL + '0+)?$)|(^([-+]?[1-9][0-9]*)$)|(^([-+]?((0?|[1-9][0-9]*)' + DECIMAL + '(0*[1-9][0-9]*)))$)|(^[-+]?[1-9]+[0-9]*' + DECIMAL + '0+$)|(^[-+]?[1-9][0-9]*[.,\\s][0-9]*[.,\\s][0-9]*$)/';
+        const exp =
+          '/(^0$)|(^[+]?0(' +
+          DECIMAL +
+          '0+)?$)|(^([-+]?[1-9][0-9]*)$)|(^([-+]?((0?|[1-9][0-9]*)' +
+          DECIMAL +
+          '(0*[1-9][0-9]*)))$)|(^[-+]?[1-9]+[0-9]*' +
+          DECIMAL +
+          '0+$)|(^[-+]?[1-9][0-9]*[.,\\s][0-9]*[.,\\s][0-9]*$)/';
 
         text = text.replace(/ /g, '');
         return RegExp(exp).test(text.trim());
@@ -112,7 +119,9 @@ class Helpers {
       format: function (text: string) {
         text = text.replace(/ /g, '').replace(/,/g, '.');
 
-        const number: RegExpMatchArray | null = text.match(/^(\d+)\(\d*\)$|^(\d+[\.,\s]d*)\(\d*\)$/);
+        const number: RegExpMatchArray | null = text.match(
+          /^(\d+)\(\d*\)$|^(\d+[\.,\s]d*)\(\d*\)$/
+        );
         if (number) {
           return Helpers.formatFloat(number[0] || '0');
         } else {
@@ -127,7 +136,9 @@ class Helpers {
         return /^[£$€₽元?.]|[£$€₽元]$/.test(text);
       },
       format: function (text: string) {
-        return Helpers.formatFloat(text.replace(/,/g, '.').replace(new RegExp(/[^0-9.]/g), ''));
+        return Helpers.formatFloat(
+          text.replace(/,/g, '.').replace(new RegExp(/[^0-9.]/g), '')
+        );
       },
       type: 'numeric',
     },
@@ -137,7 +148,9 @@ class Helpers {
         return /^(https?|http?|ftp|file):\/\/$/.test(text);
       },
       format: (text: string) => {
-        return text.trim().replace(new RegExp(/(https?|http?|ftp|file):\/\//), '');
+        return text
+          .trim()
+          .replace(new RegExp(/(https?|http?|ftp|file):\/\//), '');
       },
       type: 'text',
     },
@@ -148,7 +161,11 @@ class Helpers {
       },
       format: (text: string) => {
         const date = text.match(/^(\d{1,2})[\.\/-](\d{1,2})$/);
-        return Helpers.formatFloat(date && date.length === 3 ? new Date(text.replace(new RegExp(/-/g), '/')).getTime().toString() : '0');
+        return Helpers.formatFloat(
+          date && date.length === 3
+            ? new Date(text.replace(new RegExp(/-/g), '/')).getTime().toString()
+            : '0'
+        );
       },
       type: 'numeric',
     },
@@ -158,8 +175,14 @@ class Helpers {
         return /^\d{4}[\.\/-]\d{1,2}[\.\/-]\d{1,2}\s*\d{2}:\d{2}/.test(text);
       },
       format: (text: string) => {
-        const date = text.match(/^(\d{4})[\.\/-](\d{1,2})[\.\/-](\d{1,2})\s*\d{2}:\d{2}/);
-        return Helpers.formatFloat(date && date.length === 4 ? new Date(text.replace(new RegExp(/-/g), '/')).getTime().toString() : '0');
+        const date = text.match(
+          /^(\d{4})[\.\/-](\d{1,2})[\.\/-](\d{1,2})\s*\d{2}:\d{2}/
+        );
+        return Helpers.formatFloat(
+          date && date.length === 4
+            ? new Date(text.replace(new RegExp(/-/g), '/')).getTime().toString()
+            : '0'
+        );
       },
       type: 'numeric',
     },
@@ -169,7 +192,9 @@ class Helpers {
         return /^\d{1,2}[\.\/-]\d{1,2}[\.\/-]\d{4}\s*\d{2}:\d{2}/.test(text);
       },
       format: (text: string) => {
-        const date = text.match(/^(\d{1,2})[\.\/-](\d{1,2})[\.\/-](\d{4})\s*(\d{2}):(\d{2})/);
+        const date = text.match(
+          /^(\d{1,2})[\.\/-](\d{1,2})[\.\/-](\d{4})\s*(\d{2}):(\d{2})/
+        );
 
         let dateString;
         if (date && date.length === 6) {
@@ -178,7 +203,13 @@ class Helpers {
           dateString = '0';
         }
 
-        return Helpers.formatFloat(date && date.length === 6 ? new Date(dateString.replace(new RegExp(/-/g), '/')).getTime().toString() : '0');
+        return Helpers.formatFloat(
+          date && date.length === 6
+            ? new Date(dateString.replace(new RegExp(/-/g), '/'))
+                .getTime()
+                .toString()
+            : '0'
+        );
       },
       type: 'numeric',
     },
@@ -189,7 +220,11 @@ class Helpers {
       },
       format: (text: string) => {
         const date = text.match(/^(\d{4})[\.\/-](\d{1,2})[\.\/-](\d{1,2})$/);
-        return Helpers.formatFloat(date && date.length === 4 ? new Date(text.replace(new RegExp(/-/g), '/')).getTime().toString() : '0');
+        return Helpers.formatFloat(
+          date && date.length === 4
+            ? new Date(text.replace(new RegExp(/-/g), '/')).getTime().toString()
+            : '0'
+        );
       },
       type: 'numeric',
     },
@@ -248,53 +283,60 @@ class Helpers {
    * Маска мобильного телефона для поля ввода
    */
   static bindMobileMask(): void {
-    document.querySelectorAll<HTMLInputElement>('.faze-mask-mobile').forEach((inputNode: HTMLInputElement) => {
-      Helpers.mobileMask(inputNode);
-    });
+    document
+      .querySelectorAll<HTMLInputElement>('.faze-mask-mobile')
+      .forEach((inputNode: HTMLInputElement) => {
+        Helpers.mobileMask(inputNode);
+      });
   }
 
   /**
    * Копирование текста(textContent) при нажатии на DOM элемент с классом "faze-copy-text"
    */
   static bindCopyText(): void {
-    Faze.on('click', '.faze-copy-text', (event: Event, textNode: HTMLElement) => {
-      // Если есть что копировать
-      if (textNode.textContent) {
-        // Создаем инпут с этим текстом и позиционированием "absolute" чтобы вьюпорт не прыгал вниз
-        const inputNode = document.createElement('textarea');
-        inputNode.value = textNode.dataset.fazeCopyTextValue || textNode.textContent || '';
-        inputNode.style.position = 'fixed';
-        inputNode.style.top = `${(event as MouseEvent).clientY}px`;
-        inputNode.style.left = `${(event as MouseEvent).clientX}px`;
-        inputNode.style.opacity = '0';
-        document.body.appendChild(inputNode);
+    Faze.on(
+      'click',
+      '.faze-copy-text',
+      (event: Event, textNode: HTMLElement) => {
+        // Если есть что копировать
+        if (textNode.textContent) {
+          // Создаем инпут с этим текстом и позиционированием "absolute" чтобы вьюпорт не прыгал вниз
+          const inputNode = document.createElement('textarea');
+          inputNode.value =
+            textNode.dataset.fazeCopyTextValue || textNode.textContent || '';
+          inputNode.style.position = 'fixed';
+          inputNode.style.top = `${(event as MouseEvent).clientY}px`;
+          inputNode.style.left = `${(event as MouseEvent).clientX}px`;
+          inputNode.style.opacity = '0';
+          document.body.appendChild(inputNode);
 
-        // Выделяем и копируем текст
-        inputNode.focus();
-        inputNode.select();
-        document.execCommand('copy');
+          // Выделяем и копируем текст
+          inputNode.focus();
+          inputNode.select();
+          document.execCommand('copy');
 
-        // Обязательно удаляем инпут, он больше не нужен
-        inputNode.remove();
+          // Обязательно удаляем инпут, он больше не нужен
+          inputNode.remove();
 
-        // Создаем элемент для информационного сообщения
-        const notificationNode = document.createElement('div');
-        notificationNode.className = 'faze-notification';
-        notificationNode.textContent = 'Скопировано!';
-        textNode.appendChild(notificationNode);
+          // Создаем элемент для информационного сообщения
+          const notificationNode = document.createElement('div');
+          notificationNode.className = 'faze-notification';
+          notificationNode.textContent = 'Скопировано!';
+          textNode.appendChild(notificationNode);
 
-        // Проставляем класс, что происходит действие
-        textNode.classList.add('faze-active');
+          // Проставляем класс, что происходит действие
+          textNode.classList.add('faze-active');
 
-        // Через время удаляем
-        setTimeout(() => {
-          notificationNode.remove();
+          // Через время удаляем
+          setTimeout(() => {
+            notificationNode.remove();
 
-          // Удалем класс
-          textNode.classList.remove('faze-active');
-        }, 3000);
+            // Удалем класс
+            textNode.classList.remove('faze-active');
+          }, 3000);
+        }
       }
-    });
+    );
   }
 
   /**
@@ -309,7 +351,9 @@ class Helpers {
   static loadJS(url: string): Promise<any> {
     return new Promise((resolve, reject) => {
       if (document.querySelector(`script[src="${url}"]`)) {
-        return reject(`Faze.Helpers.loadJS: Скрипт "${url}" уже загружен на странице!`);
+        return reject(
+          `Faze.Helpers.loadJS: Скрипт "${url}" уже загружен на странице!`
+        );
       }
 
       const nodeScript = document.createElement('script');
@@ -328,7 +372,11 @@ class Helpers {
    * @param index     - индекс искомого элемента
    * @param cssClass  - CSS класс, который вешается на активный элемент, по умолчанию 'active'
    */
-  static activateItem(array: HTMLElement[], index: number, cssClass: string = 'active'): void {
+  static activateItem(
+    array: HTMLElement[],
+    index: number,
+    cssClass: string = 'active'
+  ): void {
     array.forEach((itemNode: HTMLElement, i: number) => {
       if (index === i) {
         itemNode.classList.add(cssClass);
@@ -358,7 +406,10 @@ class Helpers {
    *
    * @return строка разделенная пробелами каждые 3 символа
    */
-  static numberWithSpaces(numberToFormat: number | string, separator: string = '.'): string {
+  static numberWithSpaces(
+    numberToFormat: number | string,
+    separator: string = '.'
+  ): string {
     const numberString: string = numberToFormat.toString();
     let result: string = '';
 
@@ -409,7 +460,12 @@ class Helpers {
         if (value.length <= 4) {
           value = '+7 (';
         }
-      } else if (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].includes(event.data) && value.length < 18) {
+      } else if (
+        ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].includes(
+          event.data
+        ) &&
+        value.length < 18
+      ) {
         // Добавление цифры, проверка на цифры и что номер меньше 18 знаков(включая -, ( и ))
         value += event.data;
         if (value.length === 7) {
@@ -437,7 +493,9 @@ class Helpers {
     const backgroundColor = options?.backgroundColor || '#00b938';
 
     // DOM элемент обертки для информационнах сообщений, она нужна для того, чтобы сообщения шли друг под другом, если их несколько
-    let notificationWrapperNode: HTMLDivElement | null = document.querySelector('.faze-notification-wrapper');
+    let notificationWrapperNode: HTMLDivElement | null = document.querySelector(
+      '.faze-notification-wrapper'
+    );
 
     // Проверяем, существует ли DOM элемент обертки для информационных сообщений
     if (!notificationWrapperNode) {
@@ -468,7 +526,11 @@ class Helpers {
       notificationNode.remove();
 
       // Проверка на содержание в обертке информационных сообщений, если их нет, то удаляем саму обертку
-      if (notificationWrapperNode && notificationWrapperNode.querySelectorAll('.faze-notification').length === 0) {
+      if (
+        notificationWrapperNode &&
+        notificationWrapperNode.querySelectorAll('.faze-notification')
+          .length === 0
+      ) {
         notificationWrapperNode.remove();
       }
     }, time);
@@ -480,9 +542,16 @@ class Helpers {
    * @param quantity - число для проверки
    * @param endings  - массив окончаний
    */
-  static wordEnd(quantity: number, endings: string[] = ['', 'а', 'ов']): string {
+  static wordEnd(
+    quantity: number,
+    endings: string[] = ['', 'а', 'ов']
+  ): string {
     const cases: number[] = [2, 0, 1, 1, 1, 2];
-    return endings[quantity % 100 > 4 && quantity % 100 < 20 ? 2 : cases[quantity % 10 < 5 ? quantity % 10 : 5]];
+    return endings[
+      quantity % 100 > 4 && quantity % 100 < 20
+        ? 2
+        : cases[quantity % 10 < 5 ? quantity % 10 : 5]
+    ];
   }
 
   /**
@@ -494,7 +563,13 @@ class Helpers {
    * @param showMinutes  - показывать ли минуты, имеет приоритет выше, чем "showEmpty"
    * @param showSeconds  - показывать ли секунды, имеет приоритет выше, чем "showEmpty"
    */
-  static secondsToTime({ totalSeconds = 0, showEmpty = false, showHours = true, showMinutes = true, showSeconds = true } = {}): string {
+  static secondsToTime({
+    totalSeconds = 0,
+    showEmpty = false,
+    showHours = true,
+    showMinutes = true,
+    showSeconds = true,
+  } = {}): string {
     let totalSecondsRaw: number = totalSeconds;
 
     // Время в человекопонимаемом формате
@@ -510,11 +585,19 @@ class Helpers {
     }
 
     if ((minutes !== 0 || showEmpty) && showMinutes) {
-      resultTime += `${minutes} минут${Helpers.wordEnd(minutes, ['а', 'ы', ''])} `;
+      resultTime += `${minutes} минут${Helpers.wordEnd(minutes, [
+        'а',
+        'ы',
+        '',
+      ])} `;
     }
 
     if ((seconds !== 0 || showEmpty) && showSeconds) {
-      resultTime += `${seconds} секунд${Helpers.wordEnd(seconds, ['а', 'ы', ''])}`;
+      resultTime += `${seconds} секунд${Helpers.wordEnd(seconds, [
+        'а',
+        'ы',
+        '',
+      ])}`;
     }
 
     return resultTime;
@@ -526,8 +609,13 @@ class Helpers {
    * @param name        - имя чекбокса
    * @param parentNode  - DOM элемент родителя, по умолчанию ищем везде, то есть document
    */
-  static isCheckboxChecked(name: string, parentNode: HTMLElement | Document = document): boolean {
-    return parentNode.querySelectorAll('input[type="checkbox"]:checked').length > 0;
+  static isCheckboxChecked(
+    name: string,
+    parentNode: HTMLElement | Document = document
+  ): boolean {
+    return (
+      parentNode.querySelectorAll('input[type="checkbox"]:checked').length > 0
+    );
   }
 
   /**
@@ -536,8 +624,13 @@ class Helpers {
    * @param name        - имя чекбокса
    * @param parentNode  - DOM элемент родителя, по умолчанию ищем везде, то есть document
    */
-  static isRadioChecked(name: string, parentNode: HTMLElement | Document = document): boolean {
-    return parentNode.querySelectorAll('input[type="radio"]:checked').length > 0;
+  static isRadioChecked(
+    name: string,
+    parentNode: HTMLElement | Document = document
+  ): boolean {
+    return (
+      parentNode.querySelectorAll('input[type="radio"]:checked').length > 0
+    );
   }
 
   /**
@@ -548,7 +641,12 @@ class Helpers {
    * @param expiresInDays - Время жизни в днях
    * @param encode - Нужно ли кодировать значение
    */
-  static setCookie(name: string, value: string, expiresInDays?: number, encode: boolean = false): void {
+  static setCookie(
+    name: string,
+    value: string,
+    expiresInDays?: number,
+    encode: boolean = false
+  ): void {
     let expires: string = '';
     if (expiresInDays) {
       const date: Date = new Date();
@@ -556,7 +654,9 @@ class Helpers {
       expires = `;expires=${date.toUTCString()}`;
     }
 
-    document.cookie = `${name}=${encode ? encodeURIComponent(value) : value}${expires};path=/`;
+    document.cookie = `${name}=${
+      encode ? encodeURIComponent(value) : value
+    }${expires};path=/`;
   }
 
   /**
@@ -634,7 +734,11 @@ class Helpers {
    * @param target      - объект в который сливаем
    * @param sources     - сливаемый объект
    */
-  static mergeDeep(arraysReplace: boolean, target: any, ...sources: any[]): any {
+  static mergeDeep(
+    arraysReplace: boolean,
+    target: any,
+    ...sources: any[]
+  ): any {
     if (!sources.length) return target;
     const source = sources.shift();
 
@@ -649,7 +753,12 @@ class Helpers {
             Helpers.mergeDeep(arraysReplace, target[key], source[key]);
           } else {
             // Если это массив или содержит служебный ключ "__id", то необходимо произвести объединение
-            if (Array.isArray(target[key]) || (source[key] && source[key][0] && source[key][0].__group !== undefined)) {
+            if (
+              Array.isArray(target[key]) ||
+              (source[key] &&
+                source[key][0] &&
+                source[key][0].__group !== undefined)
+            ) {
               // Если значение не задано, создаем пустой массив и пушим в него первый элемент
               if (!target[key]) {
                 target[key] = [];
@@ -659,7 +768,10 @@ class Helpers {
               // Если содержит служебный ключ "__group"
               if (source[key][0].__group !== undefined) {
                 // Ищем элемент у которого уже есть такая группа
-                const foundElement = target[key].find((targetObject: any) => targetObject.__group === source[key][0].__group);
+                const foundElement = target[key].find(
+                  (targetObject: any) =>
+                    targetObject.__group === source[key][0].__group
+                );
 
                 // Определяем индекс найденного элемента
                 const foundIndex = target[key].indexOf(foundElement);
@@ -669,7 +781,10 @@ class Helpers {
                   target[key].push(source[key][0]);
                 } else {
                   // Если нашли, то объединяем объекты этого элемента с новым
-                  target[key][foundIndex] = { ...foundElement, ...source[key][0] };
+                  target[key][foundIndex] = {
+                    ...foundElement,
+                    ...source[key][0],
+                  };
                 }
               } else {
                 // Если не содержит, то это просто элемент массива, значит пушим его
@@ -715,12 +830,20 @@ class Helpers {
    * @param value      - значение для вставки в итоговый объект по так же переданному ключу
    * @param arrayGroup - группа для слияния нескольких пар ключ-значение в один объект при сборке массива объектов
    */
-  static objectFromString(jsonObject: any, stringData: string, key: string, value: string, arrayGroup = 'default'): object {
+  static objectFromString(
+    jsonObject: any,
+    stringData: string,
+    key: string,
+    value: string,
+    arrayGroup = 'default'
+  ): object {
     jsonObject ||= {};
 
     // Разбиваем строку на токены, при этом фильтруя на пустоту токена, т.к. если мы пытаемся разделить пустую строку, "split" вернет
     // массив у которого 1 пустой элемент, а это некорректно в данном случае.
-    const objectTokens: string[] = stringData.split('.').filter((token) => token.length !== 0);
+    const objectTokens: string[] = stringData
+      .split('.')
+      .filter((token) => token.length !== 0);
 
     // Конечный результат генерации объекта из строки
     const result = {};
@@ -791,7 +914,11 @@ class Helpers {
 
     // Объект с результатами проверки
     const result: MouseOverResult = {
-      contains: x > itemRect.left && x < itemRect.left + itemRect.width && y > itemRect.top && y < itemRect.top + itemRect.height,
+      contains:
+        x > itemRect.left &&
+        x < itemRect.left + itemRect.width &&
+        y > itemRect.top &&
+        y < itemRect.top + itemRect.height,
       sides: {
         top: undefined,
         bottom: undefined,
@@ -806,13 +933,20 @@ class Helpers {
       const halfHeight = itemRect.height / 2;
 
       // Проверяем внутри ли мышь по горизонтали
-      const isInsideHorizontally = x > itemRect.left && x < itemRect.left + itemRect.width;
+      const isInsideHorizontally =
+        x > itemRect.left && x < itemRect.left + itemRect.width;
 
       // Проверяем на вхождение в верхнюю часть
-      result.sides.top = y > itemRect.top && y < itemRect.top + halfHeight && isInsideHorizontally;
+      result.sides.top =
+        y > itemRect.top &&
+        y < itemRect.top + halfHeight &&
+        isInsideHorizontally;
 
       // Проверяем на вхождение в нижнюю часть
-      result.sides.bottom = y > itemRect.top + halfHeight && y < itemRect.top + itemRect.height && isInsideHorizontally;
+      result.sides.bottom =
+        y > itemRect.top + halfHeight &&
+        y < itemRect.top + itemRect.height &&
+        isInsideHorizontally;
     }
 
     // Вычисляем входы в горизонтальном направлении(верх и низ)
@@ -821,13 +955,20 @@ class Helpers {
       const halfWidth = itemRect.width / 2;
 
       // Проверяем внутри ли мышь по горизонтали
-      const isInsideVertically = y > itemRect.top && y < itemRect.top + itemRect.height;
+      const isInsideVertically =
+        y > itemRect.top && y < itemRect.top + itemRect.height;
 
       // Проверяем на вхождение в верхнюю часть
-      result.sides.left = x > itemRect.left && x < itemRect.left + halfWidth && isInsideVertically;
+      result.sides.left =
+        x > itemRect.left &&
+        x < itemRect.left + halfWidth &&
+        isInsideVertically;
 
       // Проверяем на вхождение в нижнюю часть
-      result.sides.right = x > itemRect.left + halfWidth && x < itemRect.left + itemRect.width && isInsideVertically;
+      result.sides.right =
+        x > itemRect.left + halfWidth &&
+        x < itemRect.left + itemRect.width &&
+        isInsideVertically;
     }
 
     return result;
@@ -863,7 +1004,8 @@ class Helpers {
    * @param node{HTMLElement} Искомый DOM элемент
    */
   static isMouseOverlapsNode(event: Event, node: HTMLElement): boolean {
-    const path = (<any>event).path || (event.composedPath && event.composedPath());
+    const path =
+      (<any>event).path || (event.composedPath && event.composedPath());
     if (path) {
       if (path.find((element: HTMLElement) => element === node)) {
         return true;
@@ -880,9 +1022,14 @@ class Helpers {
    * @param nodes{HTMLElement[]} Искомые DOM элементы
    */
   static isMouseOverlapsNodes(event: Event, nodes: HTMLElement[]): boolean {
-    const path = (<any>event).path || (event.composedPath && event.composedPath());
+    const path =
+      (<any>event).path || (event.composedPath && event.composedPath());
     if (path) {
-      if (path.find((element: HTMLElement) => Array.from(nodes).some((node) => node === element))) {
+      if (
+        path.find((element: HTMLElement) =>
+          Array.from(nodes).some((node) => node === element)
+        )
+      ) {
         return true;
       }
     }
@@ -926,7 +1073,13 @@ class Helpers {
    * @param styles      - стили создаваемого DOM элемента
    * @param parent      - родитель создаваемого DOM элемента
    */
-  static createElement(tag: string, attributes?: FazeObject, styles?: FazeObject, parent?: HTMLElement, className?: string): HTMLElement {
+  static createElement(
+    tag: string,
+    attributes?: FazeObject,
+    styles?: FazeObject,
+    parent?: HTMLElement,
+    className?: string
+  ): HTMLElement {
     // Создаем DOM элемент
     const node = document.createElement(tag);
 
@@ -980,7 +1133,10 @@ class Helpers {
       calculatedNode = calculatedNode.offsetParent as HTMLElement;
       position.x += calculatedNode.offsetLeft;
       position.y += calculatedNode.offsetTop;
-      if (calculatedNode !== document.body && calculatedNode !== document.documentElement) {
+      if (
+        calculatedNode !== document.body &&
+        calculatedNode !== document.documentElement
+      ) {
         position.x -= calculatedNode.scrollLeft;
         position.y -= calculatedNode.scrollTop;
       }
@@ -1017,7 +1173,10 @@ class Helpers {
     };
   }
 
-  static getElementRealSize(node: HTMLElement, childSelector?: string): FazeSize {
+  static getElementRealSize(
+    node: HTMLElement,
+    childSelector?: string
+  ): FazeSize {
     const cloneNode: HTMLElement = node.cloneNode(true) as HTMLElement;
     cloneNode.style.cssText = 'position:fixed; top:-9999px; opacity:0;';
     document.body.appendChild(cloneNode);
@@ -1029,7 +1188,8 @@ class Helpers {
 
     // Если указан CSS селектор дочернего элемента, берём его размер
     if (childSelector) {
-      const childNode: HTMLElement | null = cloneNode.querySelector(childSelector);
+      const childNode: HTMLElement | null =
+        cloneNode.querySelector(childSelector);
       if (childNode) {
         size.width = childNode.clientWidth;
         size.height = childNode.clientHeight;
@@ -1092,15 +1252,26 @@ class Helpers {
       startMousePosition.y = event.clientY;
 
       // Расчёт новой позиции
-      options.node.style.left = `${parseInt(options.node.style.left, 10) - endMousePosition.x}px`;
-      options.node.style.top = `${parseInt(options.node.style.top, 10) - endMousePosition.y}px`;
+      options.node.style.left = `${
+        parseInt(options.node.style.left, 10) - endMousePosition.x
+      }px`;
+      options.node.style.top = `${
+        parseInt(options.node.style.top, 10) - endMousePosition.y
+      }px`;
 
       // Вызываем пользовательскую функцию
-      if (options.callbacks && 'drag' in options.callbacks && typeof options.callbacks.drag === 'function') {
+      if (
+        options.callbacks &&
+        'drag' in options.callbacks &&
+        typeof options.callbacks.drag === 'function'
+      ) {
         try {
           options.callbacks.drag();
         } catch (error) {
-          console.error('Ошибка исполнения пользовательского метода "drag":', error);
+          console.error(
+            'Ошибка исполнения пользовательского метода "drag":',
+            error
+          );
         }
       }
     };
@@ -1123,14 +1294,21 @@ class Helpers {
       options.node.classList.remove('faze-drag-active');
 
       // Вызываем пользовательскую функцию
-      if (options.callbacks && 'afterDrag' in options.callbacks && typeof options.callbacks.afterDrag === 'function') {
+      if (
+        options.callbacks &&
+        'afterDrag' in options.callbacks &&
+        typeof options.callbacks.afterDrag === 'function'
+      ) {
         try {
           options.callbacks.afterDrag({
             startPosition,
             event,
           });
         } catch (error) {
-          console.error('Ошибка исполнения пользовательского метода "afterDrag":', error);
+          console.error(
+            'Ошибка исполнения пользовательского метода "afterDrag":',
+            error
+          );
         }
       }
     };
@@ -1162,11 +1340,18 @@ class Helpers {
       startMousePosition.y = event.clientY;
 
       // Вызываем пользовательскую функцию
-      if (options.callbacks && 'beforeDrag' in options.callbacks && typeof options.callbacks.beforeDrag === 'function') {
+      if (
+        options.callbacks &&
+        'beforeDrag' in options.callbacks &&
+        typeof options.callbacks.beforeDrag === 'function'
+      ) {
         try {
           options.callbacks.beforeDrag();
         } catch (error) {
-          console.error('Ошибка исполнения пользовательского метода "beforeDrag":', error);
+          console.error(
+            'Ошибка исполнения пользовательского метода "beforeDrag":',
+            error
+          );
         }
       }
 
@@ -1186,7 +1371,10 @@ class Helpers {
    *
    * @return{Promise<FazeSize>} - промис, который выполнится в случае загрузки изображения или ошибки
    */
-  static changeImage(source: string, node: HTMLImageElement): Promise<FazeSize> {
+  static changeImage(
+    source: string,
+    node: HTMLImageElement
+  ): Promise<FazeSize> {
     return new Promise<FazeSize>((resolve, reject) => {
       // Создаём экземпляр новой картинки
       const image = new Image();
@@ -1216,7 +1404,9 @@ class Helpers {
    *
    * @return{FazeObject} - объект с собранными CSS стилями
    */
-  static fromPositionAndSizeToStyles(positionAndSize: FazePositionAndSize): FazeObject {
+  static fromPositionAndSizeToStyles(
+    positionAndSize: FazePositionAndSize
+  ): FazeObject {
     // Собираем стили в переменную
     const result: FazeObject = {};
 
@@ -1275,7 +1465,10 @@ class Helpers {
    *
    * @return{boolean} - истина, если позиции равны
    */
-  static comparePositions(position1: FazePosition, position2: FazePosition): boolean {
+  static comparePositions(
+    position1: FazePosition,
+    position2: FazePosition
+  ): boolean {
     return position1.x === position2.x && position1.y === position2.y;
   }
 
@@ -1317,11 +1510,19 @@ class Helpers {
    *
    * @return {boolean} - true если элемент находится во вьюпорте
    */
-  static isElementInViewport(node: HTMLElement, offset: number = 0, enableWhenOnTop: boolean = false): boolean {
+  static isElementInViewport(
+    node: HTMLElement,
+    offset: number = 0,
+    enableWhenOnTop: boolean = false
+  ): boolean {
     const rect: DOMRect = node.getBoundingClientRect();
 
-    const vertInView = rect.top + window.scrollY + offset >= window.scrollY && rect.top + window.scrollY + offset <= window.scrollY + window.innerHeight;
-    const horInView = rect.left + window.scrollX + offset >= window.scrollX && rect.left + window.scrollX + offset <= window.scrollX + window.innerWidth;
+    const vertInView =
+      rect.top + window.scrollY + offset >= window.scrollY &&
+      rect.top + window.scrollY + offset <= window.scrollY + window.innerHeight;
+    const horInView =
+      rect.left + window.scrollX + offset >= window.scrollX &&
+      rect.left + window.scrollX + offset <= window.scrollX + window.innerWidth;
 
     return vertInView && horInView;
   }
@@ -1335,15 +1536,25 @@ class Helpers {
    *
    * @return{HTMLElement[]} - список DOM элементов которые находятся во вьюпорте
    */
-  static isElementsInViewport(nodes: HTMLElement[], offset: number = 0, enableWhenOnTop: boolean = false): HTMLElement[] {
-    const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-    const windowWidth = window.innerWidth || document.documentElement.clientWidth;
+  static isElementsInViewport(
+    nodes: HTMLElement[],
+    offset: number = 0,
+    enableWhenOnTop: boolean = false
+  ): HTMLElement[] {
+    const windowHeight =
+      window.innerHeight || document.documentElement.clientHeight;
+    const windowWidth =
+      window.innerWidth || document.documentElement.clientWidth;
 
     return Array.from(nodes).filter((node) => {
       const rect = node.getBoundingClientRect();
 
-      const vertInView = rect.top - offset <= windowHeight && (enableWhenOnTop ? true : rect.top + rect.height >= 0);
-      const horInView = rect.left - offset <= windowWidth && (enableWhenOnTop ? true : rect.left + rect.width >= 0);
+      const vertInView =
+        rect.top - offset <= windowHeight &&
+        (enableWhenOnTop ? true : rect.top + rect.height >= 0);
+      const horInView =
+        rect.left - offset <= windowWidth &&
+        (enableWhenOnTop ? true : rect.left + rect.width >= 0);
 
       return vertInView && horInView;
     });
@@ -1443,7 +1654,12 @@ class Helpers {
    * @return{object} Готовый JS объект
    */
   static parseJSON(text?: string): object {
-    if (!text || text.trim() === '' || text === 'null' || text === 'undefined') {
+    if (
+      !text ||
+      text.trim() === '' ||
+      text === 'null' ||
+      text === 'undefined'
+    ) {
       return {};
     }
 
@@ -1479,7 +1695,11 @@ class Helpers {
    * @param events{string[]} Список событий
    * @param callback{(event: Event) => void} Пользовательская функция, которая выполнится после срабатывания события
    */
-  static addEventListeners(node: HTMLElement, events: string[], callback: (event: Event) => void): void {
+  static addEventListeners(
+    node: HTMLElement,
+    events: string[],
+    callback: (event: Event) => void
+  ): void {
     events.forEach((eventName: string) => {
       node.addEventListener(eventName, (event: Event) => {
         callback(event);
@@ -1495,7 +1715,11 @@ class Helpers {
    * @returns {string} Нужную форму склонения слова
    */
   static declOfNum(value: number, words: string[]): string {
-    return words[value % 100 > 4 && value % 100 < 20 ? 2 : [2, 0, 1, 1, 1, 2][value % 10 < 5 ? Math.abs(value) % 10 : 5]];
+    return words[
+      value % 100 > 4 && value % 100 < 20
+        ? 2
+        : [2, 0, 1, 1, 1, 2][value % 10 < 5 ? Math.abs(value) % 10 : 5]
+    ];
   }
 
   /**

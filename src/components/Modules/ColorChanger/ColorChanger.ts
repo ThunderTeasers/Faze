@@ -302,6 +302,7 @@ class ColorChanger extends Module {
       changeOnHover:
         (node.dataset.fazeColorchangerChangeOnHover || 'false') === 'true',
       preview: parseInt(node.dataset.fazeColorchangerPreview || '4', 10),
+      perRow: parseInt(node.dataset.fazeColorchangerPerRow || '4', 10),
       direction:
         node.dataset.fazeColorchangerDirection === 'vertical'
           ? 'vertical'

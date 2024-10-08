@@ -30,13 +30,13 @@ interface CallbackData {
  *
  * Содержит:
  *   changeOnHover - изменять ли цвет при наведении(по умолчанию смена идёт при клике)
- *   shortShow - количество цветов в свёрнутом варианте
+ *   preview - количество цветов в свёрнутом варианте
  *   callbacks
  *     changed - пользовательская функция, исполняющаяся после изменения таба
  */
 interface Config {
   changeOnHover: boolean;
-  shortShow: number;
+  preview: number;
   callbacks: {
     changed?: (data: CallbackData) => void;
   };
@@ -47,7 +47,10 @@ interface Config {
  */
 class ColorChanger extends Module {
   // Количество цветов
-  quantity?: number;
+  quantity: number;
+
+  // Данные о цветах
+  data?: any;
 
   /**
    * Стандартный конструктор
@@ -56,12 +59,10 @@ class ColorChanger extends Module {
    * @param config Конфиг модуля
    */
   constructor(node?: HTMLElement, config?: Partial<Config>) {
-    console.log(123);
-
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       changeOnHover: false,
-      shortShow: 4,
+      preview: 4,
       callbacks: {
         changed: undefined,
       },
@@ -73,6 +74,10 @@ class ColorChanger extends Module {
       config: Object.assign(defaultConfig, config),
       name: 'ColorChanger',
     });
+
+    // Инициализация переменных
+    this.quantity = 0;
+    this.data = undefined;
   }
 
   /**
@@ -84,7 +89,6 @@ class ColorChanger extends Module {
     super.initialize();
 
     this.parse();
-    this.build();
   }
 
   /**
@@ -100,11 +104,10 @@ class ColorChanger extends Module {
    * Парсинг JSON с данными
    */
   private parse(): void {
-    const data: any = Faze.Helpers.parseJSON(
-      this.node.dataset.fazeColorchangerData
-    );
-
-    console.log(data);
+    this.data = Faze.Helpers.parseJSON(this.node.dataset.fazeColorchangerData);
+    if (!this.data) {
+      this.logger.error('Ошибка парсинга данных цветов!');
+    }
   }
 
   /**
@@ -112,7 +115,29 @@ class ColorChanger extends Module {
    *
    * @protected
    */
-  protected build(): void {}
+  protected build(): void {
+    if (this.data && Array.isArray(this.data)) {
+      const colorsHolderNode: HTMLElement = document.createElement('div');
+      colorsHolderNode.className = `${this.classPrefix}-colors`;
+
+      this.data.forEach((dataRow: any) => {
+        const colorNode: HTMLImageElement = document.createElement('img');
+        colorNode.className = `${this.classPrefix}-color`;
+
+        if ('image' in dataRow) {
+          colorNode.src = dataRow.image;
+        }
+
+        Object.keys(dataRow).forEach((key: string) => {
+          colorNode.dataset[key] = dataRow[key];
+        });
+
+        colorsHolderNode.appendChild(colorNode);
+      });
+
+      this.node.appendChild(colorsHolderNode);
+    }
+  }
 
   /**
    * Инициализация модуля по data атрибутам
@@ -122,7 +147,7 @@ class ColorChanger extends Module {
   static initializeByDataAttributes(node: HTMLElement): void {
     new ColorChanger(node, {
       changeOnHover: (node.dataset.fazeTabUseHash || 'false') === 'true',
-      shortShow: parseInt(node.dataset.fazeTabMaxBodies || '1', 4),
+      preview: parseInt(node.dataset.fazeTabMaxBodies || '4', 10),
     });
   }
 }

@@ -36,6 +36,9 @@ abstract class Module {
   // Имя плагина
   private readonly name: string;
 
+  // Префикс класса
+  protected readonly classPrefix: string;
+
   // CSS класс главного DOM элемента
   protected readonly className?: string;
 
@@ -67,10 +70,13 @@ abstract class Module {
     this.node = data.node;
     this.config = data.config;
     this.additionalParams = data.additionalParams;
+    this.classPrefix = `faze-${this.name.toLowerCase()}`;
 
     // Вычисляем CSS селектор класса
     const classNameTmp = data.node?.className;
-    this.className = classNameTmp ? `.${classNameTmp.trim().replace(' ', '.')}` : undefined;
+    this.className = classNameTmp
+      ? `.${classNameTmp.trim().replace(' ', '.')}`
+      : undefined;
 
     // Вызываем стандартные методы
     this.initialize();
@@ -87,8 +93,8 @@ abstract class Module {
    */
   protected initialize(): void {
     // У основного DOM элемента, добавляем классы, показывающие, что данный плагин инициализирован, это необходимо для "hotInitialize"
-    this.node.classList.add(`faze-${this.name.toLowerCase()}`);
-    this.node.classList.add(`faze-${this.name.toLowerCase()}-initialized`);
+    this.node.classList.add(this.classPrefix);
+    this.node.classList.add(`${this.classPrefix}-initialized`);
   }
 
   /**
@@ -132,9 +138,11 @@ abstract class Module {
     });
 
     // Стандартная инициализация по data атрибутам
-    document.querySelectorAll<HTMLElement>(`[data-faze~="${name}"]`).forEach((node: HTMLElement) => {
-      this.initializeByDataAttributes(node);
-    });
+    document
+      .querySelectorAll<HTMLElement>(`[data-faze~="${name}"]`)
+      .forEach((node: HTMLElement) => {
+        this.initializeByDataAttributes(node);
+      });
   }
 }
 

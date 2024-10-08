@@ -179,8 +179,52 @@ class ColorChanger extends Module {
     // Изменяем выбранный цвет
     this.selectedColorNode = colorNode;
 
+    Object.keys(colorNode.dataset).forEach((key: string) => {
+      // DOM элемент в котором нужно изменить значения
+      const foundNode: HTMLElement | null = this.node.querySelector(
+        `[data-faze-colorchanger="${key}"]`
+      );
+
+      if (foundNode) {
+        this.changeParam(foundNode, colorNode.dataset[key], key);
+      }
+    });
+
     // Вызываем пользовательскую функцию
     this.changeCallbackCall();
+  }
+
+  /**
+   * Изменяем данные в DOM элементе
+   *
+   * @param {HTMLElement} node Изменяемый DOM элемент
+   * @param {string} data Данные на которые меняем
+   * @param {string} key Ключ, необходим если нужно менять data атрибут
+   */
+  private changeParam(
+    node: HTMLElement | HTMLImageElement,
+    data: string | undefined,
+    key: string
+  ): void {
+    if (!data) {
+      return;
+    }
+
+    const types = (node.dataset.fazeColorchangerType || 'text').split(',');
+
+    types.forEach((type: string) => {
+      switch (type) {
+        case 'src':
+          (node as HTMLImageElement).src = data;
+          break;
+        case 'data':
+          node.dataset[key] = data;
+          break;
+        case 'text':
+        default:
+          node.textContent = data;
+      }
+    });
   }
 
   /**

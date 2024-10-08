@@ -4,3 +4,73 @@
  * Автор: Ерохин Максим
  * Дата: 09.10.2024
  */
+
+[data-faze='colorchanger'] {
+  position: relative;
+
+  // Холдер для цветов
+  .faze-colorchanger-colors {
+    position: absolute;
+
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+
+    // Строка цветов
+    .faze-colorchanger-row {
+      display: flex;
+
+      // Цвет
+      .faze-colorchanger-color {
+        width: 2.4rem;
+        height: 2.4rem;
+
+        padding: 0.2rem;
+
+        border: 0.1rem solid var(--faze-color-border);
+        border-radius: var(--faze-border-radius);
+
+        // При наведении
+        &:hover {
+          cursor: pointer;
+        }
+      }
+
+      // Отступ слева
+      &:not(:last-child) {
+        margin-left: 0.2rem;
+      }
+    }
+  }
+
+  // Вертикальное расположение
+  &.faze-colorchanger-vertical {
+    // Холдер для цветов
+    .faze-colorchanger-colors {
+      top: 0;
+      right: 0;
+
+      // Строка цветов
+      .faze-colorchanger-row {
+        flex-direction: column;
+
+        // Цвет
+        .faze-colorchanger-color {
+          // Отступ снизу
+          &:not(:last-child) {
+            margin-bottom: 0.2rem;
+          }
+        }
+      }
+    }
+  }
+
+  // Горизонтальное расположение
+  &.faze-colorchanger-horizontal {
+    // Холдер для цветов
+    .faze-colorchanger-colors {
+      left: 0;
+      bottom: 0;
+    }
+  }
+}

@@ -37,6 +37,8 @@ interface CallbackData {
 interface Config {
   changeOnHover: boolean;
   preview: number;
+  perRow: number;
+  direction: 'vertical' | 'horizontal';
   callbacks: {
     changed?: (data: CallbackData) => void;
   };
@@ -58,6 +60,9 @@ class ColorChanger extends Module {
   // DOM элементы цветов
   colorsNodes: HTMLImageElement[];
 
+  // DOM элементы строк(колонок)
+  colorsRowNodes: HTMLElement[];
+
   // DOM элемент выбранного цвета
   selectedColorNode?: HTMLElement;
 
@@ -72,6 +77,8 @@ class ColorChanger extends Module {
     const defaultConfig: Config = {
       changeOnHover: false,
       preview: 4,
+      perRow: 4,
+      direction: 'vertical',
       callbacks: {
         changed: undefined,
       },
@@ -99,6 +106,8 @@ class ColorChanger extends Module {
     this.selectedColorNode = undefined;
     this.colorsNode = document.createElement('div');
     this.colorsNodes = [];
+    this.colorsRowNodes = [];
+    this.node.classList.add(`${this.classPrefix}-${this.config.direction}`);
 
     this.parse();
   }
@@ -133,7 +142,18 @@ class ColorChanger extends Module {
     if (this.data && Array.isArray(this.data)) {
       this.colorsNode.className = `${this.classPrefix}-colors`;
 
-      this.data.forEach((dataRow: any) => {
+      // Количество колонок(строк) с цветами
+      const numberOfRows = Math.ceil(this.data.length / this.config.perRow);
+
+      for (let i = 0; i < numberOfRows; i++) {
+        const rowNode = document.createElement('div');
+        rowNode.className = 'faze-colorchanger-row';
+        this.colorsRowNodes.push(rowNode);
+
+        this.colorsNode.appendChild(rowNode);
+      }
+
+      this.data.forEach((dataRow: any, index: number) => {
         const colorNode: HTMLImageElement = document.createElement('img');
         colorNode.className = `${this.classPrefix}-color`;
 
@@ -146,7 +166,9 @@ class ColorChanger extends Module {
         });
 
         this.colorsNodes.push(colorNode);
-        this.colorsNode.appendChild(colorNode);
+        this.colorsRowNodes[Math.floor(index / this.config.perRow)].appendChild(
+          colorNode
+        );
       });
 
       this.node.appendChild(this.colorsNode);
@@ -260,6 +282,10 @@ class ColorChanger extends Module {
       changeOnHover:
         (node.dataset.fazeColorchangerChangeOnHover || 'false') === 'true',
       preview: parseInt(node.dataset.fazeColorchangerPreview || '4', 10),
+      direction:
+        node.dataset.fazeColorchangerDirection === 'vertical'
+          ? 'vertical'
+          : 'horizontal',
     });
   }
 }

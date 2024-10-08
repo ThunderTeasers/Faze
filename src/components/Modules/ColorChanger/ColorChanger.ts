@@ -58,6 +58,9 @@ class ColorChanger extends Module {
   // DOM элементы цветов
   colorsNodes: HTMLImageElement[];
 
+  // DOM элемент выбранного цвета
+  selectedColorNode?: HTMLElement;
+
   /**
    * Стандартный конструктор
    *
@@ -93,6 +96,7 @@ class ColorChanger extends Module {
     // Инициализация переменных
     this.quantity = 0;
     this.data = undefined;
+    this.selectedColorNode = undefined;
     this.colorsNode = document.createElement('div');
     this.colorsNodes = [];
 
@@ -154,17 +158,52 @@ class ColorChanger extends Module {
    *
    * @private
    */
-  private bindColorChange() {
+  private bindColorChange(): void {
     this.colorsNodes.forEach((colorNode: HTMLElement) => {
-      console.log(this.config.changeOnHover ? 'mouseenter' : 'click');
       Faze.Events.listener(
         this.config.changeOnHover ? 'mouseenter' : 'click',
         colorNode,
         () => {
-          console.log(123);
+          this.change(colorNode);
         }
       );
     });
+  }
+
+  /**
+   * Изменение цвета
+   *
+   * @param {HTMLElement} colorNode DOM элемент выбранного цвета
+   */
+  private change(colorNode: HTMLElement): void {
+    // Изменяем выбранный цвет
+    this.selectedColorNode = colorNode;
+
+    // Вызываем пользовательскую функцию
+    this.changeCallbackCall();
+  }
+
+  /**
+   * Выполнение пользовательской функции "changed"
+   *
+   * @param currentSlide - DOM элемент текущего слайда
+   * @param direction - направление карусели
+   */
+  private changeCallbackCall(): void {
+    if (typeof this.config.callbacks.changed === 'function') {
+      try {
+        this.config.callbacks.changed({
+          node: this.node,
+          colorsNode: this.colorsNode,
+          colorsNodes: this.colorsNodes,
+          selectedColorNode: this.selectedColorNode,
+        });
+      } catch (error) {
+        this.logger.error(
+          `Ошибка исполнения пользовательского метода "changed": ${error}`
+        );
+      }
+    }
   }
 
   /**

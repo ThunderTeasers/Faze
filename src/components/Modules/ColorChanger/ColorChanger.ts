@@ -13,16 +13,16 @@ import Faze from '../../Core/Faze';
  * Структура возвращаемого объекта в пользовательском методе
  *
  * Содержит:
- *   itemNode - DOM элемент где происходит работа модуля
+ *   node - DOM элемент где происходит работа модуля
  *   colorsNode - DOM элемент холдера цветов
  *   colorsNodes - DOM элементы цветов
  *   selectedColorNode - DOM элемент выбранного цвета
  */
 interface CallbackData {
-  itemNode: HTMLElement;
+  node: HTMLElement;
   colorsNode: HTMLElement;
   colorsNodes: HTMLElement[];
-  selectedColorNode: HTMLElement;
+  selectedColorNode?: HTMLElement;
 }
 
 /**
@@ -52,6 +52,12 @@ class ColorChanger extends Module {
   // Данные о цветах
   data?: any;
 
+  // DOM элемент холдера цветов
+  colorsNode: HTMLElement;
+
+  // DOM элементы цветов
+  colorsNodes: HTMLImageElement[];
+
   /**
    * Стандартный конструктор
    *
@@ -74,10 +80,6 @@ class ColorChanger extends Module {
       config: Object.assign(defaultConfig, config),
       name: 'ColorChanger',
     });
-
-    // Инициализация переменных
-    this.quantity = 0;
-    this.data = undefined;
   }
 
   /**
@@ -87,6 +89,12 @@ class ColorChanger extends Module {
    */
   protected initialize(): void {
     super.initialize();
+
+    // Инициализация переменных
+    this.quantity = 0;
+    this.data = undefined;
+    this.colorsNode = document.createElement('div');
+    this.colorsNodes = [];
 
     this.parse();
   }
@@ -98,6 +106,8 @@ class ColorChanger extends Module {
    */
   protected bind(): void {
     super.bind();
+
+    this.bindColorChange();
   }
 
   /**
@@ -117,8 +127,7 @@ class ColorChanger extends Module {
    */
   protected build(): void {
     if (this.data && Array.isArray(this.data)) {
-      const colorsHolderNode: HTMLElement = document.createElement('div');
-      colorsHolderNode.className = `${this.classPrefix}-colors`;
+      this.colorsNode.className = `${this.classPrefix}-colors`;
 
       this.data.forEach((dataRow: any) => {
         const colorNode: HTMLImageElement = document.createElement('img');
@@ -132,11 +141,30 @@ class ColorChanger extends Module {
           colorNode.dataset[key] = dataRow[key];
         });
 
-        colorsHolderNode.appendChild(colorNode);
+        this.colorsNodes.push(colorNode);
+        this.colorsNode.appendChild(colorNode);
       });
 
-      this.node.appendChild(colorsHolderNode);
+      this.node.appendChild(this.colorsNode);
     }
+  }
+
+  /**
+   * Навешивание событий на изменение цвета
+   *
+   * @private
+   */
+  private bindColorChange() {
+    this.colorsNodes.forEach((colorNode: HTMLElement) => {
+      console.log(this.config.changeOnHover ? 'mouseenter' : 'click');
+      Faze.Events.listener(
+        this.config.changeOnHover ? 'mouseenter' : 'click',
+        colorNode,
+        () => {
+          console.log(123);
+        }
+      );
+    });
   }
 
   /**

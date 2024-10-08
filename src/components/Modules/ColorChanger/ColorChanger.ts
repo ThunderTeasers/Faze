@@ -174,8 +174,9 @@ class ColorChanger extends Module {
    */
   static initializeByDataAttributes(node: HTMLElement): void {
     new ColorChanger(node, {
-      changeOnHover: (node.dataset.fazeTabUseHash || 'false') === 'true',
-      preview: parseInt(node.dataset.fazeTabMaxBodies || '4', 10),
+      changeOnHover:
+        (node.dataset.fazeColorchangerChangeOnHover || 'false') === 'true',
+      preview: parseInt(node.dataset.fazeColorchangerPreview || '4', 10),
     });
   }
 }

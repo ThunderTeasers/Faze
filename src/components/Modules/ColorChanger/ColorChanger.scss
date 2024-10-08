@@ -13,12 +13,12 @@
     position: absolute;
 
     display: flex;
-    flex-direction: row-reverse;
-    flex-wrap: wrap;
+    gap: 0.2rem;
 
     // Строка цветов
     .faze-colorchanger-row {
       display: flex;
+      gap: 0.2rem;
 
       // Цвет
       .faze-colorchanger-color {
@@ -35,11 +35,6 @@
           cursor: pointer;
         }
       }
-
-      // Отступ слева
-      &:not(:last-child) {
-        margin-left: 0.2rem;
-      }
     }
   }
 
@@ -50,17 +45,11 @@
       top: 0;
       right: 0;
 
+      flex-direction: row-reverse;
+
       // Строка цветов
       .faze-colorchanger-row {
         flex-direction: column;
-
-        // Цвет
-        .faze-colorchanger-color {
-          // Отступ снизу
-          &:not(:last-child) {
-            margin-bottom: 0.2rem;
-          }
-        }
       }
     }
   }
@@ -71,6 +60,14 @@
     .faze-colorchanger-colors {
       left: 0;
       bottom: 0;
+
+      flex-direction: column-reverse;
+      gap: 0.2rem;
+
+      // Строка цветов
+      .faze-colorchanger-row {
+        flex-direction: row;
+      }
     }
   }
 }

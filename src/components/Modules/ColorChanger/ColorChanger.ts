@@ -140,19 +140,27 @@ class ColorChanger extends Module {
    */
   protected build(): void {
     if (this.data && Array.isArray(this.data)) {
-      this.colorsNode.className = `${this.classPrefix}-colors`;
+      // Если цветов больше чем может вывести превью
+      const isMore: boolean = this.data.length > this.config.preview;
+
+      // Проставляем классы
+      this.colorsNode.className = `${this.classPrefix}-colors ${
+        isMore ? `${this.classPrefix}-colors-more` : ''
+      }`;
 
       // Количество колонок(строк) с цветами
       const numberOfRows = Math.ceil(this.data.length / this.config.perRow);
 
+      // Создаём колонки для цветов
       for (let i = 0; i < numberOfRows; i++) {
         const rowNode = document.createElement('div');
-        rowNode.className = 'faze-colorchanger-row';
+        rowNode.className = `${this.classPrefix}-row`;
         this.colorsRowNodes.push(rowNode);
 
         this.colorsNode.appendChild(rowNode);
       }
 
+      // Генерируем HTML код для цветов
       this.data.forEach((dataRow: any, index: number) => {
         const colorNode: HTMLImageElement = document.createElement('img');
         colorNode.className = `${this.classPrefix}-color`;
@@ -172,7 +180,7 @@ class ColorChanger extends Module {
       });
 
       // Вставляем элемент "Показать ещё"
-      if (this.data.length > this.config.preview - 1) {
+      if (isMore) {
         const moreNode = document.createElement('div');
         moreNode.className = `${this.classPrefix}-more`;
         moreNode.textContent = `+${this.data.length - this.config.preview + 1}`;

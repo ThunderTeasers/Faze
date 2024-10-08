@@ -35,6 +35,21 @@
           cursor: pointer;
         }
       }
+
+      // Скрываем всё кроме первой
+      &:not(:first-child) {
+        display: none;
+      }
+    }
+
+    // При наведении
+    &:hover {
+      // Строка цветов
+      .faze-colorchanger-row {
+        &:not(:first-child) {
+          display: flex;
+        }
+      }
     }
   }
 
@@ -62,7 +77,6 @@
       bottom: 0;
 
       flex-direction: column-reverse;
-      gap: 0.2rem;
 
       // Строка цветов
       .faze-colorchanger-row {

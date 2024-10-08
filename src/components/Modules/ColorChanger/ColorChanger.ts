@@ -171,6 +171,15 @@ class ColorChanger extends Module {
         );
       });
 
+      // Вставляем элемент "Показать ещё"
+      if (this.data.length > this.config.preview - 1) {
+        const moreNode = document.createElement('div');
+        moreNode.className = `${this.classPrefix}-more`;
+        moreNode.textContent = `+${this.data.length - this.config.preview - 1}`;
+
+        this.colorsRowNodes[0].appendChild(moreNode);
+      }
+
       this.node.appendChild(this.colorsNode);
     }
   }

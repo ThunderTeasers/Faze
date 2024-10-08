@@ -21,12 +21,14 @@
       gap: 0.2rem;
 
       // Цвет
-      .faze-colorchanger-color {
+      .faze-colorchanger-color,
+      .faze-colorchanger-more {
         width: 2.4rem;
         height: 2.4rem;
 
         padding: 0.2rem;
 
+        background-color: var(--faze-color-white);
         border: 0.1rem solid var(--faze-color-border);
         border-radius: var(--faze-border-radius);
 
@@ -36,9 +38,27 @@
         }
       }
 
+      // Показать ещё
+      .faze-colorchanger-more {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+      }
+
       // Скрываем всё кроме первой
       &:not(:first-child) {
         display: none;
+      }
+
+      // Скрываем последний цвет в первой строке чтобы кнопка "Показать ещё" была на равне с остальными
+      &:first-child {
+        // Цвет
+        .faze-colorchanger-color {
+          &:last-of-type {
+            display: none;
+          }
+        }
       }
     }
 
@@ -46,8 +66,22 @@
     &:hover {
       // Строка цветов
       .faze-colorchanger-row {
+        // Показать ещё
+        .faze-colorchanger-more {
+          display: none;
+        }
+
         &:not(:first-child) {
           display: flex;
+        }
+
+        &:first-child {
+          // Цвет
+          .faze-colorchanger-color {
+            &:last-of-type {
+              display: block;
+            }
+          }
         }
       }
     }

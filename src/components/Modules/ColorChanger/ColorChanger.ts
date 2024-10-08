@@ -218,14 +218,7 @@ class ColorChanger extends Module {
     this.selectedColorNode = colorNode;
 
     Object.keys(colorNode.dataset).forEach((key: string) => {
-      // DOM элемент в котором нужно изменить значения
-      const foundNode: HTMLElement | null = this.node.querySelector(
-        `[data-faze-colorchanger="${key}"]`
-      );
-
-      if (foundNode) {
-        this.changeParam(foundNode, colorNode.dataset[key], key);
-      }
+      this.changeParam(key);
     });
 
     // Вызываем пользовательскую функцию
@@ -235,37 +228,36 @@ class ColorChanger extends Module {
   /**
    * Изменяем данные в DOM элементе
    *
-   * @param {HTMLElement} node Изменяемый DOM элемент
-   * @param {string} data Данные на которые меняем
    * @param {string} key Ключ, необходим если нужно менять data атрибут
    */
-  private changeParam(
-    node: HTMLElement | HTMLImageElement | HTMLAnchorElement,
-    data: string | undefined,
-    key: string
-  ): void {
-    if (!data) {
+  private changeParam(key: string): void {
+    const value: string | undefined = this.selectedColorNode?.dataset[key];
+    if (!value) {
       return;
     }
 
-    const types = (node.dataset.fazeColorchangerType || 'text').split(',');
+    this.node
+      .querySelectorAll<HTMLElement>(`[data-faze-colorchanger="${key}"]`)
+      .forEach((node: HTMLElement) => {
+        const types = (node.dataset.fazeColorchangerType || 'text').split(',');
 
-    types.forEach((type: string) => {
-      switch (type) {
-        case 'src':
-          (node as HTMLImageElement).src = data;
-          break;
-        case 'href':
-          (node as HTMLAnchorElement).href = data;
-          break;
-        case 'data':
-          node.dataset[key] = data;
-          break;
-        case 'text':
-        default:
-          node.textContent = data;
-      }
-    });
+        types.forEach((type: string) => {
+          switch (type) {
+            case 'src':
+              (node as HTMLImageElement).src = value;
+              break;
+            case 'href':
+              (node as HTMLAnchorElement).href = value;
+              break;
+            case 'data':
+              node.dataset[key] = value;
+              break;
+            case 'text':
+            default:
+              node.textContent = value;
+          }
+        });
+      });
   }
 
   /**

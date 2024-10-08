@@ -302,9 +302,9 @@ class ColorChanger extends Module {
         (node.dataset.fazeColorchangerChangeOnHover || 'false') === 'true',
       perRow: parseInt(node.dataset.fazeColorchangerPerRow || '4', 10),
       direction:
-        node.dataset.fazeColorchangerDirection === 'vertical'
-          ? 'vertical'
-          : 'horizontal',
+        node.dataset.fazeColorchangerDirection === 'horizontal'
+          ? 'horizontal'
+          : 'vertical',
     });
   }
 }

@@ -224,7 +224,7 @@ class ColorChanger extends Module {
    * @param {string} key Ключ, необходим если нужно менять data атрибут
    */
   private changeParam(
-    node: HTMLElement | HTMLImageElement,
+    node: HTMLElement | HTMLImageElement | HTMLAnchorElement,
     data: string | undefined,
     key: string
   ): void {
@@ -238,6 +238,9 @@ class ColorChanger extends Module {
       switch (type) {
         case 'src':
           (node as HTMLImageElement).src = data;
+          break;
+        case 'href':
+          (node as HTMLAnchorElement).href = data;
           break;
         case 'data':
           node.dataset[key] = data;

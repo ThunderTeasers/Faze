@@ -197,11 +197,13 @@ class ColorChanger extends Module {
    * @private
    */
   private bindColorChange(): void {
-    this.colorsNodes.forEach((colorNode: HTMLElement) => {
+    this.colorsNodes.forEach((colorNode: HTMLElement, index: number) => {
       Faze.Events.listener(
         this.config.changeOnHover ? 'mouseenter' : 'click',
         colorNode,
         () => {
+          Faze.Helpers.activateItem(this.colorsNodes, index, 'faze-active');
+
           this.change(colorNode);
         }
       );

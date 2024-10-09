@@ -250,6 +250,7 @@ class ColorChanger extends Module {
       .querySelectorAll<HTMLElement>(`[data-faze-colorchanger="${key}"]`)
       .forEach((node: HTMLElement) => {
         const types = (node.dataset.fazeColorchangerType || 'text').split(',');
+        const name = node.dataset.fazeColorchangerName;
 
         types.forEach((type: string) => {
           switch (type) {
@@ -260,7 +261,7 @@ class ColorChanger extends Module {
               (node as HTMLAnchorElement).href = value;
               break;
             case 'data':
-              node.dataset[key] = value;
+              node.dataset[name || key] = value;
               break;
             case 'text':
             default:

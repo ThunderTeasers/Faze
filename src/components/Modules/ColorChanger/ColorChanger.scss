@@ -50,13 +50,19 @@
       &:not(:first-child) {
         display: none;
       }
+    }
 
-      // Скрываем последний цвет в первой строке чтобы кнопка "Показать ещё" была на равне с остальными
-      &:first-child {
-        // Цвет
-        .faze-colorchanger-color {
-          &:last-of-type {
-            display: none;
+    // Если есть много цветов
+    &.faze-colorchanger-colors-more {
+      // Строка цветов
+      .faze-colorchanger-row {
+        // Скрываем последний цвет в первой строке чтобы кнопка "Показать ещё" была на равне с остальными
+        &:first-child {
+          // Цвет
+          .faze-colorchanger-color {
+            &:last-of-type {
+              display: none;
+            }
           }
         }
       }

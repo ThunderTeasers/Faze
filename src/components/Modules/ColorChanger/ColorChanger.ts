@@ -164,12 +164,20 @@ class ColorChanger extends Module {
         const colorNode: HTMLImageElement = document.createElement('img');
         colorNode.className = `${this.classPrefix}-color`;
 
+        // Специальное условие для отображения картинки цвета
         if ('image' in dataRow) {
           colorNode.src = dataRow.image;
         }
 
         Object.keys(dataRow).forEach((key: string) => {
-          colorNode.dataset[key] = dataRow[key];
+          let value = dataRow[key];
+
+          // Проверка на массив, т.к. при стандартном приведении массива в строку JS убирает скобки, а они нам нужны для будущего парсинга
+          if (Array.isArray(dataRow[key])) {
+            value = `[${dataRow[key]}]`;
+          }
+
+          colorNode.dataset[key] = value;
         });
 
         this.colorsNodes.push(colorNode);

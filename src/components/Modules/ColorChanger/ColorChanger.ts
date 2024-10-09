@@ -174,7 +174,7 @@ class ColorChanger extends Module {
 
           // Проверка на массив, т.к. при стандартном приведении массива в строку JS убирает скобки, а они нам нужны для будущего парсинга
           if (Array.isArray(dataRow[key])) {
-            value = `[${dataRow[key]}]`;
+            value = `["${dataRow[key].join('","')}"]`;
           }
 
           colorNode.dataset[key] = value;

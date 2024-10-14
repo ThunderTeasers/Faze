@@ -191,7 +191,10 @@ class Carousel {
 
     // Проверка на двойную инициализацию
     if (node.classList.contains('faze-carousel-initialized')) {
-      this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
+      this.logger.warning(
+        'Плагин уже был инициализирован на этот DOM элемент:',
+        node
+      );
       return;
     }
 
@@ -273,8 +276,12 @@ class Carousel {
       // Проверка на присутствие кастомных стрелок
       if (this.config.selectors.arrowLeft && this.config.selectors.arrowRight) {
         // DOM элементы стрелок управления
-        const arrowLeftNode = document.querySelector<HTMLElement>(this.config.selectors.arrowLeft);
-        const arrowRightNode = document.querySelector<HTMLElement>(this.config.selectors.arrowRight);
+        const arrowLeftNode = document.querySelector<HTMLElement>(
+          this.config.selectors.arrowLeft
+        );
+        const arrowRightNode = document.querySelector<HTMLElement>(
+          this.config.selectors.arrowRight
+        );
 
         // Если нашли кастомные стрелки, то задаём их
         if (arrowLeftNode && arrowRightNode) {
@@ -296,7 +303,9 @@ class Carousel {
     // Для счетчика
     if (this.config.counter) {
       if (this.config.selectors.counter) {
-        const counterNode = document.querySelector<HTMLElement>(this.config.selectors.counter);
+        const counterNode = document.querySelector<HTMLElement>(
+          this.config.selectors.counter
+        );
         if (counterNode) {
           this.counterNode = counterNode;
         }
@@ -340,7 +349,10 @@ class Carousel {
 
     // Присвоение DOM объекту карусели необходимых классов и стилей для работы самой карусели
     this.node.classList.add('faze-carousel');
-    this.node.classList.add(`faze-animation-${this.config.animation.type}`, `faze-direction-${this.config.animation.direction}`);
+    this.node.classList.add(
+      `faze-animation-${this.config.animation.type}`,
+      `faze-direction-${this.config.animation.direction}`
+    );
     this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
 
     if (this.config.amountPerSlide !== 1) {
@@ -377,7 +389,9 @@ class Carousel {
           currentSlideNode: this.slidesNodes[this.index],
         });
       } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
+        this.logger.error(
+          `Ошибка исполнения пользовательского метода "created": ${error}`
+        );
       }
     }
   }
@@ -423,7 +437,10 @@ class Carousel {
   _checkDisallowRanges(): boolean {
     // Проходимся по всем границам, при первом же попадении выходим из цикла, т.к. проверять уже нет смысла
     for (const disallowRange of this.config.disallowRanges) {
-      if (window.innerWidth > (disallowRange.from || 0) && window.innerWidth < (disallowRange.to || window.screen.width)) {
+      if (
+        window.innerWidth > (disallowRange.from || 0) &&
+        window.innerWidth < (disallowRange.to || window.screen.width)
+      ) {
         return false;
       }
     }
@@ -457,7 +474,7 @@ class Carousel {
         event.preventDefault();
 
         const index = page.dataset.fazeIndex;
-        if (index) {
+        if (index && this.isIdle) {
           this.change(parseInt(index, 10));
         }
       });
@@ -642,7 +659,9 @@ class Carousel {
     // Если сдвинуто влево больше чем на пол слайда, то активируем следующий слайд
     if (offset < -(this.slideWidth / 6)) {
       this.insertSlideAfter();
-      this.itemsHolderNode.style.left = `${parseInt(this.itemsHolderNode.style.left, 10) + this.slideWidth}px`;
+      this.itemsHolderNode.style.left = `${
+        parseInt(this.itemsHolderNode.style.left, 10) + this.slideWidth
+      }px`;
       this.next();
     } else if (offset > this.slideWidth / 6) {
       // Если тоже самое вправо, то предыдущий
@@ -669,7 +688,10 @@ class Carousel {
     this.slidesNodes = <HTMLElement[]>Array.from(this.itemsHolderNode.children);
 
     // Берем последний слайд и перемещаем его в начало
-    this.itemsHolderNode.insertBefore(this.slidesNodes[this.slidesNodes.length - 1], this.slidesNodes[0]);
+    this.itemsHolderNode.insertBefore(
+      this.slidesNodes[this.slidesNodes.length - 1],
+      this.slidesNodes[0]
+    );
   }
 
   /**
@@ -703,7 +725,9 @@ class Carousel {
     } else {
       // Иначе нужно сгруппировать элементы
       // Высчитываем сколько групп нужно
-      const groupCount = Math.ceil(this.slidesNodes.length / this.config.amountPerSlide);
+      const groupCount = Math.ceil(
+        this.slidesNodes.length / this.config.amountPerSlide
+      );
 
       // Группы слайдов
       const slidesGroupNodes = [];
@@ -716,9 +740,14 @@ class Carousel {
         sliderGroupNode.style.transitionDuration = this.transitionDuration;
 
         // Перемещаем в неё слайды
-        this.slidesNodes.slice(i * this.config.amountPerSlide, i * this.config.amountPerSlide + this.config.amountPerSlide).forEach((slideNode) => {
-          sliderGroupNode.appendChild(slideNode);
-        });
+        this.slidesNodes
+          .slice(
+            i * this.config.amountPerSlide,
+            i * this.config.amountPerSlide + this.config.amountPerSlide
+          )
+          .forEach((slideNode) => {
+            sliderGroupNode.appendChild(slideNode);
+          });
 
         // Перевещаем слайд в родителя
         this.itemsHolderNode.appendChild(sliderGroupNode);
@@ -804,7 +833,11 @@ class Carousel {
    * Изменение назписи счетчика в соответствии с текущим индексом
    */
   changeCounter() {
-    this.counterNode.innerHTML = `<span class="faze-carousel-counter-current">${this.index + 1}</span> / <span class="faze-carousel-counter-total">${this.totalSlides}</span>`;
+    this.counterNode.innerHTML = `<span class="faze-carousel-counter-current">${
+      this.index + 1
+    }</span> / <span class="faze-carousel-counter-total">${
+      this.totalSlides
+    }</span>`;
   }
 
   /**
@@ -814,11 +847,15 @@ class Carousel {
     this.arrowsNode.className = 'faze-carousel-arrows';
     this.controlsNode.appendChild(this.arrowsNode);
 
-    if (!(this.config.selectors.arrowLeft && this.config.selectors.arrowRight)) {
-      this.arrowsNodes.left.className = 'faze-carousel-arrow faze-carousel-arrow-prev';
+    if (
+      !(this.config.selectors.arrowLeft && this.config.selectors.arrowRight)
+    ) {
+      this.arrowsNodes.left.className =
+        'faze-carousel-arrow faze-carousel-arrow-prev';
       this.arrowsNode.appendChild(this.arrowsNodes.left);
 
-      this.arrowsNodes.right.className = 'faze-carousel-arrow faze-carousel-arrow-next';
+      this.arrowsNodes.right.className =
+        'faze-carousel-arrow faze-carousel-arrow-next';
       this.arrowsNode.appendChild(this.arrowsNodes.right);
     }
   }
@@ -854,7 +891,10 @@ class Carousel {
       if (this.isIdle) {
         this.index -= 1;
         if (this.index < 0) {
-          this.index = Math.min(this.totalSlides - Math.abs(this.index), this.totalSlides - 1);
+          this.index = Math.min(
+            this.totalSlides - Math.abs(this.index),
+            this.totalSlides - 1
+          );
         }
       }
 
@@ -995,16 +1035,23 @@ class Carousel {
           // Снова получаем все слайды, т.к. при анимации "slide" DOM элементы слайдов перемещаются внутри родителя, что в свою очередь
           // говорит о том, что изначальный массим this.slidesNodes будет содержать неправельные ссылки на элемент когда мы обращаемся
           // по индексу, например [0]
-          this.slidesNodes = <HTMLElement[]>Array.from(this.itemsHolderNode.children);
+          this.slidesNodes = <HTMLElement[]>(
+            Array.from(this.itemsHolderNode.children)
+          );
 
           // Определение направления, относительно него разное поведение и стили у карусели
           if (direction === 'next') {
             // Задаем карусели необходимые стили для сдвига влево
-            this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
+            this.itemsHolderNode.style.transitionDuration =
+              this.transitionDuration;
             if (this.config.animation.direction === 'horizontal') {
-              this.itemsHolderNode.style.left = `-${this.slideWidth * amount}px`;
+              this.itemsHolderNode.style.left = `-${
+                this.slideWidth * amount
+              }px`;
             } else if (this.config.animation.direction === 'vertical') {
-              this.itemsHolderNode.style.top = `-${this.slideHeight * amount}px`;
+              this.itemsHolderNode.style.top = `-${
+                this.slideHeight * amount
+              }px`;
             }
 
             // Присваиваем следующему слайду класс
@@ -1033,7 +1080,12 @@ class Carousel {
               }
 
               // Присваиваем текущий слайд
-              currentSlide = this.slidesNodes.find((tmpSlideNode) => parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index) || this.slidesNodes[0];
+              currentSlide =
+                this.slidesNodes.find(
+                  (tmpSlideNode) =>
+                    parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) ===
+                    this.index
+                ) || this.slidesNodes[0];
 
               // Выставление флага, что карусель в простое и готова к новой анимации
               this.isIdle = true;
@@ -1044,19 +1096,27 @@ class Carousel {
           } else if (direction === 'prev') {
             // При направлении влево, сначала перемещаем крайние правые слайды в начало
             for (let i = amount; i !== 0; i -= 1) {
-              this.itemsHolderNode.insertBefore(this.slidesNodes[this.totalSlides - i], this.slidesNodes[0]);
+              this.itemsHolderNode.insertBefore(
+                this.slidesNodes[this.totalSlides - i],
+                this.slidesNodes[0]
+              );
             }
 
             // Задаем стили
             if (this.config.animation.direction === 'horizontal') {
-              this.itemsHolderNode.style.left = `-${this.slideWidth * amount}px`;
+              this.itemsHolderNode.style.left = `-${
+                this.slideWidth * amount
+              }px`;
             } else if (this.config.animation.direction === 'vertical') {
-              this.itemsHolderNode.style.top = `-${this.slideHeight * amount}px`;
+              this.itemsHolderNode.style.top = `-${
+                this.slideHeight * amount
+              }px`;
             }
             this.itemsHolderNode.style.transitionDuration = '';
 
             // Присваиваем предыдущему слайду класс
-            const prevSlide: HTMLElement = this.slidesNodes[this.totalSlides - 1];
+            const prevSlide: HTMLElement =
+              this.slidesNodes[this.totalSlides - 1];
             if (prevSlide) {
               prevSlide.classList.add('faze-prev');
             }
@@ -1068,12 +1128,18 @@ class Carousel {
               } else if (this.config.animation.direction === 'vertical') {
                 this.itemsHolderNode.style.top = '0';
               }
-              this.itemsHolderNode.style.transitionDuration = this.transitionDuration;
+              this.itemsHolderNode.style.transitionDuration =
+                this.transitionDuration;
             }, 10);
 
             // И после выполнения анимации, ставится флаг, что карусель свободна
             setTimeout(() => {
-              currentSlide = this.slidesNodes.find((tmpSlideNode) => parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index) || this.slidesNodes[0];
+              currentSlide =
+                this.slidesNodes.find(
+                  (tmpSlideNode) =>
+                    parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) ===
+                    this.index
+                ) || this.slidesNodes[0];
 
               // Удаляем класс с "предыдущего" слайда, т.к. он уже стал текущим
               if (prevSlide) {
@@ -1106,7 +1172,10 @@ class Carousel {
    * @param currentSlide - DOM элемент текущего слайда
    * @param direction - направление карусели
    */
-  private changeCallbackCall(currentSlide: HTMLElement | null, direction?: string): void {
+  private changeCallbackCall(
+    currentSlide: HTMLElement | null,
+    direction?: string
+  ): void {
     if (typeof this.config.callbacks.changed === 'function') {
       try {
         this.config.callbacks.changed({
@@ -1124,7 +1193,9 @@ class Carousel {
           pagesNode: this.pagesNode,
         });
       } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+        this.logger.error(
+          `Ошибка исполнения пользовательского метода "changed": ${error}`
+        );
       }
     }
   }
@@ -1137,7 +1208,11 @@ class Carousel {
   private beforeChangeCallbackCall(direction?: string): void {
     if (typeof this.config.callbacks.beforeChanged === 'function') {
       // Текущий слайд(по факту он следующий, т.к. изменение уже началось)
-      const currentSlideNode = this.slidesNodes.find((tmpSlideNode) => parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index) || this.slidesNodes[0];
+      const currentSlideNode =
+        this.slidesNodes.find(
+          (tmpSlideNode) =>
+            parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index
+        ) || this.slidesNodes[0];
 
       try {
         this.config.callbacks.beforeChanged({
@@ -1155,7 +1230,9 @@ class Carousel {
           pagesNode: this.pagesNode,
         });
       } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+        this.logger.error(
+          `Ошибка исполнения пользовательского метода "changed": ${error}`
+        );
       }
     }
   }
@@ -1168,7 +1245,11 @@ class Carousel {
   private afterChangeCallbackCall(direction?: string): void {
     if (typeof this.config.callbacks.afterChanged === 'function') {
       // Текущий слайд(по факту он следующий, т.к. изменение уже началось)
-      const currentSlideNode = this.slidesNodes.find((tmpSlideNode) => parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index) || this.slidesNodes[0];
+      const currentSlideNode =
+        this.slidesNodes.find(
+          (tmpSlideNode) =>
+            parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index
+        ) || this.slidesNodes[0];
 
       try {
         this.config.callbacks.afterChanged({
@@ -1186,7 +1267,9 @@ class Carousel {
           pagesNode: this.pagesNode,
         });
       } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+        this.logger.error(
+          `Ошибка исполнения пользовательского метода "changed": ${error}`
+        );
       }
     }
   }
@@ -1210,7 +1293,11 @@ class Carousel {
    * Изменение активной точки в пагинации
    */
   changePagination(): void {
-    Faze.Helpers.activateItem(Array.from(this.pagesNodes), this.index, 'faze-active');
+    Faze.Helpers.activateItem(
+      Array.from(this.pagesNodes),
+      this.index,
+      'faze-active'
+    );
   }
 
   /**
@@ -1222,9 +1309,15 @@ class Carousel {
     if (this.config.useSlideFullSize) {
       const style: CSSStyleDeclaration = window.getComputedStyle(slideNode);
 
-      this.slideWidth = slideNode.offsetWidth + parseFloat(style.marginLeft || '0') + parseFloat(style.marginRight || '0');
+      this.slideWidth =
+        slideNode.offsetWidth +
+        parseFloat(style.marginLeft || '0') +
+        parseFloat(style.marginRight || '0');
 
-      this.slideHeight = slideNode.offsetHeight + parseFloat(style.marginTop || '0') + parseFloat(style.marginBottom || '0');
+      this.slideHeight =
+        slideNode.offsetHeight +
+        parseFloat(style.marginTop || '0') +
+        parseFloat(style.marginBottom || '0');
     } else {
       this.slideWidth = slideNode.offsetWidth;
       this.slideHeight = slideNode.offsetHeight;
@@ -1255,23 +1348,37 @@ class Carousel {
    */
   static initializeByDataAttributes(carouselNode: HTMLElement): void {
     new Faze.Carousel(carouselNode, {
-      autoplay: (carouselNode.dataset.fazeCarouselAutoplay || 'false') === 'true',
+      autoplay:
+        (carouselNode.dataset.fazeCarouselAutoplay || 'false') === 'true',
       counter: (carouselNode.dataset.fazeCarouselCounter || 'false') === 'true',
       pages: (carouselNode.dataset.fazeCarouselPages || 'false') === 'true',
       arrows: (carouselNode.dataset.fazeCarouselArrows || 'true') === 'true',
-      arrowsOutside: (carouselNode.dataset.fazeCarouselArrowsOutside || 'true') === 'true',
+      arrowsOutside:
+        (carouselNode.dataset.fazeCarouselArrowsOutside || 'true') === 'true',
       duration: carouselNode.dataset.fazeCarouselDuration || 3000,
-      infinite: (carouselNode.dataset.fazeCarouselInfinite || 'true') === 'true',
-      useSlideFullSize: (carouselNode.dataset.fazeCarouselUseSlideFullSize || 'false') === 'true',
-      stopOnHover: (carouselNode.dataset.fazeCarouselStopOnHover || 'false') === 'true',
-      mouseMove: (carouselNode.dataset.fazeCarouselMouseMove || 'false') === 'true',
-      touchMove: (carouselNode.dataset.fazeCarouselTouchMove || 'false') === 'true',
-      amountPerSlide: parseInt(carouselNode.dataset.fazeCarouselAmountPerSlide || '1', 10),
-      disallowRanges: JSON.parse(carouselNode.dataset.fazeCarouselDisallowRanges || '[]'),
+      infinite:
+        (carouselNode.dataset.fazeCarouselInfinite || 'true') === 'true',
+      useSlideFullSize:
+        (carouselNode.dataset.fazeCarouselUseSlideFullSize || 'false') ===
+        'true',
+      stopOnHover:
+        (carouselNode.dataset.fazeCarouselStopOnHover || 'false') === 'true',
+      mouseMove:
+        (carouselNode.dataset.fazeCarouselMouseMove || 'false') === 'true',
+      touchMove:
+        (carouselNode.dataset.fazeCarouselTouchMove || 'false') === 'true',
+      amountPerSlide: parseInt(
+        carouselNode.dataset.fazeCarouselAmountPerSlide || '1',
+        10
+      ),
+      disallowRanges: JSON.parse(
+        carouselNode.dataset.fazeCarouselDisallowRanges || '[]'
+      ),
       animation: {
         type: carouselNode.dataset.fazeCarouselAnimationType || 'fade',
         time: carouselNode.dataset.fazeCarouselAnimationTime || 1000,
-        direction: carouselNode.dataset.fazeCarouselAnimationDirection || 'horizontal',
+        direction:
+          carouselNode.dataset.fazeCarouselAnimationDirection || 'horizontal',
       },
       selectors: {
         arrowLeft: carouselNode.dataset.fazeCarouselSelectorsArrowLeft,
@@ -1285,13 +1392,18 @@ class Carousel {
    * Инициализация модуля либо по data атрибутам либо через observer
    */
   static hotInitialize(): void {
-    Faze.Observer.watch('[data-faze~="carousel"]', (carouselNode: HTMLElement) => {
-      Carousel.initializeByDataAttributes(carouselNode);
-    });
+    Faze.Observer.watch(
+      '[data-faze~="carousel"]',
+      (carouselNode: HTMLElement) => {
+        Carousel.initializeByDataAttributes(carouselNode);
+      }
+    );
 
-    document.querySelectorAll<HTMLElement>('[data-faze~="carousel"]').forEach((carouselNode: HTMLElement) => {
-      Carousel.initializeByDataAttributes(carouselNode);
-    });
+    document
+      .querySelectorAll<HTMLElement>('[data-faze~="carousel"]')
+      .forEach((carouselNode: HTMLElement) => {
+        Carousel.initializeByDataAttributes(carouselNode);
+      });
   }
 }
 

@@ -32,6 +32,7 @@ interface CallbackData {
  *   changeOnHover - изменять ли цвет при наведении(по умолчанию смена идёт при клике)
  *   perRow - количество цветов в строке
  *   direction - направление строк(колонок)
+ *   showIfOne - показывать если один цвет
  *   callbacks
  *     changed - пользовательская функция, исполняющаяся после изменения таба
  */
@@ -39,6 +40,7 @@ interface Config {
   changeOnHover: boolean;
   perRow: number;
   direction: 'vertical' | 'horizontal';
+  showIfOne: boolean;
   callbacks: {
     changed?: (data: CallbackData) => void;
   };
@@ -78,6 +80,7 @@ class ColorChanger extends Module {
       changeOnHover: false,
       perRow: 4,
       direction: 'vertical',
+      showIfOne: false,
       callbacks: {
         changed: undefined,
       },
@@ -139,6 +142,11 @@ class ColorChanger extends Module {
    */
   protected build(): void {
     if (this.data && Array.isArray(this.data)) {
+      // Проверка на вывод единичного цвета
+      if (!this.config.showIfOne && this.data.length < 2) {
+        return;
+      }
+
       // Если цветов больше чем может вывести превью
       const isMore: boolean = this.data.length > this.config.perRow;
 
@@ -303,6 +311,7 @@ class ColorChanger extends Module {
     new ColorChanger(node, {
       changeOnHover:
         (node.dataset.fazeColorchangerChangeOnHover || 'false') === 'true',
+      showIfOne: (node.dataset.fazeColorchangerShowIfOne || 'false') === 'true',
       perRow: parseInt(node.dataset.fazeColorchangerPerRow || '4', 10),
       direction:
         node.dataset.fazeColorchangerDirection === 'horizontal'

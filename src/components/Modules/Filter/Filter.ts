@@ -79,6 +79,7 @@ interface Config {
     buttonLoading: string;
   };
   callbacks: {
+    beforeCreated?: (data: CallbackData) => void;
     created?: (data: CallbackData) => void;
     filtered?: (data: CallbackData) => void;
   };
@@ -169,6 +170,7 @@ class Filter {
         buttonLoading: 'Обработка...',
       },
       callbacks: {
+        beforeCreated: undefined,
         created: undefined,
         filtered: undefined,
       },
@@ -210,6 +212,26 @@ class Filter {
    * Инициализация
    */
   initialize(): void {
+    // Выполняем пользовательскую фукнции
+    if (typeof this.config.callbacks.beforeCreated === 'function') {
+      try {
+        this.config.callbacks.beforeCreated({
+          filterNode: this.node,
+          formNode: this.formNode,
+          itemsHolderNode: this.itemsHolderNode,
+          params: this.params,
+          totalSelected: this.totalSelected,
+          total: parseInt(this.node.dataset.fazeFilterTotal || '0', 10),
+        });
+      } catch (error) {
+        console.error(
+          'Ошибка исполнения пользовательской функции "beforeCreated"',
+          error
+        );
+      }
+    }
+
+    // Проставляем класс инициализации
     this.node.classList.add('faze-filter-initialized');
 
     // Инициализация конфига

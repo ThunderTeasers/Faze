@@ -46,8 +46,8 @@ class Gallery {
 
   // DOM элементы стрелок переключения
   private arrowsNodes: {
-    prev: HTMLDivElement,
-    next: HTMLDivElement,
+    prev: HTMLDivElement;
+    next: HTMLDivElement;
   };
 
   // DOM элемент крестика для закрытия галереи
@@ -138,18 +138,23 @@ class Gallery {
           callerNode.addEventListener(this.config.event, () => {
             // Фильтруем только элементы у которых такая же группа, как и у элемента инициализировавшего галерею
             this.imagesData = Array.from(this.callerNodes)
-              .filter(tmpCallerNode => tmpCallerNode.dataset.fazeGalleryGroup === callerNode.dataset.fazeGalleryGroup)
-              .map(tmpCallerNode => ({
+              .filter(
+                (tmpCallerNode) =>
+                  tmpCallerNode.dataset.fazeGalleryGroup ===
+                  callerNode.dataset.fazeGalleryGroup
+              )
+              .map((tmpCallerNode) => ({
                 thumbnail: (tmpCallerNode as HTMLImageElement).src,
-                full: tmpCallerNode.dataset.fazeGalleryImage || (tmpCallerNode as HTMLImageElement).src,
+                full:
+                  tmpCallerNode.dataset.fazeGalleryImage ||
+                  (tmpCallerNode as HTMLImageElement).src,
               }));
 
             // Обновляем общее количество элементов
             this.totalImages = this.imagesData.length;
 
             // Присвоение корректного индекса
-            this.index = Array.from(this.callerNodes)
-              .indexOf(callerNode);
+            this.index = Array.from(this.callerNodes).indexOf(callerNode);
 
             // Построение галереи
             this.build();
@@ -163,10 +168,15 @@ class Gallery {
     } else {
       // Фильтруем только элементы у которых такая же группа, как и у элемента инициализирующего галерею
       this.imagesData = Array.from(this.callerNodes)
-        .filter(callerNode => callerNode.dataset.fazeGalleryGroup === this.config.group)
-        .map(callerNode => ({
+        .filter(
+          (callerNode) =>
+            callerNode.dataset.fazeGalleryGroup === this.config.group
+        )
+        .map((callerNode) => ({
           thumbnail: (callerNode as HTMLImageElement).src,
-          full: callerNode.dataset.fazeGalleryImage || (callerNode as HTMLImageElement).src,
+          full:
+            callerNode.dataset.fazeGalleryImage ||
+            (callerNode as HTMLImageElement).src,
         }));
 
       // Обновляем общее количество элементов
@@ -205,10 +215,14 @@ class Gallery {
     this.imageNode = document.createElement('img');
 
     // Присваиваем необходимые классы
-    this.wrapperNode.className = `faze-gallery-wrapper ${this.config.zoomable ? 'faze-gallery-wrapper-zoomable' : ''}`;
+    this.wrapperNode.className = `faze-gallery-wrapper ${
+      this.config.zoomable ? 'faze-gallery-wrapper-zoomable' : ''
+    }`;
 
-    this.arrowsNodes.prev.className = 'faze-gallery-arrow faze-gallery-arrow-prev';
-    this.arrowsNodes.next.className = 'faze-gallery-arrow faze-gallery-arrow-next';
+    this.arrowsNodes.prev.className =
+      'faze-gallery-arrow faze-gallery-arrow-prev';
+    this.arrowsNodes.next.className =
+      'faze-gallery-arrow faze-gallery-arrow-next';
 
     this.closeButtonNode.className = 'faze-gallery-close';
 
@@ -249,7 +263,9 @@ class Gallery {
     // Создаём список превью
     this.thumbnailsNode = document.createElement('div');
     this.thumbnailsNode.className = 'faze-gallery-thumbnails';
-    this.wrapperNode.classList.add(`faze-gallery-wrapper-thumbnails-${this.config.thumbnailsPosition}`);
+    this.wrapperNode.classList.add(
+      `faze-gallery-wrapper-thumbnails-${this.config.thumbnailsPosition}`
+    );
 
     // Проходимся по всем данным изображений и создаём превью
     this.imagesData.forEach((imageData: ImageData, imageIndex: number) => {
@@ -330,8 +346,11 @@ class Gallery {
    * Обновление счётчика
    */
   private updateCounter(): void {
-    this.counterNode.innerHTML =
-      `<span class="faze-gallery-counter-current">${this.index + 1}</span> <span class="faze-gallery-counter-delimiter">/</span> <span class="faze-gallery-counter-total">${this.totalImages}</span>`;
+    this.counterNode.innerHTML = `<span class="faze-gallery-counter-current">${
+      this.index + 1
+    }</span> <span class="faze-gallery-counter-delimiter">/</span> <span class="faze-gallery-counter-total">${
+      this.totalImages
+    }</span>`;
   }
 
   /**
@@ -481,8 +500,15 @@ class Gallery {
    */
   private checkConfig(): void {
     // Если задано значение положения превью и оно не равно нужным, выдаем ошибку
-    if (this.config.thumbnailsPosition && !['left', 'right', 'top', 'bottom'].includes(this.config.thumbnailsPosition)) {
-      throw new Error('Значение "thumbnailsPosition" некорректно, возможные значения: "left", "right", "top", "bottom".');
+    if (
+      this.config.thumbnailsPosition &&
+      !['left', 'right', 'top', 'bottom'].includes(
+        this.config.thumbnailsPosition
+      )
+    ) {
+      throw new Error(
+        'Значение "thumbnailsPosition" некорректно, возможные значения: "left", "right", "top", "bottom".'
+      );
     }
   }
 
@@ -491,7 +517,8 @@ class Gallery {
    */
   static hotInitialize(): void {
     // Задаем всем элементам без группы стандартную
-    document.querySelectorAll<HTMLElement>('[data-faze="gallery"]')
+    document
+      .querySelectorAll<HTMLElement>('[data-faze="gallery"]')
       .forEach((callerNode: HTMLElement) => {
         callerNode.classList.add('faze-gallery-caller');
 
@@ -500,22 +527,33 @@ class Gallery {
         }
       });
 
-    Faze.on('click', '[data-faze="gallery"]:not([data-faze-gallery-passive])', (event: Event, callerNode: HTMLElement) => {
-      const group: string | undefined = callerNode.dataset.fazeGalleryGroup;
-      const callerNodes = document.querySelectorAll(`[data-faze-gallery-group="${group}"]`);
+    Faze.on(
+      'click',
+      '[data-faze="gallery"]:not([data-faze-gallery-passive])',
+      (event: Event, callerNode: HTMLElement) => {
+        const group: string | undefined = callerNode.dataset.fazeGalleryGroup;
+        const callerNodes = document.querySelectorAll(
+          `[data-faze-gallery-group="${group}"]`
+        );
 
-      if (parseInt(callerNode.dataset.fazeGalleryDisableResolution || '0', 10) < window.innerWidth) {
-        new Faze.Gallery(callerNodes, {
-          group,
-          evented: false,
-          index: Array.from(callerNodes)
-            .indexOf(callerNode),
-          counter: (callerNode.dataset.fazeGalleryCounter || 'false') === 'true',
-          zoomable: (callerNode.dataset.fazeGalleryZoomable || 'false') === 'true',
-          thumbnailsPosition: callerNode.dataset.fazeGalleryThumbnailsPosition,
-        });
+        if (
+          parseInt(callerNode.dataset.fazeGalleryDisableResolution || '0', 10) <
+          window.innerWidth
+        ) {
+          new Faze.Gallery(callerNodes, {
+            group,
+            evented: false,
+            index: Array.from(callerNodes).indexOf(callerNode),
+            counter:
+              (callerNode.dataset.fazeGalleryCounter || 'false') === 'true',
+            zoomable:
+              (callerNode.dataset.fazeGalleryZoomable || 'false') === 'true',
+            thumbnailsPosition:
+              callerNode.dataset.fazeGalleryThumbnailsPosition,
+          });
+        }
       }
-    });
+    );
   }
 }
 

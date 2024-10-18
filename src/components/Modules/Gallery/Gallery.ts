@@ -543,7 +543,9 @@ class Gallery {
           new Faze.Gallery(callerNodes, {
             group,
             evented: false,
-            index: Array.from(callerNodes).indexOf(callerNode),
+            index:
+              callerNode.dataset.fazeGalleryIndex ||
+              Array.from(callerNodes).indexOf(callerNode),
             counter:
               (callerNode.dataset.fazeGalleryCounter || 'false') === 'true',
             zoomable:

@@ -145,7 +145,9 @@ class Slider extends Module {
           values: this.getValues(),
         });
       } catch (error) {
-        return this.logger.error(`Ошибка исполнения пользовательского метода "created", дословно: ${error}!`);
+        return this.logger.error(
+          `Ошибка исполнения пользовательского метода "created", дословно: ${error}!`
+        );
       }
     }
   }
@@ -173,7 +175,9 @@ class Slider extends Module {
     // Проходимся по всем доступным полям ввода
     this.inputsNodes.forEach((inputNode: HTMLInputElement, index: number) => {
       // Получаем стандартный дескриптор для поля ввода
-      const descriptor: PropertyDescriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value') || {};
+      const descriptor: PropertyDescriptor =
+        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value') ||
+        {};
       if (descriptor) {
         const inputSetter = descriptor.set;
 
@@ -199,15 +203,18 @@ class Slider extends Module {
    * Инициализация инпутов для вывода значений ползунков
    */
   private initializeInputs(): void {
-    this.config.selectors.inputs.split(',').forEach((selector: string, index: number) => {
-      const inputNode: HTMLInputElement | null = document.querySelector<HTMLInputElement>(selector);
-      if (inputNode) {
-        this.inputsNodes.push(inputNode);
+    this.config.selectors.inputs
+      .split(',')
+      .forEach((selector: string, index: number) => {
+        const inputNode: HTMLInputElement | null =
+          document.querySelector<HTMLInputElement>(selector);
+        if (inputNode) {
+          this.inputsNodes.push(inputNode);
 
-        // Проставляем начальные значения
-        inputNode.value = this.config.points[index];
-      }
-    });
+          // Проставляем начальные значения
+          inputNode.value = this.config.points[index];
+        }
+      });
   }
 
   /**
@@ -251,7 +258,9 @@ class Slider extends Module {
                 values: this.getValues(),
               });
             } catch (error) {
-              return this.logger.error(`Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`);
+              return this.logger.error(
+                `Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`
+              );
             }
           }
         }, this.config.changeDelay);
@@ -285,11 +294,22 @@ class Slider extends Module {
        */
       const elementDrag = (event: any): void => {
         // Рассчет новой позиции курсора
-        endMousePosition = startMousePosition - (event.clientX || (event.touches ? event.touches[0].clientX : 0));
-        startMousePosition = event.clientX || (event.touches ? event.touches[0].clientX : 0);
+        endMousePosition =
+          startMousePosition -
+          (event.clientX || (event.touches ? event.touches[0].clientX : 0));
+        startMousePosition =
+          event.clientX || (event.touches ? event.touches[0].clientX : 0);
 
         // Передвижение ползунка
-        this.move(pointNode, nextPointNode, prevPointNode, pointNode.offsetLeft - endMousePosition, i, true, true);
+        this.move(
+          pointNode,
+          nextPointNode,
+          prevPointNode,
+          pointNode.offsetLeft - endMousePosition,
+          i,
+          true,
+          true
+        );
 
         // Просчёт положения и размера соединительной полоски
         if (this.config.connect) {
@@ -303,7 +323,9 @@ class Slider extends Module {
               values: this.getValues(),
             });
           } catch (error) {
-            return this.logger.error(`Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`);
+            return this.logger.error(
+              `Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`
+            );
           }
         }
       };
@@ -330,7 +352,9 @@ class Slider extends Module {
               values: this.getValues(),
             });
           } catch (error) {
-            return this.logger.error(`Ошибка исполнения пользовательского метода "stopped", дословно: ${error}!`);
+            return this.logger.error(
+              `Ошибка исполнения пользовательского метода "stopped", дословно: ${error}!`
+            );
           }
         }
       };
@@ -374,10 +398,13 @@ class Slider extends Module {
     setTimeout(() => {
       if (this.connectNode) {
         // Ширина - это расстояние между самыми крайними точками
-        const width = this.pointsNodes[this.pointsNodes.length - 1].offsetLeft - this.pointsNodes[0].offsetLeft;
+        const width =
+          this.pointsNodes[this.pointsNodes.length - 1].offsetLeft -
+          this.pointsNodes[0].offsetLeft;
 
         // Половина ширины ползунка
-        const halfPointWidth = this.pointsNodes[0].getBoundingClientRect().width / 2;
+        const halfPointWidth =
+          this.pointsNodes[0].getBoundingClientRect().width / 2;
 
         // Проверка чтобы размер линии не ушел в минус
         let connectWidth = width - halfPointWidth;
@@ -387,11 +414,20 @@ class Slider extends Module {
 
         // Если только один ползунок, тогда считаем от левого края до него, если несколько то между первым и последним
         if (this.pointsNodes.length === 1) {
-          this.connectNode.style.width = `${this.calculateSizeInPercent(this.pointsNodes[0].offsetLeft + halfPointWidth, false)}%`;
+          this.connectNode.style.width = `${this.calculateSizeInPercent(
+            this.pointsNodes[0].offsetLeft + halfPointWidth,
+            false
+          )}%`;
           this.connectNode.style.left = '0';
         } else {
-          this.connectNode.style.width = `${this.calculateSizeInPercent(connectWidth + halfPointWidth, false)}%`;
-          this.connectNode.style.left = `${this.calculateSizeInPercent(this.pointsNodes[0].offsetLeft + halfPointWidth, false)}%`;
+          this.connectNode.style.width = `${this.calculateSizeInPercent(
+            connectWidth + halfPointWidth,
+            false
+          )}%`;
+          this.connectNode.style.left = `${this.calculateSizeInPercent(
+            this.pointsNodes[0].offsetLeft + halfPointWidth,
+            false
+          )}%`;
         }
       }
     }, 0);
@@ -406,7 +442,15 @@ class Slider extends Module {
    * @param position      - новое значение ползунка
    * @param index         - индекс ползунка
    */
-  move(pointNode: HTMLElement, nextPointNode: HTMLElement, prevPointNode: HTMLElement, position: number, index: number, needToUpdateInputs: boolean = true, needToCorrect: boolean = false) {
+  move(
+    pointNode: HTMLElement,
+    nextPointNode: HTMLElement,
+    prevPointNode: HTMLElement,
+    position: number,
+    index: number,
+    needToUpdateInputs: boolean = true,
+    needToCorrect: boolean = false
+  ) {
     let tmpPosition = position;
 
     // Ширина всего слайдера
@@ -468,7 +512,13 @@ class Slider extends Module {
 
     // Расчёт финального значения
     if (needToCorrect) {
-      this.values[index] = this.config.range[0] + Math.round(((tmpPosition + pointWidthFactor) * (this.config.range[1] - this.config.range[0])) / sliderWidth);
+      this.values[index] =
+        this.config.range[0] +
+        Math.round(
+          ((tmpPosition + pointWidthFactor) *
+            (this.config.range[1] - this.config.range[0])) /
+            sliderWidth
+        );
     }
 
     // Ставим ограничение
@@ -508,8 +558,13 @@ class Slider extends Module {
 
     // Ограничение для последнего ползунка
     setTimeout(() => {
-      if (pointNode.offsetLeft >= this.node.getBoundingClientRect().width - this.pointSize) {
-        pointNode.style.left = `${this.calculateSizeInPercent(this.pointSize)}%`;
+      if (
+        pointNode.offsetLeft >=
+        this.node.getBoundingClientRect().width - this.pointSize
+      ) {
+        pointNode.style.left = `${this.calculateSizeInPercent(
+          this.pointSize
+        )}%`;
       }
     }, 0);
   }
@@ -540,7 +595,14 @@ class Slider extends Module {
   private calculatePercent(value: number): number {
     const sliderWidth = this.node.getBoundingClientRect().width - 32;
 
-    return (-((sliderWidth * (this.config.range[0] - value)) / (this.config.range[1] - this.config.range[0])) * 100) / sliderWidth;
+    return (
+      (-(
+        (sliderWidth * (this.config.range[0] - value)) /
+        (this.config.range[1] - this.config.range[0])
+      ) *
+        100) /
+      sliderWidth
+    );
   }
 
   /**
@@ -565,7 +627,9 @@ class Slider extends Module {
 
     // Если только одно значение
     if (this.config.range.length !== 2) {
-      return this.logger.error('Необходимо задать два значения в поле "range"!');
+      return this.logger.error(
+        'Необходимо задать два значения в поле "range"!'
+      );
     }
   }
 
@@ -585,15 +649,16 @@ class Slider extends Module {
   /**
    * Простановка значения для точки с указанным индексом
    *
-   * @param index     - индекс ползунка
-   * @param value     - значение
+   * @param {number} index Индекс ползунка
+   * @param {number} value Значение
+   * @param {boolean} force Принудительно пересчитать
    */
-  setValue(index: number, value: number): void {
+  setValue(index: number, value: number, force: boolean = false): void {
     // DOM элемент ползунка
     const pointNode = this.pointsNodes[index];
     if (pointNode && index >= 0 && index < this.values.length) {
       // Проверка на срабатывание, даже если это не нужно
-      if (this.values[index] === value) {
+      if (this.values[index] === value && !force) {
         return;
       }
 
@@ -615,7 +680,14 @@ class Slider extends Module {
       }
 
       // Передвигаем ползунок на нужное место
-      this.move(pointNode, nextPointNode, prevPointNode, position * this.ratio, index, false);
+      this.move(
+        pointNode,
+        nextPointNode,
+        prevPointNode,
+        position * this.ratio,
+        index,
+        false
+      );
 
       // Если указаны селекторы инпутов, то обновляем их
       if (this.config.selectors.inputs) {
@@ -630,12 +702,12 @@ class Slider extends Module {
   /**
    * Простановка значений для точек
    *
-   * @param values - массив значений, где индекс значения равен индексу точки
-   * @param inPercent - значение в процентах или нет
+   * @param {number[]} values Массив значений, где индекс значения равен индексу точки
+   * @param {boolean} force Принудительно пересчитать
    */
-  setValues(values: number[]): void {
+  setValues(values: number[], force: boolean = false): void {
     values.forEach((value, index) => {
-      this.setValue(index, value);
+      this.setValue(index, value, force);
     });
   }
 
@@ -650,7 +722,9 @@ class Slider extends Module {
    * Перерасчёт модификатора движения
    */
   recalculateRatio(): void {
-    this.ratio = this.node.getBoundingClientRect().width / (this.config.range[1] - this.config.range[0]);
+    this.ratio =
+      this.node.getBoundingClientRect().width /
+      (this.config.range[1] - this.config.range[0]);
   }
 
   /**
@@ -668,7 +742,9 @@ class Slider extends Module {
   resetValue(index: number): void {
     // Проверка на валидность
     if (index > this.config.points.length - 1 && index < 0) {
-      return this.logger.error(`Попытка сбросить несуществующий ползунок с индексом ${index}`);
+      return this.logger.error(
+        `Попытка сбросить несуществующий ползунок с индексом ${index}`
+      );
     }
 
     // Сброс значения
@@ -681,8 +757,10 @@ class Slider extends Module {
    * @param node - DOM элемент на который нужно инициализировать плагин
    */
   static initializeByDataAttributes(node: HTMLElement): void {
-    const range: string | undefined = node.dataset.fazeSliderRange || node.dataset.fazeSliderPoints;
-    const points: string | undefined = node.dataset.fazeSliderPoints || node.dataset.fazeSliderRange;
+    const range: string | undefined =
+      node.dataset.fazeSliderRange || node.dataset.fazeSliderPoints;
+    const points: string | undefined =
+      node.dataset.fazeSliderPoints || node.dataset.fazeSliderRange;
 
     new Slider(node, {
       points: points?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],

@@ -474,6 +474,17 @@ class Helpers {
           value += '-';
         }
       }
+      // Если это номер телефона
+      else if (event.data.startsWith('+7') || event.data.startsWith('8')) {
+        const phone: string = event.data.replace(/-|\(|\)|\s+|^\+7|^8/g, '');
+
+        const matches = phone.match(/(\d{3})(\d{3})?(\d{2})?(\d{2})?/);
+        if (matches) {
+          value = `+7 (${matches[1]})${matches[2] ? ` ${matches[2]}` : ''}${
+            matches[3] ? `-${matches[3]}` : ''
+          }${matches[4] ? `-${matches[4]}` : ''}`;
+        }
+      }
 
       // Присваиваем собранный номер
       input.value = value;

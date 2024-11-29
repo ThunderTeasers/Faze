@@ -189,7 +189,7 @@ class Finder extends Module {
       caseSensitive:
         (node.dataset.fazeFinderCaseSensitive || 'false') === 'true',
       hideMode:
-        node.dataset.fazeFinderHideMode === 'display'
+        node.dataset.fazeFinderHideMode === 'visibility'
           ? 'visibility'
           : 'display',
     });

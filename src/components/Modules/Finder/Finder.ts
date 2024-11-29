@@ -40,6 +40,7 @@ interface Config {
   hideMode: 'display' | 'visibility';
   showClass: string;
   caseSensitive: boolean;
+  minLength: number;
   callbacks: {
     created?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
@@ -70,6 +71,7 @@ class Finder extends Module {
     const defaultConfig: Config = {
       hideMode: 'display',
       showClass: 'block',
+      minLength: 3,
       caseSensitive: false,
       callbacks: {
         created: undefined,
@@ -128,7 +130,9 @@ class Finder extends Module {
    */
   private bindInput(): void {
     Faze.Events.listener('input', this.inputNode, () => {
-      this.update();
+      if ((this.inputNode?.value.length || 0) >= this.config.minLength) {
+        this.update();
+      }
     });
   }
 
@@ -234,6 +238,7 @@ class Finder extends Module {
   static initializeByDataAttributes(node: HTMLElement): void {
     new Finder(node, {
       showClass: node.dataset.fazeFinderShowClass || 'block',
+      minLength: parseInt(node.dataset.fazeFinderMinLength || '3', 10),
       caseSensitive:
         (node.dataset.fazeFinderCaseSensitive || 'false') === 'true',
       hideMode:

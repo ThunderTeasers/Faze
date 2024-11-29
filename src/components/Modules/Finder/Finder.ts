@@ -105,6 +105,9 @@ class Finder extends Module {
     this.itemsNodes = this.itemsNode?.querySelectorAll<HTMLElement>(
       `[${this.dataPrefix}="item"]`
     );
+
+    // Вызываем пользовательскую функцию
+    this.createdCallbackCall();
   }
 
   /**
@@ -146,14 +149,15 @@ class Finder extends Module {
         ? itemNode.dataset.fazeFinderItemValue
         : itemNode.dataset.fazeFinderItemValue?.toLowerCase();
 
-      console.log(this.config.hideMode);
-
       if (itemValue?.includes(value || '')) {
         this.showItem(itemNode);
       } else {
         this.hideItem(itemNode);
       }
     });
+
+    // Вызываем пользовательскую функцию
+    this.changeCallbackCall();
   }
 
   private hideItem(node: HTMLElement): void {
@@ -175,6 +179,50 @@ class Finder extends Module {
       node.style.display = this.config.showClass;
     } else {
       node.style.visibility = 'visible';
+    }
+  }
+
+  /**
+   * Выполнение пользовательской функции "created"
+   *
+   * @private
+   */
+  private createdCallbackCall(): void {
+    if (typeof this.config.callbacks.created === 'function') {
+      try {
+        this.config.callbacks.created({
+          node: this.node,
+          inputNode: this.inputNode,
+          itemsNode: this.itemsNode,
+          itemsNodes: this.itemsNodes,
+        });
+      } catch (error) {
+        this.logger.error(
+          `Ошибка исполнения пользовательского метода "created": ${error}`
+        );
+      }
+    }
+  }
+
+  /**
+   * Выполнение пользовательской функции "changed"
+   *
+   * @private
+   */
+  private changeCallbackCall(): void {
+    if (typeof this.config.callbacks.changed === 'function') {
+      try {
+        this.config.callbacks.changed({
+          node: this.node,
+          inputNode: this.inputNode,
+          itemsNode: this.itemsNode,
+          itemsNodes: this.itemsNodes,
+        });
+      } catch (error) {
+        this.logger.error(
+          `Ошибка исполнения пользовательского метода "changed": ${error}`
+        );
+      }
     }
   }
 

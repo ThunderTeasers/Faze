@@ -128,6 +128,10 @@ module.exports = (env) => {
         template: './src/tests/views/colorchanger.html',
       }),
       new HtmlWebpackPlugin({
+        filename: 'finder.html',
+        template: './src/tests/views/finder.html',
+      }),
+      new HtmlWebpackPlugin({
         template: './src/index.html',
       }),
       new webpack.HotModuleReplacementPlugin(),

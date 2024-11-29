@@ -37,6 +37,7 @@ import SmartSelect from '../Modules/SmartSelect/SmartSelect';
 import Carousel from '../Modules/Carousel/Carousel';
 import Carousel2 from '../Modules/Carousel2/Carousel2';
 import ThumbGallery from '../Modules/ThumbGallery/ThumbGallery';
+import Finder from '../Modules/Finder/Finder';
 import TableSorter from '../Modules/TableSorter/TableSorter';
 import Sorter from '../Modules/Sorter/Sorter';
 import Zoom from '../Modules/Zoom/Zoom';
@@ -144,6 +145,8 @@ class Faze {
   static Constants: any = Constants;
 
   static TableSorter: any = TableSorter;
+
+  static Finder: any = Finder;
 
   static Sorter: any = Sorter;
 
@@ -267,6 +270,7 @@ class Faze {
       'REST',
       'Logger',
       'ColorChanger',
+      'Finder',
     ];
 
     // Проверка на ошибки
@@ -422,6 +426,7 @@ class Faze {
     Faze.Carousel.hotInitialize();
     Faze.Tooltip.hotInitialize();
     Faze.Tour.hotInitialize('tour');
+    Faze.Finder.hotInitialize('finder');
     Faze.Zoom.hotInitialize();
     Faze.ZoomBox.hotInitialize();
     Faze.Select.hotInitialize();

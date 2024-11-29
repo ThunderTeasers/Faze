@@ -39,6 +39,9 @@ abstract class Module {
   // Префикс класса
   protected readonly classPrefix: string;
 
+  // Префикс data атрибута
+  protected readonly dataPrefix: string;
+
   // CSS класс главного DOM элемента
   protected readonly className?: string;
 
@@ -71,6 +74,7 @@ abstract class Module {
     this.config = data.config;
     this.additionalParams = data.additionalParams;
     this.classPrefix = `faze-${this.name.toLowerCase()}`;
+    this.dataPrefix = `data-${this.classPrefix}`;
 
     // Вычисляем CSS селектор класса
     const classNameTmp = data.node?.className;

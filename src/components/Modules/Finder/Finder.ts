@@ -7,6 +7,7 @@
 
 import './Finder.scss';
 import Module from '../../Core/Module';
+import Faze from '../../Core/Faze';
 
 /**
  * Структура возвращаемого объекта в пользовательском методе
@@ -37,6 +38,8 @@ interface CallbackData {
  */
 interface Config {
   hideMode: 'display' | 'visibility';
+  showClass: string;
+  caseSensitive: boolean;
   callbacks: {
     created?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
@@ -66,6 +69,8 @@ class Finder extends Module {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       hideMode: 'display',
+      showClass: 'block',
+      caseSensitive: false,
       callbacks: {
         created: undefined,
         changed: undefined,
@@ -115,8 +120,63 @@ class Finder extends Module {
 
   /**
    * Навешивание событий поиска
+   *
+   * @private
    */
-  private bindInput(): void {}
+  private bindInput(): void {
+    Faze.Events.listener('input', this.inputNode, () => {
+      this.update();
+    });
+  }
+
+  /**
+   * Обновление результата поиска
+   *
+   * @private
+   */
+  public update(): void {
+    // Получаем значение
+    const value = this.config.caseSensitive
+      ? this.inputNode?.value
+      : this.inputNode?.value.toLowerCase();
+
+    // Проходимся по всем элементам и скрываем ненужные
+    this.itemsNodes?.forEach((itemNode: HTMLElement) => {
+      const itemValue = this.config.caseSensitive
+        ? itemNode.dataset.fazeFinderItemValue
+        : itemNode.dataset.fazeFinderItemValue?.toLowerCase();
+
+      console.log(this.config.hideMode);
+
+      if (itemValue?.includes(value || '')) {
+        this.showItem(itemNode);
+      } else {
+        this.hideItem(itemNode);
+      }
+    });
+  }
+
+  private hideItem(node: HTMLElement): void {
+    if (this.config.hideMode === 'display') {
+      node.style.display = 'none';
+    } else {
+      node.style.visibility = 'hidden';
+    }
+  }
+
+  /**
+   * Показывает DOM элемент
+   *
+   * @param {HTMLElement} node DOM элемент, который нужно показать
+   * @private
+   */
+  private showItem(node: HTMLElement): void {
+    if (this.config.hideMode === 'display') {
+      node.style.display = this.config.showClass;
+    } else {
+      node.style.visibility = 'visible';
+    }
+  }
 
   /**
    * Инициализация модуля по data атрибутам
@@ -125,10 +185,13 @@ class Finder extends Module {
    */
   static initializeByDataAttributes(node: HTMLElement): void {
     new Finder(node, {
+      showClass: node.dataset.fazeFinderShowClass || 'block',
+      caseSensitive:
+        (node.dataset.fazeFinderCaseSensitive || 'false') === 'true',
       hideMode:
-        node.dataset.fazeColorchangerDirection === 'display'
-          ? 'display'
-          : 'visibility',
+        node.dataset.fazeFinderHideMode === 'display'
+          ? 'visibility'
+          : 'display',
     });
   }
 }

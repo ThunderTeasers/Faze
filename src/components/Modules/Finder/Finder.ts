@@ -34,7 +34,8 @@ interface CallbackData {
  *   direction - направление строк(колонок)
  *   showIfOne - показывать если один цвет
  *   callbacks
- *     changed - пользовательская функция, исполняющаяся после изменения таба
+ *     created - пользовательская функция, исполняющаяся при создании
+ *     changed - пользовательская функция, исполняющаяся после изменения в поиске
  */
 interface Config {
   hideMode: 'display' | 'visibility';

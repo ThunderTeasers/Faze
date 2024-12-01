@@ -132,6 +132,10 @@ module.exports = (env) => {
         template: './src/tests/views/finder.html',
       }),
       new HtmlWebpackPlugin({
+        filename: 'scroller.html',
+        template: './src/tests/views/scroller.html',
+      }),
+      new HtmlWebpackPlugin({
         template: './src/index.html',
       }),
       new webpack.HotModuleReplacementPlugin(),

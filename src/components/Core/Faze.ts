@@ -40,6 +40,7 @@ import ThumbGallery from '../Modules/ThumbGallery/ThumbGallery';
 import Finder from '../Modules/Finder/Finder';
 import TableSorter from '../Modules/TableSorter/TableSorter';
 import Sorter from '../Modules/Sorter/Sorter';
+import Scroller from '../Modules/Scroller/Scroller';
 import Zoom from '../Modules/Zoom/Zoom';
 import ZoomBox from '../Modules/ZoomBox/ZoomBox';
 import Look from '../Modules/Look/Look';
@@ -162,6 +163,8 @@ class Faze {
 
   static Placeholder: any = Placeholder;
 
+  static Scroller: any = Scroller;
+
   static Scroll: any = Scroll;
 
   static Spoiler: any = Spoiler;
@@ -271,6 +274,7 @@ class Faze {
       'Logger',
       'ColorChanger',
       'Finder',
+      'Scroller',
     ];
 
     // Проверка на ошибки
@@ -427,6 +431,7 @@ class Faze {
     Faze.Tooltip.hotInitialize();
     Faze.Tour.hotInitialize('tour');
     Faze.Finder.hotInitialize('finder');
+    Faze.Scroller.hotInitialize('scroller');
     Faze.Zoom.hotInitialize();
     Faze.ZoomBox.hotInitialize();
     Faze.Select.hotInitialize();

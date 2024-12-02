@@ -83,7 +83,11 @@ class Scroller extends Module {
   protected initialize(): void {
     super.initialize();
 
+    // Простановка стандартных классов
     this.node.classList.add(`${this.classPrefix}-${this.config.side}`);
+
+    // Выполнение пользовательской функции "created"
+    this.createdCallbackCall();
   }
 
   /**
@@ -154,7 +158,50 @@ class Scroller extends Module {
         top: 0,
         behavior: this.config.smooth ? 'smooth' : 'instant',
       });
+
+      // Выполнение пользовательской функции "changed"
+      this.changeCallbackCall();
     });
+  }
+
+  /**
+   * Выполнение пользовательской функции "created"
+   *
+   * @private
+   */
+  private createdCallbackCall(): void {
+    if (typeof this.config.callbacks.created === 'function') {
+      try {
+        this.config.callbacks.created({
+          node: this.node,
+          btnNode: this.btnNode,
+        });
+      } catch (error) {
+        this.logger.error(
+          `Ошибка исполнения пользовательского метода "created": ${error}`
+        );
+      }
+    }
+  }
+
+  /**
+   * Выполнение пользовательской функции "changed"
+   *
+   * @private
+   */
+  private changeCallbackCall(): void {
+    if (typeof this.config.callbacks.changed === 'function') {
+      try {
+        this.config.callbacks.changed({
+          node: this.node,
+          btnNode: this.btnNode,
+        });
+      } catch (error) {
+        this.logger.error(
+          `Ошибка исполнения пользовательского метода "changed": ${error}`
+        );
+      }
+    }
   }
 
   /**

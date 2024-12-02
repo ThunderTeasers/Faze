@@ -7,7 +7,7 @@
 
 import './Scroller.scss';
 import Module from '../../Core/Module';
-// import Faze from '../../Core/Faze';
+import Faze from '../../Core/Faze';
 
 /**
  * Структура возвращаемого объекта в пользовательском методе
@@ -27,12 +27,14 @@ interface CallbackData {
  * Содержит:
  *   side - сторона где выводится кнопка
  *   offset - количество пикселей на которых показываем кнопку
+ *   smooth - флаг плавности прокрутки
  *   callbacks
  *     created - пользовательская функция, исполняющаяся при создании
  *     changed - пользовательская функция, исполняющаяся после нажатия на кнопку скрола
  */
 interface Config {
   side: 'left' | 'right';
+  smooth: boolean;
   offset: number;
   callbacks: {
     created?: (data: CallbackData) => void;
@@ -57,7 +59,8 @@ class Scroller extends Module {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       side: 'right',
-      offset: 100,
+      offset: 300,
+      smooth: true,
       callbacks: {
         created: undefined,
         changed: undefined,
@@ -68,7 +71,7 @@ class Scroller extends Module {
     super({
       node,
       config: Object.assign(defaultConfig, config),
-      name: 'Finder',
+      name: 'Scroller',
     });
   }
 
@@ -79,6 +82,8 @@ class Scroller extends Module {
    */
   protected initialize(): void {
     super.initialize();
+
+    this.node.classList.add(`${this.classPrefix}-${this.config.side}`);
   }
 
   /**
@@ -89,7 +94,19 @@ class Scroller extends Module {
   protected bind(): void {
     super.bind();
 
+    this.bindScroll();
     this.bindButton();
+  }
+
+  /**
+   * Навешивание события на скролл для отслежки видимости кнопки
+   *
+   * @private
+   */
+  private bindScroll(): void {
+    Faze.Events.listener('scroll', window, () => {
+      this.checkVisibility();
+    });
   }
 
   /**
@@ -103,13 +120,42 @@ class Scroller extends Module {
     this.buildButton();
   }
 
+  /**
+   * Создает кнопку прокрутки
+   *
+   * @private
+   */
   private buildButton() {
     this.btnNode = document.createElement('button');
     this.btnNode.className = 'faze-scroller-btn';
     this.node.appendChild(this.btnNode);
   }
 
-  private bindButton(): void {}
+  /**
+   * Проверяет видимость кнопки
+   *
+   * @private
+   */
+  private checkVisibility(): void {
+    this.btnNode.classList.toggle(
+      'faze-active',
+      window.scrollY >= this.config.offset
+    );
+  }
+
+  /**
+   * Навешивание события на кнопку прокрутки
+   *
+   * @private
+   */
+  private bindButton(): void {
+    Faze.Events.listener('click', this.btnNode, () => {
+      window.scrollTo({
+        top: 0,
+        behavior: this.config.smooth ? 'smooth' : 'instant',
+      });
+    });
+  }
 
   /**
    * Инициализация модуля по data атрибутам
@@ -118,8 +164,9 @@ class Scroller extends Module {
    */
   static initializeByDataAttributes(node: HTMLElement): void {
     new Scroller(node, {
-      offset: parseInt(node.dataset.fazeScrollerOffset || '100', 10),
+      offset: parseInt(node.dataset.fazeScrollerOffset || '300', 10),
       side: node.dataset.fazeScrollerSide === 'left' ? 'left' : 'right',
+      smooth: (node.dataset.fazeScrollerSmooth || 'true') === 'true',
     });
   }
 }

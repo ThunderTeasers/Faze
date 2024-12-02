@@ -1,0 +1,99 @@
+/**
+ * Стили для плагина прокрутчика
+ *
+ * Автор: Ерохин Максим
+ * Дата: 02.12.2024
+ */
+
+@keyframes appearing {
+  from {
+    display: none;
+    opacity: 0;
+  }
+
+  to {
+    display: flex;
+    opacity: 1;
+  }
+}
+
+@keyframes disappearing {
+  from {
+    display: flex;
+    opacity: 1;
+  }
+
+  to {
+    display: none;
+    opacity: 0;
+  }
+}
+
+[data-faze='scroller'] {
+  // Кнопка прокрутчика
+  .faze-scroller-btn {
+    position: fixed;
+    bottom: 2rem;
+    z-index: 9999;
+
+    // display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    width: 6.4rem;
+    height: 6.4rem;
+
+    border: none;
+    border-radius: 50%;
+    background: var(--faze-color-primary);
+
+    transition: background 0.2s ease;
+
+    animation: disappearing 0.5s ease forwards;
+
+    // Стрелочка
+    &:after {
+      content: '';
+
+      display: block;
+      margin-top: 0.4rem;
+
+      border: solid var(--faze-color-white);
+      border-width: 0 0.3rem 0.3rem 0;
+
+      width: 1.2rem;
+      height: 1.2rem;
+
+      transform: rotate(-135deg);
+    }
+
+    // При наведении
+    &:hover {
+      cursor: pointer;
+
+      background: var(--faze-color-primary-dark);
+    }
+
+    // При активности
+    &.faze-active {
+      animation: appearing 0.5s ease forwards;
+    }
+  }
+
+  // Справа
+  &.faze-scroller-right {
+    // Кнопка прокрутчика
+    .faze-scroller-btn {
+      right: 2rem;
+    }
+  }
+
+  // Слева
+  &.faze-scroller-left {
+    // Кнопка прокрутчика
+    .faze-scroller-btn {
+      left: 2rem;
+    }
+  }
+}

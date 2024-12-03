@@ -292,7 +292,7 @@ class Gallery {
    *
    * @private
    */
-  private bindZoom() {
+  private bindZoom(): void {
     let isZoomed = false;
 
     this.imageNode.addEventListener('click', (event: MouseEvent) => {
@@ -318,8 +318,8 @@ class Gallery {
   /**
    * Навешивание событий на нажатия по превью, для показа изображения
    *
-   * @param thumbnailNode DOM элемент превью
-   * @param index Индекс превью
+   * @param {HTMLImageElement} thumbnailNode DOM элемент превью
+   * @param {number} index Индекс превью
    *
    * @private
    */
@@ -334,6 +334,8 @@ class Gallery {
 
   /**
    * Создание счётчика изображений
+   *
+   * @private
    */
   private buildPagination(): void {
     // DOM элемент счётчика
@@ -346,6 +348,8 @@ class Gallery {
 
   /**
    * Обновление счётчика
+   *
+   * @private
    */
   private updateCounter(): void {
     this.counterNode.innerHTML = `<span class="faze-gallery-counter-current">${
@@ -357,6 +361,8 @@ class Gallery {
 
   /**
    * Навешивание событий на стрелки переключения фотографий
+   *
+   * @private
    */
   private bindArrows(): void {
     // Кнопка перелистывания назад
@@ -402,6 +408,8 @@ class Gallery {
 
   /**
    * Навешивание события на кнопку закрытия
+   *
+   * @private
    */
   private bindCloseButton(): void {
     Faze.Events.listener('click', this.closeButtonNode, () => {
@@ -409,6 +417,11 @@ class Gallery {
     });
   }
 
+  /**
+   * Навешивание события на закрытие галереи по клику за ее пределами
+   *
+   * @private
+   */
   private bindCloseOnClickOutside(): void {
     Faze.Events.listener('click', document, (event: MouseEvent) => {
       if (
@@ -428,6 +441,8 @@ class Gallery {
 
   /**
    * Закрытие галереи
+   *
+   * @private
    */
   private close(): void {
     this.wrapperNode.remove();
@@ -437,6 +452,8 @@ class Gallery {
 
   /**
    * Переключение галереи на одну фотографию вперед
+   *
+   * @private
    */
   private next(): void {
     this.index += 1;
@@ -452,6 +469,8 @@ class Gallery {
 
   /**
    * Переключение галереи на одну фотографию назад
+   *
+   * @private
    */
   private prev(): void {
     this.index -= 1;
@@ -468,7 +487,9 @@ class Gallery {
   /**
    * Изменение текущего изображения
    *
-   * @param index Индекс нового изображения
+   * @param {number} index Индекс нового изображения
+   *
+   * @private
    */
   public change(index: number) {
     this.index = index;
@@ -514,6 +535,8 @@ class Gallery {
 
   /**
    * Проверка конфиг файла на ошибки
+   *
+   * @private
    */
   private checkConfig(): void {
     // Если задано значение положения превью и оно не равно нужным, выдаем ошибку

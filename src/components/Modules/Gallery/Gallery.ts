@@ -162,6 +162,7 @@ class Gallery {
             // Навешивание событий на созданные выше элементы
             this.bindArrows();
             this.bindCloseButton();
+            this.bindCloseOnClickOutside();
           });
         }
       });
@@ -192,6 +193,7 @@ class Gallery {
       this.bindArrows();
       this.bindKeyboardButtons();
       this.bindCloseButton();
+      this.bindCloseOnClickOutside();
 
       // Если есть увеличение, навешиваем его
       if (this.config.zoomable) {
@@ -402,10 +404,25 @@ class Gallery {
    * Навешивание события на кнопку закрытия
    */
   private bindCloseButton(): void {
-    this.closeButtonNode.addEventListener('click', (event: Event) => {
-      event.preventDefault();
-
+    Faze.Events.listener('click', this.closeButtonNode, () => {
       this.close();
+    });
+  }
+
+  private bindCloseOnClickOutside(): void {
+    Faze.Events.listener('click', document, (event: MouseEvent) => {
+      if (
+        !Faze.Helpers.isMouseOverlapsNodes(event, [
+          this.arrowsNodes.next,
+          this.arrowsNodes.prev,
+          this.closeButtonNode,
+          this.counterNode,
+          this.thumbnailsNode,
+          this.imageWrapperNode,
+        ])
+      ) {
+        this.close();
+      }
     });
   }
 

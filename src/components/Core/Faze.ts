@@ -44,7 +44,6 @@ import Scroller from '../Modules/Scroller/Scroller';
 import Zoom from '../Modules/Zoom/Zoom';
 import ZoomBox from '../Modules/ZoomBox/ZoomBox';
 import Look from '../Modules/Look/Look';
-import Scroll from '../Modules/Scroll/Scroll';
 import Form from '../Helpers/Form';
 import ColorChanger from '../Modules/ColorChanger/ColorChanger';
 import Page from '../Modules/Page/Page';
@@ -165,8 +164,6 @@ class Faze {
 
   static Scroller: any = Scroller;
 
-  static Scroll: any = Scroll;
-
   static Spoiler: any = Spoiler;
 
   static Page: any = Page;
@@ -258,7 +255,6 @@ class Faze {
       'Form',
       'Spoiler',
       'Select',
-      'Scroll',
       'Tab',
       'Dropdown',
       'Slider',

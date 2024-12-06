@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru" class="test-finder">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Finder</title>
+  </head>
+  <body>
+    <form action="/" data-faze="form">
+      <input
+        type="tel"
+        name="phone"
+        placeholder="Телефон"
+        data-faze-form-rule="^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$"
+      />
+      <input
+        type="number"
+        placeholder="Номер"
+        data-faze-form-rule="number"
+        required
+      />
+      <input type="text" placeholder="Что нибудь" required />
+    </form>
+  </body>
+</html>

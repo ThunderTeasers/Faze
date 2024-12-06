@@ -38,6 +38,56 @@ interface Config {
 /**
  * Класс
  */
-class Form extends Module {}
+class Form extends Module {
+  /**
+   * Стандартный конструктор
+   *
+   * @param {HTMLElement} node DOM элемент на который навешивается модуль
+   * @param {Config} config Конфиг модуля
+   */
+  constructor(node?: HTMLElement, config?: Partial<Config>) {
+    // Конфиг по умолчанию
+    const defaultConfig: Config = {
+      callbacks: {
+        created: undefined,
+        submitted: undefined,
+      },
+    };
+
+    // Инициализируем базовый класс
+    super({
+      node,
+      config: Object.assign(defaultConfig, config),
+      name: 'Form',
+    });
+  }
+
+  /**
+   * Инициализация
+   *
+   * @protected
+   */
+  protected initialize(): void {
+    super.initialize();
+  }
+
+  /**
+   * Навешивание событий
+   *
+   * @protected
+   */
+  protected bind(): void {
+    super.bind();
+  }
+
+  /**
+   * Построение необходимых DOM элементов
+   *
+   * @protected
+   */
+  protected build(): void {
+    super.build();
+  }
+}
 
 export default Form;

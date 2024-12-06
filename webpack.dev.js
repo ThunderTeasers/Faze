@@ -136,6 +136,10 @@ module.exports = (env) => {
         template: './src/tests/views/scroller.html',
       }),
       new HtmlWebpackPlugin({
+        filename: 'form.html',
+        template: './src/tests/views/form.html',
+      }),
+      new HtmlWebpackPlugin({
         template: './src/index.html',
       }),
       new webpack.HotModuleReplacementPlugin(),

@@ -187,25 +187,28 @@ Faze.add({
 
     fazeSelect.setValue('Выбор 2');
 
-    const carousel = new Faze.Carousel(document.querySelector('.carousel-test'), {
-      autoplay: false,
-      pages: true,
-      arrows: true,
-      // arrowsOutside: true,
-      counter: false,
-      infinite: false,
-      mouseMove: false,
-      // amountPerSlide: 2,
-      animation: {
-        type: 'fade',
-        time: 1000,
-        direction: 'horizontal',
-      },
-      selectors: {
-        arrowLeft: '.js-test-arrow-left',
-        arrowRight: '.js-test-arrow-right',
-      },
-    });
+    const carousel = new Faze.Carousel(
+      document.querySelector('.carousel-test'),
+      {
+        autoplay: false,
+        pages: true,
+        arrows: true,
+        // arrowsOutside: true,
+        counter: false,
+        infinite: false,
+        mouseMove: false,
+        // amountPerSlide: 2,
+        animation: {
+          type: 'fade',
+          time: 1000,
+          direction: 'horizontal',
+        },
+        selectors: {
+          arrowLeft: '.js-test-arrow-left',
+          arrowRight: '.js-test-arrow-right',
+        },
+      }
+    );
 
     const carouselChangeButtonNode = document.querySelector('.js-notification');
     if (carouselChangeButtonNode) {
@@ -221,11 +224,6 @@ Faze.add({
     });
 
     new Faze.Spoiler(document.querySelector('.spoiler-test'));
-
-    new Faze.Scroll(document.querySelector('.for-scroll'), {
-      width: '100%',
-      height: '300',
-    });
 
     new Faze.Form(document.querySelector('.form-order'), {
       callbacks: {

@@ -32,6 +32,7 @@ import Tour from '../Modules/Tour/Tour';
 import Tab from '../Modules/Tab/Tab';
 import Drag from '../Modules/Drag/Drag';
 import Dropdown from '../Modules/Dropdown/Dropdown';
+import Form from '../Modules/Form/Form';
 import Select from '../Modules/Select/Select';
 import SmartSelect from '../Modules/SmartSelect/SmartSelect';
 import Carousel from '../Modules/Carousel/Carousel';
@@ -44,7 +45,7 @@ import Scroller from '../Modules/Scroller/Scroller';
 import Zoom from '../Modules/Zoom/Zoom';
 import ZoomBox from '../Modules/ZoomBox/ZoomBox';
 import Look from '../Modules/Look/Look';
-import Form from '../Helpers/Form';
+import { default as HelpersForm } from '../Helpers/Form';
 import ColorChanger from '../Modules/ColorChanger/ColorChanger';
 import Page from '../Modules/Page/Page';
 import Filter from '../Modules/Filter/Filter';
@@ -166,9 +167,11 @@ class Faze {
 
   static Spoiler: any = Spoiler;
 
+  static Form: any = Form;
+
   static Page: any = Page;
 
-  static Form: any = Form;
+  static HelpersForm: any = HelpersForm;
 
   static Filter: any = Filter;
 
@@ -426,6 +429,7 @@ class Faze {
     Faze.Carousel.hotInitialize();
     Faze.Tooltip.hotInitialize();
     Faze.Tour.hotInitialize('tour');
+    Faze.Form.hotInitialize('form');
     Faze.Finder.hotInitialize('finder');
     Faze.Scroller.hotInitialize('scroller');
     Faze.Zoom.hotInitialize();

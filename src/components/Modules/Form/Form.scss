@@ -4,3 +4,14 @@
  * Автор: Ерохин Максим
  * Дата: 07.12.2024
  */
+
+// Форма
+.faze-form {
+  // Инпут
+  input {
+    // Ошибка
+    &.faze-form-input-error {
+      border-color: var(--faze-color-error);
+    }
+  }
+}

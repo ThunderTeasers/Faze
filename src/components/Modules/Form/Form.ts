@@ -135,7 +135,7 @@ class Form extends Module {
   private bindInputs(): void {
     this.inputsNodes.forEach((inputNode: HTMLInputElement) => {
       inputNode.addEventListener('input', () => {
-        this.checkInput(inputNode);
+        this.updateInput(this.checkInput(inputNode));
       });
     });
   }
@@ -179,19 +179,24 @@ class Form extends Module {
 
     // Информация об инпуте
     const inputInfo: InputInfo = {
-      message: '',
+      message: inputNode.dataset.fazeFormMessage || '',
       type,
       checked: false,
       node: inputNode,
     };
 
+    // Проверка на соответствие правилу
     switch (type) {
-      case Type.Required:
-        break;
       case Type.Regex:
+        inputInfo.checked = !!inputNode.value.match(
+          new RegExp(inputNode.dataset.fazeFormInput || '')
+        );
+
         break;
       case Type.None:
+      case Type.Required:
       default:
+        inputInfo.checked = inputNode.checkValidity();
         break;
     }
 
@@ -199,6 +204,10 @@ class Form extends Module {
   }
 
   private getRuleType(inputNode: HTMLInputElement): Type {
+    if (inputNode.dataset.fazeFormInput) {
+      return Type.Regex;
+    }
+
     return Type.None;
   }
 

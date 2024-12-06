@@ -10,8 +10,8 @@
         type="tel"
         name="phone"
         placeholder="Телефон"
-        data-faze-form-input
-        data-faze-form-rule="^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$"
+        data-faze-form-input="^\d{3}$"
+        data-faze-form-message="Введите три цифры!"
       />
       <input data-faze-form-input type="number" placeholder="Номер" required />
       <input
@@ -20,6 +20,7 @@
         placeholder="Что нибудь"
         required
       />
+      <!-- \+7 \(\d{3}\) \d{3}-\d{2}-\d{2} -->
       <button type="submit">Отправить</button>
     </form>
   </body>

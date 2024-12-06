@@ -88,6 +88,15 @@ class Form extends Module {
   protected build(): void {
     super.build();
   }
+
+  /**
+   * Инициализация модуля по data атрибутам
+   *
+   * @param {HTMLElement} node DOM элемент на который нужно инициализировать плагин
+   */
+  static initializeByDataAttributes(node: HTMLElement): void {
+    new Form(node, {});
+  }
 }
 
 export default Form;

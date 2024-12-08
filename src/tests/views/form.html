@@ -10,14 +10,20 @@
         type="tel"
         name="phone"
         placeholder="Телефон"
-        data-faze-form-input="^\d{3}$"
-        data-faze-form-message="Введите три цифры!"
+        data-faze-form-rules='[{"message":"Введите три цифры!", "rule":"^\d{3}$"},{"message":"Введите пять цифр!", "rule":"^\d{5}$"}]'
       />
-      <input data-faze-form-input type="number" placeholder="Номер" required />
+      <input
+        data-faze-form-input
+        type="number"
+        placeholder="Номер"
+        data-faze-form-rules='[{"message":"Введите что нибудь!", "rule":"validation"}]'
+        required
+      />
       <input
         data-faze-form-input
         type="text"
         placeholder="Что нибудь"
+        data-faze-form-rules='[{"message":"Хоть что-то!", "rule":"validation"}]'
         required
       />
       <!-- \+7 \(\d{3}\) \d{3}-\d{2}-\d{2} -->

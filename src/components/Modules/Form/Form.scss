@@ -7,6 +7,22 @@
 
 // Форма
 .faze-form {
+  // Подсказка
+  .faze-form-hint {
+    position: absolute;
+
+    display: none;
+    padding: 5px;
+
+    border: 1px solid var(--faze-color-primary);
+    border-radius: var(--faze-border-radius);
+
+    // Активная подсказка
+    &.active {
+      display: flex;
+    }
+  }
+
   // Инпут
   input {
     // Ошибка

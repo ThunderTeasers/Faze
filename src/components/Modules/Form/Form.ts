@@ -46,13 +46,21 @@ enum Type {
 }
 
 /**
- * Структура информации об инпуте
+ * Структура правил
  */
-type InputInfo = {
-  node: HTMLInputElement;
+type Rule = {
+  message: string;
+  rule: RegExp;
   type: Type;
   checked: boolean;
-  message: string;
+};
+
+/**
+ * Структура информации об инпуте
+ */
+type InputData = {
+  node: HTMLInputElement;
+  rules: Rule[];
 };
 
 /**
@@ -97,7 +105,7 @@ class Form extends Module {
     super.initialize();
 
     this.inputsNodes = this.node.querySelectorAll<HTMLInputElement>(
-      '[data-faze-form-input]'
+      '[data-faze-form-rules]'
     );
   }
 
@@ -156,11 +164,81 @@ class Form extends Module {
     });
   }
 
-  private updateInput(inputInfo: InputInfo): void {
-    inputInfo.node.classList.toggle(
-      'faze-form-input-error',
-      !inputInfo.checked
-    );
+  /**
+   * Обновляет инпут
+   *
+   * Метод вызывается при изменении значения инпута,
+   * и обновляет статус инпута на основе информации,
+   * полученной из inputData
+   *
+   * @param {InputData} inputData Структура информации об инпуте
+   * @private
+   */
+
+  private updateInput(inputData: InputData): void {
+    // Есть хоть одно неправильное значение
+    const isFailed = inputData.rules.some((rule) => !rule.checked);
+
+    inputData.node.classList.toggle('faze-form-input-error', isFailed);
+
+    if (isFailed) {
+      this.showHint(inputData);
+    } else {
+      this.hideHint();
+    }
+  }
+
+  /**
+   * Показывает подсказку
+   *
+   * Метод вызывается, когда возникла ошибка валидации,
+   * и показывает подсказку с ошибкой
+   *
+   * @param {InputData} inputData Структура информации об инпуте
+   * @private
+   */
+  private showHint(inputData: InputData): void {
+    this.buildRules(inputData);
+
+    // Позиционируем подсказку
+    this.hintNode.classList.add('active');
+    this.hintNode.style.top = `${
+      inputData.node.offsetTop + inputData.node.getBoundingClientRect().height
+    }px`;
+    this.hintNode.style.left = `${inputData.node.offsetLeft}px`;
+  }
+
+  /**
+   * Генерирует HTML код для подсказки
+   *
+   * Метод берёт информацию из inputData.rules,
+   * и генерирует HTML код для подсказки,
+   * который будет отображаться у инпута
+   *
+   * @param {InputData} inputData Структура информации об инпуте
+   * @private
+   */
+  private buildRules(inputData: InputData): void {
+    let rulesHTML = '';
+    inputData.rules.forEach((rule: Rule) => {
+      rulesHTML += `<div class="faze-form-rule ${
+        rule.checked ? 'faze-form-rule-passed' : 'faze-form-rule-error'
+      }">${rule.message}</div>`;
+    });
+
+    this.hintNode.innerHTML = rulesHTML;
+  }
+
+  /**
+   * Скрывает подсказку
+   *
+   * Метод вызывается, когда необходимо скрыть
+   * подсказку, возникшую при ошибке валидации.
+   *
+   * @private
+   */
+  private hideHint(): void {
+    this.hintNode.classList.remove('active');
   }
 
   /**
@@ -173,42 +251,59 @@ class Form extends Module {
    * @param {HTMLInputElement} inputNode DOM элемент инпута
    * @private
    */
-  private checkInput(inputNode: HTMLInputElement): InputInfo {
-    // Тип правила
-    const type = this.getRuleType(inputNode);
+  private checkInput(inputNode: HTMLInputElement): InputData {
+    // Правило
+    const rules: Rule[] = this.parseRules(inputNode);
+
+    rules.forEach((rule: Rule) => {
+      // Проверка на соответствие правилу
+      switch (rule.type) {
+        case Type.Regex:
+          rule.checked = !!inputNode.value.match(new RegExp(rule.rule || ''));
+
+          break;
+        case Type.None:
+        case Type.Required:
+        default:
+          rule.checked = inputNode.checkValidity();
+          break;
+      }
+    });
 
     // Информация об инпуте
-    const inputInfo: InputInfo = {
-      message: inputNode.dataset.fazeFormMessage || '',
-      type,
-      checked: false,
+    const inputData: InputData = {
       node: inputNode,
+      rules,
     };
 
-    // Проверка на соответствие правилу
-    switch (type) {
-      case Type.Regex:
-        inputInfo.checked = !!inputNode.value.match(
-          new RegExp(inputNode.dataset.fazeFormInput || '')
-        );
-
-        break;
-      case Type.None:
-      case Type.Required:
-      default:
-        inputInfo.checked = inputNode.checkValidity();
-        break;
-    }
-
-    return inputInfo;
+    return inputData;
   }
 
-  private getRuleType(inputNode: HTMLInputElement): Type {
-    if (inputNode.dataset.fazeFormInput) {
-      return Type.Regex;
+  private parseRules(inputNode: HTMLInputElement): Rule[] {
+    let result: Rule[] = [];
+
+    const jsonData = Faze.Helpers.parseJSON(
+      inputNode.dataset.fazeFormRules?.replace(/\\/g, '|||') || '[]'
+    );
+    if (Array.isArray(result)) {
+      result = jsonData.map((jsonData: any) => {
+        if (jsonData.rule === 'validation') {
+          return {
+            message: jsonData.message,
+            rule: 'validation',
+            type: Type.Required,
+          };
+        } else {
+          return {
+            message: jsonData.message,
+            rule: new RegExp((jsonData.rule || '').replace(/\|\|\|/g, '\\')),
+            type: Type.Regex,
+          };
+        }
+      });
     }
 
-    return Type.None;
+    return result;
   }
 
   /**

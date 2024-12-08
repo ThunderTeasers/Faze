@@ -52,7 +52,7 @@ type Rule = {
   message: string;
   rule: RegExp;
   type: Type;
-  checked: boolean;
+  valid: boolean;
 };
 
 /**
@@ -177,11 +177,11 @@ class Form extends Module {
 
   private updateInput(inputData: InputData): void {
     // Есть хоть одно неправильное значение
-    const isFailed = inputData.rules.some((rule) => !rule.checked);
+    const isInvalid = inputData.rules.some((rule) => !rule.valid);
 
-    inputData.node.classList.toggle('faze-form-input-error', isFailed);
+    inputData.node.classList.toggle('faze-form-input-invalid', isInvalid);
 
-    if (isFailed) {
+    if (isInvalid) {
       this.showHint(inputData);
     } else {
       this.hideHint();
@@ -203,7 +203,9 @@ class Form extends Module {
     // Позиционируем подсказку
     this.hintNode.classList.add('active');
     this.hintNode.style.top = `${
-      inputData.node.offsetTop + inputData.node.getBoundingClientRect().height
+      inputData.node.offsetTop +
+      inputData.node.getBoundingClientRect().height +
+      4
     }px`;
     this.hintNode.style.left = `${inputData.node.offsetLeft}px`;
   }
@@ -222,7 +224,7 @@ class Form extends Module {
     let rulesHTML = '';
     inputData.rules.forEach((rule: Rule) => {
       rulesHTML += `<div class="faze-form-rule ${
-        rule.checked ? 'faze-form-rule-passed' : 'faze-form-rule-error'
+        rule.valid ? 'faze-form-rule-valid' : 'faze-form-rule-invalid'
       }">${rule.message}</div>`;
     });
 
@@ -259,13 +261,13 @@ class Form extends Module {
       // Проверка на соответствие правилу
       switch (rule.type) {
         case Type.Regex:
-          rule.checked = !!inputNode.value.match(new RegExp(rule.rule || ''));
+          rule.valid = !!inputNode.value.match(new RegExp(rule.rule || ''));
 
           break;
         case Type.None:
         case Type.Required:
         default:
-          rule.checked = inputNode.checkValidity();
+          rule.valid = inputNode.checkValidity();
           break;
       }
     });

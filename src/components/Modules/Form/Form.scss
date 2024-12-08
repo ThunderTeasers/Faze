@@ -12,10 +12,31 @@
     position: absolute;
 
     display: none;
-    padding: 5px;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem;
 
-    border: 1px solid var(--faze-color-primary);
+    border: 0.1rem solid var(--faze-color-primary);
     border-radius: var(--faze-border-radius);
+
+    // Правило
+    .faze-form-rule {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      font-size: 1.4rem;
+      line-height: 1;
+
+      // Иконка
+      &::before {
+        margin-right: 0.8rem;
+
+        font-family: 'Font Awesome 6 Pro';
+        font-weight: 700;
+        font-style: normal;
+      }
+    }
 
     // Активная подсказка
     &.active {
@@ -26,7 +47,7 @@
   // Инпут
   input {
     // Ошибка
-    &.faze-form-input-error {
+    &.faze-form-input-invalid {
       border-color: var(--faze-color-error);
     }
   }

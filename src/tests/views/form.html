@@ -7,10 +7,18 @@
   <body>
     <form action="/" data-faze="form">
       <input
-        type="tel"
-        name="phone"
-        placeholder="Телефон"
-        data-faze-form-rules='[{"message":"Введите три цифры!", "rule":"^\d{3}$"},{"message":"Введите пять цифр!", "rule":"^\d{5}$"}]'
+        type="text"
+        name="password"
+        placeholder="Пароль"
+        class="js-password-1"
+        data-faze-form-rules='[{"message":"От 8 до 32 символов", "rule":".{8,32}"},{"message":"Не менее одной цифры", "rule":"\d{1,}"},{"message":"Не менее одной заглавной буквы", "rule":"[A-Z]{1,}"},{"message":"Не менее одного спец. символа", "rule":"[-@_\[\]\(\)\+]{1,}"},{"message":"Пароли должны совпадать", "rule":"same", "special":".js-password-2"}]'
+      />
+      <input
+        type="text"
+        name="password2"
+        placeholder="Повторите пароль"
+        class="js-password-2"
+        data-faze-form-rules='[{"message":"От 8 до 32 символов", "rule":".{8,32}"},{"message":"Не менее одной цифры", "rule":"\d{1,}"},{"message":"Не менее одной заглавной буквы", "rule":"[A-Z]{1,}"},{"message":"Не менее одного спец. символа", "rule":"[-@_\[\]\(\)\+]{1,}"},{"message":"Пароли должны совпадать", "rule":"same", "special":".js-password-1"}]'
       />
       <input
         data-faze-form-input
@@ -27,7 +35,7 @@
         required
       />
       <!-- \+7 \(\d{3}\) \d{3}-\d{2}-\d{2} -->
-      <button type="submit">Отправить</button>
+      <button type="submit" data-faze-form-button>Отправить</button>
     </form>
   </body>
 </html>

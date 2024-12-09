@@ -30,11 +30,33 @@
 
       // Иконка
       &::before {
+        content: '';
+
         margin-right: 0.8rem;
 
         font-family: 'Font Awesome 6 Pro';
         font-weight: 700;
         font-style: normal;
+      }
+
+      // Ошибка
+      &.faze-form-rule-valid {
+        // Иконка
+        &::before {
+          content: '\f058';
+
+          color: var(--faze-color-success);
+        }
+      }
+
+      // Ошибка
+      &.faze-form-rule-invalid {
+        // Иконка
+        &::before {
+          content: '\f057';
+
+          color: var(--faze-color-error);
+        }
       }
     }
 

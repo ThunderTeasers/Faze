@@ -43,6 +43,7 @@ enum Type {
   None = 1,
   Required,
   Regex,
+  Same,
 }
 
 /**
@@ -53,6 +54,7 @@ type Rule = {
   rule: RegExp;
   type: Type;
   valid: boolean;
+  special?: string;
 };
 
 /**
@@ -70,8 +72,8 @@ class Form extends Module {
   // DOM элемент подсказки
   hintNode: HTMLDivElement;
 
-  // DOM элементы инпутов
-  inputsNodes: NodeListOf<HTMLInputElement>;
+  // Дапнные инпутов
+  inputsData: InputData[];
 
   /**
    * Стандартный конструктор
@@ -104,9 +106,13 @@ class Form extends Module {
   protected initialize(): void {
     super.initialize();
 
-    this.inputsNodes = this.node.querySelectorAll<HTMLInputElement>(
-      '[data-faze-form-rules]'
-    );
+    // Получение всех данных
+    this.inputsData = Array.from(
+      this.node.querySelectorAll<HTMLInputElement>('[data-faze-form-rules]')
+    ).map((inputNode: HTMLInputElement) => ({
+      node: inputNode,
+      rules: this.parseRules(inputNode),
+    }));
   }
 
   /**
@@ -141,9 +147,9 @@ class Form extends Module {
    * @private
    */
   private bindInputs(): void {
-    this.inputsNodes.forEach((inputNode: HTMLInputElement) => {
-      inputNode.addEventListener('input', () => {
-        this.updateInput(this.checkInput(inputNode));
+    this.inputsData.forEach((inputsData: InputData) => {
+      Faze.Events.listener('input', inputsData.node, () => {
+        this.updateInput(this.checkInput(inputsData));
       });
     });
   }
@@ -157,9 +163,9 @@ class Form extends Module {
    * @private
    */
   private bindFocus(): void {
-    this.inputsNodes.forEach((inputNode: HTMLInputElement) => {
-      inputNode.addEventListener('focus', () => {
-        this.updateInput(this.checkInput(inputNode));
+    this.inputsData.forEach((inputsData: InputData) => {
+      Faze.Events.listener('focus', inputsData.node, () => {
+        this.updateInput(this.checkInput(inputsData));
       });
     });
   }
@@ -250,33 +256,38 @@ class Form extends Module {
    * и проверяет его на соответствие правилу,
    * которое было указано в data атрибуте "data-faze-form-rule"
    *
-   * @param {HTMLInputElement} inputNode DOM элемент инпута
+   * @param {InputData} inputData Данные инпута
    * @private
    */
-  private checkInput(inputNode: HTMLInputElement): InputData {
-    // Правило
-    const rules: Rule[] = this.parseRules(inputNode);
-
-    rules.forEach((rule: Rule) => {
+  private checkInput(inputData: InputData): InputData {
+    inputData.rules.forEach((rule: Rule) => {
       // Проверка на соответствие правилу
       switch (rule.type) {
         case Type.Regex:
-          rule.valid = !!inputNode.value.match(new RegExp(rule.rule || ''));
+          rule.valid = !!inputData.node.value.match(
+            new RegExp(rule.rule || '')
+          );
+
+          break;
+        case Type.Same:
+          const specialInputNode = document.querySelector<HTMLInputElement>(
+            rule.special || ''
+          );
+
+          if (specialInputNode) {
+            rule.valid = inputData.node.value === specialInputNode.value;
+          } else {
+            rule.valid = false;
+          }
 
           break;
         case Type.None:
         case Type.Required:
         default:
-          rule.valid = inputNode.checkValidity();
+          rule.valid = inputData.node.checkValidity();
           break;
       }
     });
-
-    // Информация об инпуте
-    const inputData: InputData = {
-      node: inputNode,
-      rules,
-    };
 
     return inputData;
   }
@@ -294,6 +305,13 @@ class Form extends Module {
             message: jsonData.message,
             rule: 'validation',
             type: Type.Required,
+          };
+        } else if (jsonData.rule === 'same') {
+          return {
+            message: jsonData.message,
+            rule: 'same',
+            special: jsonData.special,
+            type: Type.Same,
           };
         } else {
           return {

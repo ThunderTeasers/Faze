@@ -18,7 +18,7 @@ import Faze from '../../Core/Faze';
  */
 interface CallbackData {
   node: HTMLElement;
-  inputsNode: NodeListOf<HTMLInputElement>;
+  inputsData: InputData[];
 }
 
 /**
@@ -113,6 +113,9 @@ class Form extends Module {
       node: inputNode,
       rules: this.parseRules(inputNode),
     }));
+
+    // Выполнение пользовательской функции "created"
+    this.createdCallbackCall();
   }
 
   /**
@@ -360,6 +363,46 @@ class Form extends Module {
       'faze-form-hint'
     );
   }
+
+  /**
+   * Выполнение пользовательской функции "created"
+   *
+   * @private
+   */
+  private createdCallbackCall(): void {
+    if (typeof this.config.callbacks.created === 'function') {
+      try {
+        this.config.callbacks.created({
+          node: this.node,
+          inputsData: this.inputsData,
+        });
+      } catch (error) {
+        this.logger.error(
+          `Ошибка исполнения пользовательского метода "created": ${error}`
+        );
+      }
+    }
+  }
+
+  /**
+   * Выполнение пользовательской функции "changed"
+   *
+   * @private
+   */
+  // private changeCallbackCall(): void {
+  //   if (typeof this.config.callbacks.submitted === 'function') {
+  //     try {
+  //       this.config.callbacks.submitted({
+  //         node: this.node,
+  //         inputsData: this.inputsData,
+  //       });
+  //     } catch (error) {
+  //       this.logger.error(
+  //         `Ошибка исполнения пользовательского метода "submitted": ${error}`
+  //       );
+  //     }
+  //   }
+  // }
 
   /**
    * Инициализация модуля по data атрибутам

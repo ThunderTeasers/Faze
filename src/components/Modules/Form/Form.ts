@@ -270,12 +270,32 @@ class Form extends Module {
 
           break;
         case Type.Same:
+          // Ищем специальный инпут для проверки
           const specialInputNode = document.querySelector<HTMLInputElement>(
             rule.special || ''
           );
 
-          if (specialInputNode) {
-            rule.valid = inputData.node.value === specialInputNode.value;
+          // Если специальный инпут нашелся, ищем его данные
+          const spetialInputData = this.inputsData.find(
+            (inputData) => inputData.node === specialInputNode
+          );
+
+          // Если данные найдены
+          if (spetialInputData) {
+            // Проверяем соответствие
+            const isSame = inputData.node.value === spetialInputData.node.value;
+            rule.valid = isSame;
+
+            // Обновляем правило найденного инпута
+            const specialRule: Rule | undefined = spetialInputData.rules.find(
+              (rule: Rule) => rule.type === Type.Same
+            );
+
+            if (specialRule) {
+              specialRule.valid = isSame;
+
+              this.updateInput(spetialInputData);
+            }
           } else {
             rule.valid = false;
           }

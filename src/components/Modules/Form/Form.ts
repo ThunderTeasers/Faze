@@ -275,37 +275,45 @@ class Form extends Module {
     // Позиционируем подсказку
     this.hintNode.classList.add('active');
 
+    // Позиция инпута
+    const position: FazePosition = Faze.Helpers.getElementPosition(
+      inputData.node
+    );
+
+    console.log(
+      inputData.node,
+      Faze.Helpers.getElementPosition(inputData.node),
+      inputData.node.offsetLeft,
+      inputData.node.offsetTop
+    );
+
     switch (this.config.hintSide) {
       case 'top':
         this.hintNode.style.top = `${
-          inputData.node.offsetTop -
-          this.hintNode.offsetHeight -
-          this.config.hintOffset
+          position.y - this.hintNode.offsetHeight - this.config.hintOffset
         }px`;
-        this.hintNode.style.left = `${inputData.node.offsetLeft}px`;
+        this.hintNode.style.left = `${position.x}px`;
         break;
       case 'bottom':
       default:
         this.hintNode.style.top = `${
-          inputData.node.offsetTop +
+          position.y +
           inputData.node.getBoundingClientRect().height +
           this.config.hintOffset
         }px`;
-        this.hintNode.style.left = `${inputData.node.offsetLeft}px`;
+        this.hintNode.style.left = `${position.x}px`;
         break;
       case 'left':
-        this.hintNode.style.top = `${inputData.node.offsetTop}px`;
+        this.hintNode.style.top = `${position.y}px`;
         this.hintNode.style.left = `${
-          inputData.node.offsetLeft -
-          this.hintNode.offsetWidth -
-          this.config.hintOffset
+          position.x - this.hintNode.offsetWidth - this.config.hintOffset
         }px`;
         break;
       case 'right':
-        this.hintNode.style.top = `${inputData.node.offsetTop}px`;
+        this.hintNode.style.top = `${position.y}px`;
         this.hintNode.style.left = `${
-          inputData.node.offsetLeft +
-          inputData.node.offsetWidth +
+          position.x +
+          inputData.node.getBoundingClientRect().width +
           this.config.hintOffset
         }px`;
         break;
@@ -452,7 +460,7 @@ class Form extends Module {
       'div',
       {},
       {},
-      this.node,
+      document.body,
       'faze-form-hint'
     );
   }

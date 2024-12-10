@@ -4,14 +4,24 @@
     <meta charset="UTF-8" />
     <title>Finder</title>
     <style>
+      body {
+        height: 2000px;
+      }
+
       form {
+        position: relative;
+
         margin-top: 200px;
         margin-left: 200px;
+      }
+
+      form input {
+        position: relative;
       }
     </style>
   </head>
   <body>
-    <form action="/" data-faze="form" data-faze-form-hint-side="bottom">
+    <form action="/" data-faze="form" data-faze-form-hint-side="right">
       <input
         type="text"
         name="password"

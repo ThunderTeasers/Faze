@@ -147,6 +147,7 @@ class Form extends Module {
 
     this.bindInputs();
     this.bindFocus();
+    this.bindClickOutside();
   }
 
   /**
@@ -158,6 +159,19 @@ class Form extends Module {
     super.build();
 
     this.buildHint();
+  }
+
+  private bindClickOutside(): void {
+    Faze.Events.listener('click', window, (event: MouseEvent) => {
+      if (
+        !Faze.Helpers.isMouseOverlapsNodes(event, [
+          ...this.inputsData.map((inputData) => inputData.node),
+          this.hintNode,
+        ])
+      ) {
+        this.hideHint();
+      }
+    });
   }
 
   /**
@@ -251,6 +265,7 @@ class Form extends Module {
   private showHint(inputData: InputData): void {
     // Не выводим подсказку если она отключена у инпута
     if (inputData.hintDisabled) {
+      this.hideHint();
       return;
     }
 

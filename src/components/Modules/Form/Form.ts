@@ -32,7 +32,7 @@ interface CallbackData {
 interface Config {
   callbacks: {
     created?: (data: CallbackData) => void;
-    submitted?: (data: CallbackData) => void;
+    input?: (data: CallbackData) => void;
   };
 }
 
@@ -89,7 +89,7 @@ class Form extends Module {
     const defaultConfig: Config = {
       callbacks: {
         created: undefined,
-        submitted: undefined,
+        input: undefined,
       },
     };
 
@@ -226,6 +226,9 @@ class Form extends Module {
 
     // Проверка состояния кнопок
     this.checkButtons();
+
+    // Выполнение пользовательской функции "input"
+    this.inputCallbackCall();
   }
 
   /**
@@ -416,24 +419,24 @@ class Form extends Module {
   }
 
   /**
-   * Выполнение пользовательской функции "changed"
+   * Выполнение пользовательской функции "input"
    *
    * @private
    */
-  // private changeCallbackCall(): void {
-  //   if (typeof this.config.callbacks.submitted === 'function') {
-  //     try {
-  //       this.config.callbacks.submitted({
-  //         node: this.node,
-  //         inputsData: this.inputsData,
-  //       });
-  //     } catch (error) {
-  //       this.logger.error(
-  //         `Ошибка исполнения пользовательского метода "submitted": ${error}`
-  //       );
-  //     }
-  //   }
-  // }
+  private inputCallbackCall(): void {
+    if (typeof this.config.callbacks.input === 'function') {
+      try {
+        this.config.callbacks.input({
+          node: this.node,
+          inputsData: this.inputsData,
+        });
+      } catch (error) {
+        this.logger.error(
+          `Ошибка исполнения пользовательского метода "input": ${error}`
+        );
+      }
+    }
+  }
 
   /**
    * Инициализация модуля по data атрибутам

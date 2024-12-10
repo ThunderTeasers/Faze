@@ -72,8 +72,11 @@ class Form extends Module {
   // DOM элемент подсказки
   hintNode: HTMLDivElement;
 
-  // Дапнные инпутов
+  // Данные инпутов
   inputsData: InputData[];
+
+  // DOM элементы кнопок
+  buttonsNodes: NodeListOf<HTMLButtonElement>;
 
   /**
    * Стандартный конструктор
@@ -106,6 +109,11 @@ class Form extends Module {
   protected initialize(): void {
     super.initialize();
 
+    // Получение всех кнопок
+    this.buttonsNodes = this.node.querySelectorAll<HTMLButtonElement>(
+      '[data-faze-form-button], .faze-form-button'
+    );
+
     // Получение всех данных
     this.inputsData = Array.from(
       this.node.querySelectorAll<HTMLInputElement>('[data-faze-form-rules]')
@@ -113,6 +121,9 @@ class Form extends Module {
       node: inputNode,
       rules: this.parseRules(inputNode),
     }));
+
+    // Проверка состояния кнопок
+    this.checkButtons();
 
     // Выполнение пользовательской функции "created"
     this.createdCallbackCall();
@@ -174,6 +185,24 @@ class Form extends Module {
   }
 
   /**
+   * Проверка кнопок
+   *
+   * Проверяет, все ли инпуты валидны,
+   * и устанавливает состояние кнопок
+   *
+   * @private
+   */
+  private checkButtons(): void {
+    const isValid = this.inputsData.some((inputsData: InputData) =>
+      inputsData.rules.some((rule) => !rule.valid)
+    );
+
+    this.buttonsNodes.forEach((buttonNode: HTMLButtonElement) => {
+      buttonNode.disabled = isValid;
+    });
+  }
+
+  /**
    * Обновляет инпут
    *
    * Метод вызывается при изменении значения инпута,
@@ -183,7 +212,6 @@ class Form extends Module {
    * @param {InputData} inputData Структура информации об инпуте
    * @private
    */
-
   private updateInput(inputData: InputData): void {
     // Есть хоть одно неправильное значение
     const isInvalid = inputData.rules.some((rule) => !rule.valid);
@@ -195,6 +223,9 @@ class Form extends Module {
     } else {
       this.hideHint();
     }
+
+    // Проверка состояния кнопок
+    this.checkButtons();
   }
 
   /**

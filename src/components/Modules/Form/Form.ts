@@ -264,7 +264,11 @@ class Form extends Module {
    */
   private showHint(inputData: InputData): void {
     // Не выводим подсказку если она отключена у инпута
-    if (inputData.hintDisabled) {
+    // или если нет сообщения для вывода
+    if (
+      inputData.hintDisabled ||
+      !inputData.rules.some((rule) => rule.message)
+    ) {
       this.hideHint();
       return;
     }

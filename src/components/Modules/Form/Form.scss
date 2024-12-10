@@ -18,6 +18,9 @@
 
     border: 0.1rem solid var(--faze-color-primary);
     border-radius: var(--faze-border-radius);
+    background-color: var(--faze-color-white);
+
+    z-index: 10;
 
     // Правило
     .faze-form-rule {

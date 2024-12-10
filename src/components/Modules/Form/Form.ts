@@ -25,11 +25,15 @@ interface CallbackData {
  * Структура конфига
  *
  * Содержит:
+ *   hintSide - положение подсказки
+ *   hintOffset - смещение подсказки
  *   callbacks
  *     created - пользовательская функция, исполняющаяся при создании
  *     changed - пользовательская функция, исполняющаяся после сабмита формы
  */
 interface Config {
+  hintSide: FazeSide;
+  hintOffset: number;
   callbacks: {
     created?: (data: CallbackData) => void;
     input?: (data: CallbackData) => void;
@@ -87,6 +91,8 @@ class Form extends Module {
   constructor(node?: HTMLElement, config?: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
+      hintOffset: 4,
+      hintSide: 'bottom',
       callbacks: {
         created: undefined,
         input: undefined,
@@ -245,12 +251,42 @@ class Form extends Module {
 
     // Позиционируем подсказку
     this.hintNode.classList.add('active');
-    this.hintNode.style.top = `${
-      inputData.node.offsetTop +
-      inputData.node.getBoundingClientRect().height +
-      4
-    }px`;
-    this.hintNode.style.left = `${inputData.node.offsetLeft}px`;
+
+    switch (this.config.hintSide) {
+      case 'top':
+        this.hintNode.style.top = `${
+          inputData.node.offsetTop -
+          this.hintNode.offsetHeight -
+          this.config.hintOffset
+        }px`;
+        this.hintNode.style.left = `${inputData.node.offsetLeft}px`;
+        break;
+      case 'bottom':
+      default:
+        this.hintNode.style.top = `${
+          inputData.node.offsetTop +
+          inputData.node.getBoundingClientRect().height +
+          this.config.hintOffset
+        }px`;
+        this.hintNode.style.left = `${inputData.node.offsetLeft}px`;
+        break;
+      case 'left':
+        this.hintNode.style.top = `${inputData.node.offsetTop}px`;
+        this.hintNode.style.left = `${
+          inputData.node.offsetLeft -
+          this.hintNode.offsetWidth -
+          this.config.hintOffset
+        }px`;
+        break;
+      case 'right':
+        this.hintNode.style.top = `${inputData.node.offsetTop}px`;
+        this.hintNode.style.left = `${
+          inputData.node.offsetLeft +
+          inputData.node.offsetWidth +
+          this.config.hintOffset
+        }px`;
+        break;
+    }
   }
 
   /**
@@ -444,7 +480,10 @@ class Form extends Module {
    * @param {HTMLElement} node DOM элемент на который нужно инициализировать плагин
    */
   static initializeByDataAttributes(node: HTMLElement): void {
-    new Form(node, {});
+    new Form(node, {
+      hintSide: (node.dataset.fazeFormHintSide || 'bottom') as FazeSide,
+      hintOffset: parseInt(node.dataset.fazeFormHintOffset || '4', 10),
+    });
   }
 }
 

@@ -329,11 +329,13 @@ class Form extends Module {
    */
   private buildRules(inputData: InputData): void {
     let rulesHTML = '';
-    inputData.rules.forEach((rule: Rule) => {
-      rulesHTML += `<div class="faze-form-rule ${
-        rule.valid ? 'faze-form-rule-valid' : 'faze-form-rule-invalid'
-      }">${rule.message}</div>`;
-    });
+    inputData.rules
+      .filter((rule: Rule) => rule.message)
+      .forEach((rule: Rule) => {
+        rulesHTML += `<div class="faze-form-rule ${
+          rule.valid ? 'faze-form-rule-valid' : 'faze-form-rule-invalid'
+        }">${rule.message}</div>`;
+      });
 
     this.hintNode.innerHTML = rulesHTML;
   }

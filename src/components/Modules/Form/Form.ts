@@ -66,6 +66,7 @@ type Rule = {
  */
 type InputData = {
   node: HTMLInputElement;
+  hintDisabled: boolean;
   rules: Rule[];
 };
 
@@ -126,6 +127,7 @@ class Form extends Module {
     ).map((inputNode: HTMLInputElement) => ({
       node: inputNode,
       rules: this.parseRules(inputNode),
+      hintDisabled: inputNode.dataset.fazeFormHintDisabled === 'true',
     }));
 
     // Проверка состояния кнопок
@@ -247,6 +249,12 @@ class Form extends Module {
    * @private
    */
   private showHint(inputData: InputData): void {
+    // Не выводим подсказку если она отключена у инпута
+    if (inputData.hintDisabled) {
+      return;
+    }
+
+    // Построение HTML кода подсказки
     this.buildRules(inputData);
 
     // Позиционируем подсказку

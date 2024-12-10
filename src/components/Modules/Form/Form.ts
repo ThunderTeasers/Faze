@@ -280,13 +280,6 @@ class Form extends Module {
       inputData.node
     );
 
-    console.log(
-      inputData.node,
-      Faze.Helpers.getElementPosition(inputData.node),
-      inputData.node.offsetLeft,
-      inputData.node.offsetTop
-    );
-
     switch (this.config.hintSide) {
       case 'top':
         this.hintNode.style.top = `${

@@ -52,3 +52,14 @@ interface FazeDisallowRange {
   from?: number;
   to?: number;
 }
+
+/**
+ * Интерфейс описания стороны
+ *
+ * Содержит:
+ *   top{number}    - верхняя сторона
+ *   right{number}  - правая сторона
+ *   bottom{number} - нижняя сторона
+ *   left{number}   - левая сторона
+ */
+type FazeSide = 'top' | 'right' | 'bottom' | 'left';

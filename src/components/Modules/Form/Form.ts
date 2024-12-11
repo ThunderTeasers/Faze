@@ -185,7 +185,7 @@ class Form extends Module {
   private bindInputs(): void {
     this.inputsData.forEach((inputsData: InputData) => {
       Faze.Events.listener('input', inputsData.node, () => {
-        this.updateInput(this.checkInput(inputsData));
+        this.updateInput(inputsData);
       });
     });
   }
@@ -201,7 +201,7 @@ class Form extends Module {
   private bindFocus(): void {
     this.inputsData.forEach((inputsData: InputData) => {
       Faze.Events.listener('focus', inputsData.node, () => {
-        this.updateInput(this.checkInput(inputsData));
+        this.updateInput(inputsData);
       });
     });
   }
@@ -232,9 +232,15 @@ class Form extends Module {
    * полученной из inputData
    *
    * @param {InputData} inputData Структура информации об инпуте
+   * @param {boolean} checkNeeded Проверять инпут на соответствие правилам
    * @private
    */
-  private updateInput(inputData: InputData): void {
+  private updateInput(inputData: InputData, checkNeeded: boolean = true): void {
+    // Проверка инпута
+    if (checkNeeded) {
+      inputData = this.checkInput(inputData);
+    }
+
     // Есть хоть одно неправильное значение
     const isInvalid = inputData.rules.some((rule) => !rule.valid);
 
@@ -397,7 +403,7 @@ class Form extends Module {
             if (specialRule) {
               specialRule.valid = isSame;
 
-              this.updateInput(spetialInputData);
+              this.updateInput(spetialInputData, false);
             }
           } else {
             rule.valid = false;

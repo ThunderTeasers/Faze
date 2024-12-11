@@ -23,6 +23,14 @@
   <body>
     <form action="/" data-faze="form" data-faze-form-hint-side="right">
       <input
+        data-faze-form-input
+        type="text"
+        placeholder="Что нибудь"
+        data-faze-form-rules='[{"rule":"validation"}]'
+        readonly
+        required
+      />
+      <input
         type="text"
         name="password"
         placeholder="Пароль"

@@ -162,16 +162,21 @@ class Form extends Module {
   }
 
   private bindClickOutside(): void {
-    Faze.Events.listener('click', window, (event: MouseEvent) => {
-      if (
-        !Faze.Helpers.isMouseOverlapsNodes(event, [
-          ...this.inputsData.map((inputData) => inputData.node),
-          this.hintNode,
-        ])
-      ) {
-        this.hideHint();
-      }
-    });
+    Faze.Events.listener(
+      'click',
+      document,
+      (event: MouseEvent) => {
+        if (
+          !Faze.Helpers.isMouseOverlapsNodes(event, [
+            ...this.inputsData.map((inputData) => inputData.node),
+            this.hintNode,
+          ])
+        ) {
+          this.hideHint();
+        }
+      },
+      false
+    );
   }
 
   /**

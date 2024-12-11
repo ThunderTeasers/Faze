@@ -23,14 +23,14 @@
   <body>
     <form action="/" data-faze="form" data-faze-form-hint-side="right">
       <input
-        data-faze-form-input
+        name="test"
         type="text"
         placeholder="Что нибудь"
-        data-faze-form-rules='[{"rule":"validation"}]'
+        data-faze-form-rules='[{"rule":".{1,}"}]'
         readonly
         required
       />
-      <input
+      <!-- <input
         type="text"
         name="password"
         placeholder="Пароль"
@@ -43,9 +43,8 @@
         placeholder="Повторите пароль"
         class="js-password-2"
         data-faze-form-rules='[{"message":"От 8 до 32 символов", "rule":".{8,32}"},{"message":"Не менее одной цифры", "rule":"\d{1,}"},{"message":"Не менее одной заглавной буквы", "rule":"[A-Z]{1,}"},{"message":"Не менее одного спец. символа", "rule":"[-@_\[\]\(\)\+]{1,}"},{"message":"Пароли должны совпадать", "rule":"same", "special":".js-password-1"}]'
-      />
+      /> -->
       <input
-        data-faze-form-input
         type="number"
         placeholder="Номер"
         data-faze-form-hint-disabled="true"
@@ -53,7 +52,6 @@
         required
       />
       <input
-        data-faze-form-input
         type="text"
         placeholder="Что нибудь"
         data-faze-form-rules='[{"message":"Хоть что-то!", "rule":"validation"}]'
@@ -61,6 +59,13 @@
       />
       <!-- \+7 \(\d{3}\) \d{3}-\d{2}-\d{2} -->
       <button type="submit" class="faze-form-button">Отправить</button>
+
+      <button
+        type="button"
+        onclick="this.form.test.dispatchEvent(new Event('input'))"
+      >
+        Заполнить
+      </button>
     </form>
   </body>
 </html>

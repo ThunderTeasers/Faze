@@ -39,7 +39,6 @@ interface CallbackData {
  */
 interface Config {
   hideMode: 'display' | 'visibility';
-  showClass: string;
   caseSensitive: boolean;
   minLength: number;
   callbacks: {
@@ -71,7 +70,6 @@ class Finder extends Module {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       hideMode: 'display',
-      showClass: 'block',
       minLength: 3,
       caseSensitive: false,
       callbacks: {
@@ -154,37 +152,11 @@ class Finder extends Module {
         ? itemNode.dataset.fazeFinderItemValue
         : itemNode.dataset.fazeFinderItemValue?.toLowerCase();
 
-      if (itemValue?.includes(value || '')) {
-        this.showItem(itemNode);
-      } else {
-        this.hideItem(itemNode);
-      }
+      itemNode.classList.toggle('faze-hide', !itemValue?.includes(value || ''));
     });
 
     // Вызываем пользовательскую функцию
     this.changeCallbackCall();
-  }
-
-  private hideItem(node: HTMLElement): void {
-    if (this.config.hideMode === 'display') {
-      node.style.display = 'none';
-    } else {
-      node.style.visibility = 'hidden';
-    }
-  }
-
-  /**
-   * Показывает DOM элемент
-   *
-   * @param {HTMLElement} node DOM элемент, который нужно показать
-   * @private
-   */
-  private showItem(node: HTMLElement): void {
-    if (this.config.hideMode === 'display') {
-      node.style.display = this.config.showClass;
-    } else {
-      node.style.visibility = 'visible';
-    }
   }
 
   /**
@@ -238,7 +210,6 @@ class Finder extends Module {
    */
   static initializeByDataAttributes(node: HTMLElement): void {
     new Finder(node, {
-      showClass: node.dataset.fazeFinderShowClass || 'block',
       minLength: parseInt(node.dataset.fazeFinderMinLength || '3', 10),
       caseSensitive:
         (node.dataset.fazeFinderCaseSensitive || 'false') === 'true',

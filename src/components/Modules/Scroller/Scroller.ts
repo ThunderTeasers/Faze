@@ -133,6 +133,9 @@ class Scroller extends Module {
     this.btnNode = document.createElement('button');
     this.btnNode.className = 'faze-scroller-btn';
     this.node.appendChild(this.btnNode);
+
+    // Сразу проверяем должно ли быть видно кнопку
+    this.checkVisibility();
   }
 
   /**

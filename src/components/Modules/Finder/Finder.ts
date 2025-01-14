@@ -70,7 +70,7 @@ class Finder extends Module {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       mode: 'display',
-      minLength: 3,
+      minLength: 0,
       caseSensitive: false,
       callbacks: {
         created: undefined,
@@ -129,9 +129,7 @@ class Finder extends Module {
    */
   private bindInput(): void {
     Faze.Events.listener('input', this.inputNode, () => {
-      if ((this.inputNode?.value.length || 0) >= this.config.minLength) {
-        this.update();
-      }
+      this.update();
     });
   }
 
@@ -156,7 +154,14 @@ class Finder extends Module {
         ? itemNode.dataset.fazeFinderItemValue
         : itemNode.dataset.fazeFinderItemValue?.toLowerCase();
 
-      itemNode.classList.toggle(hideClass, !itemValue?.includes(value || ''));
+      // Управляем видимостью элементов
+      itemNode.classList.toggle(
+        hideClass,
+        !(
+          (this.inputNode?.value.length || 0) < this.config.minLength ||
+          itemValue?.includes(value || '')
+        )
+      );
     });
 
     // Вызываем пользовательскую функцию
@@ -214,7 +219,7 @@ class Finder extends Module {
    */
   static initializeByDataAttributes(node: HTMLElement): void {
     new Finder(node, {
-      minLength: parseInt(node.dataset.fazeFinderMinLength || '3', 10),
+      minLength: parseInt(node.dataset.fazeFinderMinLength || '0', 10),
       caseSensitive:
         (node.dataset.fazeFinderCaseSensitive || 'false') === 'true',
       mode:

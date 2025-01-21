@@ -15,13 +15,11 @@ import Faze from '../../Core/Faze';
  * Содержит:
  *   node - DOM элемент где происходит работа модуля
  *   inputNode - DOM элемент холдера элементов
- *   itemsNode - DOM элементы элементов
  *   itemsNodes - DOM элемент инпута поиска
  */
 interface CallbackData {
   node: HTMLElement;
   inputNode: HTMLInputElement;
-  itemsNode: HTMLElement;
   itemsNodes: HTMLElement[];
 }
 
@@ -53,9 +51,6 @@ interface Config {
 class Finder extends Module {
   // DOM элемент инпута
   inputNode: HTMLInputElement | null;
-
-  // DOM элемент элементов
-  itemsNode: HTMLElement | null;
 
   // DOM элементы элементов
   itemsNodes?: NodeListOf<HTMLElement>;
@@ -99,11 +94,7 @@ class Finder extends Module {
       `[${this.dataPrefix}="input"]`
     );
 
-    this.itemsNode = this.node.querySelector<HTMLElement>(
-      `[${this.dataPrefix}="items"]`
-    );
-
-    this.itemsNodes = this.itemsNode?.querySelectorAll<HTMLElement>(
+    this.itemsNodes = this.node?.querySelectorAll<HTMLElement>(
       `[${this.dataPrefix}="item"]`
     );
 
@@ -179,7 +170,6 @@ class Finder extends Module {
         this.config.callbacks.created({
           node: this.node,
           inputNode: this.inputNode,
-          itemsNode: this.itemsNode,
           itemsNodes: this.itemsNodes,
         });
       } catch (error) {
@@ -201,7 +191,6 @@ class Finder extends Module {
         this.config.callbacks.changed({
           node: this.node,
           inputNode: this.inputNode,
-          itemsNode: this.itemsNode,
           itemsNodes: this.itemsNodes,
         });
       } catch (error) {

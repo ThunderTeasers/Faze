@@ -39,6 +39,7 @@ interface Config {
   mode: 'display' | 'visibility';
   caseSensitive: boolean;
   minLength: number;
+  clearButton: boolean;
   callbacks: {
     created?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
@@ -55,6 +56,9 @@ class Finder extends Module {
   // DOM элементы элементов
   itemsNodes?: NodeListOf<HTMLElement>;
 
+  // DOM элемент кнопки очистки
+  btnClearNode?: HTMLButtonElement;
+
   /**
    * Стандартный конструктор
    *
@@ -67,6 +71,7 @@ class Finder extends Module {
       mode: 'display',
       minLength: 0,
       caseSensitive: false,
+      clearButton: false,
       callbacks: {
         created: undefined,
         changed: undefined,
@@ -102,6 +107,41 @@ class Finder extends Module {
     this.createdCallbackCall();
   }
 
+  protected build(): void {
+    super.build();
+
+    this.buildClearButton();
+  }
+
+  /**
+   * Создает и добавляет кнопку очистки рядом с инпутом поиска.
+   *
+   * @private
+   */
+  private buildClearButton(): void {
+    if (this.config.clearButton && this.inputNode) {
+      this.btnClearNode = document.createElement('button');
+      this.btnClearNode.type = 'button';
+      this.btnClearNode.className = 'faze-finder-clear-button';
+      this.node.appendChild(this.btnClearNode);
+    }
+  }
+
+  /**
+   * Навешивание события на кнопку очистки.
+   *
+   * @private
+   */
+  private bindClearButton(): void {
+    Faze.Events.listener('click', this.btnClearNode, () => {
+      if (this.inputNode) {
+        this.inputNode.value = '';
+      }
+
+      this.update();
+    });
+  }
+
   /**
    * Навешивание событий
    *
@@ -111,6 +151,7 @@ class Finder extends Module {
     super.bind();
 
     this.bindInput();
+    this.bindClearButton();
   }
 
   /**
@@ -211,6 +252,7 @@ class Finder extends Module {
       minLength: parseInt(node.dataset.fazeFinderMinLength || '0', 10),
       caseSensitive:
         (node.dataset.fazeFinderCaseSensitive || 'false') === 'true',
+      clearButton: (node.dataset.fazeFinderClearButton || 'false') === 'true',
       mode:
         node.dataset.fazeFinderMode === 'visibility' ? 'visibility' : 'display',
     });

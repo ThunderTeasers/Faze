@@ -51,13 +51,16 @@ interface Config {
  */
 class Finder extends Module {
   // DOM элемент инпута
-  inputNode: HTMLInputElement | null;
+  private inputNode: HTMLInputElement | null;
 
   // DOM элементы элементов
-  itemsNodes?: NodeListOf<HTMLElement>;
+  private itemsNodes?: NodeListOf<HTMLElement>;
 
   // DOM элемент кнопки очистки
-  btnClearNode?: HTMLButtonElement;
+  private btnClearNode?: HTMLButtonElement;
+
+  // DOM элемент холдера инпута
+  private inputHolderNode?: HTMLElement;
 
   /**
    * Стандартный конструктор
@@ -110,7 +113,22 @@ class Finder extends Module {
   protected build(): void {
     super.build();
 
+    this.buildInputHolder();
     this.buildClearButton();
+  }
+
+  /**
+   * Создает контейнер для input, если clearButton включен.
+   *
+   * @private
+   */
+  private buildInputHolder(): void {
+    if (this.config.clearButton && this.inputNode) {
+      this.inputHolderNode = document.createElement('div');
+      this.inputHolderNode.className = 'faze-finder-input-holder';
+      Faze.DOM.insertBefore(this.inputNode, this.inputHolderNode);
+      this.inputHolderNode.appendChild(this.inputNode);
+    }
   }
 
   /**
@@ -119,11 +137,11 @@ class Finder extends Module {
    * @private
    */
   private buildClearButton(): void {
-    if (this.config.clearButton && this.inputNode) {
+    if (this.config.clearButton && this.inputHolderNode) {
       this.btnClearNode = document.createElement('button');
       this.btnClearNode.type = 'button';
       this.btnClearNode.className = 'faze-finder-clear-button';
-      this.node.appendChild(this.btnClearNode);
+      this.inputHolderNode.appendChild(this.btnClearNode);
     }
   }
 

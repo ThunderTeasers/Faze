@@ -140,8 +140,22 @@ class Finder extends Module {
     if (this.config.clearButton && this.inputHolderNode) {
       this.btnClearNode = document.createElement('button');
       this.btnClearNode.type = 'button';
-      this.btnClearNode.className = 'faze-finder-clear-button';
+      this.btnClearNode.className = 'faze-finder-clear-button faze-hide';
       this.inputHolderNode.appendChild(this.btnClearNode);
+    }
+  }
+
+  /**
+   * Менеджер видимости кнопки очистки
+   *
+   * @private
+   */
+  private manageClearButtonVisibility(): void {
+    if (this.config.clearButton && this.inputNode) {
+      this.btnClearNode?.classList.toggle(
+        'faze-hide',
+        this.inputNode.value.length === 0
+      );
     }
   }
 
@@ -213,6 +227,8 @@ class Finder extends Module {
         )
       );
     });
+
+    this.manageClearButtonVisibility();
 
     // Вызываем пользовательскую функцию
     this.changeCallbackCall();

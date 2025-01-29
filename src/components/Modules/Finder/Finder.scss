@@ -6,8 +6,16 @@
  */
 
 .faze-finder {
+  // Контейнер инпута
   .faze-finder-input-holder {
     position: relative;
+
+    // Инпут
+    input {
+      width: 100%;
+
+      padding-right: 3rem;
+    }
 
     // Кнопка очистки
     .faze-finder-clear-button {

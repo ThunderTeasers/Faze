@@ -423,20 +423,25 @@ class Gallery {
    * @private
    */
   private bindCloseOnClickOutside(): void {
-    Faze.Events.listener('click', document, (event: MouseEvent) => {
-      if (
-        !Faze.Helpers.isMouseOverlapsNodes(event, [
-          this.arrowsNodes.next,
-          this.arrowsNodes.prev,
-          this.closeButtonNode,
-          this.counterNode,
-          this.thumbnailsNode,
-          this.imageWrapperNode,
-        ])
-      ) {
-        this.close();
-      }
-    });
+    Faze.Events.listener(
+      'click',
+      document,
+      (event: MouseEvent) => {
+        if (
+          !Faze.Helpers.isMouseOverlapsNodes(event, [
+            this.arrowsNodes.next,
+            this.arrowsNodes.prev,
+            this.closeButtonNode,
+            this.counterNode,
+            this.thumbnailsNode,
+            this.imageWrapperNode,
+          ])
+        ) {
+          this.close();
+        }
+      },
+      false
+    );
   }
 
   /**

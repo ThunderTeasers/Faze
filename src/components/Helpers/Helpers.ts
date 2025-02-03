@@ -661,7 +661,7 @@ class Helpers {
     let expires: string = '';
     if (expiresInDays) {
       const date: Date = new Date();
-      date.setTime(date.getTime() + expiresInDays * 24 * 60 * 60 * 1000);
+      date.setTime(date.getTime() + expiresInDays * 86400000);
       expires = `;expires=${date.toUTCString()}`;
     }
 
@@ -1035,14 +1035,13 @@ class Helpers {
   static isMouseOverlapsNodes(event: Event, nodes: HTMLElement[]): boolean {
     const path =
       (<any>event).path || (event.composedPath && event.composedPath());
-    if (path) {
-      if (
-        path.find((element: HTMLElement) =>
-          Array.from(nodes).some((node) => node === element)
-        )
-      ) {
-        return true;
-      }
+    if (
+      path &&
+      path.find((element: HTMLElement) =>
+        Array.from(nodes).some((node) => node === element)
+      )
+    ) {
+      return true;
     }
 
     return false;
@@ -1056,9 +1055,7 @@ class Helpers {
    */
   static setElementStyle(node: HTMLElement, styles: FazeObject): void {
     for (const style in styles) {
-      if (styles.hasOwnProperty(style)) {
-        node.style[style as any] = styles[style];
-      }
+      node.style[style as any] = styles[style];
     }
   }
 
@@ -1070,9 +1067,7 @@ class Helpers {
    */
   static setElementAttributes(node: HTMLElement, attributes: FazeObject) {
     for (const attribute in attributes) {
-      if (attributes.hasOwnProperty(attribute)) {
-        node.setAttribute(attribute, attributes[attribute]);
-      }
+      node.setAttribute(attribute, attributes[attribute]);
     }
   }
 
@@ -1501,15 +1496,12 @@ class Helpers {
    * @param {HTMLElement} node DOM элемент который проверяем
    */
   static isElementVisible(node: HTMLElement): boolean {
-    if (window.getComputedStyle(node).display === 'none') {
-      return false;
-    } else {
-      if (node.parentNode && node !== document.body) {
-        return this.isElementVisible(node.parentNode as HTMLElement);
-      } else {
-        return true;
-      }
-    }
+    return (
+      window.getComputedStyle(node).display !== 'none' &&
+      (!node.parentNode ||
+        node === document.body ||
+        this.isElementVisible(node.parentNode as HTMLElement))
+    );
   }
 
   /**
@@ -1527,15 +1519,17 @@ class Helpers {
     enableWhenOnTop: boolean = false
   ): boolean {
     const rect: DOMRect = node.getBoundingClientRect();
+    var scrollX: number = window.scrollX;
+    var scrollY: number = window.scrollY;
+    var top: number = rect.top;
+    var left: number = rect.left;
 
-    const vertInView =
-      rect.top + window.scrollY + offset >= window.scrollY &&
-      rect.top + window.scrollY + offset <= window.scrollY + window.innerHeight;
-    const horInView =
-      rect.left + window.scrollX + offset >= window.scrollX &&
-      rect.left + window.scrollX + offset <= window.scrollX + window.innerWidth;
-
-    return vertInView && horInView;
+    return (
+      top + scrollY + offset >= scrollY &&
+      top + scrollY + offset <= scrollY + window.innerHeight &&
+      left + scrollX + offset >= scrollX &&
+      left + scrollX + offset <= scrollX + window.innerWidth
+    );
   }
 
   /**
@@ -1559,15 +1553,15 @@ class Helpers {
 
     return Array.from(nodes).filter((node) => {
       const rect = node.getBoundingClientRect();
+      var top: number = rect.top;
+      var left: number = rect.left;
 
-      const vertInView =
-        rect.top - offset <= windowHeight &&
-        (enableWhenOnTop ? true : rect.top + rect.height >= 0);
-      const horInView =
-        rect.left - offset <= windowWidth &&
-        (enableWhenOnTop ? true : rect.left + rect.width >= 0);
-
-      return vertInView && horInView;
+      return (
+        top - offset <= windowHeight &&
+        (enableWhenOnTop ? true : top + rect.height >= 0) &&
+        left - offset <= windowWidth &&
+        (enableWhenOnTop ? true : left + rect.width >= 0)
+      );
     });
   }
 
@@ -1649,12 +1643,11 @@ class Helpers {
       ю: 'yu',
     };
 
-    return text
-      .split('')
-      .map(function (char: string) {
-        return dictionary[char] || char;
-      })
-      .join('');
+    var result = '';
+    for (var i = 0; i < text.length; i++) {
+      result += dictionary[text[i]];
+    }
+    return result;
   }
 
   /**

@@ -121,7 +121,6 @@ class Slider extends Module {
     this.pointSize = 10;
     this.connectNode = null;
     this.values = this.config.points;
-    console.log(this.config.step);
     this.step = this.parseStep(this.config.step);
 
     // Простановка класса, если этого не было сделано руками

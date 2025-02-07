@@ -39,7 +39,7 @@ interface CallbackData {
 interface Config {
   range: number[];
   points: number[];
-  step: number;
+  step: string;
   connect: boolean;
   changeDelay: number;
   selectors: {
@@ -74,13 +74,16 @@ class Slider extends Module {
   // Отношение ширины слайдера и его возможного максимального значения
   ratio: number;
 
+  // Шаг
+  private step: number;
+
   constructor(node: HTMLElement, config: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       points: [0, 100],
       range: [0, 100],
       connect: true,
-      step: 1,
+      step: '1',
       changeDelay: 1000,
       selectors: {
         inputs: undefined,
@@ -118,6 +121,8 @@ class Slider extends Module {
     this.pointSize = 10;
     this.connectNode = null;
     this.values = this.config.points;
+    console.log(this.config.step);
+    this.step = this.parseStep(this.config.step);
 
     // Простановка класса, если этого не было сделано руками
     this.node.classList.add('faze-slider');
@@ -169,6 +174,25 @@ class Slider extends Module {
 
     // Инициализация
     new Slider(this.node, newConfig);
+  }
+
+  /**
+   * Возвращает количество знаков после запятой у шага
+   *
+   * @returns {number} Количество знаков после запятой
+   */
+  private parseStep(step: string = '1'): number {
+    switch (step) {
+      case '0.1':
+        return 1;
+      case '0.01':
+        return 2;
+      case '0.001':
+        return 3;
+      case '1':
+      default:
+        return 0;
+    }
   }
 
   /**
@@ -469,13 +493,14 @@ class Slider extends Module {
 
     // Расчёт финального значения
     if (needToCorrect) {
-      this.values[index] =
-        this.config.range[0] +
-        Math.round(
+      this.values[index] = parseFloat(
+        (
+          this.config.range[0] +
           ((tmpPosition + pointWidthFactor) *
             (this.config.range[1] - this.config.range[0])) /
             sliderWidth
-        );
+        ).toFixed(this.step)
+      );
     }
 
     // Ставим ограничение
@@ -722,10 +747,10 @@ class Slider extends Module {
       dataset.fazeSliderPoints || dataset.fazeSliderRange;
 
     new Slider(node, {
-      points: points?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
-      range: range?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
+      points: points?.split(',').map((tmp) => parseFloat(tmp)) || [0, 100],
+      range: range?.split(',').map((tmp) => parseFloat(tmp)) || [0, 100],
       connect: (dataset.fazeSliderConnect || 'true') === 'true',
-      step: parseInt(dataset.fazeSliderStep || '1', 10),
+      step: dataset.fazeSliderStep || '1',
       changeDelay: parseInt(dataset.fazeChangeDelay || '1000', 10),
       selectors: {
         inputs: dataset.fazeSliderSelectorsInputs,

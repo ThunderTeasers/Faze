@@ -9,6 +9,8 @@
 
 import './Slider.scss';
 import Module from '../../Core/Module';
+import Faze from '../../Core/Faze';
+// import Faze from '../../Core/Faze';
 
 /**
  * Структура возвращаемого объекта в пользовательском методе
@@ -27,6 +29,7 @@ interface CallbackData {
  *   range    - диапазон значений слайдера
  *   points   - координаты ползунков на слайдере
  *   connect  - флаг, указывающий на то, нужно ли заполнять пространство между точками или нет
+ *   step     - шаг изменения значения
  *   changeDelay - время задержки отправки события "changed" в миллисекундах
  *   callbacks
  *     created  - пользовательская функция, исполняющийся при успешном создании спойлера
@@ -36,6 +39,7 @@ interface CallbackData {
 interface Config {
   range: number[];
   points: number[];
+  step: number;
   connect: boolean;
   changeDelay: number;
   selectors: {
@@ -76,6 +80,7 @@ class Slider extends Module {
       points: [0, 100],
       range: [0, 100],
       connect: true,
+      step: 1,
       changeDelay: 1000,
       selectors: {
         inputs: undefined,
@@ -274,110 +279,62 @@ class Slider extends Module {
    * @private
    */
   private bindPoints(): void {
-    this.pointsNodes.forEach((pointNode, i) => {
-      // Начальная позиция мыши
-      let startMousePosition = 0;
-
-      // Конечная позиция мыши
-      let endMousePosition = 0;
-
+    this.pointsNodes.forEach((pointNode: HTMLElement, i: number) => {
       // DOM элемент следующего ползунка
-      const nextPointNode = <HTMLElement>pointNode.nextSibling;
+      var nextPointNode = <HTMLElement>pointNode.nextSibling;
 
       // DOM элемент предыдущего ползунка
-      const prevPointNode = <HTMLElement>pointNode.previousSibling;
+      var prevPointNode = <HTMLElement>pointNode.previousSibling;
 
-      /**
-       * Функция перетаскивания ползунка
-       *
-       * @param event - событие мыши
-       */
-      const elementDrag = (event: any): void => {
-        // Рассчет новой позиции курсора
-        endMousePosition =
-          startMousePosition -
-          (event.clientX || (event.touches ? event.touches[0].clientX : 0));
-        startMousePosition =
-          event.clientX || (event.touches ? event.touches[0].clientX : 0);
-
-        // Передвижение ползунка
-        this.move(
-          pointNode,
-          nextPointNode,
-          prevPointNode,
-          pointNode.offsetLeft - endMousePosition,
-          i,
-          true,
-          true
-        );
-
-        // Просчёт положения и размера соединительной полоски
-        if (this.config.connect) {
-          this.calculateConnect();
-        }
-
-        // Вызываем пользовательскую функцию
-        if (typeof this.config.callbacks.changed === 'function') {
-          try {
-            this.config.callbacks.changed({
-              values: this.getValues(),
-            });
-          } catch (error) {
-            return this.logger.error(
-              `Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`
+      Faze.Helpers.bindDrag({
+        node: pointNode,
+        callbacks: {
+          drag: ({ endMousePosition }: { endMousePosition: FazePosition }) => {
+            // Передвижение ползунка
+            this.move(
+              pointNode,
+              nextPointNode,
+              prevPointNode,
+              pointNode.offsetLeft - endMousePosition.x,
+              i,
+              true,
+              true
             );
-          }
-        }
-      };
 
-      /**
-       * Завершение перетаскивания(момент отпускания кнопки мыши), удаляем все слушатели, т.к. они создаются при каждом новом перетаскивании
-       */
-      const endDragElement = (): void => {
-        document.removeEventListener('mouseup', <any>endDragElement);
-        document.removeEventListener('touchend', <any>endDragElement);
+            // Просчёт положения и размера соединительной полоски
+            if (this.config.connect) {
+              this.calculateConnect();
+            }
 
-        document.removeEventListener('mousemove', <any>elementDrag);
-        document.removeEventListener('touchmove', <any>elementDrag);
-
-        // Просчёт положения и размера соединительной полоски
-        if (this.config.connect) {
-          this.calculateConnect();
-        }
-
-        // Вызываем пользовательскую функцию
-        if (typeof this.config.callbacks.stopped === 'function') {
-          try {
-            this.config.callbacks.stopped({
-              values: this.getValues(),
-            });
-          } catch (error) {
-            return this.logger.error(
-              `Ошибка исполнения пользовательского метода "stopped", дословно: ${error}!`
-            );
-          }
-        }
-      };
-
-      /**
-       * Функция нажатия на ползунок для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
-       *
-       * @param event - событие мыши
-       */
-      const dragMouseDown = (event: MouseEvent) => {
-        // Получение позиции курсора при нажатии на элемент
-        startMousePosition = event.clientX;
-
-        document.addEventListener('mouseup', <any>endDragElement);
-        document.addEventListener('touchend', <any>endDragElement);
-
-        document.addEventListener('mousemove', <any>elementDrag);
-        document.addEventListener('touchmove', <any>elementDrag);
-      };
-
-      // Навешиваем событие перетаскивания
-      pointNode.addEventListener('mousedown', <any>dragMouseDown);
-      pointNode.addEventListener('touchstart', <any>dragMouseDown);
+            // Вызываем пользовательскую функцию
+            if (typeof this.config.callbacks.changed === 'function') {
+              try {
+                this.config.callbacks.changed({
+                  values: this.getValues(),
+                });
+              } catch (error) {
+                return this.logger.error(
+                  `Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`
+                );
+              }
+            }
+          },
+          afterDrag: () => {
+            // Вызываем пользовательскую функцию
+            if (typeof this.config.callbacks.stopped === 'function') {
+              try {
+                this.config.callbacks.stopped({
+                  values: this.getValues(),
+                });
+              } catch (error) {
+                return this.logger.error(
+                  `Ошибка исполнения пользовательского метода "stopped", дословно: ${error}!`
+                );
+              }
+            }
+          },
+        },
+      });
     });
   }
 
@@ -451,17 +408,17 @@ class Slider extends Module {
     needToUpdateInputs: boolean = true,
     needToCorrect: boolean = false
   ) {
-    let tmpPosition = position;
+    var tmpPosition = position;
 
     // Ширина всего слайдера
     const sliderWidth = this.node.getBoundingClientRect().width;
 
     // Флаги для определения уперся ли ползунок в другого
-    let isCollideNext = false;
-    let isCollidePrev = false;
+    var isCollideNext = false;
+    var isCollidePrev = false;
 
     // Насколько нужно сдвигать значение для корректного пересчёта конкретного ползунка
-    let pointWidthFactor = 0;
+    var pointWidthFactor = 0;
 
     // Проверка на заезд дальше следующего ползунка
     if (nextPointNode) {
@@ -757,18 +714,21 @@ class Slider extends Module {
    * @param node - DOM элемент на который нужно инициализировать плагин
    */
   static initializeByDataAttributes(node: HTMLElement): void {
+    var { dataset }: { dataset: DOMStringMap } = node;
+
     const range: string | undefined =
-      node.dataset.fazeSliderRange || node.dataset.fazeSliderPoints;
+      dataset.fazeSliderRange || dataset.fazeSliderPoints;
     const points: string | undefined =
-      node.dataset.fazeSliderPoints || node.dataset.fazeSliderRange;
+      dataset.fazeSliderPoints || dataset.fazeSliderRange;
 
     new Slider(node, {
       points: points?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
       range: range?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
-      connect: (node.dataset.fazeSliderConnect || 'true') === 'true',
-      changeDelay: parseInt(node.dataset.fazeChangeDelay || '1000', 10),
+      connect: (dataset.fazeSliderConnect || 'true') === 'true',
+      step: parseInt(dataset.fazeSliderStep || '1', 10),
+      changeDelay: parseInt(dataset.fazeChangeDelay || '1000', 10),
       selectors: {
-        inputs: node.dataset.fazeSliderSelectorsInputs,
+        inputs: dataset.fazeSliderSelectorsInputs,
       },
     });
   }

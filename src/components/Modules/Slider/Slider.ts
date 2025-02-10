@@ -11,6 +11,8 @@ import './Slider.scss';
 import Module from '../../Core/Module';
 import Faze from '../../Core/Faze';
 import { DragCallbackData } from '../../Helpers/Helpers';
+import Faze from '../../Core/Faze';
+// import Faze from '../../Core/Faze';
 
 /**
  * Структура возвращаемого объекта в пользовательском методе
@@ -39,7 +41,7 @@ interface CallbackData {
 interface Config {
   range: number[];
   points: number[];
-  step: number;
+  step: string;
   connect: boolean;
   changeDelay: number;
   selectors: {
@@ -74,13 +76,16 @@ class Slider extends Module {
   // Отношение ширины слайдера и его возможного максимального значения
   ratio: number;
 
+  // Шаг
+  private step: number;
+
   constructor(node: HTMLElement, config: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       points: [0, 100],
       range: [0, 100],
       connect: true,
-      step: 1,
+      step: '1',
       changeDelay: 1000,
       selectors: {
         inputs: undefined,
@@ -118,6 +123,7 @@ class Slider extends Module {
     this.pointSize = 10;
     this.connectNode = null;
     this.values = this.config.points;
+    this.step = this.parseStep(this.config.step);
 
     // Простановка класса, если этого не было сделано руками
     this.node.classList.add('faze-slider');
@@ -169,6 +175,25 @@ class Slider extends Module {
 
     // Инициализация
     new Slider(this.node, newConfig);
+  }
+
+  /**
+   * Возвращает количество знаков после запятой у шага
+   *
+   * @returns {number} Количество знаков после запятой
+   */
+  private parseStep(step: string = '1'): number {
+    switch (step) {
+      case '0.1':
+        return 1;
+      case '0.01':
+        return 2;
+      case '0.001':
+        return 3;
+      case '1':
+      default:
+        return 0;
+    }
   }
 
   /**
@@ -279,13 +304,27 @@ class Slider extends Module {
    * @private
    */
   private bindPoints(): void {
-    this.pointsNodes.forEach((pointNode) => {
+    this.pointsNodes.forEach((pointNode: HTMLElement, i: number) => {
+      // DOM элемент следующего ползунка
+      var nextPointNode = <HTMLElement>pointNode.nextSibling;
+
+      // DOM элемент предыдущего ползунка
+      var prevPointNode = <HTMLElement>pointNode.previousSibling;
+
       Faze.Helpers.bindDrag({
         node: pointNode,
         callbacks: {
-          beforeDrag: () => {},
-          drag: (data: DragCallbackData) => {
-            console.log(data);
+          drag: ({ endMousePosition }: { endMousePosition: FazePosition }) => {
+            // Передвижение ползунка
+            this.move(
+              pointNode,
+              nextPointNode,
+              prevPointNode,
+              pointNode.offsetLeft - endMousePosition.x,
+              i,
+              true,
+              true
+            );
 
             // Просчёт положения и размера соединительной полоски
             if (this.config.connect) {
@@ -321,114 +360,6 @@ class Slider extends Module {
           },
         },
       });
-    });
-
-    return;
-
-    this.pointsNodes.forEach((pointNode, i) => {
-      // Начальная позиция мыши
-      let startMousePosition = 0;
-
-      // Конечная позиция мыши
-      let endMousePosition = 0;
-
-      // DOM элемент следующего ползунка
-      const nextPointNode = <HTMLElement>pointNode.nextSibling;
-
-      // DOM элемент предыдущего ползунка
-      const prevPointNode = <HTMLElement>pointNode.previousSibling;
-
-      /**
-       * Функция перетаскивания ползунка
-       *
-       * @param event - событие мыши
-       */
-      const elementDrag = (event: any): void => {
-        // Рассчет новой позиции курсора
-        endMousePosition =
-          startMousePosition -
-          (event.clientX || (event.touches ? event.touches[0].clientX : 0));
-        startMousePosition =
-          event.clientX || (event.touches ? event.touches[0].clientX : 0);
-
-        // Передвижение ползунка
-        this.move(
-          pointNode,
-          nextPointNode,
-          prevPointNode,
-          pointNode.offsetLeft - endMousePosition,
-          i,
-          true,
-          true
-        );
-
-        // Просчёт положения и размера соединительной полоски
-        if (this.config.connect) {
-          this.calculateConnect();
-        }
-
-        // Вызываем пользовательскую функцию
-        if (typeof this.config.callbacks.changed === 'function') {
-          try {
-            this.config.callbacks.changed({
-              values: this.getValues(),
-            });
-          } catch (error) {
-            return this.logger.error(
-              `Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`
-            );
-          }
-        }
-      };
-
-      /**
-       * Завершение перетаскивания(момент отпускания кнопки мыши), удаляем все слушатели, т.к. они создаются при каждом новом перетаскивании
-       */
-      const endDragElement = (): void => {
-        document.removeEventListener('mouseup', <any>endDragElement);
-        document.removeEventListener('touchend', <any>endDragElement);
-
-        document.removeEventListener('mousemove', <any>elementDrag);
-        document.removeEventListener('touchmove', <any>elementDrag);
-
-        // Просчёт положения и размера соединительной полоски
-        if (this.config.connect) {
-          this.calculateConnect();
-        }
-
-        // Вызываем пользовательскую функцию
-        if (typeof this.config.callbacks.stopped === 'function') {
-          try {
-            this.config.callbacks.stopped({
-              values: this.getValues(),
-            });
-          } catch (error) {
-            return this.logger.error(
-              `Ошибка исполнения пользовательского метода "stopped", дословно: ${error}!`
-            );
-          }
-        }
-      };
-
-      /**
-       * Функция нажатия на ползунок для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
-       *
-       * @param event - событие мыши
-       */
-      const dragMouseDown = (event: MouseEvent) => {
-        // Получение позиции курсора при нажатии на элемент
-        startMousePosition = event.clientX;
-
-        document.addEventListener('mouseup', <any>endDragElement);
-        document.addEventListener('touchend', <any>endDragElement);
-
-        document.addEventListener('mousemove', <any>elementDrag);
-        document.addEventListener('touchmove', <any>elementDrag);
-      };
-
-      // Навешиваем событие перетаскивания
-      pointNode.addEventListener('mousedown', <any>dragMouseDown);
-      pointNode.addEventListener('touchstart', <any>dragMouseDown);
     });
   }
 
@@ -502,17 +433,17 @@ class Slider extends Module {
     needToUpdateInputs: boolean = true,
     needToCorrect: boolean = false
   ) {
-    let tmpPosition = position;
+    var tmpPosition = position;
 
     // Ширина всего слайдера
     const sliderWidth = this.node.getBoundingClientRect().width;
 
     // Флаги для определения уперся ли ползунок в другого
-    let isCollideNext = false;
-    let isCollidePrev = false;
+    var isCollideNext = false;
+    var isCollidePrev = false;
 
     // Насколько нужно сдвигать значение для корректного пересчёта конкретного ползунка
-    let pointWidthFactor = 0;
+    var pointWidthFactor = 0;
 
     // Проверка на заезд дальше следующего ползунка
     if (nextPointNode) {
@@ -563,13 +494,14 @@ class Slider extends Module {
 
     // Расчёт финального значения
     if (needToCorrect) {
-      this.values[index] =
-        this.config.range[0] +
-        Math.round(
+      this.values[index] = parseFloat(
+        (
+          this.config.range[0] +
           ((tmpPosition + pointWidthFactor) *
             (this.config.range[1] - this.config.range[0])) /
             sliderWidth
-        );
+        ).toFixed(this.step)
+      );
     }
 
     // Ставим ограничение
@@ -816,10 +748,10 @@ class Slider extends Module {
       dataset.fazeSliderPoints || dataset.fazeSliderRange;
 
     new Slider(node, {
-      points: points?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
-      range: range?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
+      points: points?.split(',').map((tmp) => parseFloat(tmp)) || [0, 100],
+      range: range?.split(',').map((tmp) => parseFloat(tmp)) || [0, 100],
       connect: (dataset.fazeSliderConnect || 'true') === 'true',
-      step: parseInt(dataset.fazeSliderStep || '1', 10),
+      step: dataset.fazeSliderStep || '1',
       changeDelay: parseInt(dataset.fazeChangeDelay || '1000', 10),
       selectors: {
         inputs: dataset.fazeSliderSelectorsInputs,

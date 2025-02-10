@@ -9,6 +9,8 @@
 
 import './Slider.scss';
 import Module from '../../Core/Module';
+import Faze from '../../Core/Faze';
+import { DragCallbackData } from '../../Helpers/Helpers';
 
 /**
  * Структура возвращаемого объекта в пользовательском методе
@@ -27,6 +29,7 @@ interface CallbackData {
  *   range    - диапазон значений слайдера
  *   points   - координаты ползунков на слайдере
  *   connect  - флаг, указывающий на то, нужно ли заполнять пространство между точками или нет
+ *   step     - шаг изменения значения
  *   changeDelay - время задержки отправки события "changed" в миллисекундах
  *   callbacks
  *     created  - пользовательская функция, исполняющийся при успешном создании спойлера
@@ -36,6 +39,7 @@ interface CallbackData {
 interface Config {
   range: number[];
   points: number[];
+  step: number;
   connect: boolean;
   changeDelay: number;
   selectors: {
@@ -76,6 +80,7 @@ class Slider extends Module {
       points: [0, 100],
       range: [0, 100],
       connect: true,
+      step: 1,
       changeDelay: 1000,
       selectors: {
         inputs: undefined,
@@ -274,6 +279,52 @@ class Slider extends Module {
    * @private
    */
   private bindPoints(): void {
+    this.pointsNodes.forEach((pointNode) => {
+      Faze.Helpers.bindDrag({
+        node: pointNode,
+        callbacks: {
+          beforeDrag: () => {},
+          drag: (data: DragCallbackData) => {
+            console.log(data);
+
+            // Просчёт положения и размера соединительной полоски
+            if (this.config.connect) {
+              this.calculateConnect();
+            }
+
+            // Вызываем пользовательскую функцию
+            if (typeof this.config.callbacks.changed === 'function') {
+              try {
+                this.config.callbacks.changed({
+                  values: this.getValues(),
+                });
+              } catch (error) {
+                return this.logger.error(
+                  `Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`
+                );
+              }
+            }
+          },
+          afterDrag: () => {
+            // Вызываем пользовательскую функцию
+            if (typeof this.config.callbacks.stopped === 'function') {
+              try {
+                this.config.callbacks.stopped({
+                  values: this.getValues(),
+                });
+              } catch (error) {
+                return this.logger.error(
+                  `Ошибка исполнения пользовательского метода "stopped", дословно: ${error}!`
+                );
+              }
+            }
+          },
+        },
+      });
+    });
+
+    return;
+
     this.pointsNodes.forEach((pointNode, i) => {
       // Начальная позиция мыши
       let startMousePosition = 0;
@@ -757,18 +808,21 @@ class Slider extends Module {
    * @param node - DOM элемент на который нужно инициализировать плагин
    */
   static initializeByDataAttributes(node: HTMLElement): void {
+    var { dataset }: { dataset: DOMStringMap } = node;
+
     const range: string | undefined =
-      node.dataset.fazeSliderRange || node.dataset.fazeSliderPoints;
+      dataset.fazeSliderRange || dataset.fazeSliderPoints;
     const points: string | undefined =
-      node.dataset.fazeSliderPoints || node.dataset.fazeSliderRange;
+      dataset.fazeSliderPoints || dataset.fazeSliderRange;
 
     new Slider(node, {
       points: points?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
       range: range?.split(',').map((tmp) => parseInt(tmp, 10)) || [0, 100],
-      connect: (node.dataset.fazeSliderConnect || 'true') === 'true',
-      changeDelay: parseInt(node.dataset.fazeChangeDelay || '1000', 10),
+      connect: (dataset.fazeSliderConnect || 'true') === 'true',
+      step: parseInt(dataset.fazeSliderStep || '1', 10),
+      changeDelay: parseInt(dataset.fazeChangeDelay || '1000', 10),
       selectors: {
-        inputs: node.dataset.fazeSliderSelectorsInputs,
+        inputs: dataset.fazeSliderSelectorsInputs,
       },
     });
   }

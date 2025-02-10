@@ -25,8 +25,10 @@ interface NotificationOptions {
  *   event - событие
  *
  */
-interface DragCallbackData {
+export interface DragCallbackData {
   startPosition: FazePosition;
+  startMousePosition: FazePosition;
+  endMousePosition: FazePosition;
   event: Event;
 }
 
@@ -46,7 +48,7 @@ interface DragOptions {
   node?: HTMLElement;
   callbacks: {
     beforeDrag?: () => void;
-    drag?: () => void;
+    drag?: (data: DragCallbackData) => void;
     afterDrag?: (data: DragCallbackData) => void;
   };
 }
@@ -1272,7 +1274,12 @@ class Helpers {
         typeof options.callbacks.drag === 'function'
       ) {
         try {
-          options.callbacks.drag();
+          options.callbacks.drag({
+            startPosition,
+            startMousePosition,
+            endMousePosition,
+            event,
+          });
         } catch (error) {
           console.error(
             'Ошибка исполнения пользовательского метода "drag":',
@@ -1308,6 +1315,8 @@ class Helpers {
         try {
           options.callbacks.afterDrag({
             startPosition,
+            startMousePosition,
+            endMousePosition,
             event,
           });
         } catch (error) {

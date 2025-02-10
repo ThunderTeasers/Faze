@@ -33,6 +33,14 @@ export interface DragCallbackData {
 }
 
 /**
+ * Тип перетаскивания
+ */
+export enum DragMode {
+  MOUSE = 1,
+  TOUCH = 2,
+}
+
+/**
  * Структура настроек метода для перетаскивания
  *
  * Содержит:
@@ -46,6 +54,7 @@ export interface DragCallbackData {
  */
 interface DragOptions {
   node?: HTMLElement;
+  mode: DragMode;
   callbacks: {
     beforeDrag?: () => void;
     drag?: (data: DragCallbackData) => void;
@@ -1219,21 +1228,40 @@ class Helpers {
    *
    * @param options{DragOptions} - настройки перетаскивания
    */
-  static bindDrag(options: DragOptions): void {
+  static bindDrag(
+    options: DragOptions = {
+      node: undefined,
+      mode: DragMode.MOUSE | DragMode.TOUCH,
+      callbacks: {
+        beforeDrag: undefined,
+        drag: undefined,
+        afterDrag: undefined,
+      },
+    }
+  ): void {
+    if (!options.node) {
+      return;
+    }
+
+    // Если тип перетаскивания не указан, то по умолчанию задаем перетаскивание мышью
+    if (!options.mode) {
+      options.mode = DragMode.TOUCH;
+    }
+
     // Начальное положение DOM элемента
-    let startPosition = {
+    var startPosition = {
       x: 0,
       y: 0,
     };
 
     // Начальная позиция мыши
-    const startMousePosition = {
+    var startMousePosition = {
       x: 0,
       y: 0,
     };
 
     // Конечная позиция мыши
-    const endMousePosition = {
+    var endMousePosition = {
       x: 0,
       y: 0,
     };
@@ -1245,27 +1273,30 @@ class Helpers {
      *
      * @param event - событие мыши
      */
-    const elementDrag = (event: MouseEvent) => {
-      if (!options.node) {
-        return;
+    var elementDrag = (event: MouseEvent | TouchEvent) => {
+      if (event instanceof MouseEvent) {
+        event.preventDefault();
       }
 
-      event.preventDefault();
       event.stopPropagation();
 
-      // Рассчет новой позиции курсора
-      endMousePosition.x = startMousePosition.x - event.clientX;
-      endMousePosition.y = startMousePosition.y - event.clientY;
-      startMousePosition.x = event.clientX;
-      startMousePosition.y = event.clientY;
+      // Расчет начального положения элемента
+      var xPosition =
+        (event as MouseEvent).clientX ||
+        ((event as TouchEvent).touches
+          ? (event as TouchEvent).touches[0].clientX
+          : 0);
+      var yPosition =
+        (event as MouseEvent).clientY ||
+        ((event as TouchEvent).touches
+          ? (event as TouchEvent).touches[0].clientY
+          : 0);
 
-      // Расчёт новой позиции
-      // options.node.style.left = `${
-      //   parseInt(options.node.style.left, 10) - endMousePosition.x
-      // }px`;
-      // options.node.style.top = `${
-      //   parseInt(options.node.style.top, 10) - endMousePosition.y
-      // }px`;
+      // Рассчет новой позиции курсора
+      endMousePosition.x = startMousePosition.x - xPosition;
+      endMousePosition.y = startMousePosition.y - yPosition;
+      startMousePosition.x = xPosition;
+      startMousePosition.y = yPosition;
 
       // Вызываем пользовательскую функцию
       if (
@@ -1292,19 +1323,19 @@ class Helpers {
     /**
      * Завершение перетаскивания(момент отпускания кнопки мыши), удаляем все слушатели, т.к. они создаются при каждом новом перетаскивании
      */
-    const endDragElement = (event: MouseEvent) => {
-      if (!options.node) {
-        return;
-      }
-
+    var endDragElement = (event: MouseEvent | TouchEvent) => {
       event.preventDefault();
       event.stopPropagation();
 
       document.removeEventListener('mouseup', endDragElement);
+      document.removeEventListener('touchend', endDragElement);
       document.removeEventListener('mousemove', elementDrag);
+      document.removeEventListener('touchmove', elementDrag);
 
       // Удаляем класс, что двигаем элемент
-      options.node.classList.remove('faze-drag-active');
+      if (options.node) {
+        options.node.classList.remove('faze-drag-active');
+      }
 
       // Вызываем пользовательскую функцию
       if (
@@ -1333,8 +1364,9 @@ class Helpers {
      *
      * @param event - событие мыши
      */
-    const dragMouseDown = (event: MouseEvent) => {
-      if (!options.node) {
+    var dragMouseDown = (event: MouseEvent | TouchEvent) => {
+      var node = options.node;
+      if (!node) {
         return;
       }
 
@@ -1343,16 +1375,24 @@ class Helpers {
 
       // Получаем начальную позицию DOM элемента
       startPosition = {
-        x: parseInt(options.node.style.left, 10),
-        y: parseInt(options.node.style.top, 10),
+        x: parseInt(node.style.left, 10),
+        y: parseInt(node.style.top, 10),
       };
 
       // Проставляем класс, что двигаем элемент
-      options.node.classList.add('faze-drag-active');
+      node.classList.add('faze-drag-active');
 
       // Получение позиции курсора при нажатии на элемент
-      startMousePosition.x = event.clientX;
-      startMousePosition.y = event.clientY;
+      startMousePosition.x =
+        (event as MouseEvent).clientX ||
+        ((event as TouchEvent).touches
+          ? (event as TouchEvent).touches[0].clientX
+          : 0);
+      startMousePosition.y =
+        (event as MouseEvent).clientY ||
+        ((event as TouchEvent).touches
+          ? (event as TouchEvent).touches[0].clientY
+          : 0);
 
       // Вызываем пользовательскую функцию
       if (
@@ -1370,12 +1410,24 @@ class Helpers {
         }
       }
 
-      document.addEventListener('mouseup', endDragElement);
-      document.addEventListener('mousemove', elementDrag);
+      // Навешиваем обработчики
+      if (options.mode & DragMode.MOUSE) {
+        document.addEventListener('mouseup', endDragElement);
+        document.addEventListener('mousemove', elementDrag);
+      }
+      if (options.mode & DragMode.TOUCH) {
+        document.addEventListener('touchend', endDragElement);
+        document.addEventListener('touchmove', elementDrag);
+      }
     };
 
     // Навешиваем событие перетаскивания на элемент
-    options.node?.addEventListener('mousedown', dragMouseDown);
+    if (options.mode & DragMode.MOUSE) {
+      options.node?.addEventListener('mousedown', dragMouseDown);
+    }
+    if (options.mode & DragMode.TOUCH) {
+      options.node?.addEventListener('touchstart', dragMouseDown);
+    }
   }
 
   /**

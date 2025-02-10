@@ -10,9 +10,6 @@
 import './Slider.scss';
 import Module from '../../Core/Module';
 import Faze from '../../Core/Faze';
-import { DragCallbackData } from '../../Helpers/Helpers';
-import Faze from '../../Core/Faze';
-// import Faze from '../../Core/Faze';
 
 /**
  * Структура возвращаемого объекта в пользовательском методе

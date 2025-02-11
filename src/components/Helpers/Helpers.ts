@@ -1245,7 +1245,7 @@ class Helpers {
 
     // Если тип перетаскивания не указан, то по умолчанию задаем перетаскивание мышью
     if (!options.mode) {
-      options.mode = DragMode.TOUCH;
+      options.mode = DragMode.MOUSE | DragMode.TOUCH;
     }
 
     // Начальное положение DOM элемента

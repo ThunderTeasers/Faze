@@ -1248,7 +1248,7 @@ class Helpers {
 
     // Если тип перетаскивания не указан, то по умолчанию задаем перетаскивание мышью
     if (!options.mode) {
-      options.mode = DragMode.TOUCH;
+      options.mode = DragMode.MOUSE | DragMode.TOUCH;
     }
 
     // Начальное положение DOM элемента
@@ -1426,10 +1426,10 @@ class Helpers {
 
     // Навешиваем событие перетаскивания на элемент
     if (options.mode & DragMode.MOUSE) {
-      options.node?.addEventListener('mousedown', dragMouseDown);
+      options.node.addEventListener('mousedown', dragMouseDown);
     }
     if (options.mode & DragMode.TOUCH) {
-      options.node?.addEventListener('touchstart', dragMouseDown);
+      options.node.addEventListener('touchstart', dragMouseDown);
     }
   }
 

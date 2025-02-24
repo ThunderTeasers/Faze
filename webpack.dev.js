@@ -140,6 +140,14 @@ module.exports = (env) => {
         template: './src/tests/views/form.html',
       }),
       new HtmlWebpackPlugin({
+        filename: 'rest.html',
+        template: './src/tests/views/rest.html',
+      }),
+      new HtmlWebpackPlugin({
+        filename: 'rest_data.html',
+        template: './src/tests/views/rest_data.html',
+      }),
+      new HtmlWebpackPlugin({
         template: './src/index.html',
       }),
       new webpack.HotModuleReplacementPlugin(),

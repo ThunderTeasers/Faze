@@ -97,10 +97,7 @@ class REST {
         return responseData;
       })
       .then((response: any) => {
-        if (
-          data['response_html'] &&
-          typeof data['response_html'] === 'string'
-        ) {
+        if ('response_html' in data) {
           // Парсинг ответа
           const responseHTML = new DOMParser().parseFromString(
             response,
@@ -121,27 +118,39 @@ class REST {
                 });
               }
             });
-        } else if (
-          data['response_text'] &&
-          typeof data['response_text'] === 'string'
-        ) {
+        } else if ('response_text' in data) {
           document.querySelectorAll(data['response_text']).forEach((el) => {
             el.innerHTML = response;
           });
         } else if (
-          data['response_callback'] &&
-          typeof data['response_callback'] === 'string' &&
-          data['response_callback'] in window &&
+          'response_callback' in data &&
           (window as any)[data['response_callback']] instanceof Function
         ) {
           (window as any)[data['response_callback']](response);
-        } else if (
-          data['response_json'] &&
-          typeof data['response_json'] === 'string'
-        ) {
+        } else if ('response_json' in data) {
           document.querySelectorAll(data['response_json']).forEach((el) => {
             el.innerHTML = response.message;
           });
+        } else if ('replace_with' in data) {
+          // Парсинг ответа
+          const responseHTML = new DOMParser().parseFromString(
+            response,
+            'text/html'
+          );
+
+          // Проверка наличия элемента
+          if (!responseHTML.querySelector(data['replace_with'])) {
+            return;
+          }
+
+          // Замена элемента по селектору "replace_with"
+          document
+            .querySelectorAll<HTMLElement>(data['replace_with'])
+            .forEach((node: HTMLElement) => {
+              node.replaceWith(
+                responseHTML.querySelector(data['replace_with'])
+              );
+            });
         }
 
         // Выполнение пользовательской функции

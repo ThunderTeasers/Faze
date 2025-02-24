@@ -386,3 +386,25 @@ Faze.add({
     });
   },
 });
+
+// Тест Faze.REST
+Faze.add({
+  pluginName: 'Faze.REST Test',
+  condition: document.querySelectorAll('.js-rest').length > 0,
+  callback: () => {
+    document
+      .querySelector('.js-replace-with')
+      ?.addEventListener('click', () => {
+        Faze.REST.chain([
+          {
+            method: 'GET',
+            replace_with: '.js-replace-with-body',
+            url: '/rest_data.html',
+            callback: (response: any) => {
+              console.log(response);
+            },
+          },
+        ]);
+      });
+  },
+});

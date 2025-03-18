@@ -151,9 +151,8 @@ class ColorChanger extends Module {
       const isMore: boolean = this.data.length > this.config.perRow;
 
       // Проставляем классы
-      this.colorsNode.className = `${this.classPrefix}-colors ${
-        isMore ? `${this.classPrefix}-colors-more` : ''
-      }`;
+      this.colorsNode.className = `${this.classPrefix}-colors ${isMore ? `${this.classPrefix}-colors-more` : ''
+        }`;
 
       // Количество колонок(строк) с цветами
       const numberOfRows = Math.ceil(this.data.length / this.config.perRow);
@@ -244,18 +243,68 @@ class ColorChanger extends Module {
   }
 
   /**
+   * Выполняет пользовательскую функцию, если она определена в data-атрибутах.
+   *
+   * Функция ищет data-атрибут `data-faze-colorchanger-function-<key>`, где <key> - имя параметра,
+   * например `data-faze-colorchanger-function-price` для параметра `price`.
+   * Если атрибут найден, то функция, указанная в его значении, будет вызвана с параметрами:
+   *  - node: DOM-элемент, на который навешен модуль
+   *  - colorNode: DOM-элемент выбранного цвета
+   *  - data: данные, полученные из data-атрибута `data-faze-colorchanger-data`
+   *  - key: имя параметра
+   *
+   * @param key Ключ параметра, для которого выполняется функция.
+   * @param value Значение параметра.
+   * @param nodes DOM элементы для проставления значений
+   *
+   * @returns true, если функция найдена и выполнена, иначе false.
+   */
+  private evaluateParamFunction(key: string, value: string, nodes: NodeListOf<HTMLElement>): boolean {
+    const functionKey: string = `fazeColorchangerFunction${key.charAt(0).toUpperCase() + key.slice(1)}`;
+    if (functionKey in this.node.dataset) {
+      const functionName: string | undefined = this.node.dataset[functionKey];
+      if (typeof functionName === 'string' &&
+        functionName in window &&
+        (window as any)[functionName] instanceof Function) {
+        (window as any)[functionName]({
+          node: this.node,
+          colorNode: this.selectedColorNode,
+          data: this.data,
+          key,
+          value,
+          nodes
+        });
+
+        return true;
+      }
+
+      return false;
+    }
+
+    return false;
+  }
+
+  /**
    * Изменяем данные в DOM элементе
    *
    * @param {string} key Ключ, необходим если нужно менять data атрибут
    */
   private changeParam(key: string): void {
+    // Получаем значение параметра
     const value: string | undefined = this.selectedColorNode?.dataset[key];
     if (!value) {
       return;
     }
 
-    this.node
-      .querySelectorAll<HTMLElement>(`[data-faze-colorchanger="${key}"]`)
+    // Получаем DOM элементы, которые нужно изменить
+    const nodesToChange = this.node.querySelectorAll<HTMLElement>(`[data-faze-colorchanger="${key}"]`);
+
+    // Если есть пользовательская функция, то вызываем ее
+    if (this.evaluateParamFunction(key, value, nodesToChange)) {
+      return;
+    }
+
+    nodesToChange
       .forEach((node: HTMLElement) => {
         const types = (node.dataset.fazeColorchangerType || 'text').split(',');
         const name = node.dataset.fazeColorchangerName;

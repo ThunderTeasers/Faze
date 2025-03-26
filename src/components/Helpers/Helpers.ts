@@ -11,10 +11,10 @@ import Faze from '../Core/Faze';
  *   backgroundColor - цвет самой плашки сообщения
  */
 interface NotificationOptions {
-  className: string;
-  isNested: boolean;
-  backgroundColor: string;
-  time: number;
+  className?: string;
+  isNested?: boolean;
+  backgroundColor?: string;
+  time?: number;
 }
 
 /**
@@ -217,8 +217,8 @@ class Helpers {
         return Helpers.formatFloat(
           date && date.length === 6
             ? new Date(dateString.replace(new RegExp(/-/g), '/'))
-                .getTime()
-                .toString()
+              .getTime()
+              .toString()
             : '0'
         );
       },
@@ -491,9 +491,8 @@ class Helpers {
 
         const matches = phone.match(/(\d{3})(\d{3})?(\d{2})?(\d{2})?/);
         if (matches) {
-          value = `+7 (${matches[1]})${matches[2] ? ` ${matches[2]}` : ''}${
-            matches[3] ? `-${matches[3]}` : ''
-          }${matches[4] ? `-${matches[4]}` : ''}`;
+          value = `+7 (${matches[1]})${matches[2] ? ` ${matches[2]}` : ''}${matches[3] ? `-${matches[3]}` : ''
+            }${matches[4] ? `-${matches[4]}` : ''}`;
         }
       }
 
@@ -510,13 +509,15 @@ class Helpers {
    */
   static showNotification(
     message: string,
-    {
+    options: NotificationOptions = {}
+  ): void {
+    const {
       className = '',
       isNested = true,
       time = 3000,
       backgroundColor = '#00b938',
-    }: NotificationOptions
-  ): void {
+    } = options;
+
     // DOM элемент обертки для информационнах сообщений, она нужна для того, чтобы сообщения шли друг под другом, если их несколько
     let notificationWrapperNode: HTMLDivElement | null = document.querySelector(
       '.faze-notification-wrapper'
@@ -679,9 +680,8 @@ class Helpers {
       expires = `;expires=${date.toUTCString()}`;
     }
 
-    document.cookie = `${name}=${
-      encode ? encodeURIComponent(value) : value
-    }${expires};path=/`;
+    document.cookie = `${name}=${encode ? encodeURIComponent(value) : value
+      }${expires};path=/`;
   }
 
   /**

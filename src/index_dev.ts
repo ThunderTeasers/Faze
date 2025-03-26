@@ -291,9 +291,7 @@ Faze.add({
     const notificationButtonNode = document.querySelector('.js-notification');
     if (notificationButtonNode) {
       notificationButtonNode.addEventListener('click', () => {
-        Faze.Helpers.showNotification('Тест', {
-          isNested: false,
-        });
+        Faze.Helpers.showNotification('Тест');
       });
     }
   },

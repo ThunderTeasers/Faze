@@ -398,6 +398,10 @@ class Page {
           items: pageInitializer.dataset.fazePageSelectorsItems || '.item',
           pagination: pageInitializer.dataset.fazePageSelectorsPagination || '.pagination',
         },
+        texts: {
+          buttonIdle: pageInitializer.dataset.fazePageTextsButtonIdle || 'Показать ещё',
+          buttonLoading: pageInitializer.dataset.fazePageTextsButtonLoading || 'Загрузка...',
+        },
       });
     });
   }

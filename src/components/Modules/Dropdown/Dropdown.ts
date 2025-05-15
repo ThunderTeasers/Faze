@@ -154,7 +154,7 @@ class Dropdown {
     }
 
     // При нажатии на заголовок, меняем видимость тела дропдауна
-    this.title.addEventListener('click', () => {
+    Faze.Events.click(this.title, () => {
       this.node.classList.toggle('faze-active');
 
       if (this.node.classList.contains('faze-active')) {
@@ -182,30 +182,27 @@ class Dropdown {
           }
         }
       }
-    });
+    }, false);
 
     // Проверка на нажатие за пределами селекта
     if (this.config.closeWhenClickOutside) {
-      document.addEventListener('click', (event: Event) => {
-        const path = (<any>event).path || (event.composedPath && event.composedPath());
-        if (path) {
-          if (!path.find((element: HTMLElement) => element === this.node)) {
-            this.node.classList.remove('faze-active');
+      Faze.Events.click(document, (event: Event) => {
+        if (!Faze.Helpers.isMouseOverlapsNode(event, this.node)) {
+          this.node.classList.remove('faze-active');
 
-            // Вызываем пользовательский метод
-            if (typeof this.config.callbacks.closed === 'function') {
-              try {
-                this.config.callbacks.closed({
-                  title: this.title,
-                  body: this.body,
-                });
-              } catch (error) {
-                this.logger.error(`Ошибка исполнения пользовательского метода "closed": ${error}`);
-              }
+          // Вызываем пользовательский метод
+          if (typeof this.config.callbacks.closed === 'function') {
+            try {
+              this.config.callbacks.closed({
+                title: this.title,
+                body: this.body,
+              });
+            } catch (error) {
+              this.logger.error(`Ошибка исполнения пользовательского метода "closed": ${error}`);
             }
           }
         }
-      });
+      }, false);
     }
   }
 

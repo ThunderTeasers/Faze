@@ -18,6 +18,7 @@ import Logger from '../../Core/Logger';
  * Содержит:
  *   positionTopOffset  - сдвиг тела от верхнего края заголовка, например для отображения там стрелочки
  *   strictPosition     - считать ли сдвиг не только снизу заголовка, но еще и со сдвигом страницы
+ *   closeWhenClickOutside - закрывать ли дропдаун при клике вне его
  *   callbacks
  *     created  - пользовательский метод, исполняющийся при успешном создании дропдауна
  *     opened   - пользовательский метод, исполняющийся при открытии дропдауна
@@ -26,6 +27,7 @@ import Logger from '../../Core/Logger';
 interface Config {
   positionTopOffset: number;
   strictPosition: boolean;
+  closeWhenClickOutside: boolean;
   callbacks: {
     created?: (data: CallbackData) => void;
     opened?: (data: CallbackData) => void;
@@ -83,6 +85,7 @@ class Dropdown {
     const defaultConfig: Config = {
       positionTopOffset: 0,
       strictPosition: false,
+      closeWhenClickOutside: true,
       callbacks: {
         created: undefined,
         opened: undefined,
@@ -182,26 +185,28 @@ class Dropdown {
     });
 
     // Проверка на нажатие за пределами селекта
-    document.addEventListener('click', (event: Event) => {
-      const path = (<any>event).path || (event.composedPath && event.composedPath());
-      if (path) {
-        if (!path.find((element: HTMLElement) => element === this.node)) {
-          this.node.classList.remove('faze-active');
+    if (this.config.closeWhenClickOutside) {
+      document.addEventListener('click', (event: Event) => {
+        const path = (<any>event).path || (event.composedPath && event.composedPath());
+        if (path) {
+          if (!path.find((element: HTMLElement) => element === this.node)) {
+            this.node.classList.remove('faze-active');
 
-          // Вызываем пользовательский метод
-          if (typeof this.config.callbacks.closed === 'function') {
-            try {
-              this.config.callbacks.closed({
-                title: this.title,
-                body: this.body,
-              });
-            } catch (error) {
-              this.logger.error(`Ошибка исполнения пользовательского метода "closed": ${error}`);
+            // Вызываем пользовательский метод
+            if (typeof this.config.callbacks.closed === 'function') {
+              try {
+                this.config.callbacks.closed({
+                  title: this.title,
+                  body: this.body,
+                });
+              } catch (error) {
+                this.logger.error(`Ошибка исполнения пользовательского метода "closed": ${error}`);
+              }
             }
           }
         }
-      }
-    });
+      });
+    }
   }
 
   /**
@@ -228,6 +233,7 @@ class Dropdown {
   static initializeByDataAttributes(dropdownNode: HTMLElement): void {
     new Faze.Dropdown(dropdownNode, {
       strictPosition: (dropdownNode.dataset.fazeDropdownStrictPosition || 'false') === 'true',
+      closeWhenClickOutside: (dropdownNode.dataset.fazeDropdownCloseWhenClickOutside || 'true') === 'true',
       positionTopOffset: parseInt(dropdownNode.dataset.fazeDropdownPositionTopOffset || '0', 10),
     });
   }

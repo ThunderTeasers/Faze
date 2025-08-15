@@ -709,6 +709,25 @@ class Helpers {
     return '';
   }
 
+  static deepMerge<T extends object>(target: T, source: Partial<T>): T {
+    const output = { ...target };
+
+    for (const key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        const targetValue = target[key];
+        const sourceValue = source[key];
+
+        if (targetValue && Helpers.isObject(targetValue) && sourceValue && Helpers.isObject(sourceValue)) {
+          output[key] = Helpers.deepMerge(targetValue, sourceValue as any) as any;
+        } else {
+          output[key] = sourceValue as any;
+        }
+      }
+    }
+
+    return output;
+  }
+
   /**
    * Определение объект ли переданный параметр, суть в том, что массив тоже объект в JS и эта проверка исключает это
    *

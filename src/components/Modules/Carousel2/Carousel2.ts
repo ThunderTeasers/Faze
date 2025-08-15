@@ -261,7 +261,7 @@ class Carousel2 extends Module {
     // Инициализация модуля
     super({
       node,
-      config: Object.assign(defaultConfig, config),
+      config: Faze.Helpers.deepMerge(defaultConfig, config),
       name: 'Carousel2',
     });
   }

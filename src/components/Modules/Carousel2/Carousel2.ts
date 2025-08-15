@@ -279,9 +279,7 @@ class Carousel2 extends Module {
     this.offset = 0;
     this.counter = 0;
     this.isIdle = true;
-    this.transition = `transform ${
-      this.config.animation.time / 1000
-    }s ease-in-out`;
+    this.transition = `transform ${this.config.animation.time / 1000}s cubic-bezier(0.4, 0, 0.2, 1)`;
     this.isNeedToInitialize = !(this.totalSlides < this.config.minAmount);
 
     // Проверка на минимальное количество
@@ -628,13 +626,11 @@ class Carousel2 extends Module {
 
     // Проверяем выход за границы
     if (offset > this.offset + this.slideWidth) {
-      this.itemsHolderNode.style.transform = `translate(${
-        this.offset + this.slideWidth
-      }px, 0)`;
+      this.itemsHolderNode.style.transform = `translate(${this.offset + this.slideWidth
+        }px, 0)`;
     } else if (offset < this.offset - this.slideWidth) {
-      this.itemsHolderNode.style.transform = `translate(${
-        this.offset - this.slideWidth
-      }px, 0)`;
+      this.itemsHolderNode.style.transform = `translate(${this.offset - this.slideWidth
+        }px, 0)`;
     }
   }
 
@@ -1278,11 +1274,9 @@ class Carousel2 extends Module {
    * @private
    */
   private changeCounter(): void {
-    this.counterNode.innerHTML = `<span class="faze-carousel-counter-current">${
-      this.index + 1
-    }</span> / <span class="faze-carousel-counter-total">${
-      this.totalSlides
-    }</span>`;
+    this.counterNode.innerHTML = `<span class="faze-carousel-counter-current">${this.index + 1
+      }</span> / <span class="faze-carousel-counter-total">${this.totalSlides
+      }</span>`;
   }
 
   /**

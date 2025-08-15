@@ -14,6 +14,8 @@
     display: flex;
 
     & > .faze-item {
+      will-change: transform;
+      
       & > img {
         display: flex;
         width: 100%;

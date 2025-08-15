@@ -389,9 +389,24 @@ class Carousel2 extends Module {
         slideNode.classList.add('faze-active');
       }
 
+      // Блокируем перетаскивание
+      this.blockImageDrag(slideNode);
+
       // Перевещаем слайд в родителя
       this.itemsHolderNode.appendChild(slideNode);
     });
+  }
+
+  /**
+   * Блокирует перетаскивание изображений на слайде
+   *
+   * @param {HTMLElement} slideNode Слайд, на котором находится изображение
+   */
+  private blockImageDrag(slideNode: HTMLElement): void {
+    const imageNode = slideNode.tagName === 'IMG' ? slideNode : slideNode.querySelector('img');
+    if (imageNode) {
+      imageNode.draggable = false;
+    }
   }
 
   /**

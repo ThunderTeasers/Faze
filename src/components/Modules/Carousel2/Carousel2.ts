@@ -102,6 +102,7 @@ interface Config {
     type: string;
     time: number;
     direction: string;
+    function: string;
   };
   selectors: {
     arrowLeft?: string;
@@ -242,6 +243,7 @@ class Carousel2 extends Module {
         type: 'fade',
         time: 1000,
         direction: 'horizontal',
+        function: 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
       selectors: {
         arrowLeft: undefined,
@@ -279,7 +281,7 @@ class Carousel2 extends Module {
     this.offset = 0;
     this.counter = 0;
     this.isIdle = true;
-    this.transition = `transform ${this.config.animation.time / 1000}s cubic-bezier(0.4, 0, 0.2, 1)`;
+    this.transition = `transform ${this.config.animation.time / 1000}s ${this.config.animation.function}`;
     this.isNeedToInitialize = !(this.totalSlides < this.config.minAmount);
 
     // Проверка на минимальное количество
@@ -1325,24 +1327,19 @@ class Carousel2 extends Module {
       arrows: (node.dataset.fazeCarouselArrows || 'true') === 'true',
       duration: parseInt(node.dataset.fazeCarouselDuration || '3000', 10),
       infinite: (node.dataset.fazeCarouselInfinite || 'true') === 'true',
-      useSlideFullSize:
-        (node.dataset.fazeCarouselUseSlideFullSize || 'false') === 'true',
+      useSlideFullSize: (node.dataset.fazeCarouselUseSlideFullSize || 'false') === 'true',
       stopOnHover: (node.dataset.fazeCarouselStopOnHover || 'false') === 'true',
       mouseMove: (node.dataset.fazeCarouselMouseMove || 'false') === 'true',
       touchMove: (node.dataset.fazeCarouselTouchMove || 'false') === 'true',
-      amountPerSlide: parseInt(
-        node.dataset.fazeCarouselAmountPerSlide || '1',
-        10
-      ),
+      amountPerSlide: parseInt(node.dataset.fazeCarouselAmountPerSlide || '1', 10),
       minAmount: parseInt(node.dataset.fazeCarouselMinAmount || '2', 10),
-      disallowRanges: JSON.parse(
-        node.dataset.fazeCarouselDisallowRanges || '[]'
-      ),
+      disallowRanges: JSON.parse(node.dataset.fazeCarouselDisallowRanges || '[]'),
       offsetChange: parseInt(node.dataset.fazeCarouselOffsetChange || '50', 10),
       animation: {
         type: node.dataset.fazeCarouselAnimationType || 'fade',
         time: parseInt(node.dataset.fazeCarouselAnimationTime || '1000', 10),
         direction: node.dataset.fazeCarouselAnimationDirection || 'horizontal',
+        function: node.dataset.fazeCarouselAnimationFunction || 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
       selectors: {
         arrowLeft: node.dataset.fazeCarouselSelectorsArrowLeft,

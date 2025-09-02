@@ -21,7 +21,7 @@ import Faze from '../../Core/Faze';
 interface CallbackData {
   node: HTMLElement;
   colorsNode: HTMLElement;
-  colorsNodes: HTMLElement[];
+  colorsNodes: HTMLImageElement[];
   selectedColorNode?: HTMLElement;
 }
 
@@ -54,7 +54,10 @@ class ColorChanger extends Module {
   quantity: number;
 
   // Данные о цветах
-  data?: any;
+  data?: {
+    image?: string;
+    [key: string]: string | string[] | undefined;
+  }[];
 
   // DOM элемент холдера цветов
   colorsNode: HTMLElement;
@@ -151,8 +154,7 @@ class ColorChanger extends Module {
       const isMore: boolean = this.data.length > this.config.perRow;
 
       // Проставляем классы
-      this.colorsNode.className = `${this.classPrefix}-colors ${isMore ? `${this.classPrefix}-colors-more` : ''
-        }`;
+      this.colorsNode.className = `${this.classPrefix}-colors ${isMore ? `${this.classPrefix}-colors-more` : ''}`;
 
       // Количество колонок(строк) с цветами
       const numberOfRows = Math.ceil(this.data.length / this.config.perRow);
@@ -212,7 +214,7 @@ class ColorChanger extends Module {
    * @private
    */
   private bindColorChange(): void {
-    this.colorsNodes.forEach((colorNode: HTMLElement, index: number) => {
+    this.colorsNodes.forEach((colorNode: HTMLImageElement, index: number) => {
       Faze.Events.listener(
         this.config.changeOnHover ? 'mouseenter' : 'click',
         colorNode,
@@ -228,9 +230,9 @@ class ColorChanger extends Module {
   /**
    * Изменение цвета
    *
-   * @param {HTMLElement} colorNode DOM элемент выбранного цвета
+   * @param {HTMLImageElement} colorNode DOM элемент выбранного цвета
    */
-  private change(colorNode: HTMLElement): void {
+  private change(colorNode: HTMLImageElement): void {
     // Изменяем выбранный цвет
     this.selectedColorNode = colorNode;
 

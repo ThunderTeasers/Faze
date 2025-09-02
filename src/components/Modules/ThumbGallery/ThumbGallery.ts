@@ -31,11 +31,11 @@ interface Config {
  * Класс галереи
  */
 class ThumbGallery extends Module {
-  // DOM элемент изображения
-  private imageNode?: HTMLImageElement | null;
-
   // Список фотографий
   private imagesData: Array<string>;
+
+  // DOM элемент враппера галереи
+  private holderNode?: HTMLDivElement;
 
   // DOM элемент враппера галереи
   private galleryNode?: HTMLDivElement;
@@ -67,7 +67,6 @@ class ThumbGallery extends Module {
    */
   initialize(): void {
     // Инициализация переменных
-    this.imageNode = this.node?.querySelector('img');
     this.imagesData = [];
     this.galleryNode = undefined;
     this.galleryElementsNodes = [];
@@ -75,10 +74,6 @@ class ThumbGallery extends Module {
 
     // Инициализация
     super.initialize();
-
-    // Создание галереи
-    this.parseProductJSON();
-    this.generateSliderHTML();
   }
 
   /**
@@ -88,6 +83,20 @@ class ThumbGallery extends Module {
     super.bind();
 
     this.bindChange();
+  }
+
+  /**
+   * Создание HTML галереи
+   *
+   * Создает HTML структуру галереи на основе данных, полученных из data атрибута
+   */
+  build(): void {
+    super.build();
+
+    // Создание галереи
+    this.parseProductJSON();
+    this.buildImagesCarousel();
+    this.generateSliderHTML();
   }
 
   /**
@@ -106,8 +115,7 @@ class ThumbGallery extends Module {
     this.config.data = data;
 
     // Создание галереи
-    this.parseProductJSON();
-    this.generateSliderHTML();
+    this.build();
   }
 
   /**
@@ -117,7 +125,7 @@ class ThumbGallery extends Module {
    */
   private bindChange(): void {
     // Навешиваем событие изменения изображения относительно положения курсора
-    this.node.addEventListener('mousemove', (event: any) => {
+    this.node?.addEventListener('mousemove', (event: MouseEvent) => {
       // Получаем необходимые данные
       const total = this.imagesData.length;
 
@@ -136,7 +144,7 @@ class ThumbGallery extends Module {
       const sliderPhotoWidth = (imageWidth - totalSpace) / total;
 
       // Индекс фотографии которую нужно вывести
-      let currentPhotoIndex = Math.floor(event.layerX / sliderPhotoWidth);
+      let currentPhotoIndex = Math.floor(event.offsetX / sliderPhotoWidth);
 
       // Защита от выхода за границы
       if (currentPhotoIndex < 0) {
@@ -145,9 +153,9 @@ class ThumbGallery extends Module {
         currentPhotoIndex = total - 1;
       }
 
-      // Присваиваем новое изображение
-      if (this.imageNode) {
-        this.imageNode.src = this.imagesData[currentPhotoIndex];
+      // Скроллим галерею
+      if (this.holderNode) {
+        this.holderNode.scrollLeft = currentPhotoIndex * imageWidth;
       }
 
       // Ставим активный элемент
@@ -166,7 +174,7 @@ class ThumbGallery extends Module {
     }
 
     // Парсинг JSON
-    let jsonData;
+    let jsonData: any = [];
     try {
       jsonData = JSON.parse(this.config.data);
     } catch (error) {
@@ -186,6 +194,17 @@ class ThumbGallery extends Module {
     this.imagesData = jsonData;
   }
 
+
+  private buildImagesCarousel() {
+    this.node.innerHTML = `
+      <div class="faze-thumbgallery-holder">
+        ${this.imagesData.map(image => `<img src="${image}">`).join('')}
+      </div>
+    `;
+
+    this.holderNode = this.node.querySelector('.faze-thumbgallery-holder') as HTMLDivElement;
+  }
+
   /**
    * Генерация HTML для пагинации галереи
    *
@@ -199,11 +218,6 @@ class ThumbGallery extends Module {
 
     // Генерируем HTML для элементов слайдера
     this.generateSliderElementsHTML();
-
-    // Ставим первое изображение
-    if (this.imageNode && this.imagesData.length > 0) {
-      [this.imageNode.src] = this.imagesData;
-    }
 
     // Добавляем созданный слайдер к элементу
     this.node.appendChild(this.galleryNode);

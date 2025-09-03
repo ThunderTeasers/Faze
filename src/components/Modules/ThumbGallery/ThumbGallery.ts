@@ -61,7 +61,7 @@ class ThumbGallery extends Module {
     // Инициализируем базовый класс
     super({
       node,
-      config: Object.assign(defaultConfig, config),
+      config: Faze.Helpers.deepMerge(defaultConfig, config),
       name: 'ThumbGallery',
       additionalParams: {
         rawData,

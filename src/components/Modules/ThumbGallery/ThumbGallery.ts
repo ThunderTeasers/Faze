@@ -31,6 +31,9 @@ interface Config {
  * Класс галереи
  */
 class ThumbGallery extends Module {
+  // Ширина изображения
+  private imageWidth: number;
+
   // Список фотографий
   private imagesData: Array<string>;
 
@@ -67,6 +70,7 @@ class ThumbGallery extends Module {
    */
   initialize(): void {
     // Инициализация переменных
+    this.imageWidth = this.node.getBoundingClientRect().width;
     this.imagesData = [];
     this.galleryNode = undefined;
     this.galleryElementsNodes = [];
@@ -83,6 +87,7 @@ class ThumbGallery extends Module {
     super.bind();
 
     this.bindChange();
+    this.bindScroll();
   }
 
   /**
@@ -106,6 +111,7 @@ class ThumbGallery extends Module {
    */
   reinitialize(data: string): void {
     // Очищаем всё
+    this.imageWidth = this.node.getBoundingClientRect().width;
     this.imagesData = [];
     this.galleryElementsNodes.forEach((galleryElementNode) => galleryElementNode.remove());
     this.galleryElementsNodes = [];
@@ -116,6 +122,21 @@ class ThumbGallery extends Module {
 
     // Создание галереи
     this.build();
+  }
+
+  /**
+   * Навешивание события на скролл для отслеживания текущего активного элемента галереи
+   *
+   * @private
+   */
+  private bindScroll() {
+    this.holderNode?.addEventListener('scrollend', () => {
+      // Получаем текущий индекс
+      const currentPhotoIndex = Math.round((this.holderNode?.scrollLeft || 0) / this.imageWidth);
+
+      // Ставим активный элемент
+      Faze.Helpers.activateItem(this.galleryElementsNodes, currentPhotoIndex);
+    });
   }
 
   /**
@@ -134,14 +155,11 @@ class ThumbGallery extends Module {
         return;
       }
 
-      // Ширина изображения на котором распологаются элементы, относительно неё идут все рассчёты
-      const imageWidth = this.node.getBoundingClientRect().width;
-
       // Общая ширина пустого пространства(отступов между элементами)
       const totalSpace = total * this.config.gap;
 
       // Ширина фото в слайдере
-      const sliderPhotoWidth = (imageWidth - totalSpace) / total;
+      const sliderPhotoWidth = (this.imageWidth - totalSpace) / total;
 
       // Индекс фотографии которую нужно вывести
       let currentPhotoIndex = Math.floor(event.offsetX / sliderPhotoWidth);
@@ -155,7 +173,7 @@ class ThumbGallery extends Module {
 
       // Скроллим галерею
       if (this.holderNode) {
-        this.holderNode.scrollLeft = currentPhotoIndex * imageWidth;
+        this.holderNode.scrollLeft = currentPhotoIndex * this.imageWidth;
       }
 
       // Ставим активный элемент

@@ -25,6 +25,8 @@ interface Config {
   data?: string;
   gap: number;
   amount: number;
+  touchMove: boolean;
+  mouseMove: boolean;
 }
 
 /**
@@ -52,6 +54,8 @@ class ThumbGallery extends Module {
       data: undefined,
       gap: 0.4,
       amount: 5,
+      touchMove: true,
+      mouseMove: false,
     };
 
     // Инициализируем базовый класс
@@ -275,6 +279,8 @@ class ThumbGallery extends Module {
       data: node.dataset.fazeThumbgalleryData,
       gap: parseFloat(node.dataset.fazeThumbgalleryGap || '0'),
       amount: parseInt(node.dataset.fazeThumbgalleryGap || '5', 10),
+      touchMove: (node.dataset.fazeThumbgalleryTouchMove || 'true') === 'true',
+      mouseMove: (node.dataset.fazeThumbgalleryMouseMove || 'false') === 'true',
     });
 
     // Отслеживаем изменение в атрибуте содержащий данные изображений

@@ -36,11 +36,14 @@ class ThumbGallery extends Module {
   // Ширина изображения
   private imageWidth: number;
 
+  // Ширина враппера
+  private holderWidth: number;
+
   // Список фотографий
   private imagesData: Array<string>;
 
   // DOM элемент враппера галереи
-  private holderNode?: HTMLDivElement;
+  private holderNode: HTMLDivElement;
 
   // DOM элемент враппера галереи
   private galleryNode?: HTMLDivElement;
@@ -75,6 +78,7 @@ class ThumbGallery extends Module {
   initialize(): void {
     // Инициализация переменных
     this.imageWidth = this.node.getBoundingClientRect().width;
+    this.holderWidth = this.node.getBoundingClientRect().width;
     this.imagesData = [];
     this.galleryNode = undefined;
     this.galleryElementsNodes = [];
@@ -110,6 +114,7 @@ class ThumbGallery extends Module {
     this.parseProductJSON();
     this.buildImagesCarousel();
     this.generateSliderHTML();
+    this.manageHolderWidth();
   }
 
   /**
@@ -120,6 +125,7 @@ class ThumbGallery extends Module {
   reinitialize(data: string): void {
     // Очищаем всё
     this.imageWidth = this.node.getBoundingClientRect().width;
+    this.holderWidth = this.node.getBoundingClientRect().width;
     this.imagesData = [];
     this.galleryElementsNodes.forEach((galleryElementNode) => galleryElementNode.remove());
     this.galleryElementsNodes = [];
@@ -138,9 +144,9 @@ class ThumbGallery extends Module {
    * @private
    */
   private bindScroll() {
-    this.holderNode?.addEventListener('scrollend', () => {
+    this.holderNode.addEventListener('scrollend', () => {
       // Получаем текущий индекс
-      const currentPhotoIndex = Math.round((this.holderNode?.scrollLeft || 0) / this.imageWidth);
+      const currentPhotoIndex = Math.round((this.holderNode.scrollLeft || 0) / this.imageWidth);
 
       // Ставим активный элемент
       Faze.Helpers.activateItem(this.galleryElementsNodes, currentPhotoIndex);
@@ -163,14 +169,18 @@ class ThumbGallery extends Module {
         return;
       }
 
+      // Получаем корректные координаты родителя
+      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      const offsetX = event.clientX - rect.left;
+
       // Общая ширина пустого пространства(отступов между элементами)
       const totalSpace = total * this.config.gap;
 
       // Ширина фото в слайдере
-      const sliderPhotoWidth = (this.imageWidth - totalSpace) / total;
+      const sliderPhotoWidth = (this.holderWidth - totalSpace) / total;
 
       // Индекс фотографии которую нужно вывести
-      let currentPhotoIndex = Math.floor(event.offsetX / sliderPhotoWidth);
+      let currentPhotoIndex = Math.floor(offsetX / sliderPhotoWidth);
 
       // Защита от выхода за границы
       if (currentPhotoIndex < 0) {
@@ -180,9 +190,7 @@ class ThumbGallery extends Module {
       }
 
       // Скроллим галерею
-      if (this.holderNode) {
-        this.holderNode.scrollLeft = currentPhotoIndex * this.imageWidth;
-      }
+      this.holderNode.scrollLeft = currentPhotoIndex * this.holderWidth;
 
       // Ставим активный элемент
       Faze.Helpers.activateItem(this.galleryElementsNodes, currentPhotoIndex);
@@ -200,12 +208,7 @@ class ThumbGallery extends Module {
     }
 
     // Парсинг JSON
-    let jsonData: any = [];
-    try {
-      jsonData = JSON.parse(this.config.data);
-    } catch (error) {
-      console.error(error);
-    }
+    let jsonData: any = Faze.Helpers.parseJSON(this.config.data) || [];
 
     // Если один элемент, то пропускаем
     if (jsonData.length === 0) {
@@ -231,6 +234,10 @@ class ThumbGallery extends Module {
     this.holderNode = this.node.querySelector('.faze-thumbgallery-holder') as HTMLDivElement;
   }
 
+  private manageHolderWidth() {
+    this.holderNode.style.width = `${this.imageWidth}px`;
+  }
+
   /**
    * Генерация HTML для пагинации галереи
    *
@@ -247,6 +254,12 @@ class ThumbGallery extends Module {
 
     // Добавляем созданный слайдер к элементу
     this.node.appendChild(this.galleryNode);
+
+    // Получаем ширину одного изображения
+    const imageNode = this.node.querySelector('img');
+    if (imageNode) {
+      this.imageWidth = imageNode.getBoundingClientRect().width;
+    }
   }
 
   /**

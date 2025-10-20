@@ -144,9 +144,9 @@ class ThumbGallery extends Module {
    * @private
    */
   private bindScroll() {
-    this.holderNode.addEventListener('scrollend', () => {
+    Faze.Events.listener('scrollend', this.holderNode, () => {
       // Получаем текущий индекс
-      const currentPhotoIndex = Math.round((this.holderNode.scrollLeft || 0) / this.holderWidth);
+      const currentPhotoIndex = Math.round((this.holderNode.scrollLeft || 0) / this.imageWidth);
 
       // Ставим активный элемент
       Faze.Helpers.activateItem(this.galleryElementsNodes, currentPhotoIndex);
@@ -160,7 +160,7 @@ class ThumbGallery extends Module {
    */
   private bindChange(): void {
     // Навешиваем событие изменения изображения относительно положения курсора
-    this.node?.addEventListener('mousemove', (event: MouseEvent) => {
+    Faze.Events.listener('mousemove', this.node, (event: MouseEvent) => {
       // Получаем необходимые данные
       const total = this.imagesData.length;
 

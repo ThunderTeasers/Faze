@@ -712,6 +712,9 @@ class REST {
         // Если это FormData, то передаваться будет только её объект
         if ('formData' in data) {
           data = data.formData;
+
+          // Получаем полный адрес если необходимо
+          url = data.get('url') || url;
         }
 
         // Отправляем запрос, после выполнения которого снова вызываем ajaxChain

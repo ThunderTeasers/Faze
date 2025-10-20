@@ -80,6 +80,10 @@ class ThumbGallery extends Module {
     this.galleryElementsNodes = [];
     this.config.data = this.additionalParams?.rawData || this.node.dataset.fazeThumbgalleryData;
 
+    // Классы
+    this.node.classList.toggle('faze-thumbgallery-touchmove', this.config.touchMove);
+    this.node.classList.toggle('faze-thumbgallery-mousemove', this.config.mouseMove);
+
     // Инициализация
     super.initialize();
   }

@@ -65,6 +65,24 @@ Faze.add({
     Faze.Helpers.loadJS('https://unpkg.com/fabric@5.2.4/dist/fabric.min.js');
     Faze.Helpers.loadJS('https://unpkg.com/fabric@5.2.4/dist/fabric.min.js');
     Faze.Helpers.loadJS('https://unpkg.com/fabric@5.2.4/dist/fabric.min.js');
+
+    const node = document.querySelector('.mouse-over')
+
+    document.addEventListener('mousemove', (event) => {
+      // Получаем результаты наведения на элемент мышкой
+      const mouseOverResult = Faze.Helpers.isMouseOver(
+        event,
+        node,
+        {
+          horizontal: true,
+          horizontalThreshold: 25,
+          vertical: true,
+          verticalThreshold: 25,
+        }
+      );
+
+      console.log(mouseOverResult.sides);
+    })
   },
 });
 
@@ -303,6 +321,7 @@ Faze.add({
   condition: document.documentElement.classList.contains('js-drag'),
   callback: () => {
     new Faze.Drag(document.querySelectorAll('.js-drag-test'), {
+      threshold: 50,
       callbacks: {
         created: () => {
           console.log('Создание прошло успешно');

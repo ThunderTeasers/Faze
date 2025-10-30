@@ -945,16 +945,13 @@ class Helpers {
   static isMouseOver(
     event: MouseEvent | TouchEvent,
     itemNode: HTMLElement,
-    calculateSides: { vertical: boolean; horizontal: boolean } = {
-      vertical: false,
-      horizontal: false,
-    }
+    calculateSides: { vertical: boolean; horizontal: boolean, verticalThreshold?: number, horizontalThreshold?: number } = { vertical: false, verticalThreshold: 25, horizontal: false, horizontalThreshold: 25 }
   ): MouseOverResult {
     // DOMRect текущего элемента
     const itemRect = itemNode.getBoundingClientRect();
 
     // Получаем координаты касания/нажатия
-    let { x, y } = this.getMouseOrTouchPosition(event);
+    let { x, y } = this.getMouseOrTouchPosition(event, itemNode);
 
     // Объект с результатами проверки
     const result: MouseOverResult = {
@@ -973,46 +970,34 @@ class Helpers {
 
     // Вычисляем входы в вертикальном направлении(верх и низ)
     if (calculateSides.vertical) {
-      // Половина высоты
+      const theshold = itemRect.height * ((calculateSides.verticalThreshold || 25) / 100);
       const halfHeight = itemRect.height / 2;
 
       // Проверяем внутри ли мышь по горизонтали
-      const isInsideHorizontally =
-        x > itemRect.left && x < itemRect.left + itemRect.width;
+      const isInsideHorizontally = x > 0 && x < itemRect.width;
 
       // Проверяем на вхождение в верхнюю часть
-      result.sides.top =
-        y > itemRect.top &&
-        y < itemRect.top + halfHeight &&
-        isInsideHorizontally;
+      result.sides.top = y > theshold && y < halfHeight && isInsideHorizontally;
 
       // Проверяем на вхождение в нижнюю часть
-      result.sides.bottom =
-        y > itemRect.top + halfHeight &&
-        y < itemRect.top + itemRect.height &&
-        isInsideHorizontally;
+      result.sides.bottom = y < itemRect.height - theshold && y > halfHeight && isInsideHorizontally;
     }
 
     // Вычисляем входы в горизонтальном направлении(верх и низ)
     if (calculateSides.horizontal) {
+      const theshold = itemRect.height * ((calculateSides.horizontalThreshold || 25) / 100);
+
       // Половина высоты
       const halfWidth = itemRect.width / 2;
 
       // Проверяем внутри ли мышь по горизонтали
-      const isInsideVertically =
-        y > itemRect.top && y < itemRect.top + itemRect.height;
+      const isInsideVertically = y > 0 && y < itemRect.height;
 
       // Проверяем на вхождение в верхнюю часть
-      result.sides.left =
-        x > itemRect.left &&
-        x < itemRect.left + halfWidth &&
-        isInsideVertically;
+      result.sides.left = x > theshold && x < halfWidth && isInsideVertically;
 
       // Проверяем на вхождение в нижнюю часть
-      result.sides.right =
-        x > itemRect.left + halfWidth &&
-        x < itemRect.left + itemRect.width &&
-        isInsideVertically;
+      result.sides.right = x < itemRect.height - theshold && x > halfWidth && isInsideVertically;
     }
 
     return result;
@@ -1025,17 +1010,29 @@ class Helpers {
    *
    * @return{FazePosition} Позиция на экране
    */
-  static getMouseOrTouchPosition(event: MouseEvent | TouchEvent): FazePosition {
+  static getMouseOrTouchPosition(event: MouseEvent | TouchEvent, node?: HTMLElement): FazePosition {
     const position: FazePosition = {
       x: 0,
       y: 0,
     };
+
+    // Координаты
+    let left = 0;
+    let top = 0;
+
+    // Проверяем наличие DOM элемента
+    if (node) {
+      const rect = node.getBoundingClientRect();
+      left = rect.left;
+      top = rect.top;
+    }
+
     if (event instanceof MouseEvent) {
-      position.x = event.clientX;
-      position.y = event.clientY;
+      position.x = event.clientX - left;
+      position.y = event.clientY - top;
     } else {
-      position.x = event.changedTouches[0].clientX;
-      position.y = event.changedTouches[0].clientY;
+      position.x = event.changedTouches[0].clientX - left;
+      position.y = event.changedTouches[0].clientY - top;
     }
 
     return position;

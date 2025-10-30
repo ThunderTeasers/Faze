@@ -321,7 +321,7 @@ Faze.add({
   condition: document.documentElement.classList.contains('js-drag'),
   callback: () => {
     new Faze.Drag(document.querySelectorAll('.js-drag-test'), {
-      threshold: 50,
+      threshold: 25,
       callbacks: {
         created: () => {
           console.log('Создание прошло успешно');

@@ -71,7 +71,7 @@ class Drag extends Module {
     const defaultConfig: Config = {
       direction: SideDirection.vertical,
       phantomElementTag: 'div',
-      threshold: 50,
+      threshold: 25,
       callbacks: {
         created: undefined,
         changed: undefined,
@@ -289,25 +289,19 @@ class Drag extends Module {
             if (this.config.direction === SideDirection.horizontal) {
               // Если навели на нижнюю часть блока, то вставляем снизу
               if (mouseOverResult.sides.right) {
-                itemNode.parentNode.insertBefore(phantomNode, itemNode.nextSibling);
+                itemNode.parentNode.insertBefore(phantomNode, itemNode);
               } else if (mouseOverResult.sides.left) {
                 // Если на верхнюю, то сверху
-                itemNode.parentNode.insertBefore(phantomNode, itemNode);
+                itemNode.parentNode.insertBefore(phantomNode, itemNode.nextSibling);
               }
             } else {
               // Если навели на нижнюю часть блока, то вставляем снизу
               if (mouseOverResult.sides.bottom) {
-                console.log("BOTTOM");
-                if (itemNode.nextElementSibling === phantomNode) {
-                  itemNode.parentNode.insertBefore(phantomNode, phantomNode.previousElementSibling);
-                } else {
-                  itemNode.parentNode.insertBefore(phantomNode, itemNode.nextElementSibling);
-                }
-              } else if (mouseOverResult.sides.top) {
-                console.log("TOP");
-
-                // Если на верхнюю, то сверху
                 itemNode.parentNode.insertBefore(phantomNode, itemNode);
+              } else if (mouseOverResult.sides.top) {
+                // Если на верхнюю, то сверху
+                itemNode.parentNode.insertBefore(phantomNode, itemNode.nextElementSibling);
+
               }
             }
           }
@@ -397,7 +391,7 @@ class Drag extends Module {
 
     const dragContainerNodes = group ? Array.from(document.querySelectorAll(`[data-faze~="drag"][data-faze-drag-group=${group}]`)) : [dragNode];
     new Faze.Drag(dragContainerNodes, {
-      threshold: dragNode.dataset.fazeDragThreshold ? Number(dragNode.dataset.fazeDragThreshold) : 50,
+      threshold: dragNode.dataset.fazeDragThreshold ? Number(dragNode.dataset.fazeDragThreshold) : 25,
       direction: dragNode.dataset.fazeDragDirection === 'horizontal' ? SideDirection.horizontal : SideDirection.vertical,
       phantomElementTag: dragNode.dataset.fazeDragPhantomElementTag || 'div',
     });

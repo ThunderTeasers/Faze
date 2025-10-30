@@ -496,7 +496,7 @@ class Slider extends Module {
           this.config.range[0] +
           ((tmpPosition + pointWidthFactor) *
             (this.config.range[1] - this.config.range[0])) /
-            sliderWidth
+          sliderWidth
         ).toFixed(this.step)
       );
     }

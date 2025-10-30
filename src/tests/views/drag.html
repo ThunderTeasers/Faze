@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru" class="js-drag">
+
 <head>
   <meta charset="UTF-8">
   <title>Title</title>
@@ -10,7 +11,8 @@
       box-sizing: border-box;
     }
 
-    html, body {
+    html,
+    body {
       height: 100%;
     }
 
@@ -43,38 +45,54 @@
     }
   </style>
 </head>
+
 <body>
-<aside class="sidebar">
-  <div class="js-drag-test" data-faze-drag-group="components" data-faze-styles="false" data-faze-drag-direction="vertical">
-    <div class="drag-component" data-faze-drag="item">
-      <div class="drag-component-handle">Handle</div>
-      ITEM 1
+  <aside class="sidebar">
+    <div class="js-drag-test" data-faze-drag-group="components" data-faze-styles="false"
+      data-faze-drag-direction="vertical">
+      <div class="drag-component" data-faze-drag="item">
+        <div class="drag-component-handle">Handle</div>
+        ITEM 1
+      </div>
+      <div class="drag-component" data-faze-drag="item">
+        <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
+        ITEM 2
+      </div>
+      <div class="drag-component" data-faze-drag="item">
+        <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
+        ITEM 3
+      </div>
     </div>
-    <div class="drag-component" data-faze-drag="item">
-      <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-      ITEM 2
+    <br>
+    <button type="button" class="js-drag-add">Добавить</button>
+  </aside>
+  <aside class="content">
+    <div class="js-drag-test" data-faze-drag-group="components" data-faze-styles="false"
+      data-faze-drag-direction="vertical">
+      <div class="drag-component" data-faze-drag="item">
+        <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
+        ITEM 1
+      </div>
+      <div class="drag-component" data-faze-drag="item">
+        <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
+        ITEM 2
+      </div>
+      <div class="drag-component" data-faze-drag="item">
+        <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
+        ITEM 3
+      </div>
     </div>
-    <div class="drag-component" data-faze-drag="item">
-      <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-      ITEM 3
-    </div>
-  </div>
-</aside>
-<aside class="content">
-  <div class="js-drag-test" data-faze-drag-group="components" data-faze-styles="false" data-faze-drag-direction="vertical">
-    <div class="drag-component" data-faze-drag="item">
-      <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-      ITEM 1
-    </div>
-    <div class="drag-component" data-faze-drag="item">
-      <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-      ITEM 2
-    </div>
-    <div class="drag-component" data-faze-drag="item">
-      <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-      ITEM 3
-    </div>
-  </div>
-</aside>
+  </aside>
+  <script>
+    document.querySelector('.js-drag-add').addEventListener('click', () => {
+      document.querySelector('.js-drag-test').insertAdjacentHTML('beforeend', `
+      <div class="drag-component" data-faze-drag="item">
+        <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
+        ITEM 4
+      </div>
+    `);
+    });
+  </script>
 </body>
+
 </html>

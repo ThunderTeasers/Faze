@@ -6,8 +6,8 @@
  */
 
 import './Drag.scss';
-import Logger from '../../Core/Logger';
 import Faze from '../../Core/Faze';
+import Module from '../../Core/Module';
 
 /**
  * Направление для проверки вхождения мышки в элемент
@@ -49,6 +49,7 @@ interface CallbackData {
 interface Config {
   direction: SideDirection;
   phantomElementTag: string;
+  threshold: number;
   callbacks: {
     created?: (data: CallbackData) => void;
     beforeDrag?: (data: CallbackData) => void;
@@ -58,77 +59,47 @@ interface Config {
   };
 }
 
-class Drag {
-  // DOM элемент дропдауна
-  readonly nodes: HTMLElement[];
-
-  // Помощник для логирования
-  readonly logger: Logger;
-
-  // Конфиг с настройками
-  readonly config: Config;
-
+class Drag extends Module {
   // DOM элементы которые перетягиваем
-  readonly itemsNodes: HTMLElement[];
+  private itemsNodes: HTMLElement[];
 
   // DOM элемент переносимого элемента
   dragItemNode?: HTMLElement;
 
-  constructor(nodes: HTMLElement[] | null, config: Partial<Config>) {
-    if (!nodes) {
-      return this.logger.error('Не заданы объекты контейнеров элементов для перетаскивания');
-    }
-
-    // Конвертируем в нужный формат переданные объекты
-    if (nodes instanceof HTMLElement) {
-      this.nodes = [nodes];
-    } else {
-      this.nodes = [...Array.from(nodes)];
-    }
-
-    // Инициализация логгера
-    this.logger = new Logger('Модуль Faze.Drag:');
-
-    // Проверка на двойную инициализацию
-    const foundNode = this.nodes.find((node) => node.classList.contains('faze-drag-initialized'));
-    if (foundNode) {
-      if (!foundNode.dataset.fazeDragGroup) {
-        this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', foundNode);
-      }
-      return;
-    }
-
+  constructor(nodes: HTMLElement[], config: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       direction: SideDirection.vertical,
       phantomElementTag: 'div',
+      threshold: 50,
       callbacks: {
         created: undefined,
         changed: undefined,
       },
     };
 
-    // Инициализация переменных
-    this.config = Object.assign(defaultConfig, config);
-    this.itemsNodes = [];
-    this.nodes.forEach((node: HTMLElement) => {
-      this.itemsNodes.push(...Array.from(node.querySelectorAll<HTMLElement>('.faze-drag-item, [data-faze-drag="item"]')));
+    // Инициализируем базовый класс
+    super({
+      nodes,
+      config: Object.assign(defaultConfig, config),
+      name: 'Drag',
     });
-    this.dragItemNode = undefined;
-
-    this.initialize();
-    this.bind();
   }
 
   /**
    * Инициализация
    */
   initialize(): void {
-    // Простановка стандартных классов
+    super.initialize();
+
+    // Инициализация переменных
+    this.itemsNodes = [];
     this.nodes.forEach((node: HTMLElement) => {
-      node.classList.add('faze-drag');
-      node.classList.add('faze-drag-initialized');
+      console.log(node.querySelectorAll<HTMLElement>('.faze-drag-item, [data-faze-drag="item"]'));
+
+      this.itemsNodes.push(...Array.from(node.querySelectorAll<HTMLElement>('.faze-drag-item, [data-faze-drag="item"]')));
     });
+    this.dragItemNode = undefined;
 
     // Инициализация элементов
     this.initializeItemsIndexes();
@@ -176,6 +147,8 @@ class Drag {
    * Навешивание событий
    */
   bind(): void {
+    super.bind();
+
     this.itemsNodes.forEach((itemNode: HTMLElement) => {
       // DOM элемент ручки для перетаскивания, если её нет, то считаем весь элемент ею
       const handleNode: HTMLElement = itemNode.querySelector('.faze-drag-handle, [data-faze-drag="handle"]') || itemNode;
@@ -301,7 +274,16 @@ class Drag {
         .filter((itemNode) => !itemNode.classList.contains('faze-drag-item-moving'))
         .forEach((itemNode: HTMLElement) => {
           // Получаем результаты наведения на элемент мышкой
-          const mouseOverResult = Faze.Helpers.isMouseOver(event, itemNode, { horizontal: true, vertical: true });
+          const mouseOverResult = Faze.Helpers.isMouseOver(
+            event,
+            itemNode,
+            {
+              horizontal: true,
+              horizontalThreshold: this.config.threshold,
+              vertical: true,
+              verticalThreshold: this.config.threshold
+            }
+          );
 
           if (itemNode.parentNode) {
             if (this.config.direction === SideDirection.horizontal) {
@@ -315,8 +297,15 @@ class Drag {
             } else {
               // Если навели на нижнюю часть блока, то вставляем снизу
               if (mouseOverResult.sides.bottom) {
-                itemNode.parentNode.insertBefore(phantomNode, itemNode.nextSibling);
+                console.log("BOTTOM");
+                if (itemNode.nextElementSibling === phantomNode) {
+                  itemNode.parentNode.insertBefore(phantomNode, phantomNode.previousElementSibling);
+                } else {
+                  itemNode.parentNode.insertBefore(phantomNode, itemNode.nextElementSibling);
+                }
               } else if (mouseOverResult.sides.top) {
+                console.log("TOP");
+
                 // Если на верхнюю, то сверху
                 itemNode.parentNode.insertBefore(phantomNode, itemNode);
               }
@@ -408,21 +397,9 @@ class Drag {
 
     const dragContainerNodes = group ? Array.from(document.querySelectorAll(`[data-faze~="drag"][data-faze-drag-group=${group}]`)) : [dragNode];
     new Faze.Drag(dragContainerNodes, {
+      threshold: dragNode.dataset.fazeDragThreshold ? Number(dragNode.dataset.fazeDragThreshold) : 50,
       direction: dragNode.dataset.fazeDragDirection === 'horizontal' ? SideDirection.horizontal : SideDirection.vertical,
       phantomElementTag: dragNode.dataset.fazeDragPhantomElementTag || 'div',
-    });
-  }
-
-  /**
-   * Инициализация модуля либо по data атрибутам либо через observer
-   */
-  static hotInitialize(): void {
-    Faze.Observer.watch('[data-faze~="drag"]', (dragNode: HTMLElement) => {
-      Drag.initializeByDataAttributes(dragNode);
-    });
-
-    document.querySelectorAll<HTMLElement>('[data-faze~="drag"]').forEach((dragNode: HTMLElement) => {
-      Drag.initializeByDataAttributes(dragNode);
     });
   }
 }

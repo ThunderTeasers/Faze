@@ -27,6 +27,9 @@ abstract class Module {
   // Основной DOM элемент
   protected readonly node: HTMLElement;
 
+  // Основные DOM элементы
+  protected readonly nodes: HTMLElement[];
+
   // Помощник для логирования
   protected readonly logger: Logger;
 
@@ -65,12 +68,21 @@ abstract class Module {
     this.logger = new Logger(`Модуль Faze.${this.name}:`);
 
     // Проверяем задан ли основной DOM элемент
-    if (!data.node) {
+    if (!data.node && !data.nodes) {
       this.logger.error('Не задан основной DOM элемент модуля');
     }
 
     // Инициализируем переменные
-    this.node = data.node;
+    this.node = data.node!;
+    this.nodes = data.nodes!;
+
+    // Конвертируем в нужный формат переданные объекты
+    if (this.nodes instanceof HTMLElement) {
+      this.nodes = [this.nodes];
+    } else {
+      this.nodes = [...Array.from(this.nodes)];
+    }
+
     this.config = data.config;
     this.additionalParams = data.additionalParams;
     this.classPrefix = `faze-${this.name.toLowerCase()}`;
@@ -78,16 +90,24 @@ abstract class Module {
 
     // Вычисляем CSS селектор класса
     const classNameTmp = data.node?.className;
-    this.className = classNameTmp
-      ? `.${classNameTmp.trim().replace(' ', '.')}`
-      : undefined;
+    this.className = classNameTmp ? `.${classNameTmp.trim().replace(' ', '.')}` : undefined;
 
     // Вызываем стандартные методы
     this.initialize();
     this.build();
     this.bind();
+    this.watch();
 
-    (this.node as any).self = this;
+    // Добавляем ссылку на самого себя
+    if (this.node) {
+      (this.node as any).self = this;
+    }
+
+    if (this.nodes && Array.isArray(this.nodes) && this.nodes.length > 0) {
+      this.nodes.forEach((node) => {
+        (node as any).self = this;
+      });
+    }
   }
 
   /**
@@ -97,16 +117,32 @@ abstract class Module {
    */
   protected initialize(): void {
     // У основного DOM элемента, добавляем классы, показывающие, что данный плагин инициализирован, это необходимо для "hotInitialize"
-    this.node.classList.add(this.classPrefix);
-    this.node.classList.add(`${this.classPrefix}-initialized`);
+    if (this.node) {
+      this.node.classList.add(this.classPrefix);
+      this.node.classList.add(`${this.classPrefix}-initialized`);
+    }
+
+    if (this.nodes && Array.isArray(this.nodes) && this.nodes.length > 0) {
+      this.nodes.forEach((node) => {
+        node.classList.add(this.classPrefix);
+        node.classList.add(`${this.classPrefix}-initialized`);
+      });
+    }
   }
+
+  /**
+   * Отслеживание изменений в DOM для реинициализации или других действий
+   *
+   * @protected
+   */
+  protected watch(): void { }
 
   /**
    * Построение необходимых DOM элементов
    *
    * @protected
    */
-  protected build(): void {}
+  protected build(): void { }
 
   /**
    * Главный метод навешивания событий
@@ -121,14 +157,14 @@ abstract class Module {
     }
   }
 
-  protected resize(): void {}
+  protected resize(): void { }
 
   /**
    * Инициализация модуля по data атрибутам
    *
    * @param node{HTMLElement} DOM элемент на который нужно инициализировать плагин
    */
-  static initializeByDataAttributes(node: HTMLElement): void {}
+  static initializeByDataAttributes(node: HTMLElement): void { }
 
   /**
    * "Горячая" инициализация модуля через "observer"

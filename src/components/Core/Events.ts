@@ -1,8 +1,12 @@
+import Faze from "./Faze";
+
 /**
  * Класс для ускорения конечной разработки за счёт использования находящихся коротких функций,
  * которые делают всю шаблонную работу за нас
  */
 class Events {
+  static EVENTS_MAP: Map<HTMLElement, Map<string, string>> = new Map();
+
   /**
    * Навешивание событие клика на DOM элемент со всеми проверками
    *
@@ -21,13 +25,14 @@ class Events {
    * @param {HTMLElement | HTMLElement[] | string} nodeOrSelector DOM элемент(ы) на который навешиваем событие или его CSS селектор
    * @param {(event: Event, node: HTMLElement | null, nodes: HTMLElement[] | null, index: number)} callback Пользовательская функция исполняющаяся после события
    * @param {boolean} isPreventDefault Нужно ли делать "preventDefault()" у события
+   * @param {boolean} once Одно ли событие навешивать
    */
-  static listener(types: string | string[], nodeOrSelector: HTMLElement | HTMLElement[] | string, callback: (event: Event, node: HTMLElement | null, nodes: HTMLElement[] | null, index: number) => void, isPreventDefault: boolean = true): void {
+  static listener(types: string | string[], nodeOrSelector: HTMLElement | HTMLElement[] | string, callback: (event: Event, node: HTMLElement | null, nodes: HTMLElement[] | null, index: number) => void, isPreventDefault: boolean = true, once: boolean = true): void {
     // Проверяем, является ли переданный параметр строкой, если да,
     // то ищём соответствующий DOM элемент по селектору, если нет,
     // проверяем массив ли это и действуем в соответствии с этим
     let nodes: HTMLElement[];
-    if (typeof nodeOrSelector === 'string' || nodeOrSelector instanceof String) {
+    if (typeof nodeOrSelector === 'string') {
       nodes = [...document.querySelectorAll<HTMLElement>(nodeOrSelector as string)];
     } else if (Array.isArray(nodeOrSelector) || nodeOrSelector instanceof NodeList) {
       nodes = [...(nodeOrSelector as HTMLElement[])];
@@ -40,10 +45,26 @@ class Events {
       types = [types];
     }
 
-    // Навешиваем событие
+    // Проходимся по типам событий
     types.forEach((type: string) => {
       nodes.forEach((node: HTMLElement, index: number) => {
-        node?.addEventListener(type, (event) => {
+        // Если включено ограничение на одно одинковое событие
+        if (once) {
+          // Проверка на существование карты с событиями
+          const map = this.EVENTS_MAP.get(node) ?? new Map<string, string>();
+
+          // Проверка на повторное навешивание события
+          if (map.has(type) && map.get(type) === Faze.Helpers.hash(callback.toString())) {
+            return;
+          }
+
+          // Добавляем событие в карту
+          map.set(type, Faze.Helpers.hash(callback.toString()));
+          this.EVENTS_MAP.set(node, map);
+        }
+
+        // Навешиваем событие
+        node.addEventListener(type, (event: Event) => {
           if (isPreventDefault) {
             event.preventDefault();
           }

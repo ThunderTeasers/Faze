@@ -36,8 +36,14 @@ abstract class Module {
   // Конфиг с настройками
   protected readonly config: any;
 
+  // Идентификатор плагина
+  protected readonly uid: number;
+
   // Имя плагина
   private readonly name: string;
+
+  // Селектор для отслеживания
+  protected watchSelector?: string;
 
   // Префикс класса
   protected readonly classPrefix: string;
@@ -87,6 +93,7 @@ abstract class Module {
     this.additionalParams = data.additionalParams;
     this.classPrefix = `faze-${this.name.toLowerCase()}`;
     this.dataPrefix = `data-${this.classPrefix}`;
+    this.uid = Math.floor(Math.random() * 10001);
 
     // Вычисляем CSS селектор класса
     const classNameTmp = data.node?.className;
@@ -120,22 +127,41 @@ abstract class Module {
     if (this.node) {
       this.node.classList.add(this.classPrefix);
       this.node.classList.add(`${this.classPrefix}-initialized`);
+      this.node.dataset.fazeUid = this.uid.toString();
     }
 
     if (this.nodes && Array.isArray(this.nodes) && this.nodes.length > 0) {
       this.nodes.forEach((node) => {
         node.classList.add(this.classPrefix);
         node.classList.add(`${this.classPrefix}-initialized`);
+        node.dataset.fazeUid = this.uid.toString();
       });
     }
   }
+
+  /**
+   * Реинициализация
+   * 
+   * @param {any} data Данные для инициализации
+   */
+  protected reinitialize(data: any): void { }
 
   /**
    * Отслеживание изменений в DOM для реинициализации или других действий
    *
    * @protected
    */
-  protected watch(): void { }
+  private watch(): void {
+    // Если не задан селектор для отслеживания, то ничего не делаем
+    if (!this.watchSelector) {
+      return;
+    }
+
+    // Добавляем слушателя
+    Faze.Observer.watch(this.watchSelector, (node) => {
+      this.reinitialize(node);
+    });
+  }
 
   /**
    * Построение необходимых DOM элементов

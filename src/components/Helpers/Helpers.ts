@@ -685,6 +685,22 @@ class Helpers {
   }
 
   /**
+   * Создает хеш из строки
+   *
+   * @param {string} str Cтрока, из которой создается хеш
+   * 
+   * @returns {string} Хеш из строки
+   */
+  static hash(str: string): string {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = (hash << 5) - hash + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return hash.toString(16);
+  }
+
+  /**
    * Получение значения куки по имени
    *
    * @param name - Имя куки

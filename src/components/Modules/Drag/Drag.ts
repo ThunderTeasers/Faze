@@ -89,16 +89,14 @@ class Drag extends Module {
   /**
    * Инициализация
    */
-  initialize(): void {
+  protected initialize(): void {
     super.initialize();
 
     // Инициализация переменных
-    this.itemsNodes = [];
-    this.nodes.forEach((node: HTMLElement) => {
-      console.log(node.querySelectorAll<HTMLElement>('.faze-drag-item, [data-faze-drag="item"]'));
+    this.watchSelector = `[data-faze-uid="${this.uid}"] [data-faze-drag="item"]`;
 
-      this.itemsNodes.push(...Array.from(node.querySelectorAll<HTMLElement>('.faze-drag-item, [data-faze-drag="item"]')));
-    });
+    // Инициализация переменных
+    this.collectItems();
     this.dragItemNode = undefined;
 
     // Инициализация элементов
@@ -116,6 +114,18 @@ class Drag extends Module {
         this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
       }
     }
+  }
+
+  /**
+   * Собирает все элементы которые перетягиваем
+   * 
+   * @private
+   */
+  private collectItems() {
+    this.itemsNodes = [];
+    this.nodes.forEach((node: HTMLElement) => {
+      this.itemsNodes.push(...Array.from(node.querySelectorAll<HTMLElement>('.faze-drag-item, [data-faze-drag="item"]')));
+    });
   }
 
   /**
@@ -146,16 +156,27 @@ class Drag extends Module {
   /**
    * Навешивание событий
    */
-  bind(): void {
+  protected bind(): void {
     super.bind();
 
     this.itemsNodes.forEach((itemNode: HTMLElement) => {
-      // DOM элемент ручки для перетаскивания, если её нет, то считаем весь элемент ею
-      const handleNode: HTMLElement = itemNode.querySelector('.faze-drag-handle, [data-faze-drag="handle"]') || itemNode;
-
-      // Навешиваем события перетаскивания
-      this.bindDrag(handleNode, itemNode);
+      this.bindDrag(itemNode);
     });
+  }
+
+  /**
+   * Реинициализация
+   *
+   * @param {HTMLElement} data Данные для реинициализации
+   */
+  protected reinitialize(data: HTMLElement): void {
+    this.collectItems();
+
+    this.bindDrag(data);
+
+    // Инициализация элементов
+    this.initializeItemsIndexes();
+    this.initializeItemsPositions();
   }
 
   /**
@@ -163,7 +184,13 @@ class Drag extends Module {
    *
    * @private
    */
-  private bindDrag(handleNode: HTMLElement, draggedItemNode: HTMLElement): void {
+  private bindDrag(itemNode: HTMLElement): void {
+    // DOM элемент переносимого элемента
+    const draggedItemNode = itemNode;
+
+    // DOM элемент ручки для перетаскивания, если её нет, то считаем весь элемент ею
+    const handleNode: HTMLElement = itemNode.querySelector('.faze-drag-handle, [data-faze-drag="handle"]') || itemNode;
+
     // Начальная позиция мыши
     const startMousePosition = {
       x: 0,
@@ -378,7 +405,9 @@ class Drag extends Module {
     };
 
     // Навешиваем событие перетаскивания окна по нажатию на его заголовок
-    handleNode.addEventListener('mousedown', dragMouseDown);
+    // handleNode.addEventListener('mousedown', dragMouseDown);
+    Faze.Events.listener('mousedown', handleNode, dragMouseDown);
+    Faze.Events.listener('click', handleNode, () => { console.log(123) });
   }
 
   /**

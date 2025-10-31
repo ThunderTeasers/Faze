@@ -66,6 +66,7 @@
     </div>
     <br>
     <button type="button" class="js-drag-add">Добавить</button>
+    <button type="button" class="js-drag-remove">Удалить</button>
   </aside>
   <aside class="content">
     <div class="js-drag-test" data-faze-drag-group="components" data-faze-styles="false"
@@ -87,11 +88,15 @@
   <script>
     document.querySelector('.js-drag-add').addEventListener('click', () => {
       document.querySelector('.js-drag-test').insertAdjacentHTML('beforeend', `
-      <div class="drag-component" data-faze-drag="item">
-        <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-        ITEM 4
-      </div>
-    `);
+        <div class="drag-component" data-faze-drag="item">
+          <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
+          ITEM 4
+        </div>
+      `);
+    });
+
+    document.querySelector('.js-drag-remove').addEventListener('click', () => {
+      document.querySelector('.js-drag-test').lastElementChild.remove();
     });
   </script>
 </body>

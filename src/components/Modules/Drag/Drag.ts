@@ -260,8 +260,6 @@ class Drag extends Module {
       // Вставляем фантомный элемент под текущим
       if (draggedItemNode.parentNode) {
         draggedItemNode.parentNode.insertBefore(phantomNode, draggedItemNode.nextSibling);
-
-        console.log(phantomNode.style.marginTop, phantomNode.style.marginBottom);
       }
 
       document.addEventListener('mouseup', endDragElement);

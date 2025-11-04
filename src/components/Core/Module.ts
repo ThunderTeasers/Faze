@@ -82,13 +82,6 @@ abstract class Module {
     this.node = data.node!;
     this.nodes = data.nodes!;
 
-    // Конвертируем в нужный формат переданные объекты
-    if (this.nodes instanceof HTMLElement) {
-      this.nodes = [this.nodes];
-    } else {
-      this.nodes = [...Array.from(this.nodes)];
-    }
-
     this.config = data.config;
     this.additionalParams = data.additionalParams;
     this.classPrefix = `faze-${this.name.toLowerCase()}`;
@@ -110,10 +103,18 @@ abstract class Module {
       (this.node as any).self = this;
     }
 
+    // Добавляем ссылку на самого себя
     if (this.nodes && Array.isArray(this.nodes) && this.nodes.length > 0) {
       this.nodes.forEach((node) => {
         (node as any).self = this;
       });
+
+      // Конвертируем в нужный формат переданные объекты
+      if (this.nodes instanceof HTMLElement) {
+        this.nodes = [this.nodes];
+      } else {
+        this.nodes = [...Array.from(this.nodes)];
+      }
     }
   }
 

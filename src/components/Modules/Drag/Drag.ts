@@ -172,11 +172,22 @@ class Drag extends Module {
   protected reinitialize(data: HTMLElement): void {
     this.collectItems();
 
-    this.bindDrag(data);
+    this.bind();
 
     // Инициализация элементов
     this.initializeItemsIndexes();
     this.initializeItemsPositions();
+  }
+
+  private updatePhantomNodeStyles(draggedItemNode: HTMLElement, phantomNode: HTMLElement) {
+    // Получаем стили
+    const computedStyles = window.getComputedStyle(draggedItemNode, null);
+    phantomNode.style.marginTop = computedStyles.marginTop;
+    phantomNode.style.marginBottom = computedStyles.marginBottom;
+    phantomNode.style.marginLeft = computedStyles.marginLeft;
+    phantomNode.style.marginRight = computedStyles.marginRight;
+    phantomNode.style.width = `${draggedItemNode.getBoundingClientRect().width}px`;
+    phantomNode.style.height = `${draggedItemNode.getBoundingClientRect().height}px`;
   }
 
   /**
@@ -212,9 +223,6 @@ class Drag extends Module {
       left: draggedItemNode.style.left,
     };
 
-    // Получаем стили
-    const computedStyles = window.getComputedStyle(draggedItemNode, null);
-
     // Стартовые размеры элемента
     const width = draggedItemNode.getBoundingClientRect().width;
     const height = draggedItemNode.getBoundingClientRect().height;
@@ -222,12 +230,7 @@ class Drag extends Module {
     // Создаем фантомный элемент для замены "взятого", т.к. он станет абсолютом при драге
     const phantomNode = document.createElement(this.config.phantomElementTag);
     phantomNode.className = 'faze-drag-item-phantom';
-    phantomNode.style.width = `${width}px`;
-    phantomNode.style.height = `${height}px`;
-    phantomNode.style.marginTop = computedStyles.marginTop;
-    phantomNode.style.marginBottom = computedStyles.marginBottom;
-    phantomNode.style.marginLeft = computedStyles.marginLeft;
-    phantomNode.style.marginRight = computedStyles.marginRight;
+    this.updatePhantomNodeStyles(draggedItemNode, phantomNode);
 
     /**
      * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
@@ -236,6 +239,9 @@ class Drag extends Module {
      */
     const dragMouseDown = (event: MouseEvent) => {
       event.preventDefault();
+
+      // Обновляем стили фантомного элемента
+      this.updatePhantomNodeStyles(draggedItemNode, phantomNode);
 
       // Получение позиции курсора при нажатии на элемент
       startMousePosition.x = event.clientX;
@@ -254,6 +260,8 @@ class Drag extends Module {
       // Вставляем фантомный элемент под текущим
       if (draggedItemNode.parentNode) {
         draggedItemNode.parentNode.insertBefore(phantomNode, draggedItemNode.nextSibling);
+
+        console.log(phantomNode.style.marginTop, phantomNode.style.marginBottom);
       }
 
       document.addEventListener('mouseup', endDragElement);
@@ -407,7 +415,6 @@ class Drag extends Module {
     // Навешиваем событие перетаскивания окна по нажатию на его заголовок
     // handleNode.addEventListener('mousedown', dragMouseDown);
     Faze.Events.listener('mousedown', handleNode, dragMouseDown);
-    Faze.Events.listener('click', handleNode, () => { console.log(123) });
   }
 
   /**

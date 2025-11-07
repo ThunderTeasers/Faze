@@ -362,9 +362,7 @@ class Helpers {
   static loadJS(url: string): Promise<any> {
     return new Promise((resolve, reject) => {
       if (document.querySelector(`script[src="${url}"]`)) {
-        return reject(
-          `Faze.Helpers.loadJS: Скрипт "${url}" уже загружен на странице!`
-        );
+        return reject(`Faze.Helpers.loadJS: Скрипт "${url}" уже загружен на странице!`);
       }
 
       const nodeScript = document.createElement('script');
@@ -383,17 +381,9 @@ class Helpers {
    * @param index     - индекс искомого элемента
    * @param cssClass  - CSS класс, который вешается на активный элемент, по умолчанию 'active'
    */
-  static activateItem(
-    array: HTMLElement[],
-    index: number,
-    cssClass: string = 'active'
-  ): void {
+  static activateItem(array: HTMLElement[], index: number, cssClass: string = 'active'): void {
     array.forEach((itemNode: HTMLElement, i: number) => {
-      if (index === i) {
-        itemNode.classList.add(cssClass);
-      } else {
-        itemNode.classList.remove(cssClass);
-      }
+      itemNode.classList.toggle(cssClass, index === i);
     });
   }
 

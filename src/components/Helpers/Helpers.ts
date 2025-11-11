@@ -1148,6 +1148,23 @@ class Helpers {
   }
 
   /**
+   * Возвращает размер DOM элемента, включая его внешние поля margin
+   *
+   * @param {HTMLElement} node DOM элемент у которого вычисляем размер
+   *
+   * @return {FazeSize} Размер элемента
+   */
+  static getElementSize(node: HTMLElement): FazeSize {
+    const rect = node.getBoundingClientRect();
+    const styles = window.getComputedStyle(node);
+
+    return {
+      width: rect.width + parseInt(styles.marginLeft, 10) + parseInt(styles.marginRight, 10),
+      height: rect.height + parseInt(styles.marginTop, 10) + parseInt(styles.marginBottom, 10),
+    };
+  }
+
+  /**
    * Определение абсолютных координат DOM элемента на странице
    *
    * @param node - DOM элемент у которого вычисляем позицию

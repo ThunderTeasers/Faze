@@ -17,8 +17,15 @@ import Module from '../../Core/Module';
  *   vertical   - верхняя и нижняя сторона
  */
 enum SideDirection {
-  horizontal = 'horizontal',
-  vertical = 'vertical',
+  Horizontal = 'horizontal',
+  Vertical = 'vertical',
+}
+
+interface ItemData {
+  node: HTMLElement;
+  container: HTMLElement;
+  size: FazeSize;
+  entered: boolean;
 }
 
 /**
@@ -30,7 +37,7 @@ enum SideDirection {
  */
 interface CallbackData {
   containerNodes: HTMLElement[];
-  itemsNodes: HTMLElement[];
+  itemsData: ItemData[];
 }
 
 /**
@@ -48,8 +55,7 @@ interface CallbackData {
  */
 interface Config {
   direction: SideDirection;
-  phantomElementTag: string;
-  threshold: number;
+  animation: number,
   callbacks: {
     created?: (data: CallbackData) => void;
     beforeDrag?: (data: CallbackData) => void;
@@ -61,7 +67,10 @@ interface Config {
 
 class Drag extends Module {
   // DOM элементы которые перетягиваем
-  private itemsNodes: HTMLElement[];
+  private itemsData: ItemData[];
+
+  // Флаг перетаскивания
+  // private isDragging: boolean;
 
   // DOM элемент переносимого элемента
   dragItemNode?: HTMLElement;
@@ -69,9 +78,8 @@ class Drag extends Module {
   constructor(nodes: HTMLElement[], config: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
-      direction: SideDirection.vertical,
-      phantomElementTag: 'div',
-      threshold: 25,
+      direction: SideDirection.Vertical,
+      animation: 200,
       callbacks: {
         created: undefined,
         changed: undefined,
@@ -94,21 +102,22 @@ class Drag extends Module {
 
     // Инициализация переменных
     this.watchSelector = `[data-faze-uid="${this.uid}"] [data-faze-drag="item"]`;
+    // this.isDragging = false;
 
     // Инициализация переменных
     this.collectItems();
     this.dragItemNode = undefined;
 
     // Инициализация элементов
-    this.initializeItemsIndexes();
-    this.initializeItemsPositions();
+    this.initializeItems();
+    // this.initializeItemsAttributes();
 
     // Исполняем пользовательский метод после инициализации
     if (typeof this.config.callbacks.created === 'function') {
       try {
         this.config.callbacks.created({
           containerNodes: this.nodes,
-          itemsNodes: this.itemsNodes,
+          itemsData: this.itemsData,
         });
       } catch (error) {
         this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
@@ -122,35 +131,102 @@ class Drag extends Module {
    * @private
    */
   private collectItems() {
-    this.itemsNodes = [];
+    this.itemsData = [];
     this.nodes.forEach((node: HTMLElement) => {
-      this.itemsNodes.push(...Array.from(node.querySelectorAll<HTMLElement>('.faze-drag-item, [data-faze-drag="item"]')));
+      this.itemsData.push(
+        ...Array.from(
+          node.querySelectorAll<HTMLElement>('.faze-drag-item, [data-faze-drag="item"]'))
+          .map((itemNode: HTMLElement) => ({
+            node: itemNode,
+            container: node,
+            size: Faze.Helpers.getElementSize(itemNode),
+            entered: false,
+          }))
+      );
     });
   }
 
   /**
-   * Простановка индексов для элементов
+   * Инициализация элементов
    *
    * @private
    */
-  private initializeItemsIndexes(): void {
-    this.itemsNodes.forEach((itemNode: HTMLElement, itemIndex: number) => {
-      itemNode.dataset.fazeDragIndex = itemIndex.toString();
-    });
+  private initializeItems(): void {
+
   }
 
-  /**
-   * Простановка позиций для элементов
-   *
-   * @private
-   */
-  private initializeItemsPositions(): void {
-    this.itemsNodes.forEach((itemNode: HTMLElement) => {
-      const computedStyles = window.getComputedStyle(itemNode);
+  public move(itemData: ItemData, fromIndex: number, toIndex: number): void {
+    if (itemData.entered) {
+      return;
+    }
+    this.moveStep(itemData, fromIndex, toIndex, fromIndex > toIndex);
+  }
 
-      itemNode.dataset.fazeDragItemPositionX = (itemNode.offsetLeft - parseInt(computedStyles.marginLeft, 10)).toString();
-      itemNode.dataset.fazeDragItemPositionY = (itemNode.offsetTop - parseInt(computedStyles.marginTop, 10)).toString();
-    });
+  private moveStep(itemData: ItemData, fromIndex: number, toIndex: number, direction: boolean): void {
+    // Устанавливаем флаг
+    itemData.entered = true;
+
+    if (!direction) {
+      // Ищем элемент на который перетаскиваем
+      const underItemData = this.itemsData
+        .filter((tmpData) => tmpData.container === itemData.container)
+        .at(toIndex);
+
+      // Если не нашли, то ничего не делаем
+      if (!underItemData) {
+        return;
+      }
+
+      // Делаем выборку какие элементы передвигаем
+      const itemsToMove = this.itemsData
+        .filter((tmpData) => tmpData.container === itemData.container)
+        .slice(fromIndex + 1, toIndex + 1);
+
+      // Передвигаем
+      itemsToMove.forEach((tmpData) => {
+        const heightToMove = Faze.Helpers.getElementSize(tmpData.node.previousElementSibling).height;
+
+        tmpData.node.style.transition = `transform ${this.config.animation}ms ease-in-out`;
+        tmpData.node.style.transform = `translate3d(0, -${heightToMove}px, 0)`;
+      });
+
+      // Вычисляем высоту(путь) для движения перетаскиваемого элемента
+      const heightToMove = this.getHeightBetweenItems(itemData.container, fromIndex, toIndex);
+
+      // Перетаскиваем
+      itemData.node.style.transition = `transform ${this.config.animation}ms ease-in-out`;
+      itemData.node.style.transform = `translate3d(0, ${heightToMove}px, 0)`;
+
+      // Перемещение элементов в DOM после анимации
+      setTimeout(() => {
+        Faze.DOM.insertAfter(itemData.node, underItemData.node);
+
+        itemsToMove.forEach((tmpData) => {
+          tmpData.node.style.transition = 'none';
+          tmpData.node.style.transform = 'none';
+        });
+
+        itemData.node.style.transition = 'none';
+        itemData.node.style.transform = 'none';
+
+        this.collectItems();
+      }, this.config.animation);
+    } else {
+      const itemsToMove = this.itemsData
+        .filter((tmpData) => tmpData.container === itemData.container)
+        .slice(toIndex, fromIndex)
+
+
+      console.log(fromIndex, toIndex);
+      console.log(itemsToMove);
+    }
+  }
+
+  private getHeightBetweenItems(container: HTMLElement, fromIndex: number, toIndex: number): number {
+    return this.itemsData
+      .filter((itemData) => itemData.container === container)
+      .slice(fromIndex + 1, toIndex + 1)
+      .reduce((acc, itemData) => acc + Faze.Helpers.getElementSize(itemData.node).height, 0);
   }
 
   /**
@@ -159,9 +235,79 @@ class Drag extends Module {
   protected bind(): void {
     super.bind();
 
-    this.itemsNodes.forEach((itemNode: HTMLElement) => {
-      this.bindDrag(itemNode);
+    // Навешиваем перетаскиваемые элементы
+    this.itemsData.forEach((itemData: ItemData) => {
+      this.bindDrag(itemData);
     });
+
+    Faze.Events.listener('dragenter', this.nodes, (event: DragEvent) => {
+      const draggingItemData = this.itemsData.find((item: ItemData) => item.node.classList.contains('faze-dragging'));
+      if (!draggingItemData) {
+        return;
+      }
+
+      // Ищем элемент на который перетащили
+      const underItemData = this.itemsData.find((item: ItemData) => item.node === event.target);
+
+      // Если не нашли, то ничего не делаем
+      if (underItemData === draggingItemData) {
+        return;
+      }
+
+      // Если перетаскиваемый элемент не нашли, то ничего не делаем
+      if (underItemData) {
+        // Ищем индекс на кого перетаскиваем
+        const underItemIndex = this.itemsData
+          .filter(tmpData => tmpData.container === underItemData.container)
+          .indexOf(underItemData);
+
+        // Если не нашли индекс, то ничего не делаем
+        if (underItemIndex === -1) {
+          return;
+        }
+
+        // Ищем индекс перетаскиваемого
+        const overItemIndex = this.itemsData
+          .filter(tmpData => tmpData.container === draggingItemData.container)
+          .indexOf(draggingItemData);
+
+        // Если не нашли индекс, то ничего не делаем
+        if (overItemIndex === -1) {
+          return;
+        }
+
+        this.move(draggingItemData, overItemIndex, underItemIndex);
+      }
+    }, false);
+
+    setTimeout(() => {
+      this.move(this.itemsData[0], 4, 2);
+    }, 1000);
+  }
+
+  private bindDrag(itemData: ItemData): void {
+    // DOM элемент ручки для перетаскивания, если её нет, то считаем весь элемент ею
+    const handleNode: HTMLElement = itemData.node.querySelector('.faze-drag-handle, [data-faze-drag="handle"]') || itemData.node;
+    handleNode.draggable = true;
+
+    Faze.Events.listener('dragstart', handleNode, (event: DragEvent) => {
+      // Создаём полную копию элемента
+      const ghost: HTMLElement = itemData.node.cloneNode(true) as HTMLElement;
+      ghost.style.position = 'absolute';
+      ghost.style.top = '-9999px';
+      ghost.style.width = `${itemData.node.clientWidth}px`;
+      ghost.style.height = `${itemData.node.clientHeight}px`;
+      document.body.appendChild(ghost);
+
+      // Устанавливаем как drag image
+      event.dataTransfer?.setDragImage(ghost, 0, 0);
+
+      // Добавляем класс
+      itemData.node.classList.add('faze-dragging');
+
+      // Удаляем через кадр (после старта драга)
+      requestAnimationFrame(() => ghost.remove());
+    }, false);
   }
 
   /**
@@ -175,244 +321,7 @@ class Drag extends Module {
     this.bind();
 
     // Инициализация элементов
-    this.initializeItemsIndexes();
-    this.initializeItemsPositions();
-  }
-
-  private updatePhantomNodeStyles(draggedItemNode: HTMLElement, phantomNode: HTMLElement) {
-    // Получаем стили
-    const computedStyles = window.getComputedStyle(draggedItemNode, null);
-    phantomNode.style.marginTop = computedStyles.marginTop;
-    phantomNode.style.marginBottom = computedStyles.marginBottom;
-    phantomNode.style.marginLeft = computedStyles.marginLeft;
-    phantomNode.style.marginRight = computedStyles.marginRight;
-    phantomNode.style.width = `${draggedItemNode.getBoundingClientRect().width}px`;
-    phantomNode.style.height = `${draggedItemNode.getBoundingClientRect().height}px`;
-  }
-
-  /**
-   * Навешивание событий и управление перетаскиванием модального окна
-   *
-   * @private
-   */
-  private bindDrag(itemNode: HTMLElement): void {
-    // DOM элемент переносимого элемента
-    const draggedItemNode = itemNode;
-
-    // DOM элемент ручки для перетаскивания, если её нет, то считаем весь элемент ею
-    const handleNode: HTMLElement = itemNode.querySelector('.faze-drag-handle, [data-faze-drag="handle"]') || itemNode;
-
-    // Начальная позиция мыши
-    const startMousePosition = {
-      x: 0,
-      y: 0,
-    };
-
-    // Конечная позиция мыши
-    const endMousePosition = {
-      x: 0,
-      y: 0,
-    };
-
-    // Изначальные стили элемента, которые в момент перетаскивания будут изменяться и необходимо будет их восстановить в изначальный вид
-    const initialDraggedItemStyles = {
-      width: draggedItemNode.style.width,
-      height: draggedItemNode.style.height,
-      position: draggedItemNode.style.position,
-      top: draggedItemNode.style.top,
-      left: draggedItemNode.style.left,
-    };
-
-    // Стартовые размеры элемента
-    const width = draggedItemNode.getBoundingClientRect().width;
-    const height = draggedItemNode.getBoundingClientRect().height;
-
-    // Создаем фантомный элемент для замены "взятого", т.к. он станет абсолютом при драге
-    const phantomNode = document.createElement(this.config.phantomElementTag);
-    phantomNode.className = 'faze-drag-item-phantom';
-    this.updatePhantomNodeStyles(draggedItemNode, phantomNode);
-
-    /**
-     * Функция нажатия на шапку для начала перетаскивания, навешиваем все необходимые обработчики и вычисляем начальную точку нажатия
-     *
-     * @param event - событие мыши
-     */
-    const dragMouseDown = (event: MouseEvent) => {
-      event.preventDefault();
-
-      // Обновляем стили фантомного элемента
-      this.updatePhantomNodeStyles(draggedItemNode, phantomNode);
-
-      // Получение позиции курсора при нажатии на элемент
-      startMousePosition.x = event.clientX;
-      startMousePosition.y = event.clientY;
-
-      // Проставляем стили для возможности передвигать элемент мышкой
-      draggedItemNode.style.position = 'absolute';
-      draggedItemNode.style.width = `${width}px`;
-      draggedItemNode.style.height = `${height}px`;
-      draggedItemNode.style.left = `${draggedItemNode.dataset.fazeDragItemPositionX}px`;
-      draggedItemNode.style.top = `${draggedItemNode.dataset.fazeDragItemPositionY}px`;
-
-      // Ставим класс, показывающий, что это движемый элемент
-      draggedItemNode.classList.add('faze-drag-item-moving');
-
-      // Вставляем фантомный элемент под текущим
-      if (draggedItemNode.parentNode) {
-        draggedItemNode.parentNode.insertBefore(phantomNode, draggedItemNode.nextSibling);
-      }
-
-      document.addEventListener('mouseup', endDragElement);
-      document.addEventListener('mousemove', elementDrag);
-
-      // Исполняем пользовательский метод после инициализации
-      if (typeof this.config.callbacks.beforeDrag === 'function') {
-        try {
-          this.config.callbacks.beforeDrag({
-            containerNodes: this.nodes,
-            itemsNodes: this.itemsNodes,
-          });
-        } catch (error) {
-          this.logger.error(`Ошибка исполнения пользовательского метода "beforeDragged": ${error}`);
-        }
-      }
-    };
-
-    /**
-     * Функция перетаскивания модального окна.
-     * Тут идет расчет координат и они присваиваются окну через стили "top" и "left", окно в таком случае естественно должно иметь
-     * позиционирование "absolute"
-     *
-     * @param event - событие мыши
-     */
-    const elementDrag = (event: MouseEvent) => {
-      event.preventDefault();
-
-      // Рассчет новой позиции курсора
-      endMousePosition.x = startMousePosition.x - event.clientX;
-      endMousePosition.y = startMousePosition.y - event.clientY;
-      startMousePosition.x = event.clientX;
-      startMousePosition.y = event.clientY;
-
-      // Рассчет новой позиции элемента
-      const x = parseInt(draggedItemNode.dataset.fazeDragItemPositionX || '0', 10) - endMousePosition.x;
-      draggedItemNode.style.left = `${x}px`;
-      draggedItemNode.dataset.fazeDragItemPositionX = x.toString();
-
-      const y = parseInt(draggedItemNode.dataset.fazeDragItemPositionY || '0', 10) - endMousePosition.y;
-      draggedItemNode.style.top = `${y}px`;
-      draggedItemNode.dataset.fazeDragItemPositionY = y.toString();
-
-      Array.from(this.itemsNodes)
-        .filter((itemNode) => !itemNode.classList.contains('faze-drag-item-moving'))
-        .forEach((itemNode: HTMLElement) => {
-          // Получаем результаты наведения на элемент мышкой
-          const mouseOverResult = Faze.Helpers.isMouseOver(
-            event,
-            itemNode,
-            {
-              horizontal: true,
-              horizontalThreshold: this.config.threshold,
-              vertical: true,
-              verticalThreshold: this.config.threshold
-            }
-          );
-
-          if (itemNode.parentNode) {
-            if (this.config.direction === SideDirection.horizontal) {
-              // Если навели на нижнюю часть блока, то вставляем снизу
-              if (mouseOverResult.sides.right) {
-                itemNode.parentNode.insertBefore(phantomNode, itemNode);
-              } else if (mouseOverResult.sides.left) {
-                // Если на верхнюю, то сверху
-                itemNode.parentNode.insertBefore(phantomNode, itemNode.nextSibling);
-              }
-            } else {
-              // Если навели на нижнюю часть блока, то вставляем снизу
-              if (mouseOverResult.sides.bottom) {
-                itemNode.parentNode.insertBefore(phantomNode, itemNode);
-              } else if (mouseOverResult.sides.top) {
-                // Если на верхнюю, то сверху
-                itemNode.parentNode.insertBefore(phantomNode, itemNode.nextElementSibling);
-
-              }
-            }
-          }
-        });
-
-      // Исполняем пользовательский метод после инициализации
-      if (typeof this.config.callbacks.drag === 'function') {
-        try {
-          this.config.callbacks.drag({
-            containerNodes: this.nodes,
-            itemsNodes: this.itemsNodes,
-          });
-        } catch (error) {
-          this.logger.error(`Ошибка исполнения пользовательского метода "drag": ${error}`);
-        }
-      }
-    };
-
-    /**
-     * Завершение перетаскивания(момент отпускания кнопки мыши)
-     */
-    const endDragElement = () => {
-      // Перемещаем элемент после фантомного
-      if (phantomNode.parentNode) {
-        phantomNode.parentNode.insertBefore(draggedItemNode, phantomNode.nextSibling);
-      }
-
-      // Снимаем класс движения
-      draggedItemNode.classList.remove('faze-drag-item-moving');
-
-      // Возвращаем стили сохранённые до начала перетаскивания элемента
-      draggedItemNode.style.width = initialDraggedItemStyles.width;
-      draggedItemNode.style.height = initialDraggedItemStyles.height;
-      draggedItemNode.style.position = initialDraggedItemStyles.position;
-      draggedItemNode.style.top = initialDraggedItemStyles.top;
-      draggedItemNode.style.left = initialDraggedItemStyles.left;
-
-      // Удаляем фантомный элемент
-      phantomNode.remove();
-
-      // Переинициализируем индексы элементов, т.к. порядок может быть нарушен перетаскиванием
-      this.initializeItemsIndexes();
-
-      // Так же переинициализируем позиции элементов, т.к. если изменение произошло, то позиции сдвинулись
-      this.initializeItemsPositions();
-
-      // Удаляем все связанные события
-      document.removeEventListener('mouseup', endDragElement);
-      document.removeEventListener('mousemove', elementDrag);
-
-      // Исполняем пользовательский метод после перетаскивания
-      if (typeof this.config.callbacks.changed === 'function') {
-        try {
-          this.config.callbacks.changed({
-            containerNodes: this.nodes,
-            itemsNodes: this.itemsNodes,
-          });
-        } catch (error) {
-          this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
-        }
-      }
-
-      // Исполняем пользовательский метод после инициализации
-      if (typeof this.config.callbacks.afterDrag === 'function') {
-        try {
-          this.config.callbacks.afterDrag({
-            containerNodes: this.nodes,
-            itemsNodes: this.itemsNodes,
-          });
-        } catch (error) {
-          this.logger.error(`Ошибка исполнения пользовательского метода "beforeDragged": ${error}`);
-        }
-      }
-    };
-
-    // Навешиваем событие перетаскивания окна по нажатию на его заголовок
-    // handleNode.addEventListener('mousedown', dragMouseDown);
-    Faze.Events.listener('mousedown', handleNode, dragMouseDown);
+    this.initializeItems();
   }
 
   /**
@@ -425,9 +334,8 @@ class Drag extends Module {
 
     const dragContainerNodes = group ? Array.from(document.querySelectorAll(`[data-faze~="drag"][data-faze-drag-group=${group}]`)) : [dragNode];
     new Faze.Drag(dragContainerNodes, {
-      threshold: dragNode.dataset.fazeDragThreshold ? Number(dragNode.dataset.fazeDragThreshold) : 25,
-      direction: dragNode.dataset.fazeDragDirection === 'horizontal' ? SideDirection.horizontal : SideDirection.vertical,
-      phantomElementTag: dragNode.dataset.fazeDragPhantomElementTag || 'div',
+      animation: dragNode.dataset.fazeDragAnimation ? Number(dragNode.dataset.fazeDragAnimation) : 200,
+      direction: dragNode.dataset.fazeDragDirection === 'horizontal' ? SideDirection.Horizontal : SideDirection.Vertical,
     });
   }
 }

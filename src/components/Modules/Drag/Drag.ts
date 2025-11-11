@@ -212,13 +212,49 @@ class Drag extends Module {
         this.collectItems();
       }, this.config.animation);
     } else {
+      // Ищем элемент на который перетаскиваем
+      const underItemData = this.itemsData
+        .filter((tmpData) => tmpData.container === itemData.container)
+        .at(toIndex);
+
+      // Если не нашли, то ничего не делаем
+      if (!underItemData) {
+        return;
+      }
+
       const itemsToMove = this.itemsData
         .filter((tmpData) => tmpData.container === itemData.container)
         .slice(toIndex, fromIndex)
 
+      // Передвигаем
+      itemsToMove.forEach((tmpData) => {
+        const heightToMove = Faze.Helpers.getElementSize(tmpData.node.nextElementSibling).height;
 
-      console.log(fromIndex, toIndex);
-      console.log(itemsToMove);
+        tmpData.node.style.transition = `transform ${this.config.animation}ms ease-in-out`;
+        tmpData.node.style.transform = `translate3d(0, ${heightToMove}px, 0)`;
+      });
+
+      // Вычисляем высоту(путь) для движения перетаскиваемого элемента
+      const heightToMove = this.getHeightBetweenItems(itemData.container, toIndex, fromIndex);
+
+      // Перетаскиваем
+      itemData.node.style.transition = `transform ${this.config.animation}ms ease-in-out`;
+      itemData.node.style.transform = `translate3d(0, -${heightToMove}px, 0)`;
+
+      // Перемещение элементов в DOM после анимации
+      setTimeout(() => {
+        Faze.DOM.insertAfter(underItemData.node, itemData.node);
+
+        itemsToMove.forEach((tmpData) => {
+          tmpData.node.style.transition = 'none';
+          tmpData.node.style.transform = 'none';
+        });
+
+        itemData.node.style.transition = 'none';
+        itemData.node.style.transform = 'none';
+
+        this.collectItems();
+      }, this.config.animation);
     }
   }
 
@@ -280,9 +316,9 @@ class Drag extends Module {
       }
     }, false);
 
-    setTimeout(() => {
-      this.move(this.itemsData[0], 4, 2);
-    }, 1000);
+    // setTimeout(() => {
+    //   this.move(this.itemsData[4], 4, 2);
+    // }, 1000);
   }
 
   private bindDrag(itemData: ItemData): void {

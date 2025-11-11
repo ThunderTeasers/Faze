@@ -159,103 +159,71 @@ class Drag extends Module {
     if (itemData.entered) {
       return;
     }
-    this.moveStep(itemData, fromIndex, toIndex, fromIndex > toIndex);
-  }
 
-  private moveStep(itemData: ItemData, fromIndex: number, toIndex: number, direction: boolean): void {
     // Устанавливаем флаг
     itemData.entered = true;
 
-    if (!direction) {
-      // Ищем элемент на который перетаскиваем
-      const underItemData = this.itemsData
-        .filter((tmpData) => tmpData.container === itemData.container)
-        .at(toIndex);
+    // Проверяем в какую сторону перетаскиваем
+    const isDescending = toIndex > fromIndex;
 
-      // Если не нашли, то ничего не делаем
-      if (!underItemData) {
-        return;
-      }
+    // Ищем элемент на который перетаскиваем
+    const underItemData = this.itemsData
+      .filter((tmpData) => tmpData.container === itemData.container)
+      .at(toIndex);
 
-      // Делаем выборку какие элементы передвигаем
-      const itemsToMove = this.itemsData
-        .filter((tmpData) => tmpData.container === itemData.container)
-        .slice(fromIndex + 1, toIndex + 1);
-
-      // Передвигаем
-      itemsToMove.forEach((tmpData) => {
-        const heightToMove = Faze.Helpers.getElementSize(tmpData.node.previousElementSibling).height;
-
-        tmpData.node.style.transition = `transform ${this.config.animation}ms ease-in-out`;
-        tmpData.node.style.transform = `translate3d(0, -${heightToMove}px, 0)`;
-      });
-
-      // Вычисляем высоту(путь) для движения перетаскиваемого элемента
-      const heightToMove = this.getHeightBetweenItems(itemData.container, fromIndex, toIndex);
-
-      // Перетаскиваем
-      itemData.node.style.transition = `transform ${this.config.animation}ms ease-in-out`;
-      itemData.node.style.transform = `translate3d(0, ${heightToMove}px, 0)`;
-
-      // Перемещение элементов в DOM после анимации
-      setTimeout(() => {
-        Faze.DOM.insertAfter(itemData.node, underItemData.node);
-
-        itemsToMove.forEach((tmpData) => {
-          tmpData.node.style.transition = 'none';
-          tmpData.node.style.transform = 'none';
-        });
-
-        itemData.node.style.transition = 'none';
-        itemData.node.style.transform = 'none';
-
-        this.collectItems();
-      }, this.config.animation);
-    } else {
-      // Ищем элемент на который перетаскиваем
-      const underItemData = this.itemsData
-        .filter((tmpData) => tmpData.container === itemData.container)
-        .at(toIndex);
-
-      // Если не нашли, то ничего не делаем
-      if (!underItemData) {
-        return;
-      }
-
-      const itemsToMove = this.itemsData
-        .filter((tmpData) => tmpData.container === itemData.container)
-        .slice(toIndex, fromIndex)
-
-      // Передвигаем
-      itemsToMove.forEach((tmpData) => {
-        const heightToMove = Faze.Helpers.getElementSize(tmpData.node.nextElementSibling).height;
-
-        tmpData.node.style.transition = `transform ${this.config.animation}ms ease-in-out`;
-        tmpData.node.style.transform = `translate3d(0, ${heightToMove}px, 0)`;
-      });
-
-      // Вычисляем высоту(путь) для движения перетаскиваемого элемента
-      const heightToMove = this.getHeightBetweenItems(itemData.container, toIndex, fromIndex);
-
-      // Перетаскиваем
-      itemData.node.style.transition = `transform ${this.config.animation}ms ease-in-out`;
-      itemData.node.style.transform = `translate3d(0, -${heightToMove}px, 0)`;
-
-      // Перемещение элементов в DOM после анимации
-      setTimeout(() => {
-        Faze.DOM.insertAfter(underItemData.node, itemData.node);
-
-        itemsToMove.forEach((tmpData) => {
-          tmpData.node.style.transition = 'none';
-          tmpData.node.style.transform = 'none';
-        });
-
-        itemData.node.style.transition = 'none';
-        itemData.node.style.transform = 'none';
-
-        this.collectItems();
-      }, this.config.animation);
+    // Если не нашли, то ничего не делаем
+    if (!underItemData) {
+      return;
     }
+
+    // Делаем выборку какие элементы передвигаем
+    let itemsToMove = this.itemsData
+      .filter((tmpData) => tmpData.container === itemData.container);
+
+    if (isDescending) {
+      itemsToMove = itemsToMove.slice(fromIndex + 1, toIndex + 1);
+    } else {
+      itemsToMove = itemsToMove.slice(toIndex, fromIndex);
+    }
+
+    // Передвигаем
+    itemsToMove.forEach((tmpData) => {
+      const heightToMove = Faze.Helpers.getElementSize(isDescending ? tmpData.node.previousElementSibling : tmpData.node.nextElementSibling).height;
+
+      tmpData.node.style.transition = `transform ${this.config.animation}ms ease-in-out`;
+      tmpData.node.style.transform = `translate3d(0, ${isDescending ? -heightToMove : heightToMove}px, 0)`;
+    });
+
+    // Вычисляем высоту(путь) для движения перетаскиваемого элемента
+    let heightToMove = 0;
+    if (isDescending) {
+      heightToMove = this.getHeightBetweenItems(itemData.container, fromIndex, toIndex);
+    } else {
+      heightToMove = this.getHeightBetweenItems(itemData.container, toIndex, fromIndex);
+    }
+
+    // Перетаскиваем
+    itemData.node.style.transition = `transform ${this.config.animation}ms ease-in-out`;
+    itemData.node.style.transform = `translate3d(0, ${isDescending ? heightToMove : -heightToMove}px, 0)`;
+
+    // Перемещение элементов в DOM после анимации
+    setTimeout(() => {
+      if (isDescending) {
+        Faze.DOM.insertAfter(itemData.node, underItemData.node);
+      } else {
+        Faze.DOM.insertAfter(underItemData.node, itemData.node);
+      }
+
+      itemsToMove.forEach((tmpData) => {
+        tmpData.node.style.transition = 'none';
+        tmpData.node.style.transform = 'none';
+      });
+
+      itemData.node.style.transition = 'none';
+      itemData.node.style.transform = 'none';
+
+      this.collectItems();
+    }, this.config.animation);
   }
 
   private getHeightBetweenItems(container: HTMLElement, fromIndex: number, toIndex: number): number {

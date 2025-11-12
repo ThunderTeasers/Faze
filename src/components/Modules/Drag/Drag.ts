@@ -25,7 +25,6 @@ interface ItemData {
   node: HTMLElement;
   container: HTMLElement;
   size: FazeSize;
-  entered: boolean;
 }
 
 /**
@@ -102,6 +101,7 @@ class Drag extends Module {
 
     // Инициализация переменных
     this.watchSelector = `[data-faze-uid="${this.uid}"] [data-faze-drag="item"]`;
+    this.itemsData = [];
     // this.isDragging = false;
 
     // Инициализация переменных
@@ -131,6 +131,8 @@ class Drag extends Module {
    * @private
    */
   private collectItems() {
+    // const oldMap = new Map(this.itemsData.map(d => [d.node, d.entered]));
+
     this.itemsData = [];
     this.nodes.forEach((node: HTMLElement) => {
       this.itemsData.push(
@@ -140,7 +142,6 @@ class Drag extends Module {
             node: itemNode,
             container: node,
             size: Faze.Helpers.getElementSize(itemNode),
-            entered: false,
           }))
       );
     });
@@ -156,13 +157,6 @@ class Drag extends Module {
   }
 
   public move(itemData: ItemData, fromIndex: number, toIndex: number): void {
-    if (itemData.entered) {
-      return;
-    }
-
-    // Устанавливаем флаг
-    itemData.entered = true;
-
     // Проверяем в какую сторону перетаскиваем
     const isDescending = toIndex > fromIndex;
 
@@ -186,12 +180,13 @@ class Drag extends Module {
       itemsToMove = itemsToMove.slice(toIndex, fromIndex);
     }
 
-    // Передвигаем
+    // Моментально передвигаем их на своё же место, т.к. в следующий момент они будут сдвинуты
     itemsToMove.forEach((tmpData) => {
-      const heightToMove = Faze.Helpers.getElementSize(isDescending ? tmpData.node.previousElementSibling : tmpData.node.nextElementSibling).height;
+      const heightToMove = Faze.Helpers.getElementSize(isDescending ? tmpData.node : tmpData.node).height;
 
-      tmpData.node.style.transition = `transform ${this.config.animation}ms ease-in-out`;
-      tmpData.node.style.transform = `translate3d(0, ${isDescending ? -heightToMove : heightToMove}px, 0)`;
+      tmpData.node.style.transition = 'none';
+      tmpData.node.style.transform = `translate3d(0, ${isDescending ? heightToMove : -heightToMove}px, 0)`;
+      tmpData.node.style.pointerEvents = 'none';
     });
 
     // Вычисляем высоту(путь) для движения перетаскиваемого элемента
@@ -202,27 +197,32 @@ class Drag extends Module {
       heightToMove = this.getHeightBetweenItems(itemData.container, toIndex, fromIndex);
     }
 
-    // Перетаскиваем
-    itemData.node.style.transition = `transform ${this.config.animation}ms ease-in-out`;
-    itemData.node.style.transform = `translate3d(0, ${isDescending ? heightToMove : -heightToMove}px, 0)`;
+    // Моментально передвигаем их на своё же место, т.к. в следующий момент они будет сдвинут
+    itemData.node.style.transition = 'none';
+    itemData.node.style.transform = `translate3d(0, ${isDescending ? -heightToMove : heightToMove}px, 0)`;
 
-    // Перемещение элементов в DOM после анимации
-    setTimeout(() => {
-      if (isDescending) {
-        Faze.DOM.insertAfter(itemData.node, underItemData.node);
-      } else {
-        Faze.DOM.insertAfter(underItemData.node, itemData.node);
-      }
+    // Переносим
+    if (isDescending) {
+      Faze.DOM.insertAfter(itemData.node, underItemData.node);
+    } else {
+      Faze.DOM.insertAfter(underItemData.node, itemData.node);
+    }
 
+    // Передвигаем
+    requestAnimationFrame(() => {
       itemsToMove.forEach((tmpData) => {
-        tmpData.node.style.transition = 'none';
-        tmpData.node.style.transform = 'none';
+        tmpData.node.style.transition = `transform ${this.config.animation}ms ease-in-out`;
+        tmpData.node.style.transform = `translate3d(0, 0, 0)`;
       });
 
-      itemData.node.style.transition = 'none';
-      itemData.node.style.transform = 'none';
+      itemData.node.style.transition = `transform ${this.config.animation}ms ease-in-out`;
+      itemData.node.style.transform = `translate3d(0, 0, 0)`;
+    });
 
-      this.collectItems();
+    setTimeout(() => {
+      itemsToMove.forEach((tmpData) => {
+        tmpData.node.style.pointerEvents = 'auto';
+      });
     }, this.config.animation);
   }
 
@@ -284,9 +284,11 @@ class Drag extends Module {
       }
     }, false);
 
-    // setTimeout(() => {
-    //   this.move(this.itemsData[4], 4, 2);
-    // }, 1000);
+    Faze.Events.listener('dragend', this.nodes, (event: DragEvent) => {
+      this.itemsData.forEach((itemData: ItemData) => {
+        itemData.node.classList.remove('faze-dragging');
+      });
+    });
   }
 
   private bindDrag(itemData: ItemData): void {
@@ -321,11 +323,7 @@ class Drag extends Module {
    */
   protected reinitialize(data: HTMLElement): void {
     this.collectItems();
-
     this.bind();
-
-    // Инициализация элементов
-    this.initializeItems();
   }
 
   /**

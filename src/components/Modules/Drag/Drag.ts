@@ -286,7 +286,39 @@ class Drag extends Module {
           return;
         }
 
+        // Перемещаем
         this.move(draggingItemData, overItemIndex, underItemIndex);
+      }
+    }, false);
+
+    Faze.Events.listener('dragstart', this.nodes, (event: DragEvent) => {
+      if (event.target instanceof HTMLElement && (event.target as HTMLElement)?.closest('[data-faze-drag="item"], [data-faze-drag="handle"]')) {
+        const itemNode = (event.target as HTMLElement).closest('[data-faze-drag="item"]');
+        if (!itemNode) {
+          return;
+        }
+
+        const itemData = this.itemsData.find((item: ItemData) => item.node === itemNode);
+        if (!itemData) {
+          return;
+        }
+
+        // Создаём полную копию элемента
+        const ghost: HTMLElement = itemData.node.cloneNode(true) as HTMLElement;
+        ghost.style.position = 'absolute';
+        ghost.style.top = '-9999px';
+        ghost.style.width = `${itemData.node.clientWidth}px`;
+        ghost.style.height = `${itemData.node.clientHeight}px`;
+        document.body.appendChild(ghost);
+
+        // Устанавливаем как drag image
+        event.dataTransfer?.setDragImage(ghost, 0, 0);
+
+        // Добавляем класс
+        itemData.node.classList.add('faze-dragging');
+
+        // Удаляем через кадр (после старта драга)
+        requestAnimationFrame(() => ghost.remove());
       }
     }, false);
 
@@ -309,25 +341,6 @@ class Drag extends Module {
     // DOM элемент ручки для перетаскивания, если её нет, то считаем весь элемент ею
     const handleNode: HTMLElement = itemData.node.querySelector('.faze-drag-handle, [data-faze-drag="handle"]') || itemData.node;
     handleNode.draggable = true;
-
-    Faze.Events.listener('dragstart', handleNode, (event: DragEvent) => {
-      // Создаём полную копию элемента
-      const ghost: HTMLElement = itemData.node.cloneNode(true) as HTMLElement;
-      ghost.style.position = 'absolute';
-      ghost.style.top = '-9999px';
-      ghost.style.width = `${itemData.node.clientWidth}px`;
-      ghost.style.height = `${itemData.node.clientHeight}px`;
-      document.body.appendChild(ghost);
-
-      // Устанавливаем как drag image
-      event.dataTransfer?.setDragImage(ghost, 0, 0);
-
-      // Добавляем класс
-      itemData.node.classList.add('faze-dragging');
-
-      // Удаляем через кадр (после старта драга)
-      requestAnimationFrame(() => ghost.remove());
-    }, false);
   }
 
   /**

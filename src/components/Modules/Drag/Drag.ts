@@ -68,9 +68,6 @@ class Drag extends Module {
   // DOM элементы которые перетягиваем
   private itemsData: ItemData[];
 
-  // Флаг перетаскивания
-  // private isDragging: boolean;
-
   // DOM элемент переносимого элемента
   dragItemNode?: HTMLElement;
 
@@ -95,6 +92,8 @@ class Drag extends Module {
 
   /**
    * Инициализация
+   * 
+   * @protected
    */
   protected initialize(): void {
     super.initialize();
@@ -102,15 +101,10 @@ class Drag extends Module {
     // Инициализация переменных
     this.watchSelector = `[data-faze-uid="${this.uid}"] [data-faze-drag="item"]`;
     this.itemsData = [];
-    // this.isDragging = false;
 
     // Инициализация переменных
     this.collectItems();
     this.dragItemNode = undefined;
-
-    // Инициализация элементов
-    this.initializeItems();
-    // this.initializeItemsAttributes();
 
     // Исполняем пользовательский метод после инициализации
     if (typeof this.config.callbacks.created === 'function') {
@@ -131,8 +125,6 @@ class Drag extends Module {
    * @private
    */
   private collectItems() {
-    // const oldMap = new Map(this.itemsData.map(d => [d.node, d.entered]));
-
     this.itemsData = [];
     this.nodes.forEach((node: HTMLElement) => {
       this.itemsData.push(
@@ -148,14 +140,14 @@ class Drag extends Module {
   }
 
   /**
-   * Инициализация элементов
+   * Перемещает элемент на новое место
    *
-   * @private
+   * @param {ItemData} itemData Данные перетаскиваемого элемента
+   * @param {number} fromIndex Индекс с которого начинаем перетаскивание
+   * @param {number} toIndex Индекс на который происходит перетаскивание
+   * 
+   * @public
    */
-  private initializeItems(): void {
-
-  }
-
   public move(itemData: ItemData, fromIndex: number, toIndex: number): void {
     // Проверяем в какую сторону перетаскиваем
     const isDescending = toIndex > fromIndex;
@@ -174,6 +166,7 @@ class Drag extends Module {
     let itemsToMove = this.itemsData
       .filter((tmpData) => tmpData.container === itemData.container);
 
+    // Получаем только нужные для работы элементы
     if (isDescending) {
       itemsToMove = itemsToMove.slice(fromIndex + 1, toIndex + 1);
     } else {
@@ -219,6 +212,7 @@ class Drag extends Module {
       itemData.node.style.transform = `translate3d(0, 0, 0)`;
     });
 
+    // Возвращаем возможность принимать перетаскивание на себя
     setTimeout(() => {
       itemsToMove.forEach((tmpData) => {
         tmpData.node.style.pointerEvents = 'auto';
@@ -226,6 +220,16 @@ class Drag extends Module {
     }, this.config.animation);
   }
 
+  /**
+   * Вычисляет сумму высот элементов между двумя индексами (не включая их)
+   * 
+   * @param {HTMLElement} container Контейнер, в котором лежат элементы
+   * @param {number} fromIndex Начальный индекс
+   * @param {number} toIndex Конечный индекс
+   * @return {number} Сумма высот элементов между двумя индексами
+   * 
+   * @private
+   */
   private getHeightBetweenItems(container: HTMLElement, fromIndex: number, toIndex: number): number {
     return this.itemsData
       .filter((itemData) => itemData.container === container)
@@ -235,6 +239,8 @@ class Drag extends Module {
 
   /**
    * Навешивание событий
+   * 
+   * @protected
    */
   protected bind(): void {
     super.bind();
@@ -284,6 +290,7 @@ class Drag extends Module {
       }
     }, false);
 
+    // Убираем класс при окончании перетаскивания
     Faze.Events.listener('dragend', this.nodes, (event: DragEvent) => {
       this.itemsData.forEach((itemData: ItemData) => {
         itemData.node.classList.remove('faze-dragging');
@@ -291,6 +298,13 @@ class Drag extends Module {
     });
   }
 
+  /**
+   * Навешивание перетаскивания для элемента
+   *
+   * @param {ItemData} itemData Данные элемента
+   * 
+   * @private
+   */
   private bindDrag(itemData: ItemData): void {
     // DOM элемент ручки для перетаскивания, если её нет, то считаем весь элемент ею
     const handleNode: HTMLElement = itemData.node.querySelector('.faze-drag-handle, [data-faze-drag="handle"]') || itemData.node;
@@ -318,10 +332,10 @@ class Drag extends Module {
 
   /**
    * Реинициализация
-   *
-   * @param {HTMLElement} data Данные для реинициализации
+   * 
+   * @protected
    */
-  protected reinitialize(data: HTMLElement): void {
+  protected reinitialize(): void {
     this.collectItems();
     this.bind();
   }

@@ -252,6 +252,55 @@ class Drag extends Module {
   protected bind(): void {
     super.bind();
 
+    this.bindDragStart();
+    this.bindDragEnter();
+    this.bindDragEnd();
+  }
+
+  /**
+   * Навешивание событий на начало перетаскивания
+   * 
+   * @private
+   */
+  private bindDragStart(): void {
+    Faze.Events.listener('dragstart', this.nodes, (event: DragEvent) => {
+      if (event.target instanceof HTMLElement && (event.target as HTMLElement)?.closest('[data-faze-drag="item"], [data-faze-drag="handle"]')) {
+        const itemNode = (event.target as HTMLElement).closest('[data-faze-drag="item"]');
+        if (!itemNode) {
+          return;
+        }
+
+        const itemData = this.itemsData.find((item: ItemData) => item.node === itemNode);
+        if (!itemData) {
+          return;
+        }
+
+        // Создаём полную копию элемента
+        const ghost: HTMLElement = itemData.node.cloneNode(true) as HTMLElement;
+        ghost.style.position = 'absolute';
+        ghost.style.top = '-9999px';
+        ghost.style.width = `${itemData.node.clientWidth}px`;
+        ghost.style.height = `${itemData.node.clientHeight}px`;
+        document.body.appendChild(ghost);
+
+        // Устанавливаем как drag image
+        event.dataTransfer?.setDragImage(ghost, 0, 0);
+
+        // Добавляем класс
+        itemData.node.classList.add('faze-dragging');
+
+        // Удаляем через кадр (после старта драга)
+        requestAnimationFrame(() => ghost.remove());
+      }
+    }, false);
+  }
+
+  /**
+   * Навешивание событий на перетаскивание элемента над другим
+   * 
+   * @private
+   */
+  private bindDragEnter(): void {
     Faze.Events.listener('dragenter', this.nodes, (event: DragEvent) => {
       const draggingItemData = this.itemsData.find((item: ItemData) => item.node.classList.contains('faze-dragging'));
       if (!draggingItemData) {
@@ -292,48 +341,19 @@ class Drag extends Module {
         this.move(draggingItemData, overItemIndex, underItemIndex);
       }
     }, false);
+  }
 
-    Faze.Events.listener('dragstart', this.nodes, (event: DragEvent) => {
-      if (event.target instanceof HTMLElement && (event.target as HTMLElement)?.closest('[data-faze-drag="item"], [data-faze-drag="handle"]')) {
-        const itemNode = (event.target as HTMLElement).closest('[data-faze-drag="item"]');
-        if (!itemNode) {
-          return;
-        }
-
-        const itemData = this.itemsData.find((item: ItemData) => item.node === itemNode);
-        if (!itemData) {
-          return;
-        }
-
-        // Создаём полную копию элемента
-        const ghost: HTMLElement = itemData.node.cloneNode(true) as HTMLElement;
-        ghost.style.position = 'absolute';
-        ghost.style.top = '-9999px';
-        ghost.style.width = `${itemData.node.clientWidth}px`;
-        ghost.style.height = `${itemData.node.clientHeight}px`;
-        document.body.appendChild(ghost);
-
-        // Устанавливаем как drag image
-        event.dataTransfer?.setDragImage(ghost, 0, 0);
-
-        // Добавляем класс
-        itemData.node.classList.add('faze-dragging');
-
-        // Удаляем через кадр (после старта драга)
-        requestAnimationFrame(() => ghost.remove());
-      }
-    }, false);
-
-    // Убираем класс при окончании перетаскивания
+  /**
+   * Навешивание события на конец перетаскивания
+   * 
+   * @private
+   */
+  private bindDragEnd(): void {
     Faze.Events.listener('dragend', this.nodes, (event: DragEvent) => {
       this.itemsData.forEach((itemData: ItemData) => {
         itemData.node.classList.remove('faze-dragging');
       });
     });
-
-    setTimeout(() => {
-      // this.move(this.itemsData[0], 0, 1);
-    }, 1000)
   }
 
   /**

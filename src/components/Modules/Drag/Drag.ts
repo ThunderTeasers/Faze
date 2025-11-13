@@ -149,8 +149,11 @@ class Drag extends Module {
    * @public
    */
   public move(itemData: ItemData, fromIndex: number, toIndex: number): void {
-    // Проверяем в какую сторону перетаскиваем
+    // "Вперёд" или "назад"
     const isDescending = toIndex > fromIndex;
+
+    // Горизонтально или вертикально
+    const isHorizontal = this.config.direction === SideDirection.Horizontal;
 
     // Ищем элемент на который перетаскиваем
     const underItemData = this.itemsData
@@ -175,24 +178,22 @@ class Drag extends Module {
 
     // Моментально передвигаем их на своё же место, т.к. в следующий момент они будут сдвинуты
     itemsToMove.forEach((tmpData) => {
-      const heightToMove = Faze.Helpers.getElementSize(isDescending ? tmpData.node : tmpData.node).height;
+      const elementSize = Faze.Helpers.getElementSize(isDescending ? tmpData.node.previousElementSibling : tmpData.node.nextElementSibling);
+      const distance = isHorizontal ? elementSize.width : elementSize.height;
+      const offset = isDescending ? distance : -distance;
 
       tmpData.node.style.transition = 'none';
-      tmpData.node.style.transform = `translate3d(0, ${isDescending ? heightToMove : -heightToMove}px, 0)`;
+      tmpData.node.style.transform = `translate3d(${isHorizontal ? offset : 0}px, ${!isHorizontal ? offset : 0}px, 0)`;
       tmpData.node.style.pointerEvents = 'none';
     });
 
     // Вычисляем высоту(путь) для движения перетаскиваемого элемента
-    let heightToMove = 0;
-    if (isDescending) {
-      heightToMove = this.getHeightBetweenItems(itemData.container, fromIndex, toIndex);
-    } else {
-      heightToMove = this.getHeightBetweenItems(itemData.container, toIndex, fromIndex);
-    }
+    const distance = this.getDistanceBetweenItems(itemsToMove)
+    const offset = isDescending ? -distance : distance;
 
     // Моментально передвигаем их на своё же место, т.к. в следующий момент они будет сдвинут
     itemData.node.style.transition = 'none';
-    itemData.node.style.transform = `translate3d(0, ${isDescending ? -heightToMove : heightToMove}px, 0)`;
+    itemData.node.style.transform = `translate3d(${isHorizontal ? offset : 0}px, ${!isHorizontal ? offset : 0}px, 0)`;
 
     // Переносим
     if (isDescending) {
@@ -221,20 +222,16 @@ class Drag extends Module {
   }
 
   /**
-   * Вычисляет сумму высот элементов между двумя индексами (не включая их)
+   * Вычисляет сумму размеров элементов в заданном массиве
    * 
-   * @param {HTMLElement} container Контейнер, в котором лежат элементы
-   * @param {number} fromIndex Начальный индекс
-   * @param {number} toIndex Конечный индекс
+   * @param {ItemData[]} itemData Массив элементов
    * @return {number} Сумма высот элементов между двумя индексами
    * 
    * @private
    */
-  private getHeightBetweenItems(container: HTMLElement, fromIndex: number, toIndex: number): number {
-    return this.itemsData
-      .filter((itemData) => itemData.container === container)
-      .slice(fromIndex + 1, toIndex + 1)
-      .reduce((acc, itemData) => acc + Faze.Helpers.getElementSize(itemData.node).height, 0);
+  private getDistanceBetweenItems(itemData: ItemData[]): number {
+    return itemData
+      .reduce((acc, itemData) => acc + (this.config.direction === SideDirection.Horizontal ? itemData.size.width : itemData.size.height), 0);
   }
 
   /**
@@ -328,6 +325,10 @@ class Drag extends Module {
         itemData.node.classList.remove('faze-dragging');
       });
     });
+
+    setTimeout(() => {
+      // this.move(this.itemsData[0], 0, 1);
+    }, 1000)
   }
 
   /**

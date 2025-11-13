@@ -45,6 +45,14 @@
       background-color: #ffffff;
     }
 
+    .drag-component2 {
+      height: 50px;
+    }
+
+    .drag-component4 {
+      height: 150px;
+    }
+
     section .js-drag-test {
       display: flex;
       flex-direction: row;
@@ -65,23 +73,23 @@
     <aside class="sidebar">
       <div class="js-drag-test" data-faze-drag="container" data-faze-drag-group="components" data-faze-styles="false"
         data-faze-drag-direction="vertical">
-        <div class="drag-component" data-faze-drag="item">
+        <div class="drag-component drag-component1" data-faze-drag="item">
           <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
           ITEM 1
         </div>
-        <div class="drag-component" data-faze-drag="item">
+        <div class="drag-component drag-component2" data-faze-drag="item">
           <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
           ITEM 2
         </div>
-        <div class="drag-component" data-faze-drag="item">
+        <div class="drag-component drag-component3" data-faze-drag="item">
           <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
           ITEM 3
         </div>
-        <div class="drag-component" data-faze-drag="item">
+        <div class="drag-component drag-component4" data-faze-drag="item">
           <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
           ITEM 4
         </div>
-        <div class="drag-component" data-faze-drag="item">
+        <div class="drag-component drag-component5" data-faze-drag="item">
           <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
           ITEM 5
         </div>
@@ -116,7 +124,7 @@
       </div>
     </aside>-->
   </main>
-  <!--<section>
+  <section>
     <div class="js-drag-test" data-faze-drag="container" data-faze-drag-group="components" data-faze-styles="false"
       data-faze-drag-direction="horizontal">
       <div class="drag-component" data-faze-drag="item">
@@ -132,7 +140,7 @@
         ITEM 3
       </div>
     </div>
-  </section>-->
+  </section>
   <script>
     document.querySelector('.js-drag-add').addEventListener('click', () => {
       document.querySelector('.js-drag-test').insertAdjacentHTML('beforeend', `

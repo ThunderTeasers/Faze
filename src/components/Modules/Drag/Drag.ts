@@ -68,9 +68,6 @@ class Drag extends Module {
   // DOM элементы которые перетягиваем
   private itemsData: ItemData[];
 
-  // DOM элемент переносимого элемента
-  dragItemNode?: HTMLElement;
-
   constructor(nodes: HTMLElement[], config: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
@@ -104,7 +101,7 @@ class Drag extends Module {
 
     // Инициализация переменных
     this.collectItems();
-    this.dragItemNode = undefined;
+    this.initializeItems();
 
     // Исполняем пользовательский метод после инициализации
     if (typeof this.config.callbacks.created === 'function') {
@@ -117,6 +114,19 @@ class Drag extends Module {
         this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
       }
     }
+  }
+
+  /**
+   * Инициализация перетаскиваемых элементов
+   *
+   * @public
+   */
+  public initializeItems(): void {
+    this.itemsData.forEach((itemData: ItemData) => {
+      // DOM элемент ручки для перетаскивания, если её нет, то считаем весь элемент ею
+      const handleNode: HTMLElement = itemData.node.querySelector('.faze-drag-handle, [data-faze-drag="handle"]') || itemData.node;
+      handleNode.draggable = true;
+    });
   }
 
   /**
@@ -242,11 +252,6 @@ class Drag extends Module {
   protected bind(): void {
     super.bind();
 
-    // Навешиваем перетаскиваемые элементы
-    this.itemsData.forEach((itemData: ItemData) => {
-      this.bindDrag(itemData);
-    });
-
     Faze.Events.listener('dragenter', this.nodes, (event: DragEvent) => {
       const draggingItemData = this.itemsData.find((item: ItemData) => item.node.classList.contains('faze-dragging'));
       if (!draggingItemData) {
@@ -332,25 +337,13 @@ class Drag extends Module {
   }
 
   /**
-   * Навешивание перетаскивания для элемента
-   *
-   * @param {ItemData} itemData Данные элемента
-   * 
-   * @private
-   */
-  private bindDrag(itemData: ItemData): void {
-    // DOM элемент ручки для перетаскивания, если её нет, то считаем весь элемент ею
-    const handleNode: HTMLElement = itemData.node.querySelector('.faze-drag-handle, [data-faze-drag="handle"]') || itemData.node;
-    handleNode.draggable = true;
-  }
-
-  /**
    * Реинициализация
    * 
    * @protected
    */
   protected reinitialize(): void {
     this.collectItems();
+    this.initializeItems();
     this.bind();
   }
 

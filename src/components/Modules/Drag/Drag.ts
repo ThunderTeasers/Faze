@@ -179,6 +179,8 @@ class Drag extends Module {
     let itemsToMove = this.itemsData
       .filter((tmpData) => tmpData.container === itemData.container);
 
+    console.log(this.getRowsCoordinates(itemsToMove));
+
     // Получаем только нужные для работы элементы
     if (isDescending) {
       itemsToMove = itemsToMove.slice(fromIndex + 1, toIndex + 1);
@@ -234,14 +236,30 @@ class Drag extends Module {
   /**
    * Вычисляет сумму размеров элементов в заданном массиве
    * 
-   * @param {ItemData[]} itemData Массив элементов
+   * @param {ItemData[]} itemsData Массив элементов
    * @return {number} Сумма высот элементов между двумя индексами
    * 
    * @private
    */
-  private getDistanceBetweenItems(itemData: ItemData[]): number {
-    return itemData
+  private getDistanceBetweenItems(itemsData: ItemData[]): number {
+    return itemsData
       .reduce((acc, itemData) => acc + (this.config.direction === SideDirection.Horizontal ? itemData.size.width : itemData.size.height), 0);
+  }
+
+  /**
+   * Вычисляет координаты строк при расположении элементов в две или более строки
+   *
+   * @param {ItemData[]} itemsData Массив элементов
+   * 
+   * @return {number[]} Массив координат
+   */
+  private getRowsCoordinates(itemsData: ItemData[]): number[] {
+    const rowTops = new Set<number>();
+    itemsData.forEach((itemData) => {
+      rowTops.add(itemData.node.getBoundingClientRect().top - itemData.container.getBoundingClientRect().top);
+    });
+
+    return Array.from(rowTops).sort((a: number, b: number) => a - b);
   }
 
   /**

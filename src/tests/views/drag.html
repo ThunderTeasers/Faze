@@ -16,8 +16,6 @@
       height: 100%;
     }
 
-    body {}
-
     main {
       display: grid;
       grid-template-columns: 20rem 1fr;
@@ -64,6 +62,12 @@
     section .js-drag-test>div {
       width: 100px;
       margin-right: 10px;
+    }
+
+    .drag-test-grid {
+      display: flex;
+      flex-wrap: wrap;
+      width: 500px;
     }
   </style>
 </head>
@@ -125,8 +129,8 @@
     </aside>-->
   </main>
   <section>
-    <div class="js-drag-test" data-faze-drag="container" data-faze-drag-group="components" data-faze-styles="false"
-      data-faze-drag-direction="horizontal">
+    <div class="js-drag-test drag-test-grid" data-faze-drag="container" data-faze-drag-group="components"
+      data-faze-styles="false" data-faze-drag-direction="horizontal">
       <div class="drag-component" data-faze-drag="item">
         <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
         ITEM 1

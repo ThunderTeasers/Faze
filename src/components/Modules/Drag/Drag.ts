@@ -25,6 +25,7 @@ interface ItemData {
   node: HTMLElement;
   container: HTMLElement;
   size: FazeSize;
+  position: FazePosition;
 }
 
 /**
@@ -137,16 +138,72 @@ class Drag extends Module {
   private collectItems() {
     this.itemsData = [];
     this.nodes.forEach((node: HTMLElement) => {
-      this.itemsData.push(
-        ...Array.from(
-          node.querySelectorAll<HTMLElement>('.faze-drag-item, [data-faze-drag="item"]'))
-          .map((itemNode: HTMLElement) => ({
-            node: itemNode,
-            container: node,
-            size: Faze.Helpers.getElementSize(itemNode),
-          }))
-      );
+
+      let lastPositionX: number = -1;
+      let lastPositionY: number = 0;
+
+      // Получаем все элементы
+      const itemNodes: NodeListOf<HTMLElement> = node.querySelectorAll<HTMLElement>('.faze-drag-item, [data-faze-drag="item"]');
+      if (itemNodes.length === 0) {
+        return;
+      }
+
+      // Получаем первую координату
+      let lastCoordinate: number = this.config.direction === SideDirection.Horizontal ? itemNodes[0].getBoundingClientRect().top : itemNodes[0].getBoundingClientRect().left;
+
+      itemNodes.forEach((itemNode: HTMLElement) => {
+        // Проставляем позицию
+        const position: FazePosition = { x: 0, y: 0 };
+
+        // Вычисляем координаты
+        const rect: DOMRect = itemNode.getBoundingClientRect();
+
+        // Проставляем индекс для однонаправленного списка
+        if (this.config.direction === SideDirection.Horizontal) {
+          // Если мы двигаемся вниз на увеличение строк
+          if (rect.top > lastCoordinate) {
+            lastPositionY += 1;
+            lastPositionX = -1;
+          }
+
+          // Увеличиваем индекс главного направления
+          lastPositionX += 1;
+
+          // Проставляем координаты
+          position.x = lastPositionX;
+          position.y = lastPositionY;
+
+          // Обновляем последнюю координату по параллельной стороне относительно главного направления
+          lastCoordinate = rect.top;
+        } else {
+          // Если мы двигаемся вниз на увеличение строк
+          if (rect.left > lastCoordinate) {
+            lastPositionX += 1;
+            lastPositionY = -1;
+          }
+
+          // Увеличиваем индекс главного направления
+          lastPositionY += 1;
+
+          // Проставляем координаты
+          position.x = lastPositionX;
+          position.y = lastPositionY;
+
+          // Обновляем последнюю координату по параллельной стороне относительно главного направления
+          lastCoordinate = rect.left;
+        }
+
+        // Добавляем в массив
+        this.itemsData.push({
+          node: itemNode,
+          container: node,
+          size: Faze.Helpers.getElementSize(itemNode),
+          position,
+        });
+      });
     });
+
+    console.log(this.itemsData);
   }
 
   /**

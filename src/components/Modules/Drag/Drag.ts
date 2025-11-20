@@ -116,8 +116,6 @@ class Drag extends Module {
         this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
       }
     }
-
-    this.move(this.itemsData[0], 2);
   }
 
   /**
@@ -187,8 +185,8 @@ class Drag extends Module {
 
     // Ищем элемент на который перетаскиваем
     const underItemData = this.itemsData
-      .filter((tmpData) => tmpData.container === itemData.container)
-      .at(toIndex);
+      .filter((tmpData) => tmpData.container === itemData.container && tmpData.index === toIndex)
+      .pop();
 
     // Если не нашли, то ничего не делаем
     if (!underItemData) {
@@ -206,7 +204,7 @@ class Drag extends Module {
       itemsToMove = itemsToMove.slice(toIndex, fromIndex);
     }
 
-
+    console.log(itemsToMove);
 
     // distance = underItemData.node.getBoundingClientRect().bottom - itemData.node.getBoundingClientRect().height;
 
@@ -234,7 +232,7 @@ class Drag extends Module {
     if (isDescending) {
       Faze.DOM.insertAfter(itemData.node, underItemData.node);
     } else {
-      Faze.DOM.insertAfter(underItemData.node, itemData.node);
+      Faze.DOM.insertBefore(underItemData.node, itemData.node);
     }
 
     // Передвигаем

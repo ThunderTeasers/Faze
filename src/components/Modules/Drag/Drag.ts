@@ -159,6 +159,11 @@ class Drag extends Module {
    * @public
    */
   public move(itemData: ItemData, fromIndex: number, toIndex: number): void {
+    // Если индексы совпадают, то ничего не делаем
+    if (fromIndex === toIndex) {
+      return;
+    }
+
     // "Вперёд" или "назад"
     const isDescending = toIndex > fromIndex;
 
@@ -273,6 +278,10 @@ class Drag extends Module {
     this.bindDragStart();
     this.bindDragEnter();
     this.bindDragEnd();
+
+    // setTimeout(() => {
+    //   this.move(this.itemsData[2], 3, 4);
+    // }, 1000)
   }
 
   /**

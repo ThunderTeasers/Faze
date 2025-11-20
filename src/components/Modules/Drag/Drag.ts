@@ -26,6 +26,7 @@ interface ItemData {
   container: HTMLElement;
   size: FazeSize;
   position: FazePosition;
+  index: number;
 }
 
 /**
@@ -115,6 +116,8 @@ class Drag extends Module {
         this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
       }
     }
+
+    this.move(this.itemsData[0], 2);
   }
 
   /**
@@ -138,7 +141,7 @@ class Drag extends Module {
   private collectItems() {
     this.itemsData = [];
     this.nodes.forEach((node: HTMLElement) => {
-      node.querySelectorAll<HTMLElement>('.faze-drag-item, [data-faze-drag="item"]').forEach((itemNode: HTMLElement) => {
+      node.querySelectorAll<HTMLElement>('.faze-drag-item, [data-faze-drag="item"]').forEach((itemNode: HTMLElement, index: number) => {
         // Вычисляем координаты
         const rect: DOMRect = itemNode.getBoundingClientRect();
 
@@ -154,6 +157,7 @@ class Drag extends Module {
             x: Math.floor((rect.left - containerRect.left) / rect.width),
             y: Math.floor((rect.top - containerRect.top) / rect.height),
           },
+          index,
         });
       });
     });
@@ -163,12 +167,13 @@ class Drag extends Module {
    * Перемещает элемент на новое место
    *
    * @param {ItemData} itemData Данные перетаскиваемого элемента
-   * @param {number} fromIndex Индекс с которого начинаем перетаскивание
    * @param {number} toIndex Индекс на который происходит перетаскивание
    * 
    * @public
    */
-  public move(itemData: ItemData, fromIndex: number, toIndex: number): void {
+  public move(itemData: ItemData, toIndex: number): void {
+    const fromIndex = itemData.index;
+
     // Если индексы совпадают, то ничего не делаем
     if (fromIndex === toIndex) {
       return;
@@ -194,14 +199,16 @@ class Drag extends Module {
     let itemsToMove = this.itemsData
       .filter((tmpData) => tmpData.container === itemData.container);
 
-    console.log(this.getRowsCoordinates(itemsToMove));
-
     // Получаем только нужные для работы элементы
     if (isDescending) {
       itemsToMove = itemsToMove.slice(fromIndex + 1, toIndex + 1);
     } else {
       itemsToMove = itemsToMove.slice(toIndex, fromIndex);
     }
+
+
+
+    // distance = underItemData.node.getBoundingClientRect().bottom - itemData.node.getBoundingClientRect().height;
 
     // Моментально передвигаем их на своё же место, т.к. в следующий момент они будут сдвинуты
     itemsToMove.forEach((tmpData) => {
@@ -215,8 +222,9 @@ class Drag extends Module {
     });
 
     // Вычисляем высоту(путь) для движения перетаскиваемого элемента
-    const distance = this.getDistanceBetweenItems(itemsToMove)
+    let distance = this.getDistanceBetweenItems(itemsToMove);
     const offset = isDescending ? -distance : distance;
+    console.log(offset);
 
     // Моментально передвигаем их на своё же место, т.к. в следующий момент они будет сдвинут
     itemData.node.style.transition = 'none';
@@ -262,22 +270,6 @@ class Drag extends Module {
   }
 
   /**
-   * Вычисляет координаты строк при расположении элементов в две или более строки
-   *
-   * @param {ItemData[]} itemsData Массив элементов
-   * 
-   * @return {number[]} Массив координат
-   */
-  private getRowsCoordinates(itemsData: ItemData[]): number[] {
-    const rowTops = new Set<number>();
-    itemsData.forEach((itemData) => {
-      rowTops.add(itemData.node.getBoundingClientRect().top - itemData.container.getBoundingClientRect().top);
-    });
-
-    return Array.from(rowTops).sort((a: number, b: number) => a - b);
-  }
-
-  /**
    * Навешивание событий
    * 
    * @protected
@@ -289,9 +281,9 @@ class Drag extends Module {
     this.bindDragEnter();
     this.bindDragEnd();
 
-    // setTimeout(() => {
-    //   this.move(this.itemsData[2], 3, 4);
-    // }, 1000)
+    setTimeout(() => {
+      // this.move(this.itemsData[0], 0, 2);
+    }, 1000)
   }
 
   /**
@@ -364,18 +356,9 @@ class Drag extends Module {
           return;
         }
 
-        // Ищем индекс перетаскиваемого
-        const overItemIndex = this.itemsData
-          .filter(tmpData => tmpData.container === draggingItemData.container)
-          .indexOf(draggingItemData);
-
-        // Если не нашли индекс, то ничего не делаем
-        if (overItemIndex === -1) {
-          return;
-        }
 
         // Перемещаем
-        this.move(draggingItemData, overItemIndex, underItemIndex);
+        this.move(draggingItemData, underItemIndex);
       }
     }, false);
   }

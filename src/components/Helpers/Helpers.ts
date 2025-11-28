@@ -1316,6 +1316,10 @@ class Helpers {
      * @param event - событие мыши
      */
     var elementDrag = (event: MouseEvent | TouchEvent) => {
+      if (!options.node) {
+        return;
+      }
+
       if (event instanceof MouseEvent) {
         event.preventDefault();
       }
@@ -1323,16 +1327,8 @@ class Helpers {
       event.stopPropagation();
 
       // Расчет начального положения элемента
-      var xPosition =
-        (event as MouseEvent).clientX ||
-        ((event as TouchEvent).touches
-          ? (event as TouchEvent).touches[0].clientX
-          : 0);
-      var yPosition =
-        (event as MouseEvent).clientY ||
-        ((event as TouchEvent).touches
-          ? (event as TouchEvent).touches[0].clientY
-          : 0);
+      var xPosition = (event as MouseEvent).clientX || ((event as TouchEvent).touches ? (event as TouchEvent).touches[0].clientX : 0);
+      var yPosition = (event as MouseEvent).clientY || ((event as TouchEvent).touches ? (event as TouchEvent).touches[0].clientY : 0);
 
       // Рассчет новой позиции курсора
       endMousePosition.x = startMousePosition.x - xPosition;
@@ -1340,12 +1336,12 @@ class Helpers {
       startMousePosition.x = xPosition;
       startMousePosition.y = yPosition;
 
+      // Рассчет новой позиции окна
+      options.node.style.left = `${options.node.offsetLeft - endMousePosition.x}px`;
+      options.node.style.top = `${options.node.offsetTop - endMousePosition.y}px`;
+
       // Вызываем пользовательскую функцию
-      if (
-        options.callbacks &&
-        'drag' in options.callbacks &&
-        typeof options.callbacks.drag === 'function'
-      ) {
+      if (options.callbacks && 'drag' in options.callbacks && typeof options.callbacks.drag === 'function') {
         try {
           options.callbacks.drag({
             startPosition,
@@ -1407,8 +1403,7 @@ class Helpers {
      * @param event - событие мыши
      */
     var dragMouseDown = (event: MouseEvent | TouchEvent) => {
-      var node = options.node;
-      if (!node) {
+      if (!options.node) {
         return;
       }
 
@@ -1417,12 +1412,12 @@ class Helpers {
 
       // Получаем начальную позицию DOM элемента
       startPosition = {
-        x: parseInt(node.style.left, 10),
-        y: parseInt(node.style.top, 10),
+        x: parseInt(options.node.style.left, 10),
+        y: parseInt(options.node.style.top, 10),
       };
 
       // Проставляем класс, что двигаем элемент
-      node.classList.add('faze-drag-active');
+      options.node.classList.add('faze-drag-active');
 
       // Получение позиции курсора при нажатии на элемент
       startMousePosition.x =

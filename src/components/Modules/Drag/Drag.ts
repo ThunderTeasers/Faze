@@ -278,10 +278,6 @@ class Drag extends Module {
     this.bindDragStart();
     this.bindDragEnter();
     this.bindDragEnd();
-
-    setTimeout(() => {
-      // this.move(this.itemsData[0], 0, 2);
-    }, 1000)
   }
 
   /**

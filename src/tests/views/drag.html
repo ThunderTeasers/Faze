@@ -36,7 +36,7 @@
       width: 100%;
       height: 100px;
 
-      /* margin-bottom: 10px; */
+      margin-bottom: 10px;
       padding: 5px;
 
       border: 1px solid #000000;
@@ -75,7 +75,7 @@
 <body>
   <main>
     <aside class="sidebar">
-      <div class="js-drag-test" data-faze-drag="container" data-faze-drag-group="components" data-faze-styles="false"
+      <!-- <div class="js-drag-test" data-faze-drag="container" data-faze-drag-group="components" data-faze-styles="false"
         data-faze-drag-direction="vertical">
         <div class="drag-component drag-component1" data-faze-drag="item">
           <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
@@ -100,7 +100,7 @@
       </div>
       <br>
       <button type="button" class="js-drag-add">Добавить</button>
-      <button type="button" class="js-drag-remove">Удалить</button>
+      <button type="button" class="js-drag-remove">Удалить</button> -->
     </aside>
     <aside class="content">
       <!--<div class="js-drag-test" data-faze-drag="container" data-faze-drag-group="components" data-faze-styles="false"
@@ -129,7 +129,7 @@
     </aside>-->
   </main>
   <section>
-    <!-- <div class="js-drag-test drag-test-grid" data-faze-drag="container" data-faze-drag-group="components"
+    <div class="js-drag-test drag-test-grid" data-faze-drag="container" data-faze-drag-group="components"
       data-faze-styles="false" data-faze-drag-direction="horizontal">
       <div class="drag-component" data-faze-drag="item">
         <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
@@ -163,21 +163,21 @@
         <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
         ITEM 8
       </div>
-    </div> -->
+    </div>
   </section>
   <script>
-    document.querySelector('.js-drag-add').addEventListener('click', () => {
-      document.querySelector('.js-drag-test').insertAdjacentHTML('beforeend', `
-        <div class="drag-component" data-faze-drag="item">
-          <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-          ITEM 4
-        </div>
-      `);
-    });
+    // document.querySelector('.js-drag-add').addEventListener('click', () => {
+    //   document.querySelector('.js-drag-test').insertAdjacentHTML('beforeend', `
+    //     <div class="drag-component" data-faze-drag="item">
+    //       <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
+    //       ITEM 4
+    //     </div>
+    //   `);
+    // });
 
-    document.querySelector('.js-drag-remove').addEventListener('click', () => {
-      document.querySelector('.js-drag-test').lastElementChild.remove();
-    });
+    // document.querySelector('.js-drag-remove').addEventListener('click', () => {
+    //   document.querySelector('.js-drag-test').lastElementChild.remove();
+    // });
   </script>
 </body>
 

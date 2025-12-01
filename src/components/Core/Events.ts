@@ -36,8 +36,8 @@ class Events {
    */
   static {
     this.commonEvents.forEach((event: string) => {
-      (this as any)[event] = (nodeOrSelector: HTMLElement | HTMLElement[] | string, callback: (event: Event, node: HTMLElement | null) => void, isPreventDefault: boolean = true): void => {
-        this.listener(event, nodeOrSelector, callback, isPreventDefault);
+      (this as any)[event] = (nodeOrSelector: HTMLElement | HTMLElement[] | string, callback: (event: Event, node: HTMLElement | null) => void, isPreventDefault: boolean = true, once: boolean = true): void => {
+        this.listener(event, nodeOrSelector, callback, isPreventDefault, once);
       };
     });
   }

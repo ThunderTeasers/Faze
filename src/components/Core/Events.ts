@@ -5,7 +5,27 @@ import Faze from "./Faze";
  * которые делают всю шаблонную работу за нас
  */
 class Events {
+  // Карта для хранения навешанных событий
   static EVENTS_MAP: Map<HTMLElement, Map<string, string>> = new Map();
+
+  // Общие события
+  private static commonEvents: string[] = [
+    'click',
+
+    'submit',
+    'change',
+    'input',
+    'keyup',
+    'keydown',
+
+    'mouseover',
+    'mouseout',
+    'mouseenter',
+    'mouseleave',
+
+    'focus',
+    'blur',
+  ];
 
   /**
    * Навешивание событие клика на DOM элемент со всеми проверками
@@ -14,8 +34,12 @@ class Events {
    * @param {(event: Event, node: HTMLElement | null)} callback Пользовательская функция исполняющаяся после события
    * @param {boolean} isPreventDefault Нужно ли делать "preventDefault()" у события
    */
-  static click(nodeOrSelector: HTMLElement | HTMLElement[] | string, callback: (event: Event, node: HTMLElement | null) => void, isPreventDefault: boolean = true): void {
-    this.listener('click', nodeOrSelector, callback, isPreventDefault);
+  static {
+    this.commonEvents.forEach((event: string) => {
+      (this as any)[event] = (nodeOrSelector: HTMLElement | HTMLElement[] | string, callback: (event: Event, node: HTMLElement | null) => void, isPreventDefault: boolean = true): void => {
+        this.listener(event, nodeOrSelector, callback, isPreventDefault);
+      };
+    });
   }
 
   /**

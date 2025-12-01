@@ -9,6 +9,7 @@
 .faze-tabs,
 .faze-tab,
 [data-faze~='tab'] {
+
   // Тела табов
   .faze-tab-body,
   [data-faze-tab='body'],
@@ -23,14 +24,16 @@
 
 // Стили для визуала
 .faze-tabs[data-faze-styles='true'],
-.faze-tab[data-faze-styles='true'] {
+.faze-tab[data-faze-styles='true'],
+[data-faze~='tab'][data-faze-styles='true'] {
+
   // Заголовки табов
   .faze-tabs-headers {
     display: flex;
     flex-direction: row;
     align-items: center;
 
-    border-bottom: 0.1rem solid #000;
+    border-bottom: 0.1rem solid var(--faze-color-border);
   }
 
   // Заголовок
@@ -39,7 +42,11 @@
   [data-faze-tab-head] {
     padding: 1rem;
 
-    border: 0.1rem solid #000;
+    color: var(--faze-color-text);
+    font-size: 1.4rem;
+    line-height: 1;
+
+    border: 0.1rem solid var(--faze-color-border);
     border-bottom: none;
 
     user-select: none;
@@ -48,12 +55,16 @@
       border-left: none;
     }
 
-    &.faze-active {
-      background-color: #efefef;
+    // При наведении
+    &:hover {
+      background-color: var(--faze-color-background-hover);
+
+      cursor: pointer;
     }
 
-    &:hover {
-      cursor: pointer;
+    // Активный таб
+    &.faze-active {
+      background-color: var(--faze-color-background-active);
     }
   }
 

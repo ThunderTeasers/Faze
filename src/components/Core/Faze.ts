@@ -438,7 +438,7 @@ class Faze {
     Faze.Filter.hotInitialize();
     Faze.Look.hotInitialize('look');
     Faze.Steps.hotInitialize();
-    Faze.Drag.hotInitialize();
+    Faze.Drag.hotInitialize('drag');
     Faze.Dropdown.hotInitialize();
     Faze.LazyLoad.hotInitialize();
     Faze.LazyImage.hotInitialize();

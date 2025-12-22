@@ -204,8 +204,6 @@ class Drag extends Module {
       itemsToMove = itemsToMove.slice(toIndex, fromIndex);
     }
 
-    console.log(itemsToMove);
-
     // distance = underItemData.node.getBoundingClientRect().bottom - itemData.node.getBoundingClientRect().height;
 
     // Моментально передвигаем их на своё же место, т.к. в следующий момент они будут сдвинуты
@@ -222,7 +220,6 @@ class Drag extends Module {
     // Вычисляем высоту(путь) для движения перетаскиваемого элемента
     let distance = this.getDistanceBetweenItems(itemsToMove);
     const offset = isDescending ? -distance : distance;
-    console.log(offset);
 
     // Моментально передвигаем их на своё же место, т.к. в следующий момент они будет сдвинут
     itemData.node.style.transition = 'none';

@@ -39,6 +39,7 @@ interface ItemData {
 interface CallbackData {
   containerNodes: HTMLElement[];
   itemsData: ItemData[];
+  itemsNodes: HTMLElement[];
 }
 
 /**
@@ -67,9 +68,15 @@ interface Config {
 }
 
 class Drag extends Module {
-  // DOM элементы которые перетягиваем
+  // Данные элементов которые перетягиваем
   private itemsData: ItemData[];
 
+  // DOM элементы которые перетягиваем
+  itemsNodes: HTMLElement[];
+
+  /**
+   * Стандартный конструктор 
+   */
   constructor(nodes: HTMLElement[], config: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
@@ -77,7 +84,10 @@ class Drag extends Module {
       animation: 200,
       callbacks: {
         created: undefined,
+        beforeDrag: undefined,
         changed: undefined,
+        drag: undefined,
+        afterDrag: undefined,
       },
     };
 
@@ -100,17 +110,19 @@ class Drag extends Module {
     // Инициализация переменных
     this.watchSelector = `[data-faze-uid="${this.uid}"] [data-faze-drag="item"]`;
     this.itemsData = [];
+    this.itemsNodes = [];
 
     // Инициализация переменных
     this.collectItems();
     this.initializeItems();
 
-    // Исполняем пользовательский метод после инициализации
+    // Исполняем пользовательский метод
     if (typeof this.config.callbacks.created === 'function') {
       try {
         this.config.callbacks.created({
           containerNodes: this.nodes,
           itemsData: this.itemsData,
+          itemNodes: this.itemsNodes,
         });
       } catch (error) {
         this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
@@ -159,6 +171,9 @@ class Drag extends Module {
         });
       });
     });
+
+    // Собираем DOM элементы
+    this.itemsNodes = this.itemsData.map(itemData => itemData.node);
   }
 
   /**
@@ -311,6 +326,19 @@ class Drag extends Module {
 
         // Удаляем через кадр (после старта драга)
         requestAnimationFrame(() => ghost.remove());
+
+        // Исполняем пользовательский метод
+        if (typeof this.config.callbacks.beforeDrag === 'function') {
+          try {
+            this.config.callbacks.beforeDrag({
+              containerNodes: this.nodes,
+              itemsData: this.itemsData,
+              itemNodes: this.itemsNodes,
+            });
+          } catch (error) {
+            this.logger.error(`Ошибка исполнения пользовательского метода "beforeDrag": ${error}`);
+          }
+        }
       }
     }, false);
   }
@@ -351,6 +379,20 @@ class Drag extends Module {
         // Перемещаем
         this.move(draggingItemData, underItemIndex);
       }
+
+
+      // Исполняем пользовательский метод
+      if (typeof this.config.callbacks.drag === 'function') {
+        try {
+          this.config.callbacks.drag({
+            containerNodes: this.nodes,
+            itemsData: this.itemsData,
+            itemNodes: this.itemsNodes,
+          });
+        } catch (error) {
+          this.logger.error(`Ошибка исполнения пользовательского метода "drag": ${error}`);
+        }
+      }
     }, false);
   }
 
@@ -360,10 +402,36 @@ class Drag extends Module {
    * @private
    */
   private bindDragEnd(): void {
-    Faze.Events.listener('dragend', this.nodes, (event: DragEvent) => {
+    Faze.Events.listener('dragend', this.nodes, () => {
       this.itemsData.forEach((itemData: ItemData) => {
         itemData.node.classList.remove('faze-dragging');
       });
+
+      // Исполняем пользовательский метод
+      if (typeof this.config.callbacks.changed === 'function') {
+        try {
+          this.config.callbacks.changed({
+            containerNodes: this.nodes,
+            itemsData: this.itemsData,
+            itemNodes: this.itemsNodes,
+          });
+        } catch (error) {
+          this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+        }
+      }
+
+      // Исполняем пользовательский метод
+      if (typeof this.config.callbacks.afterDrag === 'function') {
+        try {
+          this.config.callbacks.afterDrag({
+            containerNodes: this.nodes,
+            itemsData: this.itemsData,
+            itemNodes: this.itemsNodes,
+          });
+        } catch (error) {
+          this.logger.error(`Ошибка исполнения пользовательского метода "afterDrag": ${error}`);
+        }
+      }
     });
   }
 

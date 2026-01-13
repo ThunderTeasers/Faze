@@ -12,13 +12,20 @@
       height: 200rem;
     }
 
+    .holder-test {
+      width: 80rem;
+      margin: 0 auto;
+    }
+
     .carousel-test {
       width: 100%;
       /* margin-left: 500px; */
+
+      overflow: visible !important;
     }
 
     .carousel-test img {
-      /* width: 250px !important; */
+      width: 250px !important;
       margin-right: 10px;
     }
 
@@ -30,14 +37,22 @@
 </head>
 
 <body>
-  <div class="carousel-test js-carousel-test1" data-faze="1carousel2" data-faze-carousel-animation-type="slide"
-    data-faze-carousel-arrows="false" data-faze-carousel-pages="true" data-faze-carousel-counter="true"
-    data-faze-carousel-disallow-ranges='[{"from": 800, "to": 1000}]' data-faze-carousel-touch-move="true">
-    <img src="https://www.admos-gifts.ru/article450x240/i/news/interesnye_novinki_dlya_kuhni_oblozhka.jpg?a=1" alt="" />
-    <img src="https://www.admos-gifts.ru/article450x240/i/news/interesnye_novinki_dlya_kuhni_oblozhka.jpg?a=2" alt="" />
-    <img src="https://www.admos-gifts.ru/article450x240/i/news/interesnye_novinki_dlya_kuhni_oblozhka.jpg?a=3" alt="" />
-    <img src="https://www.admos-gifts.ru/article450x240/i/news/interesnye_novinki_dlya_kuhni_oblozhka.jpg?a=4" alt="" />
-    <img src="https://www.admos-gifts.ru/article450x240/i/news/interesnye_novinki_dlya_kuhni_oblozhka.jpg?a=5" alt="" />
+  <div class="holder-test">
+    <div class="carousel-test js-carousel-test1" data-faze="1carousel2" data-faze-carousel-animation-type="slide"
+      data-faze-carousel-arrows="false" data-faze-carousel-pages="true" data-faze-carousel-counter="true"
+      data-faze-carousel-disallow-ranges='[{"from": 800, "to": 1000}]' data-faze-carousel-touch-move="true"
+      data-faze-carousel-offset="-200">
+      <img src="https://www.admos-gifts.ru/article450x240/i/news/interesnye_novinki_dlya_kuhni_oblozhka.jpg?a=1"
+        alt="" />
+      <img src="https://www.admos-gifts.ru/article450x240/i/news/interesnye_novinki_dlya_kuhni_oblozhka.jpg?a=2"
+        alt="" />
+      <img src="https://www.admos-gifts.ru/article450x240/i/news/interesnye_novinki_dlya_kuhni_oblozhka.jpg?a=3"
+        alt="" />
+      <img src="https://www.admos-gifts.ru/article450x240/i/news/interesnye_novinki_dlya_kuhni_oblozhka.jpg?a=4"
+        alt="" />
+      <img src="https://www.admos-gifts.ru/article450x240/i/news/interesnye_novinki_dlya_kuhni_oblozhka.jpg?a=5"
+        alt="" />
+    </div>
   </div>
 </body>
 

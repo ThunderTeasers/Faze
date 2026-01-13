@@ -137,6 +137,7 @@ Faze.add({
       mouseMove: true,
       touchMove: true,
       offsetChange: 20,
+      offset: -200,
       animation: {
         type: 'slide',
         time: 1000,

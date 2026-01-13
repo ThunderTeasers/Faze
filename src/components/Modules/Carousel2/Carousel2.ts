@@ -57,28 +57,29 @@ interface CallbackData {
  * Структура конфига карусели
  *
  * Содержит:
- *   autoplay   - флаг автовоспроизведения карусели
- *   counter    - отображать ли счетчик слайдов
- *   pages      - отображать ли пагинацию слайдов
- *   arrows     - отображать ли стрелки переключения
- *   duration   - время смены слайдов, в мс.
- *   infinite   - флаг бесконечной прокрутки
+ *   autoplay       - флаг автовоспроизведения карусели
+ *   counter        - отображать ли счетчик слайдов
+ *   pages          - отображать ли пагинацию слайдов
+ *   arrows         - отображать ли стрелки переключения
+ *   duration       - время смены слайдов, в мс.
+ *   infinite       - флаг бесконечной прокрутки
  *   useSlideFullSize - учитывать ли при измерении размера слайда его margin
- *   stopOnHover - флаг остановки ли при наведении
+ *   stopOnHover    - флаг остановки ли при наведении
  *   amountPerSlide - количества слайдов перелистываемых за один раз
- *   mouseMove - можно ли двигать слайды курсором
- *   offsetChange - % ширины слайда который нужно передвинуть пальцем/мышкой, чтобы произошло изменение
+ *   mouseMove      - можно ли двигать слайды курсором
+ *   offsetChange   - % ширины слайда который нужно передвинуть пальцем/мышкой, чтобы произошло изменение
+ *   offset         - общий сдвиг слайдов
  *   animation
- *     type     - тип анимации, может быть: 'slide', 'fade'
- *     time     - длительность анимации в миллисекундах
+ *     type      - тип анимации, может быть: 'slide', 'fade'
+ *     time      - длительность анимации в миллисекундах
  *     direction - направление смены слайдов, может быть: 'vertical', 'horizontal'. Используется только для анимации 'slide'
  *   selectors     - CSS селекторы для переопределения элементов управления
  *     arrowLeft   - CSS селектор кнопки пролистывания влево
  *     arrowRight  - CSS селектор кнопки пролистывания вправо
  *   callbacks
- *     created  - пользовательская функция, исполняющаяся при создании карусели
+ *     created       - пользовательская функция, исполняющаяся при создании карусели
  *     beforeChanged - пользовательская функция, исполняющаяся перед началом изменения слайда
- *     changed  - пользовательская функция, исполняющаяся при изменении слайда
+ *     changed       - пользовательская функция, исполняющаяся при изменении слайда
  */
 interface Config {
   autoplay: boolean;
@@ -93,6 +94,7 @@ interface Config {
   mouseMove: boolean;
   touchMove: boolean;
   offsetChange: number;
+  offset: number;
   disallowRanges: FazeDisallowRange[];
   minAmount: number;
   templates: {
@@ -239,6 +241,7 @@ class Carousel2 extends Module {
       mouseMove: false,
       touchMove: false,
       offsetChange: 50,
+      offset: 0,
       amountPerSlide: 1,
       minAmount: 2,
       disallowRanges: [],
@@ -1118,7 +1121,9 @@ class Carousel2 extends Module {
         offset = -this.totalWidth * amount;
       }
 
-      slideNode.style.transform = `translate(${offset}px, 0)`;
+      console.log(this.config.offset);
+
+      slideNode.style.transform = `translate(${offset + this.config.offset}px, 0)`;
     });
   }
 
@@ -1283,6 +1288,7 @@ class Carousel2 extends Module {
       minAmount: parseInt(node.dataset.fazeCarouselMinAmount || '2', 10),
       disallowRanges: JSON.parse(node.dataset.fazeCarouselDisallowRanges || '[]'),
       offsetChange: parseInt(node.dataset.fazeCarouselOffsetChange || '50', 10),
+      offset: parseInt(node.dataset.fazeCarouselOffset || '0', 10),
       animation: {
         type: node.dataset.fazeCarouselAnimationType || 'fade',
         time: parseInt(node.dataset.fazeCarouselAnimationTime || '1000', 10),

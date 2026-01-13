@@ -219,6 +219,12 @@ class Carousel2 extends Module {
   // Нужно ли инициализировать модуль
   private isNeedToInitialize: boolean;
 
+  /**
+   * Стандартный конструктор
+   * 
+   * @param {HTMLElement} node DOM элемент на который навешивается модуль
+   * @param {Partial<Config>} config Конфиг модуля
+   */
   constructor(node?: HTMLElement, config?: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
@@ -314,10 +320,7 @@ class Carousel2 extends Module {
     // Инициализация работы модуля
     // ===========================================
     // Проставляем необходимые классы
-    this.node.classList.add(
-      `faze-animation-${this.config.animation.type}`,
-      `faze-direction-${this.config.animation.direction}`
-    );
+    this.node.classList.add(`faze-animation-${this.config.animation.type}`, `faze-direction-${this.config.animation.direction}`);
     this.itemsHolderNode.className = 'faze-carousel-holder';
     this.itemsHolderNode.style.transition = this.transition;
 
@@ -352,9 +355,7 @@ class Carousel2 extends Module {
           currentSlideNode: this.slidesNodes[this.index],
         });
       } catch (error) {
-        this.logger.error(
-          `Ошибка исполнения пользовательского метода "created": ${error}`
-        );
+        this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
       }
     }
   }
@@ -418,9 +419,7 @@ class Carousel2 extends Module {
     // Для счетчика
     if (this.config.counter) {
       if (this.config.selectors.counter) {
-        const counterNode = document.querySelector<HTMLElement>(
-          this.config.selectors.counter
-        );
+        const counterNode = document.querySelector<HTMLElement>(this.config.selectors.counter);
         if (counterNode) {
           this.counterNode = counterNode;
         }
@@ -444,12 +443,8 @@ class Carousel2 extends Module {
       // Проверка на присутствие кастомных стрелок
       if (this.config.selectors.arrowLeft && this.config.selectors.arrowRight) {
         // DOM элементы стрелок управления
-        const arrowLeftNode = document.querySelector<HTMLElement>(
-          this.config.selectors.arrowLeft
-        );
-        const arrowRightNode = document.querySelector<HTMLElement>(
-          this.config.selectors.arrowRight
-        );
+        const arrowLeftNode = document.querySelector<HTMLElement>(this.config.selectors.arrowLeft);
+        const arrowRightNode = document.querySelector<HTMLElement>(this.config.selectors.arrowRight);
 
         // Если нашли кастомные стрелки, то задаём их
         if (arrowLeftNode && arrowRightNode) {
@@ -538,16 +533,12 @@ class Carousel2 extends Module {
    * @private
    */
   private bindPagination(): void {
-    Faze.Events.forEach(
-      'click',
-      this.pagesNodes,
-      (event: MouseEvent, pageNode: HTMLElement) => {
-        const index: string | undefined = pageNode.dataset.fazeIndex;
-        if (index) {
-          this.change(parseInt(index, 10));
-        }
+    Faze.Events.forEach('click', this.pagesNodes, (event: MouseEvent, pageNode: HTMLElement) => {
+      const index: string | undefined = pageNode.dataset.fazeIndex;
+      if (index) {
+        this.change(parseInt(index, 10));
       }
-    );
+    });
   }
 
   /**
@@ -574,15 +565,12 @@ class Carousel2 extends Module {
   /**
    * Отслеживание события нажатия пальцем или мышью на область карусели
    *
-   * @param event{MouseEvent | TouchEvent} Событие нажатия мышью или пальцем
-   * @param isDown{boolean} Было ли события нажатия до этого момента, если нет, то метод не выполняется
+   * @param {MouseEvent | TouchEvent} event Событие нажатия мышью или пальцем
+   * @param {boolean} isDown Было ли события нажатия до этого момента, если нет, то метод не выполняется
    *
    * @private
    */
-  private mouseOrTouchDown(
-    event: MouseEvent | TouchEvent,
-    isDown: boolean
-  ): boolean {
+  private mouseOrTouchDown(event: MouseEvent | TouchEvent, isDown: boolean): boolean {
     // Если мы выводили мышку из окна браузера, то "isDown" останется в положении "true"
     // и мы должны вернуть его в таком же виде, чтобы сработали эвенты на отпускание мыши
     if (isDown) {
@@ -592,12 +580,7 @@ class Carousel2 extends Module {
     if (
       Faze.Helpers.isMouseOver(event, this.node).contains &&
       !Faze.Helpers.isMouseOverlapsNode(event, this.controlsNode) &&
-      event
-        .composedPath()
-        .some(
-          (node: any) =>
-            'classList' in node && node.classList.contains('faze-item')
-        ) &&
+      event.composedPath().some((node: any) => 'classList' in node && node.classList.contains('faze-item')) &&
       this.isIdle
     ) {
       // Отключаем стандартное перетаскивание
@@ -620,15 +603,12 @@ class Carousel2 extends Module {
   /**
    * Передвижение мыши или движение пальцем
    *
-   * @param event{MouseEvent | TouchEvent} Событие мыши или пальца
-   * @param isDown{boolean} Было ли события нажатия до этого момента, если нет, то метод не выполняется
+   * @param {MouseEvent | TouchEvent} event Событие мыши или пальца
+   * @param {boolean} isDown Было ли события нажатия до этого момента, если нет, то метод не выполняется
    *
    * @private
    */
-  private mouseOrTouchMove(
-    event: MouseEvent | TouchEvent,
-    isDown: boolean
-  ): void {
+  private mouseOrTouchMove(event: MouseEvent | TouchEvent, isDown: boolean): void {
     // Если не было нажатия, то не выполняем метод
     if (!isDown) {
       return;
@@ -643,11 +623,9 @@ class Carousel2 extends Module {
 
     // Проверяем выход за границы
     if (offset > this.offset + this.slideWidth) {
-      this.itemsHolderNode.style.transform = `translate(${this.offset + this.slideWidth
-        }px, 0)`;
+      this.itemsHolderNode.style.transform = `translate(${this.offset + this.slideWidth}px, 0)`;
     } else if (offset < this.offset - this.slideWidth) {
-      this.itemsHolderNode.style.transform = `translate(${this.offset - this.slideWidth
-        }px, 0)`;
+      this.itemsHolderNode.style.transform = `translate(${this.offset - this.slideWidth}px, 0)`;
     }
   }
 
@@ -656,15 +634,12 @@ class Carousel2 extends Module {
    * преодолел ли слайд половину своей ширины/высоты для переключения. Если да, то изменяем его на следующий/предыдущий, если нет, то
    * необходимо вернуть всё как было до начала движения
    *
-   * @param event{MouseEvent | TouchEvent} Событие мыши или пальца
-   * @param isDown{boolean} Было ли события нажатия до этого момента, если нет, то метод не выполняется
+   * @param {MouseEvent | TouchEvent} event Событие мыши или пальца
+   * @param {boolean} isDown Было ли события нажатия до этого момента, если нет, то метод не выполняется
    *
    * @private
    */
-  private async mouseOrTouchUp(
-    event: MouseEvent | TouchEvent,
-    isDown: boolean
-  ): Promise<void> {
+  private async mouseOrTouchUp(event: MouseEvent | TouchEvent, isDown: boolean): Promise<void> {
     if (!isDown) {
       return;
     }
@@ -728,6 +703,8 @@ class Carousel2 extends Module {
    * Возвращает действия разрешенные для взаимодействия при помощи жестов
    *
    * @returns [actionsStart, actionsMove, actionsEnd], где "actionsStart" - начальные действия, "actionsMove" - действия при движении, "actionsEnd" - конечные действия
+   * 
+   * @private
    */
   private getGesturesActions() {
     // Действия
@@ -765,35 +742,20 @@ class Carousel2 extends Module {
     const [actionsStart, actionsMove, actionsEnd] = this.getGesturesActions();
 
     // При нажатии на враппер для слайдов ставим флаг, что можно отслеживать движение
-    Faze.Events.listener(
-      actionsStart,
-      document.body,
-      (event: MouseEvent) => {
-        isDown = this.mouseOrTouchDown(event, isDown);
-      },
-      false
-    );
+    Faze.Events.listener(actionsStart, document.body, (event: MouseEvent) => {
+      isDown = this.mouseOrTouchDown(event, isDown);
+    }, false);
 
     // Отслеживаем движение, если находимся внутри враппера слайдов
-    Faze.Events.listener(
-      actionsMove,
-      document.body,
-      (event: MouseEvent) => {
-        this.mouseOrTouchMove(event, isDown);
-      },
-      false
-    );
+    Faze.Events.listener(actionsMove, document.body, (event: MouseEvent) => {
+      this.mouseOrTouchMove(event, isDown);
+    }, false);
 
     // Убираем флаг нажатия в любом случае при отпускании мыши
-    Faze.Events.listener(
-      actionsEnd,
-      document.body,
-      (event: MouseEvent) => {
-        this.mouseOrTouchUp(event, isDown);
-        isDown = false;
-      },
-      false
-    );
+    Faze.Events.listener(actionsEnd, document.body, (event: MouseEvent) => {
+      this.mouseOrTouchUp(event, isDown);
+      isDown = false;
+    }, false);
   }
 
   /**
@@ -812,6 +774,8 @@ class Carousel2 extends Module {
 
   /**
    * Создание дополнительных элементов карусели, таких как: пагинация, стрелки, счетчик
+   * 
+   * @private
    */
   private buildControls(): void {
     if (this.config.arrows || this.config.pages || this.config.counter) {
@@ -845,10 +809,7 @@ class Carousel2 extends Module {
     this.changeCounter();
 
     // Если у карусели есть стрелки, то вставляем между них
-    if (
-      this.config.arrows &&
-      !(this.config.selectors.arrowLeft && this.config.selectors.arrowRight)
-    ) {
+    if (this.config.arrows && !(this.config.selectors.arrowLeft && this.config.selectors.arrowRight)) {
       this.arrowsNode.insertBefore(this.counterNode, this.arrowsNodes.right);
     } else {
       this.controlsNode.appendChild(this.counterNode);
@@ -873,9 +834,7 @@ class Carousel2 extends Module {
       pagesHTML += `<div class="faze-page" data-faze-index="${i}"></div>`;
     }
     this.pagesNode.innerHTML = pagesHTML;
-    this.pagesNodes = <HTMLElement[]>(
-      Array.from(this.pagesNode.querySelectorAll('.faze-page'))
-    );
+    this.pagesNodes = <HTMLElement[]>(Array.from(this.pagesNode.querySelectorAll('.faze-page')));
     this.controlsNode.appendChild(this.pagesNode);
 
     // Активируем первую по умолчанию
@@ -884,20 +843,18 @@ class Carousel2 extends Module {
 
   /**
    * Создание стрелок переключения слайдов вперед/назад(либо вверх вниз в вертикальном виде)
+   * 
+   * @private
    */
   private buildArrows(): void {
     this.arrowsNode.className = 'faze-carousel-arrows';
     this.controlsNode.appendChild(this.arrowsNode);
 
-    if (
-      !(this.config.selectors.arrowLeft && this.config.selectors.arrowRight)
-    ) {
-      this.arrowsNodes.left.className =
-        'faze-carousel-arrow faze-carousel-arrow-prev';
+    if (!(this.config.selectors.arrowLeft && this.config.selectors.arrowRight)) {
+      this.arrowsNodes.left.className = 'faze-carousel-arrow faze-carousel-arrow-prev';
       this.arrowsNode.appendChild(this.arrowsNodes.left);
 
-      this.arrowsNodes.right.className =
-        'faze-carousel-arrow faze-carousel-arrow-next';
+      this.arrowsNodes.right.className = 'faze-carousel-arrow faze-carousel-arrow-next';
       this.arrowsNode.appendChild(this.arrowsNodes.right);
     }
   }
@@ -935,7 +892,7 @@ class Carousel2 extends Module {
   /**
    * Изменение текущего слайда на указанный индекс
    *
-   * @param index{number} Индекс нужного слайда
+   * @param {number} index Индекс нужного слайда
    */
   change(index: number): void {
     if (!this.isIdle) {
@@ -992,17 +949,16 @@ class Carousel2 extends Module {
     if (this.index >= this.totalSlides) {
       this.index = Math.max(this.index - this.totalSlides, 0);
     } else if (this.index < 0) {
-      this.index = Math.min(
-        this.totalSlides - Math.abs(this.index),
-        this.totalSlides - 1
-      );
+      this.index = Math.min(this.totalSlides - Math.abs(this.index), this.totalSlides - 1);
     }
   }
 
   /**
-   * Выполнение пользовательской функции "changed"
-   *
-   * @param direction{FazeCarouselMoveDirection} Направление карусели
+   * Выполнение пользовательской функции "changed"   
+   * 
+   * @param {FazeCarouselMoveDirection} direction Направление движение
+   * 
+   * @private
    */
   private changeCallbackCall(direction?: FazeCarouselMoveDirection): void {
     if (typeof this.config.callbacks.changed === 'function') {
@@ -1032,18 +988,15 @@ class Carousel2 extends Module {
   /**
    * Выполнение пользовательской функции "beforeChanged"
    *
-   * @param direction{FazeCarouselMoveDirection} Направление карусели
+   * @param {FazeCarouselMoveDirection} direction Направление движение
+   * 
+   * @private
    */
-  private beforeChangeCallbackCall(
-    direction?: FazeCarouselMoveDirection
-  ): void {
+  private beforeChangeCallbackCall(direction?: FazeCarouselMoveDirection): void {
     if (typeof this.config.callbacks.beforeChanged === 'function') {
       // Текущий слайд(по факту он следующий, т.к. изменение уже началось)
       const currentSlideNode =
-        this.slidesNodes.find(
-          (tmpSlideNode) =>
-            parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index
-        ) || this.slidesNodes[0];
+        this.slidesNodes.find((tmpSlideNode) => parseInt(tmpSlideNode.dataset.fazeIndex || '0', 10) === this.index) || this.slidesNodes[0];
 
       try {
         this.config.callbacks.beforeChanged({
@@ -1061,9 +1014,7 @@ class Carousel2 extends Module {
           pagesNode: this.pagesNode,
         });
       } catch (error) {
-        this.logger.error(
-          `Ошибка исполнения пользовательского метода "changed": ${error}`
-        );
+        this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
       }
     }
   }
@@ -1071,16 +1022,13 @@ class Carousel2 extends Module {
   /**
    * Изменение текущего слайда
    *
-   * @param direction{FazeCarouselMoveDirection} Направление движения
-   * @param amount{number} Количество слайдов для изменения
+   * @param {FazeCarouselMoveDirection} direction Направление движение
+   * @param {number} amount Количество сдвигаемых слайдов
+   * @param {boolean} isFreeze "Замораживаем" ли слайд на время движения
    *
    * @private
    */
-  private async updateSlides(
-    direction: FazeCarouselMoveDirection,
-    amount: number = 1,
-    isFreeze: boolean = false
-  ): Promise<void> {
+  private async updateSlides(direction: FazeCarouselMoveDirection, amount: number = 1, isFreeze: boolean = false): Promise<void> {
     // Вызываем пользовательскую функцию "beforeChanged"
     this.beforeChangeCallbackCall(direction);
 
@@ -1155,14 +1103,14 @@ class Carousel2 extends Module {
 
   /**
    * Обновление сдвига слайдов
+   * 
+   * @param {number} amount Количество сдвигаемых слайдов
    *
    * @private
    */
   private updateSlidesOffset(amount: number = 1): void {
     this.slidesNodes.forEach((slideNode, index) => {
       let offset = 0;
-
-      amount = 1;
 
       if (index < this.counter - 1) {
         offset = this.totalWidth * amount;
@@ -1176,19 +1124,19 @@ class Carousel2 extends Module {
 
   /**
    * Обновление сдвига карусели
+   * 
+   * @param {FazeCarouselMoveDirection} direction Направление движение
+   * @param {number} amount Количество сдвигаемых слайдов
+   * @param {boolean} isFreeze "Замораживаем" ли слайд на время движения
    *
    * @private
    */
-  private async updateOffset(
-    direction: FazeCarouselMoveDirection,
-    amount: number = 1,
-    isFreeze: boolean = false
-  ): Promise<void> {
+  private async updateOffset(direction: FazeCarouselMoveDirection, amount: number = 1, isFreeze: boolean = false): Promise<void> {
     if (amount === 1) {
       this.updateSlidesOffset(amount);
     }
 
-    if (direction === FazeCarouselMoveDirection.Forward && this.counter === 0) {
+    if (direction === FazeCarouselMoveDirection.Forward && this.counter === 0 && true) {
       if (!isFreeze) {
         this.offset = this.slideWidth * amount;
       } else {
@@ -1199,10 +1147,7 @@ class Carousel2 extends Module {
       await this.moveSlide(true);
       this.setTransition();
       this.offset = 0;
-    } else if (
-      direction === FazeCarouselMoveDirection.Backward &&
-      this.counter === -1
-    ) {
+    } else if (direction === FazeCarouselMoveDirection.Backward && this.counter === -1) {
       if (!isFreeze) {
         this.offset = 0;
       }
@@ -1211,10 +1156,7 @@ class Carousel2 extends Module {
       await this.moveSlide(true);
       this.setTransition();
       this.offset = this.slideWidth * amount;
-    } else if (
-      direction === FazeCarouselMoveDirection.Backward &&
-      this.counter === 0
-    ) {
+    } else if (direction === FazeCarouselMoveDirection.Backward && this.counter === 0) {
       if (!isFreeze) {
         this.offset = -this.slideWidth * amount;
       } else {
@@ -1227,8 +1169,10 @@ class Carousel2 extends Module {
       this.offset = 0;
     }
 
+    // Двигаем слайд
     await this.moveSlide();
 
+    // Если количество слайдов больше 1, то сдвигаем ещё
     if (amount > 1) {
       this.updateSlidesOffset(amount);
     }
@@ -1263,7 +1207,6 @@ class Carousel2 extends Module {
    * @private
    */
   private setTransition(isClean: boolean = false): void {
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     this.itemsHolderNode.offsetHeight;
     this.itemsHolderNode.style.transition = isClean ? '' : this.transition;
   }
@@ -1291,9 +1234,9 @@ class Carousel2 extends Module {
    * @private
    */
   private changeCounter(): void {
-    this.counterNode.innerHTML = `<span class="faze-carousel-counter-current">${this.index + 1
-      }</span> / <span class="faze-carousel-counter-total">${this.totalSlides
-      }</span>`;
+    this.counterNode.innerHTML = `
+      <span class="faze-carousel-counter-current">${this.index + 1}</span> / <span class="faze-carousel-counter-total">${this.totalSlides}</span>
+    `;
   }
 
   /**
@@ -1302,11 +1245,7 @@ class Carousel2 extends Module {
    * @private
    */
   private changePagination(): void {
-    Faze.Helpers.activateItem(
-      Array.from(this.pagesNodes),
-      this.index,
-      'faze-active'
-    );
+    Faze.Helpers.activateItem(Array.from(this.pagesNodes), this.index, 'faze-active');
   }
 
   /**
@@ -1316,23 +1255,17 @@ class Carousel2 extends Module {
    */
   private updateCurrentSlideSizes(): void {
     // Стили слайда
-    const style: CSSStyleDeclaration = window.getComputedStyle(
-      this.currentSlide
-    );
+    const style: CSSStyleDeclaration = window.getComputedStyle(this.currentSlide);
 
     // Расчёт корректных размеров
-    this.slideWidth =
-      this.currentSlide.offsetWidth +
-      parseFloat(style.marginLeft || '0') +
-      parseFloat(style.marginRight || '0');
+    this.slideWidth = this.currentSlide.offsetWidth + parseFloat(style.marginLeft || '0') + parseFloat(style.marginRight || '0');
     this.totalWidth = this.slideWidth * this.totalSlides;
-    // this.slideHeight = this.currentSlide.getBoundingClientRect().height;
   }
 
   /**
    * Инициализация модуля по data атрибутам
    *
-   * @param node DOM элемент на который нужно инициализировать плагин
+   * @param {HTMLElement} node DOM элемент на который нужно инициализировать плагин
    */
   static initializeByDataAttributes(node: HTMLElement): void {
     new Carousel2(node, {

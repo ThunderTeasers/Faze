@@ -69,6 +69,10 @@ interface CallbackData {
  *   mouseMove      - можно ли двигать слайды курсором
  *   offsetChange   - % ширины слайда который нужно передвинуть пальцем/мышкой, чтобы произошло изменение
  *   offset         - общий сдвиг слайдов
+ *   disallowRanges - размер экрана на которых выключаем карусель
+ *   minAmount      - минимальное количество слайдов для инициализации
+ *   templates
+ *     page         - шаблон для пагинации
  *   animation
  *     type      - тип анимации, может быть: 'slide', 'fade'
  *     time      - длительность анимации в миллисекундах
@@ -80,6 +84,7 @@ interface CallbackData {
  *     created       - пользовательская функция, исполняющаяся при создании карусели
  *     beforeChanged - пользовательская функция, исполняющаяся перед началом изменения слайда
  *     changed       - пользовательская функция, исполняющаяся при изменении слайда
+ *     afterChanged  - пользовательская функция, исполняющаяся после изменения слайда
  */
 interface Config {
   autoplay: boolean;
@@ -118,41 +123,6 @@ interface Config {
     afterChanged?: (data: CallbackData) => void;
   };
 }
-
-/**
- * Структура возвращаемого объекта в пользовательских функциях
- *
- * Содержит:
- *   holderNode   - DOM элемент содержащий слайды
- *   carouselNode - DOM элемент в котором находится всё, что относится карусели
- *   slidesNodes  - DOM элементы слайдов
- *   controlsNode - DOM элемент родителя всех управляющих элементов карусели
- *   pagesNode    - DOM элемент пагинации слайдов
- *   arrowsNode   - DOM элемент родителя стрелок
- *   arrowsNodes  - DOM элементы стрелок, не путать с arrowsNode
- *   counterNode  - DOM элемент счетчика слайдов
- *   totalSlides  - общее число слайдов
- *   index        - индекс активного слайда
- *   direction    - направление карусели(может быть "vertical" и "horizontal")
- *   currentSlideNode - DOM элемент активного слайда
- */
-// interface CallbackData {
-//   holderNode: HTMLElement;
-//   carouselNode: HTMLElement;
-//   slidesNodes: HTMLElement[];
-//   controlsNode?: HTMLElement;
-//   pagesNode?: HTMLElement;
-//   arrowsNode?: HTMLElement;
-//   arrowsNodes?: {
-//     left: HTMLElement;
-//     right: HTMLElement;
-//   };
-//   counterNode?: HTMLElement;
-//   totalSlides: number;
-//   index: number;
-//   direction?: string;
-//   currentSlideNode: HTMLElement | null;
-// }
 
 class Carousel2 extends Module {
   // DOM элменты слайдов

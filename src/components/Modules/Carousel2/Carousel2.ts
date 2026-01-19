@@ -715,17 +715,17 @@ class Carousel2 extends Module {
     const [actionsStart, actionsMove, actionsEnd] = this.getGesturesActions();
 
     // При нажатии на враппер для слайдов ставим флаг, что можно отслеживать движение
-    Faze.Events.listener(actionsStart, document.body, (event: MouseEvent) => {
+    Faze.Events.listener(actionsStart, document.body, (event: MouseEvent | TouchEvent) => {
       isDown = this.mouseOrTouchDown(event, isDown);
     }, false);
 
     // Отслеживаем движение, если находимся внутри враппера слайдов
-    Faze.Events.listener(actionsMove, document.body, (event: MouseEvent) => {
+    Faze.Events.listener(actionsMove, document.body, (event: MouseEvent | TouchEvent) => {
       this.mouseOrTouchMove(event, isDown);
     }, false);
 
     // Убираем флаг нажатия в любом случае при отпускании мыши
-    Faze.Events.listener(actionsEnd, document.body, (event: MouseEvent) => {
+    Faze.Events.listener(actionsEnd, document.body, (event: MouseEvent | TouchEvent) => {
       this.mouseOrTouchUp(event, isDown);
       isDown = false;
     }, false);

@@ -71,34 +71,36 @@ class Events {
 
     // Проходимся по типам событий
     events.forEach((event: string) => {
-      nodes.forEach((node: HTMLElement, index: number) => {
-        // Если включено ограничение на одно одинковое событие
-        if (once) {
-          // Проверка на существование карты с событиями
-          const map = this.EVENTS_MAP.get(node) ?? new Map<string, string>();
+      nodes
+        .filter((node: HTMLElement) => node instanceof HTMLElement)
+        .forEach((node: HTMLElement, index: number) => {
+          // Если включено ограничение на одно одинковое событие
+          if (once) {
+            // Проверка на существование карты с событиями
+            const map = this.EVENTS_MAP.get(node) ?? new Map<string, string>();
 
-          // Проверка на повторное навешивание события
-          if (map.has(event) && map.get(event) === Faze.Helpers.hash(callback.toString())) {
-            return;
+            // Проверка на повторное навешивание события
+            if (map.has(event) && map.get(event) === Faze.Helpers.hash(callback.toString())) {
+              return;
+            }
+
+            // Добавляем событие в карту
+            map.set(event, Faze.Helpers.hash(callback.toString()));
+            this.EVENTS_MAP.set(node, map);
           }
 
-          // Добавляем событие в карту
-          map.set(event, Faze.Helpers.hash(callback.toString()));
-          this.EVENTS_MAP.set(node, map);
-        }
+          // Навешиваем событие
+          node.addEventListener(event, (realEvent: Event) => {
+            if (preventDefault) {
+              realEvent.preventDefault();
+            }
 
-        // Навешиваем событие
-        node.addEventListener(event, (realEvent: Event) => {
-          if (preventDefault) {
-            realEvent.preventDefault();
-          }
-
-          // Исполняем пользовательскую функцию
-          if (typeof callback === 'function') {
-            callback(realEvent, node, nodes, index);
-          }
+            // Исполняем пользовательскую функцию
+            if (typeof callback === 'function') {
+              callback(realEvent, node, nodes, index);
+            }
+          });
         });
-      });
     });
   }
 

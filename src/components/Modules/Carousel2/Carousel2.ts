@@ -1091,8 +1091,6 @@ class Carousel2 extends Module {
         offset = -this.totalWidth * amount;
       }
 
-      console.log(this.config.offset);
-
       slideNode.style.transform = `translate(${offset + this.config.offset}px, 0)`;
     });
   }

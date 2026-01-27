@@ -112,9 +112,12 @@ class ThumbGallery extends Module {
 
     // Создание галереи
     this.parseProductJSON();
-    this.buildImagesCarousel();
-    this.generateSliderHTML();
-    this.manageHolderWidth();
+
+    if (this.imagesData.length > 0) {
+      this.buildImagesCarousel();
+      this.generateSliderHTML();
+      this.manageHolderWidth();
+    }
   }
 
   /**
@@ -223,8 +226,12 @@ class ThumbGallery extends Module {
     this.imagesData = jsonData;
   }
 
-
-  private buildImagesCarousel() {
+  /**
+   * Построение HTML кода
+   * 
+   * @private
+   */
+  private buildImagesCarousel(): void {
     this.node.innerHTML = `
       <div class="faze-thumbgallery-holder">
         ${this.imagesData.map(image => `<img src="${image}">`).join('')}
@@ -234,7 +241,12 @@ class ThumbGallery extends Module {
     this.holderNode = this.node.querySelector('.faze-thumbgallery-holder') as HTMLDivElement;
   }
 
-  private manageHolderWidth() {
+  /**
+   * Проставление корректной ширины
+   * 
+   * @private
+   */
+  private manageHolderWidth(): void {
     this.holderNode.style.width = `${this.imageWidth}px`;
   }
 

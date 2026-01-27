@@ -77,7 +77,12 @@ class ThumbGallery extends Module {
    */
   initialize(): void {
     // Инициализация переменных
-    this.imageWidth = this.node.getBoundingClientRect().width;
+    // Получаем ширину одного изображения
+    const imageNode = this.node.querySelector('img');
+    if (imageNode) {
+      this.imageWidth = imageNode.getBoundingClientRect().width;
+    }
+
     this.holderWidth = this.node.getBoundingClientRect().width;
     this.imagesData = [];
     this.galleryNode = undefined;
@@ -127,7 +132,11 @@ class ThumbGallery extends Module {
    */
   reinitialize(data: string): void {
     // Очищаем всё
-    this.imageWidth = this.node.getBoundingClientRect().width;
+    const imageNode = this.node.querySelector('img');
+    if (imageNode) {
+      this.imageWidth = imageNode.getBoundingClientRect().width;
+    }
+
     this.holderWidth = this.node.getBoundingClientRect().width;
     this.imagesData = [];
     this.galleryElementsNodes.forEach((galleryElementNode) => galleryElementNode.remove());
@@ -266,12 +275,6 @@ class ThumbGallery extends Module {
 
     // Добавляем созданный слайдер к элементу
     this.node.appendChild(this.galleryNode);
-
-    // Получаем ширину одного изображения
-    const imageNode = this.node.querySelector('img');
-    if (imageNode) {
-      this.imageWidth = imageNode.getBoundingClientRect().width;
-    }
   }
 
   /**

@@ -673,7 +673,7 @@ class REST {
         }
 
         // Если это FormData, то метод всегда "POST"
-        if ('formData' in data) {
+        if ('formData' in data && data['formData'] instanceof FormData) {
           method = 'POST';
         }
 
@@ -710,7 +710,7 @@ class REST {
         }
 
         // Если это FormData, то передаваться будет только её объект
-        if ('formData' in data) {
+        if ('formData' in data && data['formData'] instanceof FormData) {
           data = data.formData;
 
           // Получаем полный адрес если необходимо

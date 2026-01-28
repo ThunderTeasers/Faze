@@ -56,7 +56,7 @@ interface CallbackData {
  *     afterDrag - пользовательская функция, исполняющаяся после фактического перетаскивания, то есть когда отпускаем кнопку мыши(аналог "changed")
  */
 interface Config {
-  direction: SideDirection;
+  direction?: SideDirection;
   animation: number,
   callbacks: {
     created?: (data: CallbackData) => void;
@@ -80,7 +80,7 @@ class Drag extends Module {
   constructor(nodes: HTMLElement[], config: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
-      direction: SideDirection.Vertical,
+      direction: undefined,
       animation: 200,
       callbacks: {
         created: undefined,
@@ -112,6 +112,8 @@ class Drag extends Module {
     this.itemsData = [];
     this.itemsNodes = [];
 
+    this.config.direction ||= Drag.getDirection(this.nodes[0]);
+
     // Инициализация переменных
     this.collectItems();
     this.initializeItems();
@@ -128,6 +130,17 @@ class Drag extends Module {
         this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
       }
     }
+  }
+
+  /**
+   * Определяет направление драга исходя из размеров области, если ширина больше, то это Horizontal, иначе Vertical
+   * 
+   * @returns Направление драга
+   */
+  private static getDirection(node: HTMLElement): SideDirection {
+    const rect = node.getBoundingClientRect();
+
+    return rect.width > rect.height ? SideDirection.Horizontal : SideDirection.Vertical;
   }
 
   /**
@@ -458,11 +471,12 @@ class Drag extends Module {
    */
   static initializeByDataAttributes(dragNode: HTMLElement): void {
     const group: string | undefined = dragNode.dataset.fazeDragGroup;
+    const direction = dragNode.dataset.fazeDragDirection ? dragNode.dataset.fazeDragDirection : Drag.getDirection(dragNode);
 
     const dragContainerNodes = group ? Array.from(document.querySelectorAll(`[data-faze~="drag"][data-faze-drag-group=${group}]`)) : [dragNode];
     new Faze.Drag(dragContainerNodes, {
       animation: dragNode.dataset.fazeDragAnimation ? Number(dragNode.dataset.fazeDragAnimation) : 200,
-      direction: dragNode.dataset.fazeDragDirection === 'horizontal' ? SideDirection.Horizontal : SideDirection.Vertical,
+      direction,
     });
   }
 }

@@ -11,6 +11,7 @@
 
   position: relative;
 
+  // Враппер для карусели
   .faze-thumbgallery-holder {
     display: flex;
 
@@ -84,6 +85,10 @@
     }
 
     &[data-faze-thumbgallery-total='5'] {
+      grid-template-columns: repeat(5, 1fr);
+    }
+
+    &[data-faze-thumbgallery-total='6'] {
       grid-template-columns: repeat(5, 1fr);
     }
   }

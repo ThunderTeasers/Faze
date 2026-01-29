@@ -582,6 +582,12 @@ class ZoomBox {
    */
   private close(): void {
     if (this.wrapperData.node) {
+      // Удаляем все элементы управления
+      this.wrapperData.controlsNodes.close?.remove();
+      this.wrapperData.controlsNodes.arrows?.next?.remove();
+      this.wrapperData.controlsNodes.arrows?.prev?.remove();
+
+      // Проигрываем анимацию
       Faze.Animations.animatePositionAndSize({
         node: this.wrapperData.node,
         from: this.currentPositionAndSize,

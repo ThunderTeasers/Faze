@@ -5,8 +5,20 @@
  * Дата: 09.01.2020
  */
 
+// Анимация появления
+@keyframes faze-zoombox-appear {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 // Элементы при нажатии на которые вызываем модуль
 [data-faze-zoombox-image] {
+
   // При наведении
   &:hover {
     cursor: zoom-in;
@@ -60,6 +72,8 @@
 
     user-select: none;
 
+    animation-name: faze-zoombox-appear;
+    animation-duration: 1s;
     transform: translateY(-50%);
 
     // Сама стрелка
@@ -116,6 +130,9 @@
     border-radius: 50%;
     background-color: #fff;
 
+    animation-name: faze-zoombox-appear;
+    animation-duration: 1s;
+
     &:before,
     &:after {
       content: '';
@@ -144,6 +161,7 @@
 
   // Перетаскиваем
   &.faze-drag-active {
+
     // При наведении
     &:hover {
       cursor: move;
@@ -151,6 +169,7 @@
 
     // Изображение
     .faze-zoombox-image {
+
       // При наведении
       &:hover {
         cursor: move;

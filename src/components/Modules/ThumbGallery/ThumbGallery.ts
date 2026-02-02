@@ -256,7 +256,7 @@ class ThumbGallery extends Module {
    * @private
    */
   private manageHolderWidth(): void {
-    this.holderNode.style.width = `${this.imageWidth}px`;
+    this.holderNode.style.width = this.imageWidth === 0 ? '100%' : `${this.imageWidth}px`;
   }
 
   /**

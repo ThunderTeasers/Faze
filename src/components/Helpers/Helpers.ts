@@ -1163,6 +1163,95 @@ class Helpers {
   }
 
   /**
+ * Рекурсивно находит ближайшего родителя, который скрывает элемент
+ * 
+ * @param {HTMLElement} node DOM элемент, от которого начинаем поиск вверх
+ * 
+ * @returns {HTMLElement | null} Ближайший скрывающий родитель или null
+ */
+  static findNearestHiddenParent(node: HTMLElement): HTMLElement | null {
+    if (!node || node === document.body || node === document.documentElement) {
+      return null;
+    }
+
+    const parent = node.parentElement;
+    if (!parent) {
+      return null;
+    }
+
+    const style = window.getComputedStyle(parent);
+
+    // Самые важные причины "скрытности"
+    const isDisplayNone = style.display === 'none';
+
+    // Можно добавить другие условия по вкусу, например:
+    // const isOpacityZero = parseFloat(style.opacity) === 0;
+    // const isContentHidden = style.contentVisibility === 'hidden';
+
+    if (isDisplayNone) {
+      return parent; // ← нашли! это он нас прячет
+    }
+
+    // Если текущий родитель нормальный — идём выше рекурсивно
+    return Helpers.findNearestHiddenParent(parent);
+  }
+
+  /**
+   * Получение размеров элемента даже если он скрыт(display: none или visibility: hidden;)
+   * 
+   * @param {HTMLElement} node DOM элемент элемента для рассчета
+   * 
+   * @returns Размеры объекта даже если он скрыт
+   */
+  static getBoundingClientRect(node: HTMLElement) {
+    let hiddenParentNode = Helpers.findNearestHiddenParent(node);
+    if (!hiddenParentNode) {
+      hiddenParentNode = node;
+      // return;
+    }
+
+    // Сохраняем оригинальные стили
+    const originalDisplay = hiddenParentNode.style.display;
+    const originalVisibility = hiddenParentNode.style.visibility;
+    const originalPosition = hiddenParentNode.style.position;
+    const originalParent = hiddenParentNode.parentNode;
+    const originalNextSibling = hiddenParentNode.nextElementSibling;
+
+    // Создаем временный контейнер
+    const tempDiv = document.createElement('div');
+    tempDiv.style.cssText = `
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+      visibility: hidden;
+      pointer-events: none;
+      z-index: -1;
+    `;
+
+    // Добавляем элемент во временный контейнер
+    originalParent?.insertBefore(tempDiv, originalNextSibling);
+    const cloneNode = hiddenParentNode.cloneNode(true);
+
+    tempDiv.appendChild(cloneNode);
+
+    // Устанавливаем display и visibility для расчета
+    hiddenParentNode.style.display = originalDisplay === 'none' ? 'block' : originalDisplay;
+    hiddenParentNode.style.visibility = 'visible';
+    hiddenParentNode.style.position = 'static';
+
+    // Получаем размеры
+    const rect = node.getBoundingClientRect();
+
+    // Восстанавливаем
+    hiddenParentNode.style.display = originalDisplay;
+    hiddenParentNode.style.visibility = originalVisibility;
+    hiddenParentNode.style.position = originalPosition;
+    // tempDiv.remove();
+
+    return rect;
+  }
+
+  /**
    * Возвращает размер DOM элемента, включая его внешние поля margin
    *
    * @param {HTMLElement} node DOM элемент у которого вычисляем размер

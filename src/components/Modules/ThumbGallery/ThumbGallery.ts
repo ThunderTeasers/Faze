@@ -36,9 +36,6 @@ class ThumbGallery extends Module {
   // Ширина изображения
   private imageWidth: number;
 
-  // Ширина враппера
-  private holderWidth: number;
-
   // Список фотографий
   private imagesData: Array<string>;
 
@@ -83,7 +80,6 @@ class ThumbGallery extends Module {
       this.imageWidth = imageNode.getBoundingClientRect().width;
     }
 
-    this.holderWidth = this.node.getBoundingClientRect().width;
     this.imagesData = [];
     this.galleryNode = undefined;
     this.galleryElementsNodes = [];
@@ -137,7 +133,6 @@ class ThumbGallery extends Module {
       this.imageWidth = imageNode.getBoundingClientRect().width;
     }
 
-    this.holderWidth = this.node.getBoundingClientRect().width;
     this.imagesData = [];
     this.galleryElementsNodes.forEach((galleryElementNode) => galleryElementNode.remove());
     this.galleryElementsNodes = [];
@@ -176,6 +171,8 @@ class ThumbGallery extends Module {
       // Получаем необходимые данные
       const total = this.imagesData.length;
 
+      const holderWidth = this.node.getBoundingClientRect().width;
+
       // Если нет изображений в галереи, то нет смысла в дальнейшем коде
       if (total <= 1) {
         return;
@@ -189,7 +186,7 @@ class ThumbGallery extends Module {
       const totalSpace = total * this.config.gap;
 
       // Ширина фото в слайдере
-      const sliderPhotoWidth = (this.holderWidth - totalSpace) / total;
+      const sliderPhotoWidth = (holderWidth - totalSpace) / total;
 
       // Индекс фотографии которую нужно вывести
       let currentPhotoIndex = Math.floor(offsetX / sliderPhotoWidth);
@@ -202,7 +199,7 @@ class ThumbGallery extends Module {
       }
 
       // Скроллим галерею
-      this.holderNode.scrollLeft = currentPhotoIndex * this.holderWidth;
+      this.holderNode.scrollLeft = currentPhotoIndex * holderWidth;
 
       // Ставим активный элемент
       Faze.Helpers.activateItem(this.galleryElementsNodes, currentPhotoIndex);

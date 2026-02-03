@@ -316,7 +316,7 @@ class Drag extends Module {
    * @private
    */
   private bindDragStart(): void {
-    Faze.Events.listener('dragstart', this.nodes, (event: DragEvent) => {
+    Faze.Events.listener('dragstart', this.nodes, (event: DragEvent, node: HTMLElement) => {
       if (event.target instanceof HTMLElement && (event.target as HTMLElement)?.closest('[data-faze-drag="item"], [data-faze-drag="handle"]')) {
         const itemNode = (event.target as HTMLElement).closest('[data-faze-drag="item"]');
         if (!itemNode) {
@@ -334,7 +334,7 @@ class Drag extends Module {
         ghost.style.top = '-9999px';
         ghost.style.width = `${itemData.node.clientWidth}px`;
         ghost.style.height = `${itemData.node.clientHeight}px`;
-        document.body.appendChild(ghost);
+        node.appendChild(ghost);
 
         // Устанавливаем как drag image
         event.dataTransfer?.setDragImage(ghost, 0, 0);

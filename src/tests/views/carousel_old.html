@@ -1,41 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Title</title>
+<html lang="ru">
 
-    <style>
-      .carousel-test {
-        width: 500px;
-        margin-left: 200px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="carousel-test">
-      <img src="https://via.placeholder.com/350x480" alt="" />
-      <img src="https://via.placeholder.com/351x480" alt="" />
-      <img src="https://via.placeholder.com/352x480" alt="" />
-      <img src="https://via.placeholder.com/353x480" alt="" />
-      <img src="https://via.placeholder.com/354x480" alt="" />
-    </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Title</title>
 
-    <div class="counter"></div>
+  <style>
+    .carousel-test {
+      width: 500px;
+      margin-left: 200px;
+    }
+  </style>
+</head>
 
-    <script>
-      setTimeout(() => {
-        new Faze.Carousel(document.querySelector('.carousel-test'), {
-          animation: {
-            type: 'slide',
-            time: 1000,
-          },
-          counter: true,
-          selectors: {
-            counter: '.counter',
-          },
-          pages: true,
-        });
-      }, 1000);
-    </script>
-  </body>
+<body>
+  <div class="carousel-test">
+    <img src="https://via.placeholder.com/350x480" alt="" />
+    <img src="https://via.placeholder.com/351x480" alt="" />
+    <img src="https://via.placeholder.com/352x480" alt="" />
+    <img src="https://via.placeholder.com/353x480" alt="" />
+    <img src="https://via.placeholder.com/354x480" alt="" />
+  </div>
+
+  <div class="counter"></div>
+
+  <script>
+    setTimeout(() => {
+      new Faze.Carousel(document.querySelector('.carousel-test'), {
+        animation: {
+          type: 'slide',
+          time: 1000,
+        },
+        counter: true,
+        selectors: {
+          counter: '.counter',
+        },
+        pages: true,
+      });
+    }, 1000);
+  </script>
+</body>
+
 </html>

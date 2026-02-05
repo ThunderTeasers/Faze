@@ -1,31 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
+
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Title</title>
 </head>
+
 <body>
-<button data-faze="tooltip" data-faze-tooltip-side="bottom">
-  Спойлер
-</button>
-<script>
-  document.addEventListener('keyup', (event) => {
-    if(event.key === 'a'){
-      setTimeout(() => {
-        const b = document.createElement('div');
+  <button data-faze="tooltip" data-faze-tooltip-side="bottom">
+    Спойлер
+  </button>
+  <script>
+    document.addEventListener('keyup', (event) => {
+      if (event.key === 'a') {
+        setTimeout(() => {
+          const b = document.createElement('div');
 
-        for (let i = 0; i < 520; i++) {
-          const a = document.createElement('button');
-          a.dataset.faze = 'tooltip';
-          a.textContent = 'test1';
+          for (let i = 0; i < 520; i++) {
+            const a = document.createElement('button');
+            a.dataset.faze = 'tooltip';
+            a.textContent = 'test1';
 
-          b.appendChild(a);
-        }
+            b.appendChild(a);
+          }
 
-        document.body.appendChild(b);
-      }, 1000)
-    }
-  })
-</script>
+          document.body.appendChild(b);
+        }, 1000)
+      }
+    })
+  </script>
 </body>
+
 </html>

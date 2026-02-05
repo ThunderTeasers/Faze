@@ -1,46 +1,61 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <div data-faze="sorter">
-      <ul class="controls">
-        <li data-faze-sorter-head="limit" data-faze-sorter-value="reserve">
-          Сортировать по лимиту
-          <i class="fas sort-arrow fa-sort"></i>
-        </li>
-        <li data-faze-sorter-head="limit" data-faze-sorter-value="value">
-          Сортировать по величине
-          <i class="fas sort-arrow fa-sort"></i>
-        </li>
-        <li data-faze-sorter-head="limit" data-faze-sorter-value="name">
-          Сортировать по названию
-          <i class="fas sort-arrow fa-sort"></i>
-        </li>
-        <li data-faze-sorter-head="limit" data-faze-sorter-value="percent">
-          Сортировать по проценту
-          <i class="fas sort-arrow fa-sort-up"></i>
-        </li>
-      </ul>
-      <ul class="limit" data-faze-sorter-body="limit">
-        <li data-faze-sorter-reserve="20294" data-faze-sorter-value="5000000" data-faze-sorter-name="Senator" data-faze-sorter-percent="0" title="20294 / 5000000">Senator <span style="color: black">0%</span></li>
-        <li data-faze-sorter-reserve="327119" data-faze-sorter-value="5000000" data-faze-sorter-name="Xindao" data-faze-sorter-percent="7" title="327119 / 5000000">Xindao <span style="color: black">7%</span></li>
-        <li data-faze-sorter-reserve="87810" data-faze-sorter-value="1000000" data-faze-sorter-name="MVKT" data-faze-sorter-percent="9" title="87810 / 1000000">MVKT <span style="color: black">9%</span></li>
-        <li data-faze-sorter-reserve="3490690" data-faze-sorter-value="25000000" data-faze-sorter-name="Оазис" data-faze-sorter-percent="14" title="3490690 / 25000000">Оазис <span style="color: black">14%</span></li>
-        <li data-faze-sorter-reserve="387206" data-faze-sorter-value="2000000" data-faze-sorter-name="Стан" data-faze-sorter-percent="19" title="387206 / 2000000">Стан <span style="color: black">19%</span></li>
-        <li data-faze-sorter-reserve="1928584" data-faze-sorter-value="9000000" data-faze-sorter-name="Хэппи Гифтс" data-faze-sorter-percent="21" title="1928584 / 9000000">Хэппи Гифтс <span style="color: black">21%</span></li>
-        <li data-faze-sorter-reserve="419219" data-faze-sorter-value="2000000" data-faze-sorter-name="Мидоушен" data-faze-sorter-percent="21" title="419219 / 2000000">Мидоушен <span style="color: black">21%</span></li>
-        <li data-faze-sorter-reserve="3283030" data-faze-sorter-value="15000000" data-faze-sorter-name="Portobello" data-faze-sorter-percent="22" title="3283030 / 15000000">Portobello <span style="color: black">22%</span></li>
-        <li data-faze-sorter-reserve="1421811" data-faze-sorter-value="6000000" data-faze-sorter-name="Arte Gifts" data-faze-sorter-percent="24" title="1421811 / 6000000">Arte Gifts <span style="color: black">24%</span></li>
-        <li data-faze-sorter-reserve="7362669" data-faze-sorter-value="25000000" data-faze-sorter-name="Проект 111" data-faze-sorter-percent="29" title="7362669 / 25000000">Проект 111 <span style="color: black">29%</span></li>
-        <li data-faze-sorter-reserve="1810912" data-faze-sorter-value="6000000" data-faze-sorter-name="Макрос" data-faze-sorter-percent="30" title="1810912 / 6000000">Макрос <span style="color: black">30%</span></li>
-        <li data-faze-sorter-reserve="470455" data-faze-sorter-value="1000000" data-faze-sorter-name="VivaGifts" data-faze-sorter-percent="47" title="470455 / 1000000">VivaGifts <span style="color: black">47%</span></li>
-        <li data-faze-sorter-reserve="1818541" data-faze-sorter-value="2600000" data-faze-sorter-name="Top Catalog" data-faze-sorter-percent="70" title="1818541 / 2600000">Top Catalog <span style="color: #fe5000">70%</span></li>
-      </ul>
-    </div>
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div data-faze="sorter">
+    <ul class="controls">
+      <li data-faze-sorter-head="limit" data-faze-sorter-value="reserve">
+        Сортировать по лимиту
+        <i class="fas sort-arrow fa-sort"></i>
+      </li>
+      <li data-faze-sorter-head="limit" data-faze-sorter-value="value">
+        Сортировать по величине
+        <i class="fas sort-arrow fa-sort"></i>
+      </li>
+      <li data-faze-sorter-head="limit" data-faze-sorter-value="name">
+        Сортировать по названию
+        <i class="fas sort-arrow fa-sort"></i>
+      </li>
+      <li data-faze-sorter-head="limit" data-faze-sorter-value="percent">
+        Сортировать по проценту
+        <i class="fas sort-arrow fa-sort-up"></i>
+      </li>
+    </ul>
+    <ul class="limit" data-faze-sorter-body="limit">
+      <li data-faze-sorter-reserve="20294" data-faze-sorter-value="5000000" data-faze-sorter-name="Senator"
+        data-faze-sorter-percent="0" title="20294 / 5000000">Senator <span style="color: black">0%</span></li>
+      <li data-faze-sorter-reserve="327119" data-faze-sorter-value="5000000" data-faze-sorter-name="Xindao"
+        data-faze-sorter-percent="7" title="327119 / 5000000">Xindao <span style="color: black">7%</span></li>
+      <li data-faze-sorter-reserve="87810" data-faze-sorter-value="1000000" data-faze-sorter-name="MVKT"
+        data-faze-sorter-percent="9" title="87810 / 1000000">MVKT <span style="color: black">9%</span></li>
+      <li data-faze-sorter-reserve="3490690" data-faze-sorter-value="25000000" data-faze-sorter-name="Оазис"
+        data-faze-sorter-percent="14" title="3490690 / 25000000">Оазис <span style="color: black">14%</span></li>
+      <li data-faze-sorter-reserve="387206" data-faze-sorter-value="2000000" data-faze-sorter-name="Стан"
+        data-faze-sorter-percent="19" title="387206 / 2000000">Стан <span style="color: black">19%</span></li>
+      <li data-faze-sorter-reserve="1928584" data-faze-sorter-value="9000000" data-faze-sorter-name="Хэппи Гифтс"
+        data-faze-sorter-percent="21" title="1928584 / 9000000">Хэппи Гифтс <span style="color: black">21%</span></li>
+      <li data-faze-sorter-reserve="419219" data-faze-sorter-value="2000000" data-faze-sorter-name="Мидоушен"
+        data-faze-sorter-percent="21" title="419219 / 2000000">Мидоушен <span style="color: black">21%</span></li>
+      <li data-faze-sorter-reserve="3283030" data-faze-sorter-value="15000000" data-faze-sorter-name="Portobello"
+        data-faze-sorter-percent="22" title="3283030 / 15000000">Portobello <span style="color: black">22%</span></li>
+      <li data-faze-sorter-reserve="1421811" data-faze-sorter-value="6000000" data-faze-sorter-name="Arte Gifts"
+        data-faze-sorter-percent="24" title="1421811 / 6000000">Arte Gifts <span style="color: black">24%</span></li>
+      <li data-faze-sorter-reserve="7362669" data-faze-sorter-value="25000000" data-faze-sorter-name="Проект 111"
+        data-faze-sorter-percent="29" title="7362669 / 25000000">Проект 111 <span style="color: black">29%</span></li>
+      <li data-faze-sorter-reserve="1810912" data-faze-sorter-value="6000000" data-faze-sorter-name="Макрос"
+        data-faze-sorter-percent="30" title="1810912 / 6000000">Макрос <span style="color: black">30%</span></li>
+      <li data-faze-sorter-reserve="470455" data-faze-sorter-value="1000000" data-faze-sorter-name="VivaGifts"
+        data-faze-sorter-percent="47" title="470455 / 1000000">VivaGifts <span style="color: black">47%</span></li>
+      <li data-faze-sorter-reserve="1818541" data-faze-sorter-value="2600000" data-faze-sorter-name="Top Catalog"
+        data-faze-sorter-percent="70" title="1818541 / 2600000">Top Catalog <span style="color: #fe5000">70%</span></li>
+    </ul>
+  </div>
+</body>
+
 </html>

@@ -1,103 +1,55 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Тестирование модуля Steps</title>
-  </head>
-  <body>
-    <div
-      class="steps js-steps"
-      data-faze1="steps"
-      data-faze-steps-form-mode="true"
-    >
-      <div class="faze-steps-bodies">
-        <div class="faze-steps-body">
-          <div class="h2">Направление</div>
-          <label>
-            <input
-              type="radio"
-              name="direction"
-              value="Россия"
-              data-faze-steps-data-name="Направление"
-              data-faze-steps-path="russia"
-              required
-            />
-            Россия
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="direction"
-              value="Москва"
-              data-faze-steps-path="moscow"
-              required
-            />
-            Москва
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="direction"
-              value="Экспорт"
-              data-faze-steps-path="export"
-              required
-            />
-            Экспорт
-          </label>
-          <br /><br />
-          <button class="faze-steps-next btn btn-primary">Далее</button>
-        </div>
 
-        <div class="faze-steps-body">
-          <div class="h2">Маршрут доставки</div>
-          <div class="faze-steps-path" data-faze-steps-path="russia">
-            <input
-              type="text"
-              name="russia_from"
-              placeholder="Город отправления"
-              required
-            />
-            <input
-              type="text"
-              name="russia_to"
-              placeholder="Город прибытия"
-              required
-            />
-          </div>
-          <div class="faze-steps-path" data-faze-steps-path="moscow">
-            <input
-              type="text"
-              name="moscow_from"
-              placeholder="Адрес отправления"
-              required
-            />
-            <input
-              type="text"
-              name="moscow_to"
-              placeholder="Адрес прибытия"
-              required
-            />
-          </div>
-          <div class="faze-steps-path" data-faze-steps-path="export">
-            <input
-              type="text"
-              name="export_from"
-              placeholder="Страна отправления"
-              required
-            />
-            <input
-              type="text"
-              name="export_to"
-              placeholder="Страна прибытия"
-              required
-            />
-          </div>
-          <br /><br />
-          <button class="faze-steps-back btn btn-primary">Назад</button>
-          <button class="faze-steps-finish btn btn-primary">Далее</button>
-        </div>
-        <div class="faze-steps-body faze-steps-body-finish">Готово!</div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тестирование модуля Steps</title>
+</head>
+
+<body>
+  <div class="steps js-steps" data-faze1="steps" data-faze-steps-form-mode="true">
+    <div class="faze-steps-bodies">
+      <div class="faze-steps-body">
+        <div class="h2">Направление</div>
+        <label>
+          <input type="radio" name="direction" value="Россия" data-faze-steps-data-name="Направление"
+            data-faze-steps-path="russia" required />
+          Россия
+        </label>
+        <label>
+          <input type="radio" name="direction" value="Москва" data-faze-steps-path="moscow" required />
+          Москва
+        </label>
+        <label>
+          <input type="radio" name="direction" value="Экспорт" data-faze-steps-path="export" required />
+          Экспорт
+        </label>
+        <br /><br />
+        <button class="faze-steps-next btn btn-primary">Далее</button>
       </div>
+
+      <div class="faze-steps-body">
+        <div class="h2">Маршрут доставки</div>
+        <div class="faze-steps-path" data-faze-steps-path="russia">
+          <input type="text" name="russia_from" placeholder="Город отправления" required />
+          <input type="text" name="russia_to" placeholder="Город прибытия" required />
+        </div>
+        <div class="faze-steps-path" data-faze-steps-path="moscow">
+          <input type="text" name="moscow_from" placeholder="Адрес отправления" required />
+          <input type="text" name="moscow_to" placeholder="Адрес прибытия" required />
+        </div>
+        <div class="faze-steps-path" data-faze-steps-path="export">
+          <input type="text" name="export_from" placeholder="Страна отправления" required />
+          <input type="text" name="export_to" placeholder="Страна прибытия" required />
+        </div>
+        <br /><br />
+        <button class="faze-steps-back btn btn-primary">Назад</button>
+        <button class="faze-steps-finish btn btn-primary">Далее</button>
+      </div>
+      <div class="faze-steps-body faze-steps-body-finish">Готово!</div>
     </div>
-  </body>
+  </div>
+</body>
+
 </html>

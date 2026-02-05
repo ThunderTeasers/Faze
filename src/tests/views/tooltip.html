@@ -1,18 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Title</title>
-  </head>
-  <body>
-    <button class="js-tooltip-change">Изменить текст тултипа 1</button>
-    <button class="js-tooltip1" style="margin-left: 200px; margin-top: 200px" data-faze="tooltip" data-faze-tooltip-dynamic-update="true" data-faze-tooltip-text="Test" data-faze-tooltip-side="bottom" data-faze-tooltip-side-mobile="top">Тултип 1</button>
+<html lang="ru">
 
-    <!-- <button data-faze="tooltip" data-faze-tooltip-text="Test" data-faze-tooltip-side="bottom" data-faze-tooltip-event="click">Тултип 2</button> -->
-    <script>
-      document.querySelector('.js-tooltip1').addEventListener('click', () => {
-        document.querySelector('.js-tooltip1').dataset.fazeTooltipText = '123';
-      });
-    </script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Title</title>
+</head>
+
+<body>
+  <button class="js-tooltip-change">Изменить текст тултипа 1</button>
+  <button class="js-tooltip1" style="margin-left: 200px; margin-top: 200px" data-faze="tooltip"
+    data-faze-tooltip-dynamic-update="true" data-faze-tooltip-text="Test" data-faze-tooltip-side="bottom"
+    data-faze-tooltip-side-mobile="top">Тултип 1</button>
+
+  <!-- <button data-faze="tooltip" data-faze-tooltip-text="Test" data-faze-tooltip-side="bottom" data-faze-tooltip-event="click">Тултип 2</button> -->
+  <script>
+    document.querySelector('.js-tooltip1').addEventListener('click', () => {
+      document.querySelector('.js-tooltip1').dataset.fazeTooltipText = '123';
+    });
+  </script>
+</body>
+
 </html>

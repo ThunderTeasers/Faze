@@ -1,36 +1,33 @@
 <!DOCTYPE html>
 <html lang="ru" class="test-finder">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Finder</title>
-    <style>
-      body {
-        height: 2000px;
-      }
 
-      form {
-        position: relative;
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finder</title>
+  <style>
+    body {
+      height: 2000px;
+    }
 
-        margin-top: 200px;
-        margin-left: 200px;
-      }
+    form {
+      position: relative;
 
-      form input {
-        position: relative;
-      }
-    </style>
-  </head>
-  <body>
-    <form action="/" data-faze="form" data-faze-form-hint-side="right">
-      <input
-        name="test"
-        type="text"
-        placeholder="Что нибудь"
-        data-faze-form-rules='[{"rule":".{1,}"}]'
-        readonly
-        required
-      />
-      <!-- <input
+      margin-top: 200px;
+      margin-left: 200px;
+    }
+
+    form input {
+      position: relative;
+    }
+  </style>
+</head>
+
+<body>
+  <form action="/" data-faze="form" data-faze-form-hint-side="right">
+    <input name="test" type="text" placeholder="Что нибудь" data-faze-form-rules='[{"rule":".{1,}"}]' readonly
+      required />
+    <!-- <input
         type="text"
         name="password"
         placeholder="Пароль"
@@ -44,28 +41,17 @@
         class="js-password-2"
         data-faze-form-rules='[{"message":"От 8 до 32 символов", "rule":".{8,32}"},{"message":"Не менее одной цифры", "rule":"\d{1,}"},{"message":"Не менее одной заглавной буквы", "rule":"[A-Z]{1,}"},{"message":"Не менее одного спец. символа", "rule":"[-@_\[\]\(\)\+]{1,}"},{"message":"Пароли должны совпадать", "rule":"same", "special":".js-password-1"}]'
       /> -->
-      <input
-        type="number"
-        placeholder="Номер"
-        data-faze-form-hint-disabled="true"
-        data-faze-form-rules='[{"message":"Введите что нибудь!", "rule":"validation"}]'
-        required
-      />
-      <input
-        type="text"
-        placeholder="Что нибудь"
-        data-faze-form-rules='[{"message":"Хоть что-то!", "rule":"validation"}]'
-        required
-      />
-      <!-- \+7 \(\d{3}\) \d{3}-\d{2}-\d{2} -->
-      <button type="submit" class="faze-form-button">Отправить</button>
+    <input type="number" placeholder="Номер" data-faze-form-hint-disabled="true"
+      data-faze-form-rules='[{"message":"Введите что нибудь!", "rule":"validation"}]' required />
+    <input type="text" placeholder="Что нибудь" data-faze-form-rules='[{"message":"Хоть что-то!", "rule":"validation"}]'
+      required />
+    <!-- \+7 \(\d{3}\) \d{3}-\d{2}-\d{2} -->
+    <button type="submit" class="faze-form-button">Отправить</button>
 
-      <button
-        type="button"
-        onclick="this.form.test.dispatchEvent(new Event('input'))"
-      >
-        Заполнить
-      </button>
-    </form>
-  </body>
+    <button type="button" onclick="this.form.test.dispatchEvent(new Event('input'))">
+      Заполнить
+    </button>
+  </form>
+</body>
+
 </html>

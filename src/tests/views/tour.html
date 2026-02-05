@@ -1,55 +1,58 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Тестирование модуля Tour</title>
-    <style>
-      body {
-        height: 5000px;
-      }
 
-      .step1 {
-        position: absolute;
-        top: 20px;
-        left: 20px;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тестирование модуля Tour</title>
+  <style>
+    body {
+      height: 5000px;
+    }
 
-      .step2 {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-      }
+    .step1 {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
 
-      .step3 {
-        position: absolute;
-        top: 2000px;
-        left: 20px;
-      }
+    .step2 {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
 
-      .step4 {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-      }
+    .step3 {
+      position: absolute;
+      top: 2000px;
+      left: 20px;
+    }
 
-      .step5 {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-      }
+    .step4 {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+    }
 
-      .step6 {
-        position: absolute;
-        top: calc(50% + 30px);
-        left: 50%;
-      }
-    </style>
-  </head>
-  <body>
-    <div data-faze="tour" data-faze-tour-group="test">
-      <button>Нажми</button>
+    .step5 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+    }
 
-      <!-- <div class="step1" data-faze-tour-step="test" data-faze-tour-step-text="Test 1" data-faze-tour-step-index="4">Подсказка 1</div>
+    .step6 {
+      position: absolute;
+      top: calc(50% + 30px);
+      left: 50%;
+    }
+  </style>
+</head>
+
+<body>
+  <div data-faze="tour" data-faze-tour-group="test">
+    <button>Нажми</button>
+
+    <!-- <div class="step1" data-faze-tour-step="test" data-faze-tour-step-text="Test 1" data-faze-tour-step-index="4">Подсказка 1</div>
       <div
         class="step2"
         data-faze-tour-step="test"
@@ -60,11 +63,15 @@
         Подсказка 2
       </div>
             -->
-      <div class="step3" data-faze-tour-step="test" data-faze-tour-step-text="Test 3" data-faze-tour-step-index="12">Подсказка 3</div>
-      <!-- <div class="step4" data-faze-tour-step="test" data-faze-tour-step-side="left" data-faze-tour-step-text="Test 4" data-faze-tour-step-index="6">Подсказка 4</div> -->
+    <div class="step3" data-faze-tour-step="test" data-faze-tour-step-text="Test 3" data-faze-tour-step-index="12">
+      Подсказка 3</div>
+    <!-- <div class="step4" data-faze-tour-step="test" data-faze-tour-step-side="left" data-faze-tour-step-text="Test 4" data-faze-tour-step-index="6">Подсказка 4</div> -->
 
-      <div class="step5" data-faze-tour-step="test" data-faze-tour-step-side="top" data-faze-tour-step-text="Test 4" data-faze-tour-step-index="2">Подсказка 5</div>
-      <div class="step6" data-faze-tour-step="test" data-faze-tour-step-side="bottom" data-faze-tour-step-text="Test 4" data-faze-tour-step-index="7">Подсказка 6</div>
-    </div>
-  </body>
+    <div class="step5" data-faze-tour-step="test" data-faze-tour-step-side="top" data-faze-tour-step-text="Test 4"
+      data-faze-tour-step-index="2">Подсказка 5</div>
+    <div class="step6" data-faze-tour-step="test" data-faze-tour-step-side="bottom" data-faze-tour-step-text="Test 4"
+      data-faze-tour-step-index="7">Подсказка 6</div>
+  </div>
+</body>
+
 </html>

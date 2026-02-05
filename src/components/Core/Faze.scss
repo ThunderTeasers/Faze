@@ -26,6 +26,13 @@
 
   // Шрифты
   --faze-font-fontawesome: 'Font Awesome 6 Pro';
+
+  // Брейкпоинты
+  --faze-breakpoint-xs: 480px;
+  --faze-breakpoint-sm: 768px;
+  --faze-breakpoint-md: 1024px;
+  --faze-breakpoint-lg: 1280px;
+  --faze-breakpoint-xl: 1440px;
 }
 
 * {

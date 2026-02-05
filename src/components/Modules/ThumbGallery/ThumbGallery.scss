@@ -7,8 +7,6 @@
 
 // Главная фото
 .faze-thumbgallery {
-  --faze-thumbgallery-offset: 0;
-
   position: relative;
 
   // Враппер для карусели
@@ -95,6 +93,15 @@
 
   // При наведении
   &:hover {
+    .faze-thumbgallery-gallery {
+      visibility: visible;
+    }
+  }
+
+  // Для телефона
+  @media (max-width: 768px) {
+
+    // Слайдер фотографий
     .faze-thumbgallery-gallery {
       visibility: visible;
     }

@@ -33,9 +33,6 @@ interface Config {
  * Класс галереи
  */
 class ThumbGallery extends Module {
-  // Ширина изображения
-  private imageWidth: number;
-
   // Список фотографий
   private imagesData: Array<string>;
 
@@ -74,12 +71,6 @@ class ThumbGallery extends Module {
    */
   initialize(): void {
     // Инициализация переменных
-    // Получаем ширину одного изображения
-    const imageNode = this.node.querySelector('img');
-    if (imageNode) {
-      this.imageWidth = imageNode.getBoundingClientRect().width;
-    }
-
     this.imagesData = [];
     this.galleryNode = undefined;
     this.galleryElementsNodes = [];
@@ -117,7 +108,6 @@ class ThumbGallery extends Module {
     if (this.imagesData.length > 0) {
       this.buildImagesCarousel();
       this.generateSliderHTML();
-      this.manageHolderWidth();
     }
   }
 
@@ -127,12 +117,6 @@ class ThumbGallery extends Module {
    * @param data Новый массив изображений
    */
   reinitialize(data: string): void {
-    // Очищаем всё
-    const imageNode = this.node.querySelector('img');
-    if (imageNode) {
-      this.imageWidth = imageNode.getBoundingClientRect().width;
-    }
-
     this.imagesData = [];
     this.galleryElementsNodes.forEach((galleryElementNode) => galleryElementNode.remove());
     this.galleryElementsNodes = [];
@@ -153,7 +137,7 @@ class ThumbGallery extends Module {
   private bindScroll() {
     Faze.Events.listener('scrollend', this.holderNode, () => {
       // Получаем текущий индекс
-      const currentPhotoIndex = Math.round((this.holderNode.scrollLeft || 0) / this.imageWidth);
+      const currentPhotoIndex = Math.round((this.holderNode.scrollLeft || 0) / this.holderNode.getBoundingClientRect().width);
 
       // Ставим активный элемент
       Faze.Helpers.activateItem(this.galleryElementsNodes, currentPhotoIndex);
@@ -245,15 +229,6 @@ class ThumbGallery extends Module {
     `;
 
     this.holderNode = this.node.querySelector('.faze-thumbgallery-holder') as HTMLDivElement;
-  }
-
-  /**
-   * Проставление корректной ширины
-   * 
-   * @private
-   */
-  private manageHolderWidth(): void {
-    this.holderNode.style.width = this.imageWidth === 0 ? '100%' : `${this.imageWidth}px`;
   }
 
   /**

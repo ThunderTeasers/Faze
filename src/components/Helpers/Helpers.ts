@@ -41,6 +41,14 @@ export enum DragMode {
 }
 
 /**
+ * Направление перетаскивания
+ */
+export enum DragDirection {
+  VERTICAL = 1,
+  HORIZONTAL = 2,
+}
+
+/**
  * Структура настроек метода для перетаскивания
  *
  * Содержит:
@@ -55,6 +63,7 @@ export enum DragMode {
 interface DragOptions {
   node?: HTMLElement;
   mode: DragMode;
+  direction: DragDirection,
   callbacks: {
     beforeDrag?: () => void;
     drag?: (data: DragCallbackData) => void;
@@ -1378,6 +1387,7 @@ class Helpers {
     options: DragOptions = {
       node: undefined,
       mode: DragMode.MOUSE | DragMode.TOUCH,
+      direction: DragDirection.HORIZONTAL | DragDirection.VERTICAL,
       callbacks: {
         beforeDrag: undefined,
         drag: undefined,
@@ -1389,9 +1399,14 @@ class Helpers {
       return;
     }
 
-    // Если тип перетаскивания не указан, то по умолчанию задаем перетаскивание мышью
+    // Если тип перетаскивания не указан, то по умолчанию задаем перетаскивание всем
     if (!options.mode) {
       options.mode = DragMode.MOUSE | DragMode.TOUCH;
+    }
+
+    // Если направление перетаскивания не указан, то по умолчанию задаем любое направление
+    if (!options.direction) {
+      options.direction = DragDirection.HORIZONTAL | DragDirection.VERTICAL;
     }
 
     // Начальное положение DOM элемента
@@ -1440,9 +1455,16 @@ class Helpers {
       startMousePosition.x = xPosition;
       startMousePosition.y = yPosition;
 
+      console.log(options.direction);
+
       // Рассчет новой позиции окна
-      options.node.style.left = `${options.node.offsetLeft - endMousePosition.x}px`;
-      options.node.style.top = `${options.node.offsetTop - endMousePosition.y}px`;
+      if (options.direction & DragDirection.HORIZONTAL) {
+        options.node.style.left = `${options.node.offsetLeft - endMousePosition.x}px`;
+      }
+
+      if (options.direction & DragDirection.VERTICAL) {
+        options.node.style.top = `${options.node.offsetTop - endMousePosition.y}px`;
+      }
 
       // Вызываем пользовательскую функцию
       if (options.callbacks && 'drag' in options.callbacks && typeof options.callbacks.drag === 'function') {

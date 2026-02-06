@@ -10,6 +10,7 @@
 import './Slider.scss';
 import Module from '../../Core/Module';
 import Faze from '../../Core/Faze';
+import { DragDirection } from '../../Helpers/Helpers';
 
 /**
  * Структура возвращаемого объекта в пользовательском методе
@@ -310,6 +311,7 @@ class Slider extends Module {
 
       Faze.Helpers.bindDrag({
         node: pointNode,
+        direction: DragDirection.HORIZONTAL,
         callbacks: {
           drag: ({ endMousePosition }: { endMousePosition: FazePosition }) => {
             // Передвижение ползунка
@@ -502,10 +504,8 @@ class Slider extends Module {
     }
 
     // Ставим ограничение
-    if (this.values.length === 2) {
-      if (this.values[0] > this.values[1]) {
-        this.values[0] = this.values[1];
-      }
+    if (this.values.length === 2 && this.values[0] > this.values[1]) {
+      this.values[0] = this.values[1];
     }
 
     // Если указаны селекторы инпутов, то обновляем их

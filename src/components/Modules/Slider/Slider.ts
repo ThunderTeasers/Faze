@@ -432,17 +432,17 @@ class Slider extends Module {
     needToUpdateInputs: boolean = true,
     needToCorrect: boolean = false
   ) {
-    var tmpPosition = position;
+    let tmpPosition = position;
 
     // Ширина всего слайдера
     const sliderWidth = this.node.getBoundingClientRect().width;
 
     // Флаги для определения уперся ли ползунок в другого
-    var isCollideNext = false;
-    var isCollidePrev = false;
+    let isCollideNext = false;
+    let isCollidePrev = false;
 
     // Насколько нужно сдвигать значение для корректного пересчёта конкретного ползунка
-    var pointWidthFactor = 0;
+    let pointWidthFactor = 0;
 
     // Проверка на заезд дальше следующего ползунка
     if (nextPointNode) {

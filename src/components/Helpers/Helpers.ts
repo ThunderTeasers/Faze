@@ -1455,8 +1455,6 @@ class Helpers {
       startMousePosition.x = xPosition;
       startMousePosition.y = yPosition;
 
-      console.log(options.direction);
-
       // Рассчет новой позиции окна
       if (options.direction & DragDirection.HORIZONTAL) {
         options.node.style.left = `${options.node.offsetLeft - endMousePosition.x}px`;

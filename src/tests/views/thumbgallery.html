@@ -36,6 +36,14 @@
       </div>
     </div>
   </div>
+
+  <button id="change">Поменять</button>
+
+  <script>
+    document.querySelector('#change').addEventListener('click', () => {
+      document.querySelector('.image').dataset.fazeThumbgalleryData = '["https://www.admos-gifts.ru/product256x256xffffff/i/product/32510042900.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/32510042900-01.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/32510042900-02.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/32510042900-03.jpg"]';
+    });
+  </script>
 </body>
 
 </html>

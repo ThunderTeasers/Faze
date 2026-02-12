@@ -80,6 +80,9 @@ class ThumbGallery extends Module {
     this.node.classList.toggle('faze-thumbgallery-touchmove', this.config.touchMove);
     this.node.classList.toggle('faze-thumbgallery-mousemove', this.config.mouseMove);
 
+    // Создание галереи
+    this.parseProductJSON();
+
     // Инициализация
     super.initialize();
   }
@@ -102,9 +105,6 @@ class ThumbGallery extends Module {
   build(): void {
     super.build();
 
-    // Создание галереи
-    this.parseProductJSON();
-
     if (this.imagesData.length > 0) {
       this.buildImagesCarousel();
       this.generateSliderHTML();
@@ -126,7 +126,17 @@ class ThumbGallery extends Module {
     this.config.data = data;
 
     // Создание галереи
-    this.build();
+    this.parseProductJSON();
+
+    if (this.imagesData && Array.isArray(this.imagesData)) {
+      const image = new Image();
+      image.src = this.imagesData[0];
+      image.onload = () => {
+
+        // Создание галереи
+        this.build();
+      };
+    }
   }
 
   /**

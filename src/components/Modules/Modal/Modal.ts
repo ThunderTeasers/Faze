@@ -86,6 +86,7 @@ interface Config {
   title?: string;
   url?: string;
   html?: string;
+  text?: string;
   class?: string;
   event: string;
   evented: boolean;
@@ -483,6 +484,8 @@ class Modal {
       });
       const data = await response.text();
       return data;
+    } else if (this.config.text) {
+      return this.config.text || '';
     } else {
       return this.config.html || '';
     }
@@ -691,6 +694,7 @@ class Modal {
 
       new Faze.Modal(callerNode, {
         html,
+        text: callerNode.dataset.fazeModalText || '',
         title: callerNode.dataset.fazeModalTitle || '',
         evented: false,
         draggable: callerNode.dataset.fazeModalDraggable === 'true',

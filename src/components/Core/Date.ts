@@ -3,6 +3,33 @@ namespace Faze {
    * Класс для работы с датами
    */
   export class Date {
+    // Дни недели
+    private static readonly DAYS_OF_WEEK = [
+      ['Понедельник', 'Пн'],
+      ['Вторник', 'Вт'],
+      ['Среда', 'Ср'],
+      ['Четверг', 'Чт'],
+      ['Пятница', 'Пт'],
+      ['Суббота', 'Сб'],
+      ['Воскресенье', 'Вс'],
+    ];
+
+    // Месяца
+    private static readonly MONTHS = [
+      ['Январь', 'Января'],
+      ['Февраль', 'Февраля'],
+      ['Март', 'Марта'],
+      ['Апрель', 'Апреля'],
+      ['Май', 'Мая'],
+      ['Июнь', 'Июня'],
+      ['Июль', 'Июля'],
+      ['Август', 'Августа'],
+      ['Сентябрь', 'Сентября'],
+      ['Октябрь', 'Октября'],
+      ['Ноябрь', 'Ноября'],
+      ['Декабрь', 'Декабря'],
+    ];
+
     /**
      * Возвращает день недели в человекочитаемом виде
      *
@@ -12,36 +39,11 @@ namespace Faze {
      * @return{string} День недели в человекочитаемом виде
      */
     static getDayOfWeek(day: number, isShort: boolean = false): string {
-      let result;
-      switch (day) {
-        case 0:
-          result = isShort ? 'Пн' : 'Понедельник';
-          break;
-        case 1:
-          result = isShort ? 'Вт' : 'Вторник';
-          break;
-        case 2:
-          result = isShort ? 'Ср' : 'Среда';
-          break;
-        case 3:
-          result = isShort ? 'Чт' : 'Четверг';
-          break;
-        case 4:
-          result = isShort ? 'Пт' : 'Пятница';
-          break;
-        case 5:
-          result = isShort ? 'Сб' : 'Суббота';
-          break;
-        case 6:
-          result = isShort ? 'Вс' : 'Воскресенье';
-          break;
-        default:
-          result = '';
-
-          throw new Error('Несуществующий индекс дня недели!');
+      if (day < 0 || day > 6) {
+        throw new Error('Несуществующий индекс дня недели!');
       }
 
-      return result;
+      return Faze.Date.DAYS_OF_WEEK[day][isShort ? 1 : 0];
     }
 
     /**
@@ -53,52 +55,11 @@ namespace Faze {
      * @return{string} Месяц в человекочитаемом виде
      */
     static getMonth(month: number, isDeclination: boolean = false): string {
-      let result;
-
-      switch (month) {
-        case 0:
-          result = isDeclination ? 'Января' : 'Январь';
-          break;
-        case 1:
-          result = isDeclination ? 'Февраля' : 'Февраль';
-          break;
-        case 2:
-          result = isDeclination ? 'Марта' : 'Март';
-          break;
-        case 3:
-          result = isDeclination ? 'Апреля' : 'Апрель';
-          break;
-        case 4:
-          result = isDeclination ? 'Мая' : 'Май';
-          break;
-        case 5:
-          result = isDeclination ? 'Июня' : 'Июнь';
-          break;
-        case 6:
-          result = isDeclination ? 'Июля' : 'Июль';
-          break;
-        case 7:
-          result = isDeclination ? 'Августа' : 'Август';
-          break;
-        case 8:
-          result = isDeclination ? 'Сентября' : 'Сентябрь';
-          break;
-        case 9:
-          result = isDeclination ? 'Октября' : 'Октябрь';
-          break;
-        case 10:
-          result = isDeclination ? 'Ноября' : 'Ноябрь';
-          break;
-        case 11:
-          result = isDeclination ? 'Декабря' : 'Декабрь';
-          break;
-        default:
-          result = '';
-
-          throw new Error('Несуществующий индекс месяца!');
+      if (month < 0 || month > 11) {
+        throw new Error('Несуществующий индекс месяца!');
       }
 
-      return result;
+      return Faze.Date.MONTHS[month][isDeclination ? 1 : 0];
     }
   }
 }

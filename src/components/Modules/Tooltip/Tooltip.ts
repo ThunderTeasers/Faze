@@ -55,11 +55,13 @@ class Tooltip {
   // Конфиг с настройками
   readonly config: Config;
 
+  // Текущая сторона тултипа (top, bottom, left, right)
   side: string;
 
   // DOM элемент для отрисовки тултипа
   readonly tooltipNode: HTMLDivElement;
 
+  // Список медиа-запросов для проверки разрешения экрана
   readonly resolutions: MediaQueryList[];
 
   constructor(node: HTMLElement | null, config: Partial<Config>) {
@@ -70,6 +72,7 @@ class Tooltip {
     // Инициализация логгера
     this.logger = new Logger('Модуль Faze.Tooltip:');
 
+    // Список медиа-запросов для проверки разрешения экрана
     this.resolutions = [window.matchMedia('(max-width: 768px)')];
 
     // Проверка на двойную инициализацию

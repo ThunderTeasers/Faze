@@ -37,6 +37,7 @@ import Select from '../Modules/Select/Select';
 import SmartSelect from '../Modules/SmartSelect/SmartSelect';
 import Carousel from '../Modules/Carousel/Carousel';
 import Carousel2 from '../Modules/Carousel2/Carousel2';
+import Carousel3 from '../Modules/Carousel3/Carousel3';
 import ThumbGallery from '../Modules/ThumbGallery/ThumbGallery';
 import Finder from '../Modules/Finder/Finder';
 import TableSorter from '../Modules/TableSorter/TableSorter';
@@ -124,6 +125,8 @@ class Faze {
   static Carousel: any = Carousel;
 
   static Carousel2: any = Carousel2;
+
+  static Carousel3: any = Carousel3;
 
   static Tooltip: any = Tooltip;
 
@@ -309,18 +312,14 @@ class Faze {
 
         // Проверка на существование такого модуля, если его не существует, загружаем следующий
         if (!Faze.plugins[pluginName]) {
-          console.error(
-            `Плагин: '${pluginName}' не найден, его конфиг:`,
-            config
-          );
+          console.error(`Плагин: '${pluginName}' не найден, его конфиг:`, config);
           continue;
         }
 
         // Загружаем нужный модуль, если он еще не был загружен
         if (Faze.plugins[pluginName].body === undefined) {
           try {
-            Faze.plugins[pluginName].body =
-              Faze.plugins[pluginName].config.callback;
+            Faze.plugins[pluginName].body = Faze.plugins[pluginName].config.callback;
             Faze.plugins[pluginName].body = Faze.plugins[pluginName].body();
           } catch (e) {
             console.error(`Ошибка в плагине '${pluginName}':`, e);
@@ -343,10 +342,7 @@ class Faze {
             Faze.Observer.watch(config.observableSelector, config.callback);
           }
         } catch (error) {
-          console.error(
-            `Error in plugin "${config.pluginName}", exception:`,
-            error
-          );
+          console.error(`Error in plugin "${config.pluginName}", exception:`, error);
         }
       }
     }
@@ -359,21 +355,15 @@ class Faze {
    * @param childSelector - CSS селектор элемента на который вешаем событие
    * @param callback      - пользовательская функция которая будет исполнена после срабатывания события
    */
-  static on(
-    eventName: string,
-    childSelector: string,
-    callback: (event: Event, child: HTMLElement) => void
-  ): void {
+  static on(eventName: string, childSelector: string, callback: (event: Event, child: HTMLElement) => void): void {
     eventName
       .split(',')
       .map((tmpEventName) => tmpEventName.trim())
       .forEach((tmpEventName: string) => {
         window.addEventListener(tmpEventName, (event: Event) => {
-          const clickedElement: HTMLElement | null =
-            event.target as HTMLElement;
+          const clickedElement: HTMLElement | null = event.target as HTMLElement;
           if (clickedElement) {
-            const matchingChild: HTMLElement | null =
-              clickedElement.closest(childSelector);
+            const matchingChild: HTMLElement | null = clickedElement.closest(childSelector);
             if (matchingChild) {
               callback(event, matchingChild);
             }
@@ -393,9 +383,7 @@ class Faze {
       try {
         callback();
       } catch (error) {
-        this.logger.error(
-          `Модуль Faze.${moduleName}: Ошибка исполнения пользовательского метода "${callback.name}": ${error}`
-        );
+        this.logger.error(`Модуль Faze.${moduleName}: Ошибка исполнения пользовательского метода "${callback.name}": ${error}`);
       }
     }
   }
@@ -426,6 +414,7 @@ class Faze {
     Faze.Placeholder.hotInitialize('placeholder');
     Faze.Spoiler.hotInitialize();
     Faze.Carousel2.hotInitialize('carousel2');
+    Faze.Carousel3.hotInitialize('carousel3');
     Faze.Carousel.hotInitialize();
     Faze.Tooltip.hotInitialize();
     Faze.Tour.hotInitialize('tour');

@@ -5,8 +5,19 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
+const fs = require('fs');
 
 module.exports = (env) => {
+  const viewsDir = path.resolve(__dirname, 'src/tests/views');
+  const viewFiles = fs.readdirSync(viewsDir).filter(f => f.endsWith('.html'));
+
+  const viewPlugins = viewFiles.map(file => 
+    new HtmlWebpackPlugin({
+      filename: file,
+      template: path.resolve(viewsDir, file),
+    })
+  );
+
   return merge(common(env), {
     entry: './src/index_dev.ts',
     mode: 'development',
@@ -35,118 +46,7 @@ module.exports = (env) => {
       new MiniCssExtractPlugin({
         filename: 'faze.min.css',
       }),
-      new HtmlWebpackPlugin({
-        filename: 'drag.html',
-        template: './src/tests/views/drag.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'tab.html',
-        template: './src/tests/views/tab.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'tooltip.html',
-        template: './src/tests/views/tooltip.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'dropdown.html',
-        template: './src/tests/views/dropdown.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'carousel.html',
-        template: './src/tests/views/carousel.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'carousel_old.html',
-        template: './src/tests/views/carousel_old.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'perf_tests.html',
-        template: './src/tests/views/perf_tests.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'modal.html',
-        template: './src/tests/views/modal.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'thumbgallery.html',
-        template: './src/tests/views/thumbgallery.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'smartselect.html',
-        template: './src/tests/views/smartselect.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'look.html',
-        template: './src/tests/views/look.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'gallery.html',
-        template: './src/tests/views/gallery.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'helpers.html',
-        template: './src/tests/views/helpers.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'slider.html',
-        template: './src/tests/views/slider.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'tablesorter.html',
-        template: './src/tests/views/tablesorter.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'sorter.html',
-        template: './src/tests/views/sorter.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'zoombox.html',
-        template: './src/tests/views/zoombox.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'placeholder.html',
-        template: './src/tests/views/placeholder.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'lazyload.html',
-        template: './src/tests/views/lazyload.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'tour.html',
-        template: './src/tests/views/tour.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'tour_js.html',
-        template: './src/tests/views/tour_js.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'steps.html',
-        template: './src/tests/views/steps.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'colorchanger.html',
-        template: './src/tests/views/colorchanger.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'finder.html',
-        template: './src/tests/views/finder.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'scroller.html',
-        template: './src/tests/views/scroller.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'form.html',
-        template: './src/tests/views/form.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'rest.html',
-        template: './src/tests/views/rest.html',
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'rest_data.html',
-        template: './src/tests/views/rest_data.html',
-      }),
+      ...viewPlugins,
       new HtmlWebpackPlugin({
         template: './src/index.html',
       }),

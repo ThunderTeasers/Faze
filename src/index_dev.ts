@@ -66,23 +66,19 @@ Faze.add({
     Faze.Helpers.loadJS('https://unpkg.com/fabric@5.2.4/dist/fabric.min.js');
     Faze.Helpers.loadJS('https://unpkg.com/fabric@5.2.4/dist/fabric.min.js');
 
-    const node = document.querySelector('.mouse-over')
+    const node = document.querySelector('.mouse-over');
 
     document.addEventListener('mousemove', (event) => {
       // Получаем результаты наведения на элемент мышкой
-      const mouseOverResult = Faze.Helpers.isMouseOver(
-        event,
-        node,
-        {
-          horizontal: true,
-          horizontalThreshold: 25,
-          vertical: true,
-          verticalThreshold: 25,
-        }
-      );
+      const mouseOverResult = Faze.Helpers.isMouseOver(event, node, {
+        horizontal: true,
+        horizontalThreshold: 25,
+        vertical: true,
+        verticalThreshold: 25,
+      });
 
       console.log(mouseOverResult.sides);
-    })
+    });
   },
 });
 
@@ -206,28 +202,25 @@ Faze.add({
 
     fazeSelect.setValue('Выбор 2');
 
-    const carousel = new Faze.Carousel(
-      document.querySelector('.carousel-test'),
-      {
-        autoplay: false,
-        pages: true,
-        arrows: true,
-        // arrowsOutside: true,
-        counter: false,
-        infinite: false,
-        mouseMove: false,
-        // amountPerSlide: 2,
-        animation: {
-          type: 'fade',
-          time: 1000,
-          direction: 'horizontal',
-        },
-        selectors: {
-          arrowLeft: '.js-test-arrow-left',
-          arrowRight: '.js-test-arrow-right',
-        },
-      }
-    );
+    const carousel = new Faze.Carousel(document.querySelector('.carousel-test'), {
+      autoplay: false,
+      pages: true,
+      arrows: true,
+      // arrowsOutside: true,
+      counter: false,
+      infinite: false,
+      mouseMove: false,
+      // amountPerSlide: 2,
+      animation: {
+        type: 'fade',
+        time: 1000,
+        direction: 'horizontal',
+      },
+      selectors: {
+        arrowLeft: '.js-test-arrow-left',
+        arrowRight: '.js-test-arrow-right',
+      },
+    });
 
     const carouselChangeButtonNode = document.querySelector('.js-notification');
     if (carouselChangeButtonNode) {
@@ -322,7 +315,7 @@ Faze.add({
   condition: document.documentElement.classList.contains('js-drag'),
   callback: () => {
     new Faze.Drag(document.querySelectorAll('.js-drag-test'), {
-      // direction: 'horizontal',
+      direction: 'vertical',
       threshold: 25,
       animation: 200,
       callbacks: {
@@ -412,19 +405,17 @@ Faze.add({
   pluginName: 'Faze.REST Test',
   condition: document.querySelectorAll('.js-rest').length > 0,
   callback: () => {
-    document
-      .querySelector('.js-replace-with')
-      ?.addEventListener('click', () => {
-        Faze.REST.chain([
-          {
-            method: 'GET',
-            replace_with: '.js-replace-with-body',
-            url: '/rest_data.html',
-            callback: (response: any) => {
-              console.log(response);
-            },
+    document.querySelector('.js-replace-with')?.addEventListener('click', () => {
+      Faze.REST.chain([
+        {
+          method: 'GET',
+          replace_with: '.js-replace-with-body',
+          url: '/rest_data.html',
+          callback: (response: any) => {
+            console.log(response);
           },
-        ]);
-      });
+        },
+      ]);
+    });
   },
 });

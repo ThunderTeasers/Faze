@@ -1,60 +1,59 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru" class="js-drag">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Title</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Title</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+            html,
+            body {
+                height: 100%;
+            }
 
-    html,
-    body {
-      height: 100%;
-    }
+            main {
+                display: grid;
+                grid-template-columns: 20rem 1fr;
+                height: 50%;
+            }
 
-    main {
-      display: grid;
-      grid-template-columns: 20rem 1fr;
-      height: 50%;
-    }
+            aside.sidebar {
+                /* padding: 10px; */
 
-    aside.sidebar {
-      /* padding: 10px; */
+                border-right: 1px solid #000000;
+            }
 
-      border-right: 1px solid #000000;
-    }
+            aside.content {
+                padding: 10px;
+            }
 
-    aside.content {
-      padding: 10px;
-    }
+            .drag-component {
+                width: 100%;
+                height: 20px;
 
-    .drag-component {
-      width: 100%;
-      height: 100px;
+                margin-bottom: 10px;
+                padding: 5px;
 
-      margin-bottom: 10px;
-      padding: 5px;
+                border: 1px solid #000000;
+                background-color: #ffffff;
+            }
 
-      border: 1px solid #000000;
-      background-color: #ffffff;
-    }
+            .test-section3 .drag-component:after {
+                content: "";
 
-    .test-section3 .drag-component:after {
-      content: '';
+                display: block;
+                width: 30px;
+                height: 30px;
 
-      display: block;
-      width: 30px;
-      height: 30px;
+                background-color: #f0f;
+            }
 
-      background-color: #f0f;
-    }
-
-    /* .drag-component2 {
+            /* .drag-component2 {
       height: 50px;
     }
 
@@ -62,31 +61,31 @@
       height: 150px;
     } */
 
-    section .js-drag-test {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
+            section .js-drag-test {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
 
-      margin-top: 20px;
-    }
+                margin-top: 20px;
+            }
 
-    section .js-drag-test>div {
-      width: 100px;
-      margin-right: 10px;
-    }
+            section .js-drag-test > div {
+                width: 100px;
+                margin-right: 10px;
+            }
 
-    .drag-test-grid {
-      display: flex;
-      flex-wrap: wrap;
-      width: 500px;
-    }
-  </style>
-</head>
+            .drag-test-grid {
+                display: flex;
+                flex-wrap: wrap;
+                width: 500px;
+            }
+        </style>
+    </head>
 
-<body>
-  <main>
-    <aside class="sidebar">
-      <!-- <div class="js-drag-test" data-faze-drag="container" data-faze-drag-group="components" data-faze-styles="false"
+    <body>
+        <main>
+            <aside class="sidebar">
+                <!-- <div class="js-drag-test" data-faze-drag="container" data-faze-drag-group="components" data-faze-styles="false"
         data-faze-drag-direction="vertical">
         <div class="drag-component drag-component1" data-faze-drag="item">
           <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
@@ -112,34 +111,136 @@
       <br>
       <button type="button" class="js-drag-add">Добавить</button>
       <button type="button" class="js-drag-remove">Удалить</button> -->
-    </aside>
-    <aside class="content">
-      <!--<div class="js-drag-test" data-faze-drag="container" data-faze-drag-group="components" data-faze-styles="false"
-        data-faze-drag-direction="vertical">
-        <div class="drag-component" data-faze-drag="item">
-          <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-          ITEM 1
-        </div>
-        <div class="drag-component" data-faze-drag="item">
-          <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-          ITEM 2
-        </div>
-        <div class="drag-component" data-faze-drag="item">
-          <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-          ITEM 3
-        </div>
-        <div class="drag-component" data-faze-drag="item">
-          <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-          ITEM 4
-        </div>
-        <div class="drag-component" data-faze-drag="item">
-          <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-          ITEM 5
-        </div>
-      </div>
-    </aside>-->
-  </main>
-  <section class="test-section3">
+            </aside>
+            <aside class="content">
+                <!-- Таблица для теста перетягивания -->
+                <table
+                    class="js-drag-test"
+                    data-faze-drag="container"
+                    data-faze-drag-group="table-rows"
+                    data-faze-styles="false"
+                    data-faze-drag-direction="vertical"
+                >
+                    <thead>
+                        <tr>
+                            <th style="width: 50px">#</th>
+                            <th>Название</th>
+                            <th>Email</th>
+                            <th>Телефон</th>
+                            <th>Город</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="drag-component" data-faze-drag="item">
+                            <td><div class="drag-component-handle" data-faze-drag="handle">☰</div></td>
+                            <td>Иванов Иван</td>
+                            <td>ivanov@example.com</td>
+                            <td>+7 (900) 111-22-33</td>
+                            <td>Москва</td>
+                        </tr>
+                        <tr class="drag-component" data-faze-drag="item">
+                            <td><div class="drag-component-handle" data-faze-drag="handle">☰</div></td>
+                            <td>Петров Петр</td>
+                            <td>petrov@example.com</td>
+                            <td>+7 (900) 222-33-44</td>
+                            <td>Санкт-Петербург</td>
+                        </tr>
+                        <tr class="drag-component" data-faze-drag="item">
+                            <td><div class="drag-component-handle" data-faze-drag="handle">☰</div></td>
+                            <td>Сидоров Сидор</td>
+                            <td>sidorov@example.com</td>
+                            <td>+7 (900) 333-44-55</td>
+                            <td>Казань</td>
+                        </tr>
+                        <tr class="drag-component" data-faze-drag="item">
+                            <td><div class="drag-component-handle" data-faze-drag="handle">☰</div></td>
+                            <td>Кузнецов Алексей</td>
+                            <td>kuznetsov@example.com</td>
+                            <td>+7 (900) 444-55-66</td>
+                            <td>Новосибирск</td>
+                        </tr>
+                        <tr class="drag-component" data-faze-drag="item">
+                            <td><div class="drag-component-handle" data-faze-drag="handle">☰</div></td>
+                            <td>Попов Дмитрий</td>
+                            <td>popov@example.com</td>
+                            <td>+7 (900) 555-66-77</td>
+                            <td>Екатеринбург</td>
+                        </tr>
+                        <tr class="drag-component" data-faze-drag="item">
+                            <td><div class="drag-component-handle" data-faze-drag="handle">☰</div></td>
+                            <td>Васильев Василий</td>
+                            <td>vasiliev@example.com</td>
+                            <td>+7 (900) 666-77-88</td>
+                            <td>Нижний Новгород</td>
+                        </tr>
+                        <tr class="drag-component" data-faze-drag="item">
+                            <td><div class="drag-component-handle" data-faze-drag="handle">☰</div></td>
+                            <td>Михайлов Михаил</td>
+                            <td>mikhailov@example.com</td>
+                            <td>+7 (900) 777-88-99</td>
+                            <td>Челябинск</td>
+                        </tr>
+                        <tr class="drag-component" data-faze-drag="item">
+                            <td><div class="drag-component-handle" data-faze-drag="handle">☰</div></td>
+                            <td>Федоров Федор</td>
+                            <td>fedorov@example.com</td>
+                            <td>+7 (900) 888-99-00</td>
+                            <td>Самара</td>
+                        </tr>
+                        <tr class="drag-component" data-faze-drag="item">
+                            <td><div class="drag-component-handle" data-faze-drag="handle">☰</div></td>
+                            <td>Алексеев Александр</td>
+                            <td>alekseev@example.com</td>
+                            <td>+7 (900) 999-00-11</td>
+                            <td>Омск</td>
+                        </tr>
+                        <tr class="drag-component" data-faze-drag="item">
+                            <td><div class="drag-component-handle" data-faze-drag="handle">☰</div></td>
+                            <td>Козлов Константин</td>
+                            <td>kozlov@example.com</td>
+                            <td>+7 (900) 000-11-22</td>
+                            <td>Ростов-на-Дону</td>
+                        </tr>
+                        <tr class="drag-component" data-faze-drag="item">
+                            <td><div class="drag-component-handle" data-faze-drag="handle">☰</div></td>
+                            <td>Новиков Николай</td>
+                            <td>novikov@example.com</td>
+                            <td>+7 (900) 123-45-67</td>
+                            <td>Уфа</td>
+                        </tr>
+                        <tr class="drag-component" data-faze-drag="item">
+                            <td><div class="drag-component-handle" data-faze-drag="handle">☰</div></td>
+                            <td>Морозов Максим</td>
+                            <td>morozov@example.com</td>
+                            <td>+7 (900) 234-56-78</td>
+                            <td>Красноярск</td>
+                        </tr>
+                        <tr class="drag-component" data-faze-drag="item">
+                            <td><div class="drag-component-handle" data-faze-drag="handle">☰</div></td>
+                            <td>Орлов Олег</td>
+                            <td>orlov@example.com</td>
+                            <td>+7 (900) 345-67-89</td>
+                            <td>Воронеж</td>
+                        </tr>
+                        <tr class="drag-component" data-faze-drag="item">
+                            <td><div class="drag-component-handle" data-faze-drag="handle">☰</div></td>
+                            <td>Лебедев Леонид</td>
+                            <td>lebedev@example.com</td>
+                            <td>+7 (900) 456-78-90</td>
+                            <td>Пермь</td>
+                        </tr>
+                        <tr class="drag-component" data-faze-drag="item">
+                            <td><div class="drag-component-handle" data-faze-drag="handle">☰</div></td>
+                            <td>Захаров Захар</td>
+                            <td>zakharov@example.com</td>
+                            <td>+7 (900) 567-89-01</td>
+                            <td>Волгоград</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </aside>
+        </main>
+        <!--<section class="test-section3">
     <div class="js-drag-test drag-test-grid" data-faze-drag="container" data-faze-drag-group="components"
       data-faze-styles="false" data-faze-drag-direction="horizontal">
       <div class="drag-component" data-faze-drag="item">
@@ -175,21 +276,20 @@
         ITEM 8
       </div>
     </div>
-  </section>
-  <script>
-    // document.querySelector('.js-drag-add').addEventListener('click', () => {
-    //   document.querySelector('.js-drag-test').insertAdjacentHTML('beforeend', `
-    //     <div class="drag-component" data-faze-drag="item">
-    //       <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-    //       ITEM 4
-    //     </div>
-    //   `);
-    // });
+  </section>-->
+        <script>
+            // document.querySelector('.js-drag-add').addEventListener('click', () => {
+            //   document.querySelector('.js-drag-test').insertAdjacentHTML('beforeend', `
+            //     <div class="drag-component" data-faze-drag="item">
+            //       <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
+            //       ITEM 4
+            //     </div>
+            //   `);
+            // });
 
-    // document.querySelector('.js-drag-remove').addEventListener('click', () => {
-    //   document.querySelector('.js-drag-test').lastElementChild.remove();
-    // });
-  </script>
-</body>
-
+            // document.querySelector('.js-drag-remove').addEventListener('click', () => {
+            //   document.querySelector('.js-drag-test').lastElementChild.remove();
+            // });
+        </script>
+    </body>
 </html>

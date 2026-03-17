@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Бесконечная карусель</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #1a1a2e;
+      font-family: Arial, sans-serif;
+    }
+
+    .carousel-container {
+      position: relative;
+      width: 600px;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.5s ease;
+      cursor: grab;
+    }
+
+    .carousel-track.dragging {
+      cursor: grabbing;
+    }
+
+    .carousel-slide {
+      height: 400px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      color: white;
+      font-weight: bold;
+      flex-shrink: 0;
+      user-select: none;
+      border-radius: 8px;
+    }
+
+    .slide-1 {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .slide-2 {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .slide-3 {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .slide-4 {
+      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+
+    .slide-5 {
+      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.3);
+      border: none;
+      color: white;
+      font-size: 2rem;
+      padding: 1rem 1.2rem;
+      cursor: pointer;
+      border-radius: 50%;
+      transition: background 0.3s;
+      z-index: 10;
+    }
+
+    .carousel-btn:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .carousel-btn.prev {
+      left: 10px;
+    }
+
+    .carousel-btn.next {
+      right: 10px;
+    }
+
+    .carousel-dots {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .dot.active {
+      background: white;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="carousel-container">
+    <div class="carousel-track"></div>
+    <button class="carousel-btn prev">❮</button>
+    <button class="carousel-btn next">❯</button>
+    <div class="carousel-dots"></div>
+  </div>
+
+  <script>
+    const track = document.querySelector('.carousel-track');
+    const prevBtn = document.querySelector('.carousel-btn.prev');
+    const nextBtn = document.querySelector('.carousel-btn.next');
+    const dotsContainer = document.querySelector('.carousel-dots');
+
+    const originalSlides = [
+      { class: 'slide-1', text: 'Слайд 1' },
+      { class: 'slide-2', text: 'Слайд 2' },
+      { class: 'slide-3', text: 'Слайд 3' },
+      { class: 'slide-4', text: 'Слайд 4' },
+      { class: 'slide-5', text: 'Слайд 5' }
+    ];
+
+    // === НАСТРОЙКИ ===
+    const visibleSlides = 4;
+    const slideMargin = 10; // Отступ между слайдами в пикселях
+    const totalOriginal = originalSlides.length;
+    const clonesPerSide = visibleSlides;
+
+    let currentIndex = clonesPerSide;
+    let isTransitioning = false;
+
+    // Вычисляем ширину слайда и полную ширину с отступами
+    const containerWidth = track.offsetWidth;
+    // Общая ширина всех отступов: (visibleSlides + 1) отступов (по краям и между слайдами)
+    const totalMarginWidth = slideMargin * (visibleSlides + 1);
+    // Ширина слайда без отступов
+    const slideWidth = (containerWidth - totalMarginWidth) / visibleSlides;
+    // Полная ширина слайда с отступами (для расчёта позиционирования)
+    const fullSlideWidth = slideWidth + slideMargin;
+    // Процент смещения на один слайд
+    const slideWidthPercent = (fullSlideWidth / containerWidth) * 100;
+
+    function createSlides() {
+      for (let i = totalOriginal - clonesPerSide; i < totalOriginal; i++) {
+        createSlide(originalSlides[i], false);
+      }
+      originalSlides.forEach((slide, index) => {
+        createSlide(slide, true, index);
+      });
+      for (let i = 0; i < clonesPerSide; i++) {
+        createSlide(originalSlides[i], false);
+      }
+    }
+
+    function createSlide(slideData, isOriginal, originalIndex = null) {
+      const slide = document.createElement('div');
+      slide.classList.add('carousel-slide', slideData.class);
+      slide.style.width = `${slideWidth}px`;
+      slide.style.marginLeft = `${slideMargin}px`;
+      slide.textContent = slideData.text;
+      slide.dataset.isOriginal = isOriginal;
+      if (isOriginal) {
+        slide.dataset.originalIndex = originalIndex;
+      }
+      track.appendChild(slide);
+    }
+
+    createSlides();
+
+    const allSlides = document.querySelectorAll('.carousel-slide');
+    const totalSlides = allSlides.length;
+
+    track.style.transform = `translateX(-${currentIndex * slideWidthPercent}%)`;
+
+    originalSlides.forEach((_, index) => {
+      const dot = document.createElement('div');
+      dot.classList.add('dot');
+      if (index === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => goToOriginalSlide(index));
+      dotsContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll('.dot');
+
+    function updateDots() {
+      const currentSlide = allSlides[currentIndex];
+      if (currentSlide && currentSlide.dataset.isOriginal === 'true') {
+        const originalIndex = parseInt(currentSlide.dataset.originalIndex);
+        dots.forEach((dot, index) => {
+          dot.classList.toggle('active', index === originalIndex);
+        });
+      } else {
+        dots.forEach(dot => dot.classList.remove('active'));
+      }
+    }
+
+    function updateTrackPosition() {
+      track.style.transform = `translateX(-${currentIndex * slideWidthPercent}%)`;
+    }
+
+    function goToSlide(index, instant = false) {
+      if (instant) {
+        track.style.transition = 'none';
+      } else {
+        track.style.transition = 'transform 0.3s ease';
+      }
+      currentIndex = index;
+      updateTrackPosition();
+      updateDots();
+    }
+
+    function nextSlide() {
+      if (isTransitioning) return;
+      isTransitioning = true;
+      goToSlide(currentIndex + 1);
+    }
+
+    function prevSlide() {
+      if (isTransitioning) return;
+      isTransitioning = true;
+      goToSlide(currentIndex - 1);
+    }
+
+    function goToOriginalSlide(index) {
+      if (isTransitioning) return;
+      isTransitioning = true;
+      const targetIndex = clonesPerSide + index;
+      goToSlide(targetIndex);
+    }
+
+    track.addEventListener('transitionend', () => {
+      isTransitioning = false;
+
+      if (currentIndex >= totalOriginal + clonesPerSide) {
+        goToSlide(currentIndex - totalOriginal, true);
+      }
+      else if (currentIndex < clonesPerSide) {
+        goToSlide(currentIndex + totalOriginal, true);
+      }
+    });
+
+    nextBtn.addEventListener('click', nextSlide);
+    prevBtn.addEventListener('click', prevSlide);
+
+    let autoPlay = setInterval(nextSlide, 5000);
+
+    const container = document.querySelector('.carousel-container');
+    container.addEventListener('mouseenter', () => clearInterval(autoPlay));
+    container.addEventListener('mouseleave', () => {
+      autoPlay = setInterval(nextSlide, 5000);
+    });
+
+    // Свайпы с отслеживанием на уровне document
+    let startX = 0;
+    let isDragging = false;
+    let startTranslate = 0;
+    let currentTranslate = 0;
+
+    function handleDragStart(e) {
+      isDragging = true;
+      startX = e.clientX;
+      startTranslate = -currentIndex * slideWidthPercent;
+      currentTranslate = startTranslate;
+      track.style.transition = 'none';
+      track.classList.add('dragging');
+    }
+
+    function handleDragMove(e) {
+      if (!isDragging) return;
+      const diff = e.clientX - startX;
+      const percentageDiff = (diff / track.offsetWidth) * 100;
+      currentTranslate = startTranslate + percentageDiff;
+      track.style.transform = `translateX(${currentTranslate}%)`;
+    }
+
+    function handleDragEnd(e) {
+      if (!isDragging) return;
+      isDragging = false;
+      track.classList.remove('dragging');
+      track.style.transition = 'transform 0.5s ease';
+
+      const diff = e.clientX - startX;
+      const slidesMoved = diff / track.offsetWidth * 100 / slideWidthPercent;
+
+      // Округляем до ближайшего целого слайда
+      const roundedSlides = Math.round(slidesMoved);
+
+      if (roundedSlides !== 0) {
+        currentIndex = currentIndex - roundedSlides;
+      }
+      goToSlide(currentIndex);
+    }
+
+    // Начало перетаскивания на треке
+    track.addEventListener('mousedown', handleDragStart);
+
+    // Движение и отпускание на document чтобы работало за пределами карусели
+    document.addEventListener('mousemove', handleDragMove);
+    document.addEventListener('mouseup', handleDragEnd);
+  </script>
+</body>
+
+</html>

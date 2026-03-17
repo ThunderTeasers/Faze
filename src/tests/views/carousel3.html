@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Title</title>
+
+  <style>
+    .carousel-test {
+      width: 500px;
+      margin-left: 200px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="carousel-container">
+    <div class="carousel-track">
+      <img class="carousel-slide" src="https://www.admos-gifts.ru/i/photo/TN_banner-admos-textile-mobile.png" />
+      <img class="carousel-slide" src="https://www.admos-gifts.ru/i/photo/TN_500x250_banner_studio.png" />
+      <img class="carousel-slide" src="https://www.admos-gifts.ru/i/photo/TN_banner-admos-textile-mobile.png" />
+      <img class="carousel-slide" src="https://www.admos-gifts.ru/i/photo/TN_500x250_banner_studio.png" />
+      <img class="carousel-slide" src="https://www.admos-gifts.ru/i/photo/TN_banner-admos-textile-mobile.png" />
+      <img class="carousel-slide" src="https://www.admos-gifts.ru/i/photo/TN_500x250_banner_studio.png" />
+    </div>
+    <button class="carousel-btn prev">❮</button>
+    <button class="carousel-btn next">❯</button>
+    <div class="carousel-dots"></div>
+  </div>
+
+  <script>
+    setTimeout(() => {
+      new Faze.Carousel3(document.querySelector('.carousel-container'));
+    }, 1000);
+  </script>
+</body>
+
+</html>

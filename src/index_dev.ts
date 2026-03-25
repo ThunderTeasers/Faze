@@ -318,6 +318,7 @@ Faze.add({
       direction: 'vertical',
       threshold: 25,
       animation: 200,
+      delay: 100,
       callbacks: {
         created: () => {
           console.log('Создание прошло успешно');

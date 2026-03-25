@@ -110,6 +110,8 @@ class Carousel3 extends Module {
       autoplay: (node.dataset.fazeCarouselAutoplay || 'false') === 'true',
     });
   }
+
+  static hotInitialize() { }
 }
 
 export default Carousel3;

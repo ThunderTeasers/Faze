@@ -20,6 +20,7 @@ import Module from '../../Core/Module';
  *   data - данные об изображениях, содержаться в формате массива JSON(текстом)
  *   gap - гирина расстояния между элементами
  *   amount - количество слайдов
+ *   alt - alt для картинок
  */
 interface Config {
   data?: string;
@@ -27,6 +28,7 @@ interface Config {
   amount: number;
   touchMove: boolean;
   mouseMove: boolean;
+  alt?: string;
 }
 
 /**
@@ -53,6 +55,7 @@ class ThumbGallery extends Module {
       amount: 5,
       touchMove: true,
       mouseMove: false,
+      alt: undefined,
     };
 
     // Инициализируем базовый класс
@@ -132,7 +135,6 @@ class ThumbGallery extends Module {
       const image = new Image();
       image.src = this.imagesData[0];
       image.onload = () => {
-
         // Создание галереи
         this.build();
       };
@@ -228,13 +230,13 @@ class ThumbGallery extends Module {
 
   /**
    * Построение HTML кода
-   * 
+   *
    * @private
    */
   private buildImagesCarousel(): void {
     this.node.innerHTML = `
       <div class="faze-thumbgallery-holder">
-        ${this.imagesData.map(image => `<img src="${image}">`).join('')}
+        ${this.imagesData.map((image) => `<img src="${image}" alt="${this.config.alt || ''}">`).join('')}
       </div>
     `;
 
@@ -295,6 +297,7 @@ class ThumbGallery extends Module {
       amount: parseInt(node.dataset.fazeThumbgalleryGap || '5', 10),
       touchMove: (node.dataset.fazeThumbgalleryTouchMove || 'true') === 'true',
       mouseMove: (node.dataset.fazeThumbgalleryMouseMove || 'false') === 'true',
+      alt: node.dataset.fazeThumbgalleryAlt,
     });
 
     // Отслеживаем изменение в атрибуте содержащий данные изображений

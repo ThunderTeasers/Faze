@@ -1,49 +1,55 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Title</title>
+    <style>
+      .product {
+        width: 30rem;
+        height: auto;
+      }
+    </style>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Title</title>
-  <style>
-    .product {
-      width: 30rem;
-      height: auto;
-    }
-  </style>
-</head>
-
-<body>
-  <div data-faze="tab">
-    <div data-faze-tab-head="1">Первый</div>
-    <div data-faze-tab-head="2">Второй</div>
-    <div data-faze-tab-body="1">
-      <div class="product">
-        <div class="image" data-faze="thumbgallery"
-          data-faze-thumbgallery-data='["https://www.admos-gifts.ru/product256x256xffffff/i/product/3256627012XL.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/3256627012XL-01.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/3256627012XL-02.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/3256627012XL-03.jpg"]'>
-          <img src="https://www.admos-gifts.ru/product256x256xffffff/i/photo/3256627012XL-03.jpg" alt="">
+  <body>
+    <div data-faze="tab">
+      <div data-faze-tab-head="1">Первый</div>
+      <div data-faze-tab-head="2">Второй</div>
+      <div data-faze-tab-body="1">
+        <div class="product">
+          <div
+            class="image"
+            data-faze="thumbgallery"
+            data-faze-thumbgallery-alt="sdf"
+            data-faze-thumbgallery-data='["https://www.admos-gifts.ru/product256x256xffffff/i/product/3256627012XL.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/3256627012XL-01.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/3256627012XL-02.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/3256627012XL-03.jpg"]'
+          >
+            <img src="https://www.admos-gifts.ru/product256x256xffffff/i/photo/3256627012XL-03.jpg" alt="" />
+          </div>
+          <div class="name">Название</div>
         </div>
-        <div class="name">Название</div>
+      </div>
+      <div data-faze-tab-body="2">
+        <div class="product">
+          <div
+            class="image"
+            data-faze="thumbgallery"
+            data-faze-thumbgallery-data='["https://www.admos-gifts.ru/product256x256xffffff/i/product/3256627012XL.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/3256627012XL-01.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/3256627012XL-02.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/3256627012XL-03.jpg"]'
+          >
+            <img src="https://www.admos-gifts.ru/product256x256xffffff/i/photo/3256627012XL-03.jpg" alt="" />
+          </div>
+          <div class="name">Название</div>
+        </div>
       </div>
     </div>
-    <div data-faze-tab-body="2">
-      <div class="product">
-        <div class="image" data-faze="thumbgallery"
-          data-faze-thumbgallery-data='["https://www.admos-gifts.ru/product256x256xffffff/i/product/3256627012XL.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/3256627012XL-01.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/3256627012XL-02.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/3256627012XL-03.jpg"]'>
-          <img src="https://www.admos-gifts.ru/product256x256xffffff/i/photo/3256627012XL-03.jpg" alt="">
-        </div>
-        <div class="name">Название</div>
-      </div>
-    </div>
-  </div>
 
-  <button id="change">Поменять</button>
+    <button id="change">Поменять</button>
 
-  <script>
-    document.querySelector('#change').addEventListener('click', () => {
-      document.querySelector('.image').dataset.fazeThumbgalleryData = '["https://www.admos-gifts.ru/product256x256xffffff/i/product/32510042900.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/32510042900-01.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/32510042900-02.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/32510042900-03.jpg"]';
-    });
-  </script>
-</body>
-
+    <script>
+      document.querySelector("#change").addEventListener("click", () => {
+        document.querySelector(".image").dataset.fazeThumbgalleryData =
+          '["https://www.admos-gifts.ru/product256x256xffffff/i/product/32510042900.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/32510042900-01.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/32510042900-02.jpg","https://www.admos-gifts.ru/product256x256xffffff/i/photo/32510042900-03.jpg"]';
+      });
+    </script>
+  </body>
 </html>

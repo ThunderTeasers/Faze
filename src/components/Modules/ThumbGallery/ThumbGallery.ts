@@ -236,11 +236,26 @@ class ThumbGallery extends Module {
   private buildImagesCarousel(): void {
     this.node.innerHTML = `
       <div class="faze-thumbgallery-holder">
-        ${this.imagesData.map((image) => `<img src="${image}" alt="${this.config.alt || ''}">`).join('')}
+        ${this.imagesData.map((image, index) => `<img src="${image}" alt="${this.formatAlt(this.config.alt, index + 1)}">`).join('')}
       </div>
     `;
 
     this.holderNode = this.node.querySelector('.faze-thumbgallery-holder') as HTMLDivElement;
+  }
+
+  /**
+   * Форматирование alt атрибута для изображения
+   *
+   * @param alt - Исходный alt текст
+   * @param index - Индекс элемента
+   * @returns Отформатированный alt текст
+   */
+  private formatAlt(alt: string | undefined, index: number): string {
+    if (!alt) {
+      return '';
+    }
+
+    return alt.replace(/{i}/g, index.toString());
   }
 
   /**

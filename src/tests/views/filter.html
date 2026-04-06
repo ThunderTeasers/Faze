@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Тестовый стенд Faze.Filter</title>
+  </head>
+
+  <body>
+    <div
+      class="data-filter"
+      data-faze="filter"
+      data-faze-filter-table-name="product"
+      data-faze-filter-change-button="true"
+      data-faze-filter-update-query="true"
+      data-faze-filter-modules-get="445363"
+      data-faze-filter-submit-after-change="true"
+      data-faze-filter-need-to-request="true"
+    >
+      <form class="faze-filter-form">
+        <div class="filters-items">
+          Цена:
+          <label
+            >от
+            <input type="text" name="gteproduct_dec_price1" value="" placeholder="0" />
+          </label>
+          <label
+            >до
+            <input type="text" name="lteproduct_dec_price1" value="" placeholder="60000" />
+          </label>
+          <button type="submit">Применить</button>
+        </div>
+      </form>
+
+      <div class="faze-filter-items">
+        <div class="product-item">
+          <div><img src="https://faze.plarson.ru/150x150xffffff/i/product/samsung_s20.jpg" /></div>
+          <div>Цвет: Белый<br />Размер: 69.1x151.7x7.9 мм</div>
+          <div>Смартфон Samsung Galaxy S20</div>
+          <div>57850.00 руб.</div>
+        </div>
+        <div class="product-item">
+          <div><img src="https://faze.plarson.ru/150x150xffffff/i/product/samsung_s10.jpg" /></div>
+          <div>Цвет: Белый<br />Размер: 70.40x149.90x7.80 мм</div>
+          <div>Смартфон Samsung Galaxy S10 8/128GB</div>
+          <div>42890.00 руб.</div>
+        </div>
+        <div class="product-item">
+          <div><img src="https://faze.plarson.ru/150x150xffffff/i/product/UE43NU7090U.jpg" /></div>
+          <div>Цвет: Белый<br />Размер: 970x605x207 мм</div>
+          <div>Телевизор Samsung UE43NU7090U 43" (2018)</div>
+          <div>27990.00 руб.</div>
+        </div>
+        <div class="product-item">
+          <div><img src="https://faze.plarson.ru/150x150xffffff/i/product/UE50NU7002U.jpg" /></div>
+          <div>Цвет: Белый<br />Размер: 1123x694x242 мм</div>
+          <div>Телевизор Samsung UE50NU7002U 50" (2019)</div>
+          <div>27895.00 руб.</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

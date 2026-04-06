@@ -18,6 +18,7 @@ interface CallbackData {
   filterNode: HTMLElement;
   formNode: HTMLFormElement | null;
   itemsHolderNode: HTMLElement | null;
+  paginationNodes: HTMLElement[];
   params: URLSearchParams;
   total: number;
   totalSelected: number;
@@ -108,6 +109,9 @@ class Filter {
   // DOM элемент родителя элементов фильтрации
   readonly itemsHolderNode: HTMLElement | null;
 
+  // DOM элементы пагинации
+  readonly paginationNodes: HTMLElement[];
+
   // DOM элемент содержащий текст об общем количестве отфильтрованных элементов
   readonly totalNode: HTMLElement | null;
 
@@ -189,6 +193,7 @@ class Filter {
       this.buttonSubmitNode = this.formNode.querySelector(`${this.config.selectors.form} [type="submit"]`);
     }
     this.itemsHolderNode = document.querySelector(this.config.selectors.itemsHolder);
+    this.paginationNodes = Array.from(document.querySelectorAll(this.config.selectors.pagination));
     this.disablePresetQuery = this.node.dataset.fazeFilterQueryDisable !== undefined;
     this.presetQuery = this.node.dataset.fazeFilterQuery;
     this.cleanPath = this.node.dataset.fazeFilterCleanPath;
@@ -215,6 +220,7 @@ class Filter {
           itemsHolderNode: this.itemsHolderNode,
           params: this.params,
           totalSelected: this.totalSelected,
+          paginationNodes: this.paginationNodes,
           total: parseInt(this.node.dataset.fazeFilterTotal || '0', 10),
         });
       } catch (error) {
@@ -254,6 +260,7 @@ class Filter {
           itemsHolderNode: this.itemsHolderNode,
           params: this.params,
           totalSelected: this.totalSelected,
+          paginationNodes: this.paginationNodes,
           total: parseInt(this.node.dataset.fazeFilterTotal || '0', 10),
         });
       } catch (error) {
@@ -361,6 +368,7 @@ class Filter {
                     .join('.')}`,
                 );
                 if (responseNode) {
+                  // Обновление товаров
                   if (this.itemsHolderNode) {
                     // Проверка, если отфильтрованных элементов больше 0, тогда происходит их вывод
                     // иначе сообщение об отсутствии элементов по данному запросу
@@ -369,6 +377,16 @@ class Filter {
                       this.itemsHolderNode.innerHTML = itemsHolderNode.innerHTML;
                     } else {
                       this.itemsHolderNode.innerHTML = '<p class="error">К сожалению, ничего не найдено...</p>';
+                    }
+                  }
+
+                  // Обновление пагинации
+                  if (this.paginationNodes.length > 0) {
+                    const paginationNode = responseNode.querySelector(this.config.selectors.pagination);
+                    if (paginationNode) {
+                      this.paginationNodes.forEach((tmpPaginationNode) => {
+                        tmpPaginationNode.innerHTML = paginationNode.innerHTML;
+                      });
                     }
                   }
 
@@ -516,6 +534,7 @@ class Filter {
           itemsHolderNode: this.itemsHolderNode,
           params: this.params,
           totalSelected: this.totalSelected,
+          paginationNodes: this.paginationNodes,
           total: parseInt(this.node.dataset.fazeFilterTotal || '0', 10),
         });
       } catch (error) {
@@ -750,6 +769,7 @@ class Filter {
         form: filterNode.dataset.fazeFilterSelectorsForm || '.faze-filter-form',
         itemsHolder: filterNode.dataset.fazeFilterSelectorsItemsHolder || '.faze-filter-items',
         total: filterNode.dataset.fazeFilterSelectorsTotal || '.faze-filter-total',
+        pagination: filterNode.dataset.fazeFilterSelectorsPagination || '.faze-filter-pagination',
       },
     });
   }

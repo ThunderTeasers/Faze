@@ -28,6 +28,7 @@ interface Config {
   amount: number;
   touchMove: boolean;
   mouseMove: boolean;
+  resetOnMouseLeave: boolean;
   alt?: string;
 }
 
@@ -55,6 +56,7 @@ class ThumbGallery extends Module {
       amount: 5,
       touchMove: true,
       mouseMove: false,
+      resetOnMouseLeave: false,
       alt: undefined,
     };
 
@@ -200,6 +202,17 @@ class ThumbGallery extends Module {
       // Ставим активный элемент
       Faze.Helpers.activateItem(this.galleryElementsNodes, currentPhotoIndex);
     });
+
+    // Навешиваем событие сброса на первый слайд при уходе мыши
+    if (this.config.resetOnMouseLeave) {
+      Faze.Events.listener('mouseleave', this.node, () => {
+        // Скроллим на первый слайд
+        this.holderNode.scrollLeft = 0;
+
+        // Ставим активный элемент на первый
+        Faze.Helpers.activateItem(this.galleryElementsNodes, 0);
+      });
+    }
   }
 
   /**
@@ -312,6 +325,7 @@ class ThumbGallery extends Module {
       amount: parseInt(node.dataset.fazeThumbgalleryGap || '5', 10),
       touchMove: (node.dataset.fazeThumbgalleryTouchMove || 'true') === 'true',
       mouseMove: (node.dataset.fazeThumbgalleryMouseMove || 'false') === 'true',
+      resetOnMouseLeave: (node.dataset.fazeThumbgalleryResetOnMouseLeave || 'false') === 'true',
       alt: node.dataset.fazeThumbgalleryAlt,
     });
 

@@ -1757,6 +1757,17 @@ class Helpers {
       node.value = min.toString();
     }
   }
+
+  /**
+   * Проверка объекта на пустоту
+   *
+   * @param {object} obj Объект для проверки
+   *
+   * @returns {boolean} является ли переданный аргумент пустым объектом
+   */
+  static isEmptyObject(obj: object): boolean {
+    return typeof obj === 'object' && obj !== null && !Array.isArray(obj) && Object.keys(obj).length === 0;
+  }
 }
 
 export default Helpers;

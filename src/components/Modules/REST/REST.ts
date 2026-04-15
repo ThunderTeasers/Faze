@@ -2,14 +2,7 @@ import Faze from '../../Core/Faze';
 import Helpers from '../../Helpers/Helpers';
 
 class REST {
-  static request(
-    method: string,
-    type: string | null,
-    url: string,
-    data: any,
-    callbackSuccess: ((response: any) => void) | null,
-    node?: HTMLElement
-  ): void {
+  static request(method: string, type: string | null, url: string, data: any, callbackSuccess: ((response: any) => void) | null, node?: HTMLElement): void {
     let formData: FormData = new FormData();
     let dataType: string = '';
     let testedMethod: string = '';
@@ -49,9 +42,7 @@ class REST {
         }
       }
     } else {
-      throw new Error(
-        'Параметр "data" функции ajaxRequest не является объектом'
-      );
+      throw new Error('Параметр "data" функции ajaxRequest не является объектом');
     }
 
     // Заполняем "from", если его нет
@@ -67,12 +58,7 @@ class REST {
     // Если это GET запрос, подставляем параметры
     if (method.toLowerCase() === 'get') {
       const formDataQuery: string = [...formData.entries()]
-        .map(
-          (entry) =>
-            `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(
-              <any>entry[1]
-            )}`
-        )
+        .map((entry) => `${encodeURIComponent(<any>entry[0])}=${encodeURIComponent(<any>entry[1])}`)
         .join('&');
 
       if (currentURL.includes('?')) {
@@ -88,8 +74,7 @@ class REST {
 
         // В зависимости от типа запроса нужно по разному получить ответ от сервера
         try {
-          responseData =
-            dataType === 'json' ? response.json() : response.text();
+          responseData = dataType === 'json' ? response.json() : response.text();
         } catch (error) {
           console.error(error);
         }
@@ -99,33 +84,23 @@ class REST {
       .then((response: any) => {
         if ('response_html' in data) {
           // Парсинг ответа
-          const responseHTML = new DOMParser().parseFromString(
-            response,
-            'text/html'
-          );
+          const responseHTML = new DOMParser().parseFromString(response, 'text/html');
 
-          document
-            .querySelectorAll<HTMLElement>(data['response_html'])
-            .forEach((el: HTMLElement) => {
-              const responseNode = responseHTML.querySelector(
-                data['response_html']
-              );
-              el.innerHTML = responseNode ? responseNode.innerHTML : '';
+          document.querySelectorAll<HTMLElement>(data['response_html']).forEach((el: HTMLElement) => {
+            const responseNode = responseHTML.querySelector(data['response_html']);
+            el.innerHTML = responseNode ? responseNode.innerHTML : '';
 
-              if (data.replace_attrs) {
-                Object.keys(responseNode.dataset).forEach((key) => {
-                  el.dataset[key] = responseNode.dataset[key];
-                });
-              }
-            });
+            if (data.replace_attrs) {
+              Object.keys(responseNode.dataset).forEach((key) => {
+                el.dataset[key] = responseNode.dataset[key];
+              });
+            }
+          });
         } else if ('response_text' in data) {
           document.querySelectorAll(data['response_text']).forEach((el) => {
             el.innerHTML = response;
           });
-        } else if (
-          'response_callback' in data &&
-          (window as any)[data['response_callback']] instanceof Function
-        ) {
+        } else if ('response_callback' in data && (window as any)[data['response_callback']] instanceof Function) {
           (window as any)[data['response_callback']](response);
         } else if ('response_json' in data) {
           document.querySelectorAll(data['response_json']).forEach((el) => {
@@ -133,10 +108,7 @@ class REST {
           });
         } else if ('replace_with' in data) {
           // Парсинг ответа
-          const responseHTML = new DOMParser().parseFromString(
-            response,
-            'text/html'
-          );
+          const responseHTML = new DOMParser().parseFromString(response, 'text/html');
 
           // Проверка наличия элемента
           if (!responseHTML.querySelector(data['replace_with'])) {
@@ -144,13 +116,9 @@ class REST {
           }
 
           // Замена элемента по селектору "replace_with"
-          document
-            .querySelectorAll<HTMLElement>(data['replace_with'])
-            .forEach((node: HTMLElement) => {
-              node.replaceWith(
-                responseHTML.querySelector(data['replace_with'])
-              );
-            });
+          document.querySelectorAll<HTMLElement>(data['replace_with']).forEach((node: HTMLElement) => {
+            node.replaceWith(responseHTML.querySelector(data['replace_with']));
+          });
         }
 
         // Выполнение пользовательской функции
@@ -158,10 +126,7 @@ class REST {
           try {
             callbackSuccess(response);
           } catch (error) {
-            console.error(
-              'Ошибка исполнения пользовательского метода: ',
-              error
-            );
+            console.error('Ошибка исполнения пользовательского метода: ', error);
           }
         }
       })
@@ -173,10 +138,7 @@ class REST {
           try {
             callbackSuccess(null);
           } catch (error) {
-            console.error(
-              'Ошибка исполнения пользовательского метода: ',
-              error
-            );
+            console.error('Ошибка исполнения пользовательского метода: ', error);
           }
         }
       });
@@ -197,10 +159,7 @@ class REST {
    * @param formNode - DOM элемент формы из которой оправляем
    * @param callback - пользовательская функция, исполняющаяся ПОСЛЕ всех действий
    */
-  static formSubmit(
-    formNode: HTMLFormElement,
-    callback?: (response?: any) => void
-  ): void {
+  static formSubmit(formNode: HTMLFormElement, callback?: (response?: any) => void): void {
     if (!(formNode instanceof HTMLFormElement)) {
       throw new Error('Параметр метода formSubmit не является формой');
     }
@@ -209,9 +168,7 @@ class REST {
     const formData: FormData = new FormData(formNode);
 
     // Поля, имеющие принадлежность к JSON
-    const jsonFields: NodeListOf<HTMLElement> = formNode.querySelectorAll(
-      '[data-faze-restapi-json-name]'
-    );
+    const jsonFields: NodeListOf<HTMLElement> = formNode.querySelectorAll('[data-faze-restapi-json-name]');
 
     // Получение уникальных названий полей для сборки JSON объектов
     const jsonNames: string[] = [
@@ -219,10 +176,8 @@ class REST {
         Array.from(jsonFields).map((item: any) => {
           const inputDataName = item.dataset.fazeRestapiJsonName;
 
-          return inputDataName.includes('.')
-            ? inputDataName.substring(0, inputDataName.indexOf('.'))
-            : inputDataName;
-        })
+          return inputDataName.includes('.') ? inputDataName.substring(0, inputDataName.indexOf('.')) : inputDataName;
+        }),
       ),
     ];
 
@@ -231,15 +186,11 @@ class REST {
       let jsonObject: any = {};
 
       // Проходимся по всем инпутам название в атрибуте которых начинается с имени ключа объекта в который мы собираем их
-      const inputsNodes: HTMLInputElement[] = Array.from(
-        formNode.querySelectorAll('[data-faze-restapi-json-name]')
-      ).filter((inputNode: any) => {
+      const inputsNodes: HTMLInputElement[] = Array.from(formNode.querySelectorAll('[data-faze-restapi-json-name]')).filter((inputNode: any) => {
         const attrJsonName = inputNode.dataset.fazeRestapiJsonName;
 
         // Проверяем, если название содержит точку, то значит нужно проверять вместе с ней, если нет - то нет, это очень важно
-        return attrJsonName.includes('.')
-          ? attrJsonName.startsWith(`${jsonName}.`)
-          : attrJsonName.startsWith(`${jsonName}`);
+        return attrJsonName.includes('.') ? attrJsonName.startsWith(`${jsonName}.`) : attrJsonName.startsWith(`${jsonName}`);
       }) as HTMLInputElement[];
 
       // Проходимся по всем инпутам и собираем итоговый объект
@@ -257,32 +208,22 @@ class REST {
           // Радио кнопки которые не в активном положении
           (isRadioButton && !itemNode.checked) ||
           // Чекбоксы в неактивном положении у которых нет data атрибута с значением неактивного положения, либо атрибут пустой
-          (isCheckbox &&
-            !itemNode.checked &&
-            !itemNode.dataset.fazeRestapiDisabledValue)
+          (isCheckbox && !itemNode.checked && !itemNode.dataset.fazeRestapiDisabledValue)
         ) {
           return;
         }
 
         // Мы должны вырезать из строки всё что идет до первой точки, т.к. это ключ для отправки в formData, если точки нет, это
         // значит, что это ключ первого уровня, а для этого необходимо передать пустую строку
-        let jsonNameForObject: string | undefined =
-          itemNode.dataset.fazeRestapiJsonName;
+        let jsonNameForObject: string | undefined = itemNode.dataset.fazeRestapiJsonName;
         if (jsonNameForObject && jsonNameForObject.includes('.')) {
-          jsonNameForObject = jsonNameForObject.substring(
-            jsonNameForObject.indexOf('.') + 1
-          );
+          jsonNameForObject = jsonNameForObject.substring(jsonNameForObject.indexOf('.') + 1);
         } else {
           jsonNameForObject = '';
         }
 
-        const key: string =
-          itemNode.dataset.fazeRestapiJsonKey || itemNode.name;
-        let value: string | null =
-          itemNode.dataset.fazeRestapiJsonValue ||
-          itemNode.value ||
-          itemNode.dataset.fazeRestapiDisabledValue ||
-          null;
+        const key: string = itemNode.dataset.fazeRestapiJsonKey || itemNode.name;
+        let value: string | null = itemNode.dataset.fazeRestapiJsonValue || itemNode.value || itemNode.dataset.fazeRestapiDisabledValue || null;
 
         // Если это не активный чекбокс, то присваиваем ему значение из data атрибута
         // Гарантированность того, что оно задано, обеспечивает условие сверху
@@ -291,18 +232,11 @@ class REST {
         }
 
         // Группа массива
-        const arrayGroup: string =
-          itemNode.dataset.fazeRestapiJsonArrayGroup || 'default';
+        const arrayGroup: string = itemNode.dataset.fazeRestapiJsonArrayGroup || 'default';
 
         // Если есть значение, тогда создаём объект
         if (value) {
-          jsonObject = Faze.Helpers.objectFromString(
-            jsonObject,
-            jsonNameForObject,
-            key,
-            value,
-            arrayGroup
-          );
+          jsonObject = Faze.Helpers.objectFromString(jsonObject, jsonNameForObject, key, value, arrayGroup);
         }
 
         // Удаляем найденные поля из formdata
@@ -322,10 +256,7 @@ class REST {
         try {
           objectToMerge = JSON.parse(jsonData);
         } catch (error) {
-          console.error(
-            `Ошибка парсинга JSON объекта для слияния("data-faze-restapi-json-merge"), JSON: ${jsonData}, текст ошибки: `,
-            error
-          );
+          console.error(`Ошибка парсинга JSON объекта для слияния("data-faze-restapi-json-merge"), JSON: ${jsonData}, текст ошибки: `, error);
         }
 
         // Объединяем объекты
@@ -337,26 +268,16 @@ class REST {
     }
 
     // Проставляем значения для выключенных чекбоксов
-    formNode
-      .querySelectorAll<HTMLInputElement>(
-        `[data-faze-restapi-disabled-value][type="checkbox"]:not(:checked)`
-      )
-      .forEach((inputNode: HTMLInputElement) => {
-        formData.append(
-          inputNode.name,
-          (inputNode as any).dataset.fazeRestapiDisabledValue
-        );
-      });
+    formNode.querySelectorAll<HTMLInputElement>(`[data-faze-restapi-disabled-value][type="checkbox"]:not(:checked)`).forEach((inputNode: HTMLInputElement) => {
+      formData.append(inputNode.name, (inputNode as any).dataset.fazeRestapiDisabledValue);
+    });
 
     // Вычисляем URL для отправки запроса
     const url: string = formNode.getAttribute('action') || window.location.href;
 
     // Определение, какой тип ответа запрашивать
     let typeForResponse: string = 'text';
-    if (
-      formNode.elements[<any>'mime'] &&
-      (<any>formNode.elements[<any>'mime']).value
-    ) {
+    if (formNode.elements[<any>'mime'] && (<any>formNode.elements[<any>'mime']).value) {
       typeForResponse = (<any>formNode.elements[<any>'mime']).value;
     }
 
@@ -366,15 +287,11 @@ class REST {
     if (formNode.dataset.fazeRestapiNotification) {
       notificationNode = formNode;
     } else {
-      notificationNode = formNode.querySelector(
-        '[data-faze-restapi-notification]'
-      );
+      notificationNode = formNode.querySelector('[data-faze-restapi-notification]');
     }
 
     if (notificationNode) {
-      if (
-        notificationNode.dataset.fazeRestapiNotification === 'response_json'
-      ) {
+      if (notificationNode.dataset.fazeRestapiNotification === 'response_json') {
         typeForResponse = 'json';
       }
     }
@@ -382,15 +299,9 @@ class REST {
     // Футкция, которая исполнится при получении ответа от сервера
     const callbackSuccess = (response: any) => {
       if (formNode.hasAttribute('data-faze-restapi-form')) {
-        REST.chain(
-          formNode.dataset.fazeRestapiForm || null,
-          callback,
-          response
-        );
+        REST.chain(formNode.dataset.fazeRestapiForm || null, callback, response);
       } else if (typeof callback === 'function') {
-        console.log(
-          'Нет атрибутов data-faze-restapi-form, но callback задан, исполняем его'
-        );
+        console.log('Нет атрибутов data-faze-restapi-form, но callback задан, исполняем его');
         callback(response);
       }
 
@@ -400,12 +311,9 @@ class REST {
       // Если есть контейнер с [data-faze-restapi-notification="text/json"]
       if (notificationNode) {
         if (notificationNode.dataset.fazeRestapiNotificationText) {
-          notificationNode.innerHTML =
-            notificationNode.dataset.fazeRestapiNotificationText;
+          notificationNode.innerHTML = notificationNode.dataset.fazeRestapiNotificationText;
         } else {
-          if (
-            notificationNode.dataset.fazeRestapiNotification === 'response_json'
-          ) {
+          if (notificationNode.dataset.fazeRestapiNotification === 'response_json') {
             notificationNode.innerHTML = response.message;
           } else {
             notificationNode.innerHTML = response;
@@ -427,14 +335,7 @@ class REST {
     formData.append('from', window.location.href);
 
     // Выполняем запрос на сервер
-    REST.request(
-      'POST',
-      typeForResponse,
-      url,
-      formData,
-      callbackSuccess,
-      formNode
-    );
+    REST.request('POST', typeForResponse, url, formData, callbackSuccess, formNode);
   }
 
   static getElementValue(element: any): string {
@@ -473,18 +374,14 @@ class REST {
       chain = object;
       json = JSON.stringify(chain);
     } else {
-      throw new Error(
-        'Параметр функции ajaxDataAttr не является ни HTML элементом, ни массивом!'
-      );
+      throw new Error('Параметр функции ajaxDataAttr не является ни HTML элементом, ни массивом!');
     }
 
     // Проверяем корректность JSON
     try {
       json = JSON.parse(json);
     } catch (error) {
-      throw new Error(
-        `Ошибка парсинга JSON конфига ("${json}"), дословно: ${error}`
-      );
+      throw new Error(`Ошибка парсинга JSON конфига ("${json}"), дословно: ${error}`);
     }
 
     // Проверяем, что JSON это массив, а не объект
@@ -505,9 +402,7 @@ class REST {
       if (chain[0].delay) {
         // Назначим ID если не было
         if (!element.hasAttribute('id')) {
-          element.id = Math.round(
-            new Date().getTime() + Math.random() * 100000
-          );
+          element.id = Math.round(new Date().getTime() + Math.random() * 100000);
         }
 
         if (timeoutID[element.id]) {
@@ -539,11 +434,7 @@ class REST {
    * @param finalCallback - пользовательская функция, исполняющаяся после всей цепочки
    * @param response      - ответ от сервера для финальной пользовательской функции
    */
-  static chain(
-    chainRawData: any,
-    finalCallback?: (response?: any) => void,
-    response?: any
-  ) {
+  static chain(chainRawData: any, finalCallback?: (response?: any) => void, response?: any) {
     let chainData: any;
 
     // Определяем тип цепочки и парсим её в соответствии с ним
@@ -553,10 +444,7 @@ class REST {
       try {
         chainData = JSON.parse(chainRawData || '');
       } catch (error) {
-        console.error(
-          `Ошибка парсинга JSON в функции ajaxChain ("${chainRawData}"), текст ошибки:`,
-          error
-        );
+        console.error(`Ошибка парсинга JSON в функции ajaxChain ("${chainRawData}"), текст ошибки:`, error);
       }
     }
 
@@ -566,10 +454,7 @@ class REST {
         try {
           finalCallback(response);
         } catch (error) {
-          console.error(
-            'Ошибка исполнения пользовательской функции в formSubmit, текст ошибки:',
-            error
-          );
+          console.error('Ошибка исполнения пользовательской функции в formSubmit, текст ошибки:', error);
         }
       }
 
@@ -587,26 +472,15 @@ class REST {
       try {
         data(response);
       } catch (error) {
-        console.error(
-          'Ошибка исполнения пользовательской функции переданной через "function" в ajaxChain, текст ошибки:',
-          error
-        );
+        console.error('Ошибка исполнения пользовательской функции переданной через "function" в ajaxChain, текст ошибки:', error);
       }
       REST.chain(chainData, finalCallback, response);
-    } else if (
-      typeof data === 'string' &&
-      data in window &&
-      (window as any)[data] &&
-      (window as any)[data] instanceof Function
-    ) {
+    } else if (typeof data === 'string' && data in window && (window as any)[data] && (window as any)[data] instanceof Function) {
       // Если это функция записанная строкой, то есть только имя, тоже выполним её
       try {
         (window as any)[data](response);
       } catch (error) {
-        console.error(
-          'Ошибка исполнения пользовательской функции переданной строкой в ajaxChain, текст ошибки:',
-          error
-        );
+        console.error('Ошибка исполнения пользовательской функции переданной строкой в ajaxChain, текст ошибки:', error);
       }
     } else {
       // Если в объекте присутствует поле "function", то есть имя некой функции, пытаемся найти её и выполнить
@@ -614,17 +488,11 @@ class REST {
         const functionName = data['function'];
 
         // Проверим существование функции
-        if (
-          functionName in window &&
-          typeof (window as any)[functionName] === 'function'
-        ) {
+        if (functionName in window && typeof (window as any)[functionName] === 'function') {
           try {
             (window as any)[functionName](response);
           } catch (error) {
-            console.error(
-              `Ошибка в пользовательской функции в параметре "function" с именем ${functionName}, текст ошибки:`,
-              error
-            );
+            console.error(`Ошибка в пользовательской функции в параметре "function" с именем ${functionName}, текст ошибки:`, error);
           }
         }
 
@@ -636,23 +504,13 @@ class REST {
 
         // Разбор параметров "page" и "module" относительно присутствия которых им присваиваются соответствующие значения
         if (data['page'] && data['module']) {
-          url = /^\//.test(data['page'])
-            ? data['page']
-            : `/${data['page']}.txt`;
+          url = /^\//.test(data['page']) ? data['page'] : `/${data['page']}.txt`;
           data['show'] = data['module'];
         } else if (data['module']) {
           url = window.location.pathname;
 
           // Системный параметры
-          const systemParams = [
-            'module',
-            'show',
-            'page',
-            'mime',
-            'from',
-            'update',
-            'method',
-          ];
+          const systemParams = ['module', 'show', 'page', 'mime', 'from', 'update', 'method'];
 
           // Добавляем параметры к запросу, если они не относятся к "системным"
           const params = new URLSearchParams(window.location.search);
@@ -667,9 +525,7 @@ class REST {
 
           data['show'] = data['module'];
         } else if (data['page']) {
-          url = /^\//.test(data['page'])
-            ? data['page']
-            : `/${data['page']}.txt`;
+          url = /^\//.test(data['page']) ? data['page'] : `/${data['page']}.txt`;
         }
 
         // Если это FormData, то метод всегда "POST"
@@ -723,10 +579,7 @@ class REST {
             try {
               callback(response);
             } catch (error) {
-              console.error(
-                'Ошибка исполнения пользовательской функции переданной в ajaxChain, текст ошибки:',
-                error
-              );
+              console.error('Ошибка исполнения пользовательской функции переданной в ajaxChain, текст ошибки:', error);
             }
           }
 
@@ -736,9 +589,7 @@ class REST {
       } else if ('redirect' in data) {
         window.location.href = data['redirect'];
       } else {
-        throw new Error(
-          'Не указан обязательный параметр "method" или "function" в ajaxChain'
-        );
+        throw new Error('Не указан обязательный параметр "method" или "function" в ajaxChain');
       }
     }
   }

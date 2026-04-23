@@ -3,6 +3,7 @@ import Helpers from './components/Helpers/Helpers';
 import Shortcuts from './components/Core/Shortcuts';
 import Globals from './components/Core/Globals';
 import Form from './components/Helpers/Form';
+import Logger from './components/Core/Logger';
 
 Faze.VERSION = 2;
 
@@ -95,6 +96,12 @@ Faze.add({
     });
   },
 });
+
+// Тесты ошибок
+if (document.documentElement.classList.contains('test-errors')) {
+  const logger = new Logger('ColorChanger');
+  logger.error('change Тестовая ошибка!');
+}
 
 // Тесты
 Faze.add({

@@ -1,176 +1,73 @@
 <!doctype html>
 <html lang="ru" class="js-drag">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Title</title>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Title</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-            html,
-            body {
-                height: 100%;
-            }
+      html,
+      body {
+        height: 100%;
+      }
 
-            main {
-                display: grid;
-                grid-template-columns: 20rem 1fr;
-                height: 50%;
-            }
+      main {
+        padding: 20px;
+      }
 
-            aside.sidebar {
-                /* padding: 10px; */
+      .drag-container {
+        display: flex;
+        flex-direction: column;
+        /*gap: 10px;*/
+      }
 
-                border-right: 1px solid #000000;
-            }
+      .drag-component {
+        position: relative;
 
-            aside.content {
-                padding: 10px;
-            }
+        padding: 30px 20px 20px;
+        border: 1px solid #000000;
+        border-radius: 10px;
+      }
 
-            .drag-component {
-                width: 100%;
-                height: 100px;
+      .drag-component-handle {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+      }
+    </style>
+  </head>
 
-                margin-bottom: 10px;
-                padding: 5px;
-
-                border: 1px solid #000000;
-                background-color: #ffffff;
-            }
-
-            .test-section3 .drag-component:after {
-                content: "";
-
-                display: block;
-                width: 30px;
-                height: 30px;
-
-                background-color: #f0f;
-            }
-
-            /* .drag-component2 {
-      height: 50px;
-    }
-
-    .drag-component4 {
-      height: 150px;
-    } */
-
-            section .js-drag-test {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-
-                margin-top: 20px;
-            }
-
-            section .js-drag-test > div {
-                width: 100px;
-                margin-right: 10px;
-            }
-
-            .drag-test-grid {
-                display: flex;
-                flex-wrap: wrap;
-                width: 500px;
-            }
-        </style>
-    </head>
-
-    <body>
-        <main>
-            <aside class="sidebar">
-                <!-- <div class="js-drag-test" data-faze-drag="container" data-faze-drag-group="components" data-faze-styles="false"
-        data-faze-drag-direction="vertical">
-        <div class="drag-component drag-component1" data-faze-drag="item">
+  <body>
+    <main>
+      <div
+        class="js-drag-test drag-container"
+        data-faze-drag="container"
+        data-faze-drag-group="components"
+        data-faze-styles="false"
+        data-faze-drag-direction="horizontal"
+      >
+        <div class="drag-component" data-faze-drag="item">
           <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
           ITEM 1
         </div>
-        <div class="drag-component drag-component2" data-faze-drag="item">
+        <div class="drag-component" data-faze-drag="item">
           <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
           ITEM 2
         </div>
-        <div class="drag-component drag-component3" data-faze-drag="item">
+        <div class="drag-component" data-faze-drag="item">
           <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
           ITEM 3
         </div>
-        <div class="drag-component drag-component4" data-faze-drag="item">
+        <div class="drag-component" data-faze-drag="item">
           <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
           ITEM 4
         </div>
-        <div class="drag-component drag-component5" data-faze-drag="item">
-          <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-          ITEM 5
-        </div>
       </div>
-      <br>
-      <button type="button" class="js-drag-add">Добавить</button>
-      <button type="button" class="js-drag-remove">Удалить</button> -->
-            </aside>
-            <aside class="content">
-                <!-- Таблица для теста перетягивания -->
-            </aside>
-        </main>
-        <section class="test-section3">
-            <div
-                class="js-drag-test drag-test-grid"
-                data-faze-drag="container"
-                data-faze-drag-group="components"
-                data-faze-styles="false"
-                data-faze-drag-direction="horizontal"
-            >
-                <div class="drag-component" data-faze-drag="item">
-                    <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-                    ITEM 1
-                </div>
-                <div class="drag-component" data-faze-drag="item">
-                    <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-                    ITEM 2
-                </div>
-                <div class="drag-component" data-faze-drag="item">
-                    <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-                    ITEM 3
-                </div>
-                <div class="drag-component" data-faze-drag="item">
-                    <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-                    ITEM 4
-                </div>
-                <div class="drag-component" data-faze-drag="item">
-                    <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-                    ITEM 5
-                </div>
-                <div class="drag-component" data-faze-drag="item">
-                    <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-                    ITEM 6
-                </div>
-                <div class="drag-component" data-faze-drag="item">
-                    <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-                    ITEM 7
-                </div>
-                <div class="drag-component" data-faze-drag="item">
-                    <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-                    ITEM 8
-                </div>
-            </div>
-        </section>
-        <script>
-            // document.querySelector('.js-drag-add').addEventListener('click', () => {
-            //   document.querySelector('.js-drag-test').insertAdjacentHTML('beforeend', `
-            //     <div class="drag-component" data-faze-drag="item">
-            //       <div class="drag-component-handle" data-faze-drag="handle">Handle</div>
-            //       ITEM 4
-            //     </div>
-            //   `);
-            // });
-
-            // document.querySelector('.js-drag-remove').addEventListener('click', () => {
-            //   document.querySelector('.js-drag-test').lastElementChild.remove();
-            // });
-        </script>
-    </body>
+    </main>
+  </body>
 </html>

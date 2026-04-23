@@ -19,20 +19,26 @@ class Logger {
   /**
    * Вывод предупреждения в консоль
    *
-   * @param message - сообщение которое необходимо отобразить
-   * @param node    - DOM элемент, если необходимо
+   * @param {string} message Сообщение которое необходимо отобразить
+   * @param {HTMLElement} node DOM элемент, если необходимо
    */
   warning(message: string, node: HTMLElement): void {
-    console.warn(`${this.prefix} ${message} ${this.postfix}`, node || '');
+    const prefix = this.prefix ? `${this.prefix} ` : '';
+    const postfix = this.postfix ? ` ${this.postfix}` : '';
+
+    console.warn(`Faze: ${prefix}${message}${postfix}`, node || '');
   }
 
   /**
    * Вывод ошибки в консоль и выброс исключения
    *
-   * @param message - сообщение которое необходимо отобразить
+   * @param {string} message Сообщение которое необходимо отобразить
    */
   error(message: string): never {
-    throw new Error(`${this.prefix} ${message} ${this.postfix}`);
+    const prefix = this.prefix ? `${this.prefix} ` : '';
+    const postfix = this.postfix ? ` ${this.postfix}` : '';
+
+    throw new Error(`Faze: ${prefix}${message}${postfix}`);
   }
 }
 

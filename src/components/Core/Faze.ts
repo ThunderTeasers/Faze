@@ -342,7 +342,7 @@ class Faze {
             Faze.Observer.watch(config.observableSelector, config.callback);
           }
         } catch (error) {
-          console.error(`Error in plugin "${config.pluginName}", exception:`, error);
+          console.error(`Faze: Ошибка в плагине "${config.pluginName}":`, error);
         }
       }
     }

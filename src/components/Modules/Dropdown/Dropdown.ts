@@ -72,12 +72,12 @@ class Dropdown {
 
     // Проверяем задан ли основной DOM элемент
     if (!node) {
-      return this.logger.error('Не задан объект дропдауна');
+      this.logger.error('constructor', 'Не задан объект дропдауна');
     }
 
     // Проверка на двойную инициализацию
     if (node.classList.contains('faze-dropdown-initialized')) {
-      this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
+      this.logger.warning('constructor', 'Плагин уже был инициализирован на этот DOM элемент:', node);
       return;
     }
 
@@ -113,7 +113,7 @@ class Dropdown {
     this.body = this.node.querySelector('.faze-body, [data-faze-dropdown="body"]');
 
     if (!this.title || !this.body) {
-      return this.logger.error('Для дропдауна не найдены шапка и тело');
+      this.logger.error('initialize', 'Для дропдауна не найдены шапка и тело');
     }
 
     // Присвоение сдвига для тела
@@ -139,8 +139,8 @@ class Dropdown {
           title: this.title,
           body: this.body,
         });
-      } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
+      } catch (error: any) {
+        this.logger.error('created', error);
       }
     }
   }
@@ -150,7 +150,7 @@ class Dropdown {
    */
   bind(): void {
     if (!this.title || !this.body) {
-      return this.logger.error('Не заданы шапка и тело дропдауна');
+      return this.logger.error('bind', 'Не заданы шапка и тело дропдауна');
     }
 
     // При нажатии на заголовок, меняем видимость тела дропдауна
@@ -165,8 +165,8 @@ class Dropdown {
               title: this.title,
               body: this.body,
             });
-          } catch (error) {
-            this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
+          } catch (error: any) {
+            this.logger.error('opened', error);
           }
         }
       } else {
@@ -177,8 +177,8 @@ class Dropdown {
               title: this.title,
               body: this.body,
             });
-          } catch (error) {
-            this.logger.error(`Ошибка исполнения пользовательского метода "closed": ${error}`);
+          } catch (error: any) {
+            this.logger.error('closed', error);
           }
         }
       }
@@ -197,8 +197,8 @@ class Dropdown {
                 title: this.title,
                 body: this.body,
               });
-            } catch (error) {
-              this.logger.error(`Ошибка исполнения пользовательского метода "closed": ${error}`);
+            } catch (error: any) {
+              this.logger.error('closed', error);
             }
           }
         }
@@ -212,7 +212,7 @@ class Dropdown {
    */
   resetTitle(): void {
     if (!this.title) {
-      return this.logger.error('Не задана шапка дропдауна');
+      this.logger.error('resetTitle', 'Не задана шапка дропдауна');
     }
 
     const cloneTitle = this.title.cloneNode(true);

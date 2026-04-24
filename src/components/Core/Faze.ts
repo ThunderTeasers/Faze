@@ -382,8 +382,8 @@ class Faze {
     if (typeof callback === 'function') {
       try {
         callback();
-      } catch (error) {
-        this.logger.error(`Модуль Faze.${moduleName}: Ошибка исполнения пользовательского метода "${callback.name}": ${error}`);
+      } catch (error: any) {
+        this.logger.error('callFunction', `Модуль Faze.${moduleName}: Ошибка исполнения пользовательского метода "${callback.name}": ${error}`);
       }
     }
   }

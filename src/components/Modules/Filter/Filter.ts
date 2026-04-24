@@ -140,7 +140,7 @@ class Filter {
 
     // Проверка на двойную инициализацию
     if (node.classList.contains('faze-filter-initialized')) {
-      this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
+      this.logger.warning('constructor', 'Плагин уже был инициализирован на этот DOM элемент:', node);
       return;
     }
 

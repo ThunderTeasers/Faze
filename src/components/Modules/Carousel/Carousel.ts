@@ -191,10 +191,7 @@ class Carousel {
 
     // Проверка на двойную инициализацию
     if (node.classList.contains('faze-carousel-initialized')) {
-      this.logger.warning(
-        'Плагин уже был инициализирован на этот DOM элемент:',
-        node
-      );
+      this.logger.warning('constructor', 'Плагин уже был инициализирован на этот DOM элемент:', node);
       return;
     }
 
@@ -388,10 +385,8 @@ class Carousel {
           pagesNode: this.pagesNode,
           currentSlideNode: this.slidesNodes[this.index],
         });
-      } catch (error) {
-        this.logger.error(
-          `Ошибка исполнения пользовательского метода "created": ${error}`
-        );
+      } catch (error: any) {
+        this.logger.error('created', error);
       }
     }
   }
@@ -659,9 +654,8 @@ class Carousel {
     // Если сдвинуто влево больше чем на пол слайда, то активируем следующий слайд
     if (offset < -(this.slideWidth / 6)) {
       this.insertSlideAfter();
-      this.itemsHolderNode.style.left = `${
-        parseInt(this.itemsHolderNode.style.left, 10) + this.slideWidth
-      }px`;
+      this.itemsHolderNode.style.left = `${parseInt(this.itemsHolderNode.style.left, 10) + this.slideWidth
+        }px`;
       this.next();
     } else if (offset > this.slideWidth / 6) {
       // Если тоже самое вправо, то предыдущий
@@ -794,7 +788,7 @@ class Carousel {
    */
   createPagination(): void {
     if (!this.pagesNode) {
-      this.logger.error('Родительский элемент пагинации не найден');
+      this.logger.error('createPagination', 'Родительский элемент пагинации не найден');
     }
 
     this.pagesNode.className = 'faze-carousel-pages';
@@ -833,11 +827,9 @@ class Carousel {
    * Изменение назписи счетчика в соответствии с текущим индексом
    */
   changeCounter() {
-    this.counterNode.innerHTML = `<span class="faze-carousel-counter-current">${
-      this.index + 1
-    }</span> / <span class="faze-carousel-counter-total">${
-      this.totalSlides
-    }</span>`;
+    this.counterNode.innerHTML = `<span class="faze-carousel-counter-current">${this.index + 1
+      }</span> / <span class="faze-carousel-counter-total">${this.totalSlides
+      }</span>`;
   }
 
   /**
@@ -1045,13 +1037,11 @@ class Carousel {
             this.itemsHolderNode.style.transitionDuration =
               this.transitionDuration;
             if (this.config.animation.direction === 'horizontal') {
-              this.itemsHolderNode.style.left = `-${
-                this.slideWidth * amount
-              }px`;
+              this.itemsHolderNode.style.left = `-${this.slideWidth * amount
+                }px`;
             } else if (this.config.animation.direction === 'vertical') {
-              this.itemsHolderNode.style.top = `-${
-                this.slideHeight * amount
-              }px`;
+              this.itemsHolderNode.style.top = `-${this.slideHeight * amount
+                }px`;
             }
 
             // Присваиваем следующему слайду класс
@@ -1104,13 +1094,11 @@ class Carousel {
 
             // Задаем стили
             if (this.config.animation.direction === 'horizontal') {
-              this.itemsHolderNode.style.left = `-${
-                this.slideWidth * amount
-              }px`;
+              this.itemsHolderNode.style.left = `-${this.slideWidth * amount
+                }px`;
             } else if (this.config.animation.direction === 'vertical') {
-              this.itemsHolderNode.style.top = `-${
-                this.slideHeight * amount
-              }px`;
+              this.itemsHolderNode.style.top = `-${this.slideHeight * amount
+                }px`;
             }
             this.itemsHolderNode.style.transitionDuration = '';
 
@@ -1192,10 +1180,8 @@ class Carousel {
           arrowsNodes: this.arrowsNodes,
           pagesNode: this.pagesNode,
         });
-      } catch (error) {
-        this.logger.error(
-          `Ошибка исполнения пользовательского метода "changed": ${error}`
-        );
+      } catch (error: any) {
+        this.logger.error('changed', error);
       }
     }
   }
@@ -1229,10 +1215,8 @@ class Carousel {
           arrowsNodes: this.arrowsNodes,
           pagesNode: this.pagesNode,
         });
-      } catch (error) {
-        this.logger.error(
-          `Ошибка исполнения пользовательского метода "changed": ${error}`
-        );
+      } catch (error: any) {
+        this.logger.error('beforeChanged', error);
       }
     }
   }
@@ -1266,10 +1250,8 @@ class Carousel {
           arrowsNodes: this.arrowsNodes,
           pagesNode: this.pagesNode,
         });
-      } catch (error) {
-        this.logger.error(
-          `Ошибка исполнения пользовательского метода "changed": ${error}`
-        );
+      } catch (error: any) {
+        this.logger.error('afterChanged', error);
       }
     }
   }

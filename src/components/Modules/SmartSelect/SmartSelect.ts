@@ -186,8 +186,8 @@ class SmartSelect extends Module {
               node: this.node,
               data: item.data,
             });
-          } catch (error) {
-            this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
+          } catch (error: any) {
+            this.logger.error('selected', error);
           }
         }
 
@@ -212,8 +212,8 @@ class SmartSelect extends Module {
               node: this.node,
               data: item.data,
             });
-          } catch (error) {
-            this.logger.error(`Ошибка исполнения пользовательского метода "entered": ${error}`);
+          } catch (error: any) {
+            this.logger.error('entered', error);
           }
         }
       });
@@ -271,8 +271,8 @@ class SmartSelect extends Module {
                 node: this.node,
                 data: foundItem.data,
               });
-            } catch (error) {
-              this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
+            } catch (error: any) {
+              this.logger.error('selected', error);
             }
           }
 
@@ -301,8 +301,8 @@ class SmartSelect extends Module {
               node: this.node,
               data: item.data,
             });
-          } catch (error) {
-            this.logger.error(`Ошибка исполнения пользовательского метода "entered": ${error}`);
+          } catch (error: any) {
+            this.logger.error('entered', error);
           }
         }
       } else {

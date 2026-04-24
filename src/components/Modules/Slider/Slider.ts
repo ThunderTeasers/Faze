@@ -153,10 +153,8 @@ class Slider extends Module {
         this.config.callbacks.created({
           values: this.getValues(),
         });
-      } catch (error) {
-        return this.logger.error(
-          `Ошибка исполнения пользовательского метода "created", дословно: ${error}!`
-        );
+      } catch (error: any) {
+        this.logger.error('created', error);
       }
     }
   }
@@ -285,10 +283,8 @@ class Slider extends Module {
               this.config.callbacks.changed({
                 values: this.getValues(),
               });
-            } catch (error) {
-              return this.logger.error(
-                `Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`
-              );
+            } catch (error: any) {
+              this.logger.error('changed', error);
             }
           }
         }, this.config.changeDelay);
@@ -336,10 +332,8 @@ class Slider extends Module {
                 this.config.callbacks.changed({
                   values: this.getValues(),
                 });
-              } catch (error) {
-                return this.logger.error(
-                  `Ошибка исполнения пользовательского метода "changed", дословно: ${error}!`
-                );
+              } catch (error: any) {
+                this.logger.error('changed', error);
               }
             }
           },
@@ -350,10 +344,8 @@ class Slider extends Module {
                 this.config.callbacks.stopped({
                   values: this.getValues(),
                 });
-              } catch (error) {
-                return this.logger.error(
-                  `Ошибка исполнения пользовательского метода "stopped", дословно: ${error}!`
-                );
+              } catch (error: any) {
+                this.logger.error('stopped', error);
               }
             }
           },
@@ -602,14 +594,12 @@ class Slider extends Module {
   private checkRange(): void {
     // Если не задан диапазон
     if (!this.config.range) {
-      return this.logger.error('Не задан диапазон значений для слайдера!');
+      this.logger.error('checkRange', 'Не задан диапазон значений для слайдера!');
     }
 
     // Если только одно значение
     if (this.config.range.length !== 2) {
-      return this.logger.error(
-        'Необходимо задать два значения в поле "range"!'
-      );
+      this.logger.error('checkRange', 'Необходимо задать два значения в поле "range"!');
     }
   }
 
@@ -722,9 +712,7 @@ class Slider extends Module {
   resetValue(index: number): void {
     // Проверка на валидность
     if (index > this.config.points.length - 1 && index < 0) {
-      return this.logger.error(
-        `Попытка сбросить несуществующий ползунок с индексом ${index}`
-      );
+      this.logger.error('resetValue', `Попытка сбросить несуществующий ползунок с индексом ${index}`);
     }
 
     // Сброс значения

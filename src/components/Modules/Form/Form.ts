@@ -297,33 +297,29 @@ class Form extends Module {
 
     switch (this.config.hintSide) {
       case 'top':
-        this.hintNode.style.top = `${
-          position.y - this.hintNode.offsetHeight - this.config.hintOffset
-        }px`;
+        this.hintNode.style.top = `${position.y - this.hintNode.offsetHeight - this.config.hintOffset
+          }px`;
         this.hintNode.style.left = `${position.x}px`;
         break;
       case 'bottom':
       default:
-        this.hintNode.style.top = `${
-          position.y +
+        this.hintNode.style.top = `${position.y +
           inputData.node.getBoundingClientRect().height +
           this.config.hintOffset
-        }px`;
+          }px`;
         this.hintNode.style.left = `${position.x}px`;
         break;
       case 'left':
         this.hintNode.style.top = `${position.y}px`;
-        this.hintNode.style.left = `${
-          position.x - this.hintNode.offsetWidth - this.config.hintOffset
-        }px`;
+        this.hintNode.style.left = `${position.x - this.hintNode.offsetWidth - this.config.hintOffset
+          }px`;
         break;
       case 'right':
         this.hintNode.style.top = `${position.y}px`;
-        this.hintNode.style.left = `${
-          position.x +
+        this.hintNode.style.left = `${position.x +
           inputData.node.getBoundingClientRect().width +
           this.config.hintOffset
-        }px`;
+          }px`;
         break;
     }
   }
@@ -343,9 +339,8 @@ class Form extends Module {
     inputData.rules
       .filter((rule: Rule) => rule.message)
       .forEach((rule: Rule) => {
-        rulesHTML += `<div class="faze-form-rule ${
-          rule.valid ? 'faze-form-rule-valid' : 'faze-form-rule-invalid'
-        }">${rule.message}</div>`;
+        rulesHTML += `<div class="faze-form-rule ${rule.valid ? 'faze-form-rule-valid' : 'faze-form-rule-invalid'
+          }">${rule.message}</div>`;
       });
 
     this.hintNode.innerHTML = rulesHTML;
@@ -487,10 +482,8 @@ class Form extends Module {
           node: this.node,
           inputsData: this.inputsData,
         });
-      } catch (error) {
-        this.logger.error(
-          `Ошибка исполнения пользовательского метода "created": ${error}`
-        );
+      } catch (error: any) {
+        this.logger.error('created', error);
       }
     }
   }
@@ -507,10 +500,8 @@ class Form extends Module {
           node: this.node,
           inputsData: this.inputsData,
         });
-      } catch (error) {
-        this.logger.error(
-          `Ошибка исполнения пользовательского метода "input": ${error}`
-        );
+      } catch (error: any) {
+        this.logger.error('input', error);
       }
     }
   }

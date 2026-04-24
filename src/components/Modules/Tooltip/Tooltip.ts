@@ -77,7 +77,7 @@ class Tooltip {
 
     // Проверка на двойную инициализацию
     if (node.classList.contains('faze-tooltip-initialized')) {
-      this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
+      this.logger.warning('constructor', 'Плагин уже был инициализирован на этот DOM элемент:', node);
       return;
     }
 
@@ -101,7 +101,7 @@ class Tooltip {
 
     // Проверка на то, что сторона задана правильно
     if (!['top', 'bottom', 'right', 'left'].includes(this.side)) {
-      this.logger.error('Параметр "side" задан верно! Корректные значения: "top", "right", "bottom", "left".');
+      this.logger.error('constructor', 'Параметр "side" задан верно! Корректные значения: "top", "right", "bottom", "left".');
     }
 
     // Инициализация переменных
@@ -204,8 +204,8 @@ class Tooltip {
     if (typeof this.config.callbacks.opened === 'function') {
       try {
         this.config.callbacks.opened();
-      } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
+      } catch (error: any) {
+        this.logger.error('opened', error);
       }
     }
   }

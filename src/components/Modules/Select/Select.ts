@@ -89,7 +89,7 @@ class Select {
 
     // Проверка на двойную инициализацию
     if (node.classList.contains('faze-select-initialized')) {
-      this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
+      this.logger.warning('constructor', 'Плагин уже был инициализирован на этот DOM элемент:', node);
       return;
     }
 
@@ -133,7 +133,7 @@ class Select {
     this.bodyNode = this.node.querySelector('.faze-body');
 
     if (!this.titleNode || !this.bodyNode) {
-      return this.logger.error('Для селекта не найдены шапка и тело!');
+      this.logger.error('initialize', 'Для селекта не найдены шапка и тело!');
     }
 
     // Если имеется первичное значение селекта
@@ -187,8 +187,8 @@ class Select {
           body: this.bodyNode,
           value: this.value,
         });
-      } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "created", дословно: ${error}`);
+      } catch (error: any) {
+        this.logger.error('created', error);
       }
     }
   }
@@ -198,7 +198,7 @@ class Select {
    */
   bind(): void {
     if (!this.titleNode || !this.bodyNode) {
-      return this.logger.error('Не заданы шапка и тело селекта');
+      this.logger.error('bind', 'Не заданы шапка и тело селекта');
     }
 
     // Пересоздаем заголовок чтобы удалить с него все бинды
@@ -221,8 +221,8 @@ class Select {
               body: this.bodyNode,
               value: this.value,
             });
-          } catch (error) {
-            this.logger.error(`Ошибка исполнения пользовательского метода "opened", дословно: ${error}`);
+          } catch (error: any) {
+            this.logger.error('opened', error);
           }
         }
       }
@@ -273,7 +273,7 @@ class Select {
    */
   setValue(value: string): void {
     if (!this.titleNode) {
-      return this.logger.error('Не задана шапка селекта');
+      this.logger.error('setValue', 'Не задана шапка селекта');
     }
 
     // Ищем нужную опцию
@@ -306,7 +306,7 @@ class Select {
    */
   resetTitle(): void {
     if (!this.titleNode) {
-      return this.logger.error('Не задана шапка дропдауна');
+      this.logger.error('resetTitle', 'Не задана шапка дропдауна');
     }
 
     const cloneTitle = this.titleNode.cloneNode(true);

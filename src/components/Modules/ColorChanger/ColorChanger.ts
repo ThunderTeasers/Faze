@@ -134,7 +134,7 @@ class ColorChanger extends Module {
   private parse(): void {
     this.data = Faze.Helpers.parseJSON(this.node.dataset.fazeColorchangerData);
     if (!this.data) {
-      this.logger.error('Ошибка парсинга данных цветов!');
+      this.logger.error('parse', 'Ошибка парсинга данных цветов!');
     }
   }
 
@@ -345,10 +345,8 @@ class ColorChanger extends Module {
           colorsNodes: this.colorsNodes,
           selectedColorNode: this.selectedColorNode,
         });
-      } catch (error) {
-        this.logger.error(
-          `Ошибка исполнения пользовательского метода "changed": ${error}`
-        );
+      } catch (error: any) {
+        this.logger.error('changed', error);
       }
     }
   }

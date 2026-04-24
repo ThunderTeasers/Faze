@@ -70,7 +70,7 @@ class Spoiler {
 
     // Проверка на двойную инициализацию
     if (node.classList.contains('faze-spoiler-initialized')) {
-      this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
+      this.logger.warning('constructor', 'Плагин уже был инициализирован на этот DOM элемент:', node);
       return;
     }
 
@@ -117,8 +117,8 @@ class Spoiler {
           title: this.titleNode,
           body: this.bodyNode,
         });
-      } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
+      } catch (error: any) {
+        this.logger.error('created', error);
       }
     }
   }
@@ -139,8 +139,8 @@ class Spoiler {
                 title: this.titleNode,
                 body: this.bodyNode,
               });
-            } catch (error) {
-              this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
+            } catch (error: any) {
+              this.logger.error('opened', error);
             }
           }
         }
@@ -152,8 +152,8 @@ class Spoiler {
               title: this.titleNode,
               body: this.bodyNode,
             });
-          } catch (error) {
-            this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+          } catch (error: any) {
+            this.logger.error('changed', error);
           }
         }
       });
@@ -173,8 +173,8 @@ class Spoiler {
           title: this.titleNode,
           body: this.bodyNode,
         });
-      } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
+      } catch (error: any) {
+        this.logger.error('opened', error);
       }
     }
   }

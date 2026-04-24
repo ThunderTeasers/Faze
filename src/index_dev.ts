@@ -100,7 +100,7 @@ Faze.add({
 // Тесты ошибок
 if (document.documentElement.classList.contains('test-errors')) {
   const logger = new Logger('ColorChanger');
-  logger.error('change Тестовая ошибка!');
+  logger.error('change', 'Тестовая ошибка!');
 }
 
 // Тесты

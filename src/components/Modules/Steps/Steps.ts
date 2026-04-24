@@ -94,7 +94,7 @@ class Steps {
 
     // Проверка на двойную инициализацию
     if (node.classList.contains('faze-steps-initialized')) {
-      this.logger.warning('Плагин уже был инициализирован на этот DOM элемент:', node);
+      this.logger.warning('constructor', 'Плагин уже был инициализирован на этот DOM элемент:', node);
       return;
     }
 
@@ -143,8 +143,8 @@ class Steps {
           index: this.currentStepIndex,
           data: this.stepsData,
         });
-      } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
+      } catch (error: any) {
+        this.logger.error('created', error);
       }
     }
   }
@@ -328,8 +328,8 @@ class Steps {
               index: this.currentStepIndex,
               data: this.stepsData,
             });
-          } catch (error) {
-            this.logger.error(`Ошибка исполнения пользовательского метода "beforeFinished": ${error}`);
+          } catch (error: any) {
+            this.logger.error('beforeFinished', error);
           }
         }
 
@@ -345,8 +345,8 @@ class Steps {
               index: this.currentStepIndex,
               data: this.stepsData,
             });
-          } catch (error) {
-            this.logger.error(`Ошибка исполнения пользовательского метода "finished": ${error}`);
+          } catch (error: any) {
+            this.logger.error('finished', error);
           }
         }
 
@@ -358,8 +358,8 @@ class Steps {
               index: this.currentStepIndex,
               data: this.stepsData,
             });
-          } catch (error) {
-            this.logger.error(`Ошибка исполнения пользовательского метода "afterFinished": ${error}`);
+          } catch (error: any) {
+            this.logger.error('afterFinished', error);
           }
         }
       });

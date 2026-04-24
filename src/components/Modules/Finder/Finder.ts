@@ -247,10 +247,8 @@ class Finder extends Module {
           inputNode: this.inputNode,
           itemsNodes: this.itemsNodes,
         });
-      } catch (error) {
-        this.logger.error(
-          `Ошибка исполнения пользовательского метода "created": ${error}`
-        );
+      } catch (error: any) {
+        this.logger.error('created', error);
       }
     }
   }
@@ -268,10 +266,8 @@ class Finder extends Module {
           inputNode: this.inputNode,
           itemsNodes: this.itemsNodes,
         });
-      } catch (error) {
-        this.logger.error(
-          `Ошибка исполнения пользовательского метода "changed": ${error}`
-        );
+      } catch (error: any) {
+        this.logger.error('changed', error);
       }
     }
   }

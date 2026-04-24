@@ -126,8 +126,8 @@ class Drag extends Module {
           itemsData: this.itemsData,
           itemNodes: this.itemsNodes,
         });
-      } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
+      } catch (error: any) {
+        this.logger.error('created', error);
       }
     }
   }
@@ -304,7 +304,7 @@ class Drag extends Module {
   /**
    * Заглушка для обратной совместимости
    */
-  public bindDrag() {}
+  public bindDrag() { }
 
   /**
    * Навешивание событий на начало перетаскивания
@@ -352,8 +352,8 @@ class Drag extends Module {
                 itemsData: this.itemsData,
                 itemNodes: this.itemsNodes,
               });
-            } catch (error) {
-              this.logger.error(`Ошибка исполнения пользовательского метода "beforeDrag": ${error}`);
+            } catch (error: any) {
+              this.logger.error('beforeDrag', error);
             }
           }
         }
@@ -424,8 +424,8 @@ class Drag extends Module {
               itemsData: this.itemsData,
               itemNodes: this.itemsNodes,
             });
-          } catch (error) {
-            this.logger.error(`Ошибка исполнения пользовательского метода "drag": ${error}`);
+          } catch (error: any) {
+            this.logger.error('drag', error);
           }
         }
       },
@@ -452,8 +452,8 @@ class Drag extends Module {
             itemsData: this.itemsData,
             itemNodes: this.itemsNodes,
           });
-        } catch (error) {
-          this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+        } catch (error: any) {
+          this.logger.error('changed', error);
         }
       }
 
@@ -465,8 +465,8 @@ class Drag extends Module {
             itemsData: this.itemsData,
             itemNodes: this.itemsNodes,
           });
-        } catch (error) {
-          this.logger.error(`Ошибка исполнения пользовательского метода "afterDrag": ${error}`);
+        } catch (error: any) {
+          this.logger.error('afterDrag', error);
         }
       }
     });

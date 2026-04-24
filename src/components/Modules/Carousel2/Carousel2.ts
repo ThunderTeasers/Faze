@@ -327,8 +327,8 @@ class Carousel2 extends Module {
           pagesNode: this.pagesNode,
           currentSlideNode: this.slidesNodes[this.index],
         });
-      } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
+      } catch (error: any) {
+        this.logger.error('created', error);
       }
     }
   }
@@ -796,7 +796,7 @@ class Carousel2 extends Module {
    */
   private buildPagination(): void {
     if (!this.pagesNode) {
-      this.logger.error('Родительский элемент пагинации не найден');
+      this.logger.error('buildPagination', 'Родительский элемент пагинации не найден');
     }
 
     this.pagesNode.className = 'faze-carousel-pages';
@@ -950,10 +950,8 @@ class Carousel2 extends Module {
           arrowsNodes: this.arrowsNodes,
           pagesNode: this.pagesNode,
         });
-      } catch (error) {
-        this.logger.error(
-          `Ошибка исполнения пользовательского метода "changed": ${error}`
-        );
+      } catch (error: any) {
+        this.logger.error('changed', error);
       }
     }
   }
@@ -986,8 +984,8 @@ class Carousel2 extends Module {
           arrowsNodes: this.arrowsNodes,
           pagesNode: this.pagesNode,
         });
-      } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+      } catch (error: any) {
+        this.logger.error('beforeChanged', error);
       }
     }
   }

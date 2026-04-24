@@ -75,7 +75,7 @@ abstract class Module {
 
     // Проверяем задан ли основной DOM элемент
     if (!data.node && !data.nodes) {
-      this.logger.error('Не задан основной DOM элемент модуля');
+      this.logger.error('constructor', 'Не задан основной DOM элемент модуля');
     }
 
     // Инициализируем переменные

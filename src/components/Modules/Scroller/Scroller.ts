@@ -179,10 +179,8 @@ class Scroller extends Module {
           node: this.node,
           btnNode: this.btnNode,
         });
-      } catch (error) {
-        this.logger.error(
-          `Ошибка исполнения пользовательского метода "created": ${error}`
-        );
+      } catch (error: any) {
+        this.logger.error('created', error);
       }
     }
   }
@@ -199,10 +197,8 @@ class Scroller extends Module {
           node: this.node,
           btnNode: this.btnNode,
         });
-      } catch (error) {
-        this.logger.error(
-          `Ошибка исполнения пользовательского метода "changed": ${error}`
-        );
+      } catch (error: any) {
+        this.logger.error('changed', error);
       }
     }
   }

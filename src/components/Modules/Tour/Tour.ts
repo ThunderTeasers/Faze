@@ -169,8 +169,8 @@ class Tour extends Module {
           group: this.config.group,
           node: this.node,
         });
-      } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "created": ${error}`);
+      } catch (error: any) {
+        this.logger.error('create', error);
       }
     }
 
@@ -209,8 +209,8 @@ class Tour extends Module {
           group: this.config.group,
           node: this.node,
         });
-      } catch (error) {
-        this.logger.error(`Ошибка исполнения пользовательского метода "closed": ${error}`);
+      } catch (error: any) {
+        this.logger.error('close', error);
       }
     }
   }
@@ -307,8 +307,8 @@ class Tour extends Module {
             step: this._currentStep,
             hint: this._hintData,
           });
-        } catch (error) {
-          this.logger.error(`Ошибка исполнения пользовательского метода "beforeChanged": ${error}`);
+        } catch (error: any) {
+          this.logger.error('beforeChanged', error);
         }
       }
 
@@ -347,8 +347,8 @@ class Tour extends Module {
             step: this._currentStep,
             hint: this._hintData,
           });
-        } catch (error) {
-          this.logger.error(`Ошибка исполнения пользовательского метода "changed": ${error}`);
+        } catch (error: any) {
+          this.logger.error('changed', error);
         }
       }
     }
@@ -455,12 +455,12 @@ class Tour extends Module {
     const steps: StepData[] = Array.from(node.querySelectorAll<HTMLElement>(`[data-faze-tour-step="${group}"]`))
       .map(
         (stepNode, index) =>
-          ({
-            index: parseInt(stepNode.dataset.fazeTourStepIndex || index.toString(), 10),
-            text: stepNode.dataset.fazeTourStepText || '',
-            side: stepNode.dataset.fazeTourStepSide || 'right',
-            node: stepNode,
-          } as StepData)
+        ({
+          index: parseInt(stepNode.dataset.fazeTourStepIndex || index.toString(), 10),
+          text: stepNode.dataset.fazeTourStepText || '',
+          side: stepNode.dataset.fazeTourStepSide || 'right',
+          node: stepNode,
+        } as StepData)
       )
       .sort((stepA, stepB) => stepA.index - stepB.index);
 

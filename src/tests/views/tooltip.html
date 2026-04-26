@@ -10,14 +10,17 @@
 <body>
   <button class="js-tooltip-change">Изменить текст тултипа 1</button>
   <button class="js-tooltip1" style="margin-left: 200px; margin-top: 200px" data-faze="tooltip"
-    data-faze-tooltip-dynamic-update="true" data-faze-tooltip-text="Test" data-faze-tooltip-side="bottom"
-    data-faze-tooltip-side-mobile="top">Тултип 1</button>
+    data-faze-tooltip-text="Test" data-faze-tooltip-side="left" data-faze-tooltip-side-mobile="top">Тултип 1</button>
 
   <!-- <button data-faze="tooltip" data-faze-tooltip-text="Test" data-faze-tooltip-side="bottom" data-faze-tooltip-event="click">Тултип 2</button> -->
   <script>
     document.querySelector('.js-tooltip1').addEventListener('click', () => {
       document.querySelector('.js-tooltip1').dataset.fazeTooltipText = '123';
     });
+
+    setTimeout(() => {
+      // document.querySelector('.js-tooltip1').dispatchEvent(new Event('mouseenter'));
+    }, 1000);
   </script>
 </body>
 

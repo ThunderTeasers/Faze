@@ -21,7 +21,6 @@ import Logger from '../../Core/Logger';
  *   margin - отступ от выбранной стороны(side) в пикселях
  *   class  - кастомный класс
  *   event - событие вызова тултипа
- *   dynamicUpdate - нужно ли динамическое обновление текста тултипа, если оно изменится в data атрибутах
  *   callbacks
  *     opened  - пользовательская функция, срабатывающая при показе тултипа
  */
@@ -30,8 +29,7 @@ interface Config {
   side: string;
   margin: number;
   class: string;
-  event: string;
-  dynamicUpdate: boolean;
+  event: 'mouseenter' | 'click';
   resolution?: {
     mobile?: {
       side?: string;
@@ -54,9 +52,6 @@ class Tooltip {
 
   // Конфиг с настройками
   readonly config: Config;
-
-  // Текущая сторона тултипа (top, bottom, left, right)
-  side: string;
 
   // DOM элемент для отрисовки тултипа
   readonly tooltipNode: HTMLDivElement;
@@ -88,7 +83,6 @@ class Tooltip {
       margin: 10,
       class: '',
       event: 'mouseenter',
-      dynamicUpdate: false,
       resolution: undefined,
       callbacks: {
         opened: undefined,
@@ -97,10 +91,8 @@ class Tooltip {
 
     this.config = Object.assign(defaultConfig, config);
 
-    this.side = this.config.side;
-
     // Проверка на то, что сторона задана правильно
-    if (!['top', 'bottom', 'right', 'left'].includes(this.side)) {
+    if (!['top', 'bottom', 'right', 'left'].includes(this.config.side)) {
       this.logger.error('constructor', 'Параметр "side" задан верно! Корректные значения: "top", "right", "bottom", "left".');
     }
 
@@ -118,9 +110,10 @@ class Tooltip {
    */
   initialize(): void {
     this.node.classList.add('faze-tooltip-initialized');
-    this.tooltipNode.className = `faze-tooltip faze-tooltip-${this.side} ${this.config.class}`;
+    this.tooltipNode.className = `faze-tooltip faze-tooltip-${this.config.side} ${this.config.class}`;
     this.tooltipNode.style.visibility = 'hidden';
-    this.tooltipNode.innerHTML = this.config.text || this.node.dataset.fazeTooltipText || this.node.title || '';
+
+    this.updateText();
   }
 
   /**
@@ -186,9 +179,7 @@ class Tooltip {
     }
 
     // Обновление текста
-    if (this.config.dynamicUpdate) {
-      this.updateText();
-    }
+    this.updateText();
 
     // Для начала скрываем тултип для первичного рассчета его данных
     this.tooltipNode.style.visibility = 'hidden';
@@ -234,7 +225,7 @@ class Tooltip {
    * Обновление текста тултипа
    */
   private updateText(): void {
-    this.tooltipNode.innerHTML = this.node.dataset.fazeTooltipText || this.node.title || '';
+    this.tooltipNode.innerHTML = this.config.text || this.node.dataset.fazeTooltipText || this.node.title || '';
   }
 
   /**
@@ -243,7 +234,7 @@ class Tooltip {
    * @param side Сторона отображения на которую меняем
    */
   setSide(side: string): void {
-    this.side = side;
+    this.config.side = side;
     this.tooltipNode.className = `faze-tooltip faze-tooltip-${side} ${this.config.class}`;
   }
 
@@ -272,7 +263,7 @@ class Tooltip {
     let centerY = callerRect.top + callerRect.height / 2 - tooltipRect.height / 2 + top;
 
     // Применение отступа в зависимости от стороны
-    switch (this.side) {
+    switch (this.config.side) {
       case 'top':
         centerY -= offsetVertical;
         break;
@@ -304,7 +295,6 @@ class Tooltip {
       side: tooltipNode.dataset.fazeTooltipSide || tooltipNode.dataset.fazeTooltipAlign || 'bottom',
       class: tooltipNode.dataset.fazeTooltipClass || '',
       event: tooltipNode.dataset.fazeTooltipEvent || 'mouseenter',
-      dynamicUpdate: tooltipNode.dataset.fazeTooltipDynamicUpdate === 'true',
       resolution: {
         mobile: {
           side: tooltipNode.dataset.fazeTooltipSideMobile || 'bottom',

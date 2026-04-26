@@ -6,92 +6,26 @@
  */
 
 .faze-tooltip {
-  // Переменные для плагина
-  $width: 0.5rem;
-  $height: 0.5rem;
-
   position: absolute;
 
   padding: 1rem;
-  background-color: rgba(0, 0, 0, 0.5);
 
-  font-size: 1.4rem;
-  line-height: 1.2;
-  color: #fff;
+  color: var(--faze-color-text);
+  font-size: var(--faze-size-sm);
+  line-height: var(--faze-line-height);
+
+  background: var(--faze-color-white);
+  border-radius: var(--faze-border-radius);
+  box-shadow: var(--faze-shadow-light);
+
+  animation: fadeInUp 0.2s ease-out;
 
   z-index: 30;
-
-  &:before {
-    content: '';
-
-    display: block;
-    width: 0;
-    height: 0;
-
-    position: absolute;
-  }
-
-  &.faze-tooltip-top,
-  &.faze-tooltip-bottom {
-    &:before {
-      left: 50%;
-
-      transform: translateX(-50%);
-    }
-  }
-
-  &.faze-tooltip-left,
-  &.faze-tooltip-right {
-    &:before {
-      top: 50%;
-
-      transform: translateY(-50%);
-    }
-  }
-
-  &.faze-tooltip-top {
-    &:before {
-      bottom: -$height;
-
-      border-left: $width solid transparent;
-      border-right: $width solid transparent;
-      border-top: $height solid rgba(0, 0, 0, 0.5);
-    }
-  }
-
-  &.faze-tooltip-bottom {
-    &:before {
-      top: -$height;
-
-      border-left: $width solid transparent;
-      border-right: $width solid transparent;
-      border-bottom: $height solid rgba(0, 0, 0, 0.5);
-    }
-  }
-
-  &.faze-tooltip-left {
-    &:before {
-      right: -$width;
-
-      border-top: $height solid transparent;
-      border-bottom: $height solid transparent;
-      border-left: $width solid rgba(0, 0, 0, 0.5);
-    }
-  }
-
-  &.faze-tooltip-right {
-    &:before {
-      left: -$width;
-
-      border-top: $height solid transparent;
-      border-bottom: $height solid transparent;
-      border-right: $width solid rgba(0, 0, 0, 0.5);
-    }
-  }
 }
 
 // Если появляться по клику, то при наведении показываем указатель
 [data-faze~='tooltip'][data-faze-tooltip-event='click'] {
+
   // При наведении
   &:hover {
     cursor: pointer;

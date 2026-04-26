@@ -11,13 +11,14 @@
   --faze-color-primary-dark: #1d53c7;
   --faze-color-success: #4bb543;
   --faze-color-error: #e94151;
-  --faze-color-white: #fff;
-  --faze-color-black: #000;
+  --faze-color-white: #ffffff;
+  --faze-color-black: #000000;
   --faze-color-text: #424242;
   --faze-color-hover: #e7e7e7;
   --faze-color-base: #f4f4f4;
   --faze-color-border: #bdbdbd;
   --faze-color-overlay: rgba(33, 33, 33, 0.5);
+  --faze-color-background: #ffffff;
   --faze-color-background-hover: #2563eb1a;
   --faze-color-background-active: #2563eb33;
 
@@ -39,6 +40,25 @@
   --faze-size-md: 1.6rem;
   --faze-size-lg: 1.8rem;
   --faze-size-xl: 2rem;
+
+  // Отступы
+  --faze-margin-xs: 0.4rem;
+  --faze-margin-sm: 0.8rem;
+  --faze-margin-md: 1.2rem;
+  --faze-margin-lg: 1.6rem;
+  --faze-margin-xl: 2rem;
+
+  --faze-padding-xs: 0.4rem;
+  --faze-padding-sm: 0.8rem;
+  --faze-padding-md: 1.2rem;
+  --faze-padding-lg: 1.6rem;
+  --faze-padding-xl: 2rem;
+
+  --faze-gap-xs: 0.4rem;
+  --faze-gap-sm: 0.8rem;
+  --faze-gap-md: 1.2rem;
+  --faze-gap-lg: 1.6rem;
+  --faze-gap-xl: 2rem;
 
   // Брейкпоинты
   --faze-breakpoint-xs: 480px;

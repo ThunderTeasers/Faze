@@ -11,42 +11,42 @@
   left: 0;
 
   display: none;
-  max-height: 330px;
+  max-height: 33rem;
 
-  background-color: #fff;
+  margin-top: var(--faze-margin-md);
+
+  border: 1px solid var(--faze-color-border);
+  border-radius: var(--faze-border-radius);
+  background: var(--faze-color-background);
+  box-shadow: var(--faze-shadow-light);
 
   overflow: auto;
+
+  animation: fadeInUp 0.2s ease-out;
 
   z-index: 5;
 
   // Элемент
   .faze-smartsearch-item {
+    padding: var(--faze-padding-sm) var(--faze-padding-md);
+
+    color: var(--faze-color-text);
+    font-size: var(--faze-size-sm);
+    line-height: var(--faze-line-height);
+
     user-select: none;
 
-    // При наведении
+    // При наведении или активности
+    &.faze-active,
     &:hover {
       cursor: pointer;
+
+      background: var(--faze-color-background-hover);
     }
   }
 
   // Открыто
   &.faze-active {
     display: block;
-  }
-
-  // Если нужно базовое оформление
-  &[data-faze-styles] {
-    border: 1px solid #aaa;
-
-    // Элемент
-    .faze-smartsearch-item {
-      padding: 5px 10px;
-
-      // При наведении или активности
-      &.faze-active,
-      &:hover {
-        background-color: #ccc;
-      }
-    }
   }
 }

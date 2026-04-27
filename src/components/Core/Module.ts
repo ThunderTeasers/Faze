@@ -71,7 +71,7 @@ abstract class Module {
     }
 
     // Инициализация логгера
-    this.logger = new Logger(`Модуль Faze.${this.name}:`);
+    this.logger = new Logger(this.name);
 
     // Проверяем задан ли основной DOM элемент
     if (!data.node && !data.nodes) {

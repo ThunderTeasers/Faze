@@ -98,16 +98,11 @@ class Finder extends Module {
     super.initialize();
 
     // Инициализация переменных
-    this.inputNode = this.node.querySelector<HTMLInputElement>(
-      `[${this.dataPrefix}="input"]`
-    );
+    this.inputNode = this.node.querySelector<HTMLInputElement>(`[${this.dataPrefix}="input"]`);
+    this.itemsNodes = this.node?.querySelectorAll<HTMLElement>(`[${this.dataPrefix}="item"]`);
 
-    this.itemsNodes = this.node?.querySelectorAll<HTMLElement>(
-      `[${this.dataPrefix}="item"]`
-    );
-
-    // Вызываем пользовательскую функцию
-    this.createdCallbackCall();
+    // Выполнение пользовательской функции
+    super.call(this.config.callbacks.created, { node: this.node, inputNode: this.inputNode, itemsNodes: this.itemsNodes, }, 'created');
   }
 
   protected build(): void {
@@ -152,10 +147,7 @@ class Finder extends Module {
    */
   private manageClearButtonVisibility(): void {
     if (this.config.clearButton && this.inputNode) {
-      this.btnClearNode?.classList.toggle(
-        'faze-hide',
-        this.inputNode.value.length === 0
-      );
+      this.btnClearNode?.classList.toggle('faze-hide', this.inputNode.value.length === 0);
     }
   }
 
@@ -204,8 +196,7 @@ class Finder extends Module {
    */
   public update(): void {
     // Класс для скрытия
-    const hideClass =
-      this.config.mode === 'visibility' ? 'faze-hidden' : 'faze-hide';
+    const hideClass = this.config.mode === 'visibility' ? 'faze-hidden' : 'faze-hide';
 
     // Получаем значение
     const value = this.config.caseSensitive
@@ -230,46 +221,8 @@ class Finder extends Module {
 
     this.manageClearButtonVisibility();
 
-    // Вызываем пользовательскую функцию
-    this.changeCallbackCall();
-  }
-
-  /**
-   * Выполнение пользовательской функции "created"
-   *
-   * @private
-   */
-  private createdCallbackCall(): void {
-    if (typeof this.config.callbacks.created === 'function') {
-      try {
-        this.config.callbacks.created({
-          node: this.node,
-          inputNode: this.inputNode,
-          itemsNodes: this.itemsNodes,
-        });
-      } catch (error: any) {
-        this.logger.error('created', error);
-      }
-    }
-  }
-
-  /**
-   * Выполнение пользовательской функции "changed"
-   *
-   * @private
-   */
-  private changeCallbackCall(): void {
-    if (typeof this.config.callbacks.changed === 'function') {
-      try {
-        this.config.callbacks.changed({
-          node: this.node,
-          inputNode: this.inputNode,
-          itemsNodes: this.itemsNodes,
-        });
-      } catch (error: any) {
-        this.logger.error('changed', error);
-      }
-    }
+    // Выполнение пользовательской функции "created"
+    super.call(this.config.callbacks.changed, { node: this.node, inputNode: this.inputNode, itemsNodes: this.itemsNodes }, 'changed');
   }
 
   /**
@@ -280,11 +233,9 @@ class Finder extends Module {
   static initializeByDataAttributes(node: HTMLElement): void {
     new Finder(node, {
       minLength: parseInt(node.dataset.fazeFinderMinLength || '0', 10),
-      caseSensitive:
-        (node.dataset.fazeFinderCaseSensitive || 'false') === 'true',
+      caseSensitive: (node.dataset.fazeFinderCaseSensitive || 'false') === 'true',
       clearButton: (node.dataset.fazeFinderClearButton || 'false') === 'true',
-      mode:
-        node.dataset.fazeFinderMode === 'visibility' ? 'visibility' : 'display',
+      mode: node.dataset.fazeFinderMode === 'visibility' ? 'visibility' : 'display',
     });
   }
 }

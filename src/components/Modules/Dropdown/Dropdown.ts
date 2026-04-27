@@ -88,7 +88,7 @@ class Dropdown extends Module {
     super.initialize();
 
     // Инициализация переменных
-    this.isOpen = false;
+    this.isOpen = this.node.classList.contains('faze-active');
     this.title = this.node.querySelector('.faze-title, [data-faze-dropdown="title"]');
     this.body = this.node.querySelector('.faze-body, [data-faze-dropdown="body"]');
 

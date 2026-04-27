@@ -82,7 +82,7 @@ class Spoiler extends Module {
     super.initialize();
 
     // Инициализация переменных
-    this.isOpen = false;
+    this.isOpen = this.node.classList.contains('faze-active');
     this.titleNode = this.node.querySelector('.title, .faze-title, [data-faze-spoiler="title"]');
     this.bodyNode = this.node.querySelector('.body, .faze-body, [data-faze-spoiler="body"]');
 

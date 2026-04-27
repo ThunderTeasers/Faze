@@ -129,8 +129,8 @@ class Select {
     this.node.classList.add('faze-select');
 
     // Поиск основных элементов и проверка на то что они найдены
-    this.titleNode = this.node.querySelector('.faze-title');
-    this.bodyNode = this.node.querySelector('.faze-body');
+    this.titleNode = this.node.querySelector('.title, .faze-title');
+    this.bodyNode = this.node.querySelector('.body, .faze-body');
 
     if (!this.titleNode || !this.bodyNode) {
       this.logger.error('initialize', 'Для селекта не найдены шапка и тело!');

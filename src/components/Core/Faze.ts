@@ -412,7 +412,7 @@ class Faze {
     Faze.Sorter.hotInitialize('sorter');
     Faze.Slider.hotInitialize('slider');
     Faze.Placeholder.hotInitialize('placeholder');
-    Faze.Spoiler.hotInitialize();
+    Faze.Spoiler.hotInitialize('spoiler');
     Faze.Carousel2.hotInitialize('carousel2');
     Faze.Carousel3.hotInitialize('carousel3');
     Faze.Carousel.hotInitialize();

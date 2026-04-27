@@ -226,11 +226,9 @@ abstract class Module {
     });
 
     // Стандартная инициализация по data атрибутам
-    document
-      .querySelectorAll<HTMLElement>(`[data-faze~="${name}"]`)
-      .forEach((node: HTMLElement) => {
-        this.initializeByDataAttributes(node);
-      });
+    document.querySelectorAll<HTMLElement>(`[data-faze~="${name}"]`).forEach((node: HTMLElement) => {
+      this.initializeByDataAttributes(node);
+    });
   }
 }
 

@@ -9,8 +9,8 @@
  */
 
 import './Spoiler.scss';
+import Module from '../../Core/Module';
 import Faze from '../../Core/Faze';
-import Logger from '../../Core/Logger';
 
 /**
  * Структура возвращаемого объекта в пользовательском методе
@@ -32,164 +32,106 @@ interface CallbackData {
  *     created  - пользовательская функция, исполняющаяся при успешном создании спойлера
  *     opened   - пользовательская функция, исполняющаяся при открытии спойлера
  *     changed  - пользовательская функция, исполняющаяся при изменении видимости спойлера
+ *     closed   - пользовательская функция, исполняющаяся при закрытии спойлера
  */
 interface Config {
   callbacks: {
     created?: (data: CallbackData) => void;
     opened?: (data: CallbackData) => void;
     changed?: (data: CallbackData) => void;
+    closed?: (data: CallbackData) => void;
   };
 }
 
 /**
  * Класс дропдауна
  */
-class Spoiler {
-  // DOM элемент при наведении на который появляется
-  readonly node: HTMLElement;
-
-  // Помощник для логирования
-  readonly logger: Logger;
-
-  // Конфиг с настройками
-  readonly config: Config;
-
+class Spoiler extends Module {
   // DOM элемент заголовка спойлера
-  readonly titleNode: HTMLElement | null;
+  titleNode: HTMLElement | null;
 
   // DOM элемент тела спойлера
-  readonly bodyNode: HTMLElement | null;
+  bodyNode: HTMLElement | null;
 
-  constructor(node: HTMLElement | null, config: Partial<Config>) {
-    if (!node) {
-      throw new Error('Не задан объект спойлера');
-    }
+  // Состояние спойлера (открыт/закрыт)
+  isOpen: boolean;
 
-    // Инициализация логгера
-    this.logger = new Logger('Модуль Faze.Spoiler:');
-
-    // Проверка на двойную инициализацию
-    if (node.classList.contains('faze-spoiler-initialized')) {
-      this.logger.warning('constructor', 'Плагин уже был инициализирован на этот DOM элемент:', node);
-      return;
-    }
-
+  constructor(node?: HTMLElement, config?: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       callbacks: {
         created: undefined,
         opened: undefined,
         changed: undefined,
+        closed: undefined,
       },
     };
 
-    this.config = Object.assign(defaultConfig, config);
-
-    // Инициализация переменных
-    this.node = node;
-
-    this.titleNode = node.querySelector('.title, [data-faze-spoiler="title"]');
-    this.bodyNode = node.querySelector('.body, [data-faze-spoiler="body"]');
-
-    this.initialize();
-    this.bind();
+    // Инициализируем базовый класс
+    super({
+      node,
+      config: Object.assign(defaultConfig, config),
+      name: 'Spoiler',
+    });
   }
 
   /**
    * Инициализация
    */
   initialize() {
-    // Простановка стандартных классов
-    this.node.classList.add('faze-spoiler');
-    this.node.classList.add('faze-spoiler-initialized');
+    super.initialize();
 
-    if (this.titleNode) {
-      this.titleNode.classList.add('faze-title');
-    }
-    if (this.bodyNode) {
-      this.bodyNode.classList.add('faze-body');
-    }
+    // Инициализация переменных
+    this.isOpen = false;
+    this.titleNode = this.node.querySelector('.title, .faze-title, [data-faze-spoiler="title"]');
+    this.bodyNode = this.node.querySelector('.body, .faze-body, [data-faze-spoiler="body"]');
+
+    // Простановка стандартных классов
+    this.titleNode?.classList.add('faze-title');
+    this.bodyNode?.classList.add('faze-body');
 
     // Вызываем пользовательский метод
-    if (typeof this.config.callbacks.created === 'function') {
-      try {
-        this.config.callbacks.created({
-          title: this.titleNode,
-          body: this.bodyNode,
-        });
-      } catch (error: any) {
-        this.logger.error('created', error);
-      }
-    }
+    super.call(this.config.callbacks.created, { title: this.titleNode, body: this.bodyNode }, 'created');
   }
 
   /**
    * Навешивание событий
    */
   bind() {
-    if (this.titleNode) {
-      this.titleNode.addEventListener('click', () => {
-        this.node.classList.toggle('faze-active');
+    super.bind();
 
-        if (this.node.classList.contains('faze-active')) {
-          // Вызываем пользовательский метод
-          if (typeof this.config.callbacks.opened === 'function') {
-            try {
-              this.config.callbacks.opened({
-                title: this.titleNode,
-                body: this.bodyNode,
-              });
-            } catch (error: any) {
-              this.logger.error('opened', error);
-            }
-          }
-        }
+    Faze.Events.click(this.titleNode, () => {
+      this.isOpen ? this.close() : this.open();
 
-        // Вызываем пользовательский метод
-        if (typeof this.config.callbacks.changed === 'function') {
-          try {
-            this.config.callbacks.changed({
-              title: this.titleNode,
-              body: this.bodyNode,
-            });
-          } catch (error: any) {
-            this.logger.error('changed', error);
-          }
-        }
-      });
-    }
+      // Вызываем пользовательский метод
+      super.call(this.config.callbacks.changed, { title: this.titleNode, body: this.bodyNode }, 'changed');
+    });
   }
 
   /**
    * Открытие спойлера
    */
-  open() {
+  open(): void {
+    this.isOpen = true;
     this.node.classList.add('faze-active');
 
     // Вызываем пользовательский метод
-    if (typeof this.config.callbacks.opened === 'function') {
-      try {
-        this.config.callbacks.opened({
-          title: this.titleNode,
-          body: this.bodyNode,
-        });
-      } catch (error: any) {
-        this.logger.error('opened', error);
-      }
-    }
+    super.call(this.config.callbacks.opened, { title: this.titleNode, body: this.bodyNode }, 'opened');
   }
 
   /**
-   * Инициализация модуля по data атрибутам
+   * Закрытие спойлера
    */
-  static hotInitialize(): void {
-    Faze.Observer.watch('[data-faze~="spoiler"]', (spoilerNode: HTMLElement) => {
-      new Faze.Spoiler(spoilerNode);
-    });
+  close(): void {
+    this.isOpen = false;
+    this.node.classList.remove('faze-active');
 
-    document.querySelectorAll('[data-faze~="spoiler"]').forEach((spoilerNode) => {
-      new Faze.Spoiler(spoilerNode);
-    });
+    // Вызываем пользовательский метод
+    super.call(this.config.callbacks.closed, { title: this.titleNode, body: this.bodyNode }, 'closed');
+  }
+
+  static initializeByDataAttributes(spoilerNode: HTMLElement): void {
+    new Faze.Spoiler(spoilerNode);
   }
 }
 

@@ -174,13 +174,7 @@ class Tooltip extends Module {
     this.tooltipNode.style.visibility = 'visible';
 
     // Вызываем пользовательский метод
-    if (typeof this.config.callbacks.opened === 'function') {
-      try {
-        this.config.callbacks.opened();
-      } catch (error: any) {
-        this.logger.error('opened', error);
-      }
-    }
+    super.call(this.config.callbacks.opened, null, 'opened');
   }
 
   /**

@@ -190,9 +190,7 @@ class ColorChanger extends Module {
         });
 
         this.colorsNodes.push(colorNode);
-        this.colorsRowNodes[Math.floor(index / this.config.perRow)].appendChild(
-          colorNode
-        );
+        this.colorsRowNodes[Math.floor(index / this.config.perRow)].appendChild(colorNode);
       });
 
       // Вставляем элемент "Показать ещё"
@@ -214,17 +212,14 @@ class ColorChanger extends Module {
    * @private
    */
   private bindColorChange(): void {
-    this.colorsNodes.forEach((colorNode: HTMLImageElement, index: number) => {
-      Faze.Events.listener(
-        this.config.changeOnHover ? 'mouseenter' : 'click',
-        colorNode,
-        () => {
-          Faze.Helpers.activateItem(this.colorsNodes, index, 'faze-active');
+    Faze.Events.listener(
+      this.config.changeOnHover ? 'mouseenter' : 'click',
+      this.colorsNodes,
+      (_event: Event, colorNode: HTMLImageElement, _colorNodes: HTMLImageElement[], index: number) => {
+        Faze.Helpers.activateItem(this.colorsNodes, index, 'faze-active');
 
-          this.change(colorNode);
-        }
-      );
-    });
+        this.change(colorNode);
+      });
   }
 
   /**
@@ -241,7 +236,12 @@ class ColorChanger extends Module {
     });
 
     // Вызываем пользовательскую функцию
-    this.changeCallbackCall();
+    super.call(this.config.callbacks.changed, {
+      node: this.node,
+      colorsNode: this.colorsNode,
+      colorsNodes: this.colorsNodes,
+      selectedColorNode: this.selectedColorNode,
+    }, 'changed');
   }
 
   /**
@@ -306,49 +306,27 @@ class ColorChanger extends Module {
       return;
     }
 
-    nodesToChange
-      .forEach((node: HTMLElement) => {
-        const types = (node.dataset.fazeColorchangerType || 'text').split(',');
-        const name = node.dataset.fazeColorchangerName;
+    nodesToChange.forEach((node: HTMLElement) => {
+      const types = (node.dataset.fazeColorchangerType || 'text').split(',');
+      const name = node.dataset.fazeColorchangerName;
 
-        types.forEach((type: string) => {
-          switch (type) {
-            case 'src':
-              (node as HTMLImageElement).src = value;
-              break;
-            case 'href':
-              (node as HTMLAnchorElement).href = value;
-              break;
-            case 'data':
-              node.dataset[name || key] = value;
-              break;
-            case 'text':
-            default:
-              node.textContent = value;
-          }
-        });
+      types.forEach((type: string) => {
+        switch (type) {
+          case 'src':
+            (node as HTMLImageElement).src = value;
+            break;
+          case 'href':
+            (node as HTMLAnchorElement).href = value;
+            break;
+          case 'data':
+            node.dataset[name || key] = value;
+            break;
+          case 'text':
+          default:
+            node.textContent = value;
+        }
       });
-  }
-
-  /**
-   * Выполнение пользовательской функции "changed"
-   *
-   * @param currentSlide - DOM элемент текущего слайда
-   * @param direction - направление карусели
-   */
-  private changeCallbackCall(): void {
-    if (typeof this.config.callbacks.changed === 'function') {
-      try {
-        this.config.callbacks.changed({
-          node: this.node,
-          colorsNode: this.colorsNode,
-          colorsNodes: this.colorsNodes,
-          selectedColorNode: this.selectedColorNode,
-        });
-      } catch (error: any) {
-        this.logger.error('changed', error);
-      }
-    }
+    });
   }
 
   /**
@@ -358,14 +336,10 @@ class ColorChanger extends Module {
    */
   static initializeByDataAttributes(node: HTMLElement): void {
     new ColorChanger(node, {
-      changeOnHover:
-        (node.dataset.fazeColorchangerChangeOnHover || 'false') === 'true',
+      changeOnHover: (node.dataset.fazeColorchangerChangeOnHover || 'false') === 'true',
       showIfOne: (node.dataset.fazeColorchangerShowIfOne || 'false') === 'true',
       perRow: parseInt(node.dataset.fazeColorchangerPerRow || '4', 10),
-      direction:
-        node.dataset.fazeColorchangerDirection === 'horizontal'
-          ? 'horizontal'
-          : 'vertical',
+      direction: node.dataset.fazeColorchangerDirection === 'horizontal' ? 'horizontal' : 'vertical',
     });
   }
 }

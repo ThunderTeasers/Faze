@@ -17,6 +17,7 @@
     padding: var(--faze-padding-sm) var(--faze-padding-md);
 
     border: 0.1rem solid var(--faze-color-border);
+    border-radius: var(--faze-border-radius);
 
     line-height: var(--faze-line-height);
 
@@ -39,8 +40,10 @@
     margin-top: var(--faze-margin-md);
     padding: var(--faze-padding-md);
 
-    background-color: var(--faze-color-background);
+    background: var(--faze-color-background);
     border: 0.1rem solid var(--faze-color-border);
+    border-radius: var(--faze-border-radius);
+    box-shadow: var(--faze-shadow-light);
 
     animation: fadeInUp 0.2s ease-out;
 

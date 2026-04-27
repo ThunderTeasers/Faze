@@ -86,8 +86,8 @@ class Scroller extends Module {
     // Простановка стандартных классов
     this.node.classList.add(`${this.classPrefix}-${this.config.side}`);
 
-    // Выполнение пользовательской функции "created"
-    this.createdCallbackCall();
+    // Выполнение пользовательской функции
+    super.call(this.config.callbacks.created, { node: this.node, btnNode: this.btnNode }, 'created');
   }
 
   /**
@@ -162,45 +162,9 @@ class Scroller extends Module {
         behavior: this.config.smooth ? 'smooth' : 'instant',
       });
 
-      // Выполнение пользовательской функции "changed"
-      this.changeCallbackCall();
+      // Выполнение пользовательской функции
+      super.call(this.config.callbacks.changed, { node: this.node, btnNode: this.btnNode }, 'changed');
     });
-  }
-
-  /**
-   * Выполнение пользовательской функции "created"
-   *
-   * @private
-   */
-  private createdCallbackCall(): void {
-    if (typeof this.config.callbacks.created === 'function') {
-      try {
-        this.config.callbacks.created({
-          node: this.node,
-          btnNode: this.btnNode,
-        });
-      } catch (error: any) {
-        this.logger.error('created', error);
-      }
-    }
-  }
-
-  /**
-   * Выполнение пользовательской функции "changed"
-   *
-   * @private
-   */
-  private changeCallbackCall(): void {
-    if (typeof this.config.callbacks.changed === 'function') {
-      try {
-        this.config.callbacks.changed({
-          node: this.node,
-          btnNode: this.btnNode,
-        });
-      } catch (error: any) {
-        this.logger.error('changed', error);
-      }
-    }
   }
 
   /**

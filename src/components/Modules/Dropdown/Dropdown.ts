@@ -186,7 +186,7 @@ class Dropdown {
 
     // Проверка на нажатие за пределами селекта
     if (this.config.closeWhenClickOutside) {
-      Faze.Events.click(document, (event: Event) => {
+      document.documentElement.addEventListener('click', (event: Event) => {
         if (!Faze.Helpers.isMouseOverlapsNode(event, this.node)) {
           this.node.classList.remove('faze-active');
 
@@ -202,7 +202,7 @@ class Dropdown {
             }
           }
         }
-      }, false);
+      });
     }
   }
 

@@ -199,9 +199,7 @@ class Finder extends Module {
     const hideClass = this.config.mode === 'visibility' ? 'faze-hidden' : 'faze-hide';
 
     // Получаем значение
-    const value = this.config.caseSensitive
-      ? this.inputNode?.value
-      : this.inputNode?.value.toLowerCase();
+    const value = this.config.caseSensitive ? this.inputNode?.value : this.inputNode?.value.toLowerCase();
 
     // Проходимся по всем элементам и скрываем ненужные
     this.itemsNodes?.forEach((itemNode: HTMLElement) => {

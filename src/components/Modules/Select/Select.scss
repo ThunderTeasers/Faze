@@ -8,48 +8,58 @@
 .faze-select {
   position: relative;
 
-  & > .faze-title {
+  // Шапка
+  &>.faze-title,
+  &>.title {
     display: inline-flex;
 
-    padding: 0.5rem 1rem;
+    padding: var(--faze-padding-sm) var(--faze-padding-md);
 
-    border: 0.1rem solid #000;
+    line-height: var(--faze-line-height);
 
-    line-height: 1;
+    border: 0.1rem solid var(--faze-color-border);
 
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
+    z-index: 5;
 
-    z-index: 3;
-
+    // При наведении
     &:hover {
       cursor: pointer;
     }
   }
 
-  & > .faze-body {
+  // Тело
+  &>.faze-body,
+  &>.body {
     position: absolute;
 
     display: none;
 
-    padding: 1rem;
+    margin-top: var(--faze-margin-md);
+    padding: var(--faze-padding-md);
 
-    background-color: #fff;
-    border: 0.1rem solid #000;
+    background-color: var(--faze-color-background);
+    border: 0.1rem solid var(--faze-color-border);
 
-    z-index: 4;
+    animation: fadeInUp 0.2s ease-out;
 
-    & > .faze-option {
+    z-index: 6;
+
+    // Опция
+    &>.faze-option {
+
+      // При наведении
       &:hover {
         cursor: pointer;
       }
     }
   }
 
+  // Активно
   &.faze-active {
-    & > .faze-body {
+
+    &>.faze-body,
+    &>.body {
       display: block;
     }
   }

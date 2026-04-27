@@ -8,9 +8,22 @@
 // Базовые стили для работы
 .faze-dropdown,
 [data-faze='dropdown'] {
+  position: relative;
+
   // Шапка
   .faze-title,
   [data-faze-dropdown='title'] {
+    display: inline-flex;
+    padding: var(--faze-padding-sm) var(--faze-padding-md);
+
+    border: 0.1rem solid var(--faze-color-border);
+
+    line-height: var(--faze-line-height);
+
+    user-select: none;
+    z-index: 5;
+
+    // При наведении
     &:hover {
       cursor: pointer;
     }
@@ -23,54 +36,23 @@
 
     display: none;
 
-    z-index: 3;
+    margin-top: var(--faze-margin-md);
+    padding: var(--faze-padding-md);
+
+    background-color: var(--faze-color-background);
+    border: 0.1rem solid var(--faze-color-border);
+
+    animation: fadeInUp 0.2s ease-out;
+
+    z-index: 6;
   }
 
   // Активный элемент
   &.faze-active {
+
     // Тело
     .faze-body,
     [data-faze-dropdown='body'] {
-      display: block;
-    }
-  }
-}
-
-// Стили для визуала
-.faze-dropdown {
-  position: relative;
-
-  & > .faze-title {
-    display: inline-flex;
-    padding: 0.5rem 1rem;
-
-    border: 0.1rem solid #000;
-
-    line-height: 1;
-
-    user-select: none;
-    z-index: 2;
-
-    &:hover {
-      cursor: pointer;
-    }
-  }
-
-  & > .faze-body {
-    position: absolute;
-
-    display: none;
-
-    padding: 1rem;
-
-    background-color: #fff;
-    border: 0.1rem solid #000;
-
-    z-index: 3;
-  }
-
-  &.faze-active {
-    & > .faze-body {
       display: block;
     }
   }

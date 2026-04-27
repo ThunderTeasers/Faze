@@ -10,7 +10,7 @@
 
 import './Dropdown.scss';
 import Faze from '../../Core/Faze';
-import Logger from '../../Core/Logger';
+import Module from '../../Core/Module';
 
 /**
  * Структура конфига дропдауна
@@ -50,37 +50,17 @@ interface CallbackData {
 /**
  * Класс дропдауна
  */
-class Dropdown {
-  // DOM элемент дропдауна
-  readonly node: HTMLElement;
-
-  // Помощник для логирования
-  readonly logger: Logger;
-
-  // Конфиг с настройками
-  readonly config: Config;
-
+class Dropdown extends Module {
   // Заголовок дропдауна
   title: HTMLElement | null;
 
   // Тело дропдауна
   body: HTMLElement | null;
 
-  constructor(node: HTMLElement | null, config: Partial<Config>) {
-    // Инициализация логгера
-    this.logger = new Logger('Модуль Faze.Dropdown:');
+  // Флаг открытости дропдауна
+  isOpen: boolean;
 
-    // Проверяем задан ли основной DOM элемент
-    if (!node) {
-      this.logger.error('constructor', 'Не задан объект дропдауна');
-    }
-
-    // Проверка на двойную инициализацию
-    if (node.classList.contains('faze-dropdown-initialized')) {
-      this.logger.warning('constructor', 'Плагин уже был инициализирован на этот DOM элемент:', node);
-      return;
-    }
-
+  constructor(node?: HTMLElement, config?: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       positionTopOffset: 0,
@@ -93,22 +73,22 @@ class Dropdown {
       },
     };
 
-    this.config = Object.assign(defaultConfig, config);
-    this.node = node;
-
-    this.initialize();
-    this.bind();
+    // Инициализируем базовый класс
+    super({
+      node,
+      config: Object.assign(defaultConfig, config),
+      name: 'Dropdown',
+    });
   }
 
   /**
    * Инициализация
    */
   initialize(): void {
-    // Простановка стандартных классов
-    this.node.classList.add('faze-dropdown');
-    this.node.classList.add('faze-dropdown-initialized');
+    super.initialize();
 
-    // Поиск основных элементов и проверка на то что они найдены
+    // Инициализация переменных
+    this.isOpen = false;
     this.title = this.node.querySelector('.faze-title, [data-faze-dropdown="title"]');
     this.body = this.node.querySelector('.faze-body, [data-faze-dropdown="body"]');
 
@@ -116,8 +96,48 @@ class Dropdown {
       this.logger.error('initialize', 'Для дропдауна не найдены шапка и тело');
     }
 
+    // Вычисляем позицию тела относительно заголовка
+    this.calculatePosition();
+
+    // Пересоздаем заголовок чтобы удалить с него все бинды
+    this.resetTitle();
+
+    // Вызываем пользовательский метод
+    super.call(this.config.callbacks.created, { title: this.title, body: this.body }, 'created');
+  }
+
+  /**
+   * Навешивание событий
+   */
+  bind(): void {
+    super.bind();
+
+    if (!this.title || !this.body) {
+      this.logger.error('bind', 'Не заданы шапка и тело дропдауна');
+    }
+
+    // При нажатии на заголовок, меняем видимость тела дропдауна
+    Faze.Events.click(this.title, () => {
+      this.isOpen ? this.close() : this.open();
+    }, false);
+
+    // Проверка на нажатие за пределами селекта
+    if (this.config.closeWhenClickOutside) {
+      document.documentElement.addEventListener('click', (event: Event) => {
+        if (!Faze.Helpers.isMouseOverlapsNode(event, this.node)) {
+          this.close();
+        }
+      });
+    }
+  }
+
+  /**
+   * Вычисление позиции тела относительно заголовка
+   * Считает позицию тела от верхнего края заголовка, с учетом сдвига страницы, если это указано в конфиге
+   */
+  private calculatePosition(): void {
     // Присвоение сдвига для тела
-    let topOffset: number = this.title.offsetHeight + this.config.positionTopOffset;
+    let topOffset: number = this.title!.offsetHeight + this.config.positionTopOffset;
     if (this.config.strictPosition) {
       const callerRect: DOMRect = this.node.getBoundingClientRect();
       const { documentElement } = document;
@@ -127,83 +147,27 @@ class Dropdown {
       }
     }
 
-    this.body.style.top = `${topOffset}px`;
-
-    // Пересоздаем заголовок чтобы удалить с него все бинды
-    this.resetTitle();
-
-    // Вызываем пользовательский метод
-    if (typeof this.config.callbacks.created === 'function') {
-      try {
-        this.config.callbacks.created({
-          title: this.title,
-          body: this.body,
-        });
-      } catch (error: any) {
-        this.logger.error('created', error);
-      }
-    }
+    this.body!.style.top = `${topOffset}px`;
   }
 
   /**
-   * Навешивание событий
+   * Открытие дропдауна
    */
-  bind(): void {
-    if (!this.title || !this.body) {
-      return this.logger.error('bind', 'Не заданы шапка и тело дропдауна');
-    }
+  open(): void {
+    this.isOpen = true;
 
-    // При нажатии на заголовок, меняем видимость тела дропдауна
-    Faze.Events.click(this.title, () => {
-      this.node.classList.toggle('faze-active');
+    this.node.classList.add('faze-active');
+    super.call(this.config.callbacks.opened, { title: this.title, body: this.body }, 'opened');
+  }
 
-      if (this.node.classList.contains('faze-active')) {
-        // Вызываем пользовательский метод
-        if (typeof this.config.callbacks.opened === 'function') {
-          try {
-            this.config.callbacks.opened({
-              title: this.title,
-              body: this.body,
-            });
-          } catch (error: any) {
-            this.logger.error('opened', error);
-          }
-        }
-      } else {
-        // Вызываем пользовательский метод
-        if (typeof this.config.callbacks.closed === 'function') {
-          try {
-            this.config.callbacks.closed({
-              title: this.title,
-              body: this.body,
-            });
-          } catch (error: any) {
-            this.logger.error('closed', error);
-          }
-        }
-      }
-    }, false);
+  /**
+   * Закрытие дропдауна
+   */
+  close(): void {
+    this.isOpen = false;
 
-    // Проверка на нажатие за пределами селекта
-    if (this.config.closeWhenClickOutside) {
-      document.documentElement.addEventListener('click', (event: Event) => {
-        if (!Faze.Helpers.isMouseOverlapsNode(event, this.node)) {
-          this.node.classList.remove('faze-active');
-
-          // Вызываем пользовательский метод
-          if (typeof this.config.callbacks.closed === 'function') {
-            try {
-              this.config.callbacks.closed({
-                title: this.title,
-                body: this.body,
-              });
-            } catch (error: any) {
-              this.logger.error('closed', error);
-            }
-          }
-        }
-      });
-    }
+    this.node.classList.remove('faze-active');
+    super.call(this.config.callbacks.closed, { title: this.title, body: this.body }, 'closed');
   }
 
   /**
@@ -232,19 +196,6 @@ class Dropdown {
       strictPosition: (dropdownNode.dataset.fazeDropdownStrictPosition || 'false') === 'true',
       closeWhenClickOutside: (dropdownNode.dataset.fazeDropdownCloseWhenClickOutside || 'true') === 'true',
       positionTopOffset: parseInt(dropdownNode.dataset.fazeDropdownPositionTopOffset || '0', 10),
-    });
-  }
-
-  /**
-   * Инициализация модуля либо по data атрибутам либо через observer
-   */
-  static hotInitialize(): void {
-    Faze.Observer.watch('[data-faze~="dropdown"]', (dropdownNode: HTMLElement) => {
-      Dropdown.initializeByDataAttributes(dropdownNode);
-    });
-
-    document.querySelectorAll<HTMLElement>('[data-faze~="dropdown"]').forEach((dropdownNode: HTMLElement) => {
-      Dropdown.initializeByDataAttributes(dropdownNode);
     });
   }
 }

@@ -234,16 +234,7 @@ class Tab extends Module {
     }
 
     // Вызываем пользовательский метод
-    if (typeof this.config.callbacks.changed === 'function') {
-      try {
-        this.config.callbacks.changed({
-          headNode: activeHeadNode,
-          bodyNode: activeBodyNode,
-        });
-      } catch (error) {
-        console.error(`Ошибка исполнения пользовательского метода "opened": ${error}`);
-      }
-    }
+    super.call(this.config.callbacks.changed, { headNode: activeHeadNode, bodyNode: activeBodyNode }, 'changed');
   }
 
   /**

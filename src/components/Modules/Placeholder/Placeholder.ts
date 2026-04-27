@@ -79,13 +79,7 @@ class Placeholder extends Module {
           this.node.classList.remove('faze-placeholder-loading');
 
           // Вызываем пользовательский метод
-          if (typeof this.config.callbacks.loaded === 'function') {
-            try {
-              this.config.callbacks.loaded();
-            } catch (error) {
-              console.error(`Ошибка исполнения пользовательского метода "loaded": ${error}`);
-            }
-          }
+          super.call(this.config.callbacks.loaded, null, 'loaded');
         });
     }, this.config.delay);
   }

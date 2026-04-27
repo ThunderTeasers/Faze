@@ -13,6 +13,7 @@ import Logger from './Logger';
  *   node{HTMLElement | undefined} - основной DOM элемент
  *   nodes{HTMLElement[] | undefined} - дополнительные DOM элементы
  *   config{any} - конфигурационные данные для плагина
+ *   classPrefix - префикс для CSS классов плагина
  *   additionalParams{any} - дополнительные параметры
  */
 interface ModuleData {
@@ -20,6 +21,7 @@ interface ModuleData {
   node?: HTMLElement;
   nodes?: HTMLElement[];
   config: any;
+  classPrefix?: string;
   additionalParams?: any;
 }
 
@@ -93,7 +95,7 @@ abstract class Module {
 
     this.config = data.config;
     this.additionalParams = data.additionalParams;
-    this.classPrefix = `faze-${this.name.toLowerCase()}`;
+    this.classPrefix = data.classPrefix || `faze-${this.name.toLowerCase()}`;
     this.dataPrefix = `data-${this.classPrefix}`;
     this.uid = Math.floor(Math.random() * 10001);
 

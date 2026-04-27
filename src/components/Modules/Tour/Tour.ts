@@ -162,17 +162,7 @@ class Tour extends Module {
    * @private
    */
   private create() {
-    // Выполнение пользовательской функции
-    if (typeof this.config.callbacks.created === 'function') {
-      try {
-        this.config.callbacks.created({
-          group: this.config.group,
-          node: this.node,
-        });
-      } catch (error: any) {
-        this.logger.error('create', error);
-      }
-    }
+    super.call(this.config.callbacks.created, { group: this.config.group, node: this.node }, 'created');
 
     // Инициализируем переменные
     this._index = 0;
@@ -203,16 +193,7 @@ class Tour extends Module {
     this._hintWrapperNode.remove();
 
     // Выполнение пользовательской функции
-    if (typeof this.config.callbacks.closed === 'function') {
-      try {
-        this.config.callbacks.closed({
-          group: this.config.group,
-          node: this.node,
-        });
-      } catch (error: any) {
-        this.logger.error('close', error);
-      }
-    }
+    super.call(this.config.callbacks.closed, { group: this.config.group, node: this.node }, 'closed');
   }
 
   /**
@@ -299,18 +280,12 @@ class Tour extends Module {
     this._currentStep = this.config.steps[this._index];
     if (this._currentStep) {
       // Выполнение пользовательской функции
-      if (typeof this.config.callbacks.beforeChanged === 'function') {
-        try {
-          this.config.callbacks.beforeChanged({
-            group: this.config.group,
-            node: this.node,
-            step: this._currentStep,
-            hint: this._hintData,
-          });
-        } catch (error: any) {
-          this.logger.error('beforeChanged', error);
-        }
-      }
+      super.call(this.config.callbacks.beforeChanged, {
+        group: this.config.group,
+        node: this.node,
+        step: this._currentStep,
+        hint: this._hintData,
+      }, 'beforeChanged');
 
       // Обновление позиции
       this.updatePosition();
@@ -339,18 +314,12 @@ class Tour extends Module {
       }
 
       // Выполнение пользовательской функции
-      if (typeof this.config.callbacks.changed === 'function') {
-        try {
-          this.config.callbacks.changed({
-            group: this.config.group,
-            node: this.node,
-            step: this._currentStep,
-            hint: this._hintData,
-          });
-        } catch (error: any) {
-          this.logger.error('changed', error);
-        }
-      }
+      super.call(this.config.callbacks.changed, {
+        group: this.config.group,
+        node: this.node,
+        step: this._currentStep,
+        hint: this._hintData,
+      }, 'changed');
     }
   }
 

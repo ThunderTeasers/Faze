@@ -10,7 +10,7 @@
 
 import './Tooltip.scss';
 import Faze from '../../Core/Faze';
-import Logger from '../../Core/Logger';
+import Module from '../../Core/Module';
 
 /**
  * Структура конфига тултипа
@@ -43,39 +43,14 @@ interface Config {
 /**
  * Класс тултипа
  */
-class Tooltip {
-  // DOM элемент при наведении на который появляется тултип
-  readonly node: HTMLElement;
-
-  // Помощник для логирования
-  readonly logger: Logger;
-
-  // Конфиг с настройками
-  readonly config: Config;
-
+class Tooltip extends Module {
   // DOM элемент для отрисовки тултипа
-  readonly tooltipNode: HTMLDivElement;
+  tooltipNode: HTMLDivElement;
 
   // Список медиа-запросов для проверки разрешения экрана
-  readonly resolutions: MediaQueryList[];
+  resolutions: MediaQueryList[];
 
-  constructor(node: HTMLElement | null, config: Partial<Config>) {
-    if (!node) {
-      throw new Error('Не задан объект у которого должен отображаться тултип.');
-    }
-
-    // Инициализация логгера
-    this.logger = new Logger('Модуль Faze.Tooltip:');
-
-    // Список медиа-запросов для проверки разрешения экрана
-    this.resolutions = [window.matchMedia('(max-width: 768px)')];
-
-    // Проверка на двойную инициализацию
-    if (node.classList.contains('faze-tooltip-initialized')) {
-      this.logger.warning('constructor', 'Плагин уже был инициализирован на этот DOM элемент:', node);
-      return;
-    }
-
+  constructor(node?: HTMLElement, config?: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       text: '',
@@ -89,19 +64,19 @@ class Tooltip {
       },
     };
 
-    this.config = Object.assign(defaultConfig, config);
+    // Инициализируем базовый класс
+    super({
+      node,
+      config: Object.assign(defaultConfig, config),
+      name: 'Tooltip',
+      classPrefix: 'faze-tooltip-caller',
+    });
 
     // Проверка на то, что сторона задана правильно
     if (!['top', 'bottom', 'right', 'left'].includes(this.config.side)) {
       this.logger.error('constructor', 'Параметр "side" задан верно! Корректные значения: "top", "right", "bottom", "left".');
     }
 
-    // Инициализация переменных
-    this.node = node;
-    this.tooltipNode = document.createElement('div');
-
-    this.initialize();
-    this.bind();
     this.handleResolution();
   }
 
@@ -109,7 +84,12 @@ class Tooltip {
    * Инициализация
    */
   initialize(): void {
-    this.node.classList.add('faze-tooltip-initialized');
+    super.initialize();
+
+    // Инициализация переменных
+    this.tooltipNode = document.createElement('div');
+    this.resolutions = [window.matchMedia('(max-width: 768px)')];
+
     this.tooltipNode.className = `faze-tooltip faze-tooltip-${this.config.side} ${this.config.class}`;
     this.tooltipNode.style.visibility = 'hidden';
 
@@ -120,6 +100,8 @@ class Tooltip {
    * Навешивание событий
    */
   bind(): void {
+    super.bind();
+
     // Проверка на нажатие за пределами тултипа
     document.addEventListener('click', (event: MouseEvent) => {
       const path = (event as any).path || (event.composedPath && event.composedPath());
@@ -300,19 +282,6 @@ class Tooltip {
           side: tooltipNode.dataset.fazeTooltipSideMobile || 'bottom',
         },
       },
-    });
-  }
-
-  /**
-   * Инициализация модуля либо по data атрибутам либо через observer
-   */
-  static hotInitialize(): void {
-    Faze.Observer.watch('[data-faze~="tooltip"]', (tooltipNode: HTMLElement) => {
-      Tooltip.initializeByDataAttributes(tooltipNode);
-    });
-
-    document.querySelectorAll<HTMLElement>('[data-faze~="tooltip"]').forEach((tooltipNode: HTMLElement) => {
-      Tooltip.initializeByDataAttributes(tooltipNode);
     });
   }
 }

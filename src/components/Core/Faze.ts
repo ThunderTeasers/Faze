@@ -416,7 +416,7 @@ class Faze {
     Faze.Carousel2.hotInitialize('carousel2');
     Faze.Carousel3.hotInitialize('carousel3');
     Faze.Carousel.hotInitialize();
-    Faze.Tooltip.hotInitialize();
+    Faze.Tooltip.hotInitialize('tooltip');
     Faze.Tour.hotInitialize('tour');
     Faze.Form.hotInitialize('form');
     Faze.Finder.hotInitialize('finder');

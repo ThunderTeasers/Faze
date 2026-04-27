@@ -168,6 +168,24 @@ abstract class Module {
   }
 
   /**
+   * Универсальный метод для вызова пользовательских функций с обработкой ошибок и логированием
+   * 
+   * @param {Function} callback Функция которую вызываем
+   * @param {any} data Данные для функции
+   * @param {string} name Имя функции для корректного логирования
+   */
+  protected call(callback?: Function, data?: any, name?: string): void {
+    // Вызываем пользовательский метод
+    if (typeof callback === 'function') {
+      try {
+        callback(data);
+      } catch (error: any) {
+        this.logger.error(name || 'call', error);
+      }
+    }
+  }
+
+  /**
    * Построение необходимых DOM элементов
    *
    * @protected

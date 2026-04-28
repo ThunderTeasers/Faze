@@ -421,7 +421,7 @@ class Faze {
     Faze.Form.hotInitialize('form');
     Faze.Finder.hotInitialize('finder');
     Faze.Scroller.hotInitialize('scroller');
-    Faze.Zoom.hotInitialize();
+    Faze.Zoom.hotInitialize('zoom');
     Faze.ZoomBox.hotInitialize();
     Faze.Select.hotInitialize();
     Faze.Filter.hotInitialize();

@@ -10,7 +10,7 @@
 
 import './Zoom.scss';
 import Faze from '../../Core/Faze';
-import Logger from '../../Core/Logger';
+import Module from '../../Core/Module';
 
 /**
  * Структура конфига
@@ -36,29 +36,20 @@ interface Config {
 /**
  * Класс зума
  */
-class Zoom {
-  // DOM элемент зума
-  readonly node: HTMLElement;
-
-  // Помощник для логирования
-  readonly logger: Logger;
-
-  // Конфиг с настройками
-  readonly config: Config;
-
+class Zoom extends Module {
   // DOM элемент обертки для зума
-  readonly wrapperNode: HTMLDivElement;
+  wrapperNode: HTMLDivElement;
 
   // DOM элемент указателя который двигается вместе с мышкой
-  readonly pointerNode: HTMLDivElement;
+  pointerNode: HTMLDivElement;
 
   // DOM элемент обертки большого изображения, которое показывается сбоку
-  readonly bigImageWrapperNode: HTMLDivElement;
+  bigImageWrapperNode: HTMLDivElement;
 
   // DOM элемент большой картинки
-  readonly bigImageNode: HTMLImageElement;
+  bigImageNode: HTMLImageElement;
 
-  readonly bigImageSize: {
+  bigImageSize: {
     width: number;
     height: number;
   };
@@ -96,19 +87,7 @@ class Zoom {
     yMaxOffset: number;
   };
 
-  constructor(node: HTMLElement | null, config: Partial<Config>) {
-    if (!node) {
-      throw new Error('Не задан объект зума');
-    }
-
-    // Инициализация логгера
-    this.logger = new Logger('Модуль Faze.Zoom:');
-
-    // Проверка на двойную инициализацию
-    if (node.classList.contains('faze-zoom-initialized')) {
-      return;
-    }
-
+  constructor(node?: HTMLElement, config?: Partial<Config>) {
     // Конфиг по умолчанию
     const defaultConfig: Config = {
       image: undefined,
@@ -120,8 +99,19 @@ class Zoom {
       },
     };
 
-    this.config = Object.assign(defaultConfig, config);
-    this.node = node;
+    // Инициализируем базовый класс
+    super({
+      node,
+      config: Object.assign(defaultConfig, config),
+      name: 'Zoom',
+    });
+  }
+
+  /**
+   * Инициализация
+   */
+  initialize(): void {
+    super.initialize();
 
     // Инициализация переменных
     this.wrapperNode = document.createElement('div');
@@ -134,25 +124,16 @@ class Zoom {
       height: 0,
     };
 
-    this.initialize();
-    this.bind();
     this.calculate();
-  }
-
-  /**
-   * Инициализация
-   */
-  initialize(): void {
-    // Простановка стандартных классов
-    this.node.classList.add('faze-zoom-initialized');
 
     // Создаем обертку
     this.wrapperNode.className = 'faze-zoom';
 
     // Перемещаем исходный элемент в обертку для дальнейшей работы
     if (!this.node.parentNode) {
-      throw new Error('У DOM элемента зума нет родителя');
+      this.logger.error('initialize', 'У DOM элемента зума нет родителя, а значит его нельзя обернуть для корректной работы. Убедитесь, что элемент зума добавлен в DOM.');
     }
+
     this.node.parentNode.insertBefore(this.wrapperNode, this.node);
     this.node.classList.add('faze-zoom-initial-image');
     this.wrapperNode.appendChild(this.node);
@@ -205,14 +186,8 @@ class Zoom {
       };
     }
 
-    // Выполняем пользовательскую фукнции
-    if (typeof this.config.callbacks.created === 'function') {
-      try {
-        this.config.callbacks.created();
-      } catch (error) {
-        console.error('Ошибка исполнения пользовательской функции "created"', error);
-      }
-    }
+    // Вызываем пользовательский метод
+    super.call(this.config.callbacks.created, null, 'created');
   }
 
   /**
@@ -370,13 +345,11 @@ class Zoom {
   }
 
   /**
-   * Инициализация модуля либо по data атрибутам либо через observer
-   */
+ * "Горячая" инициализация модуля через "observer"
+ * 
+ *  ВЫКЛЮЧАЕМ!!! Т.к. этот модуль должен работать без неё
+ */
   static hotInitialize(): void {
-    Faze.Observer.watch('[data-faze~="zoom"]', (zoomNode: HTMLElement) => {
-      Zoom.initializeByDataAttributes(zoomNode);
-    });
-
     document.querySelectorAll('[data-faze~="zoom"]').forEach((zoomNode: any) => {
       Zoom.initializeByDataAttributes(<HTMLElement>zoomNode);
     });

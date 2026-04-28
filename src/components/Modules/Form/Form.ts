@@ -122,19 +122,18 @@ class Form extends Module {
     );
 
     // Получение всех данных
-    this.inputsData = Array.from(
-      this.node.querySelectorAll<HTMLInputElement>('[data-faze-form-rules]')
-    ).map((inputNode: HTMLInputElement) => ({
-      node: inputNode,
-      rules: this.parseRules(inputNode),
-      hintDisabled: inputNode.dataset.fazeFormHintDisabled === 'true',
-    }));
+    this.inputsData = Array.from(this.node.querySelectorAll<HTMLInputElement>('[data-faze-form-rules]'))
+      .map((inputNode: HTMLInputElement) => ({
+        node: inputNode,
+        rules: this.parseRules(inputNode),
+        hintDisabled: inputNode.dataset.fazeFormHintDisabled === 'true',
+      }));
 
     // Проверка состояния кнопок
     this.checkButtons();
 
-    // Выполнение пользовательской функции "created"
-    this.createdCallbackCall();
+    // Выполнение пользовательской функции
+    super.call(this.config.callbacks.created, { node: this.node, inputsData: this.inputsData }, 'created');
   }
 
   /**
@@ -162,21 +161,11 @@ class Form extends Module {
   }
 
   private bindClickOutside(): void {
-    Faze.Events.listener(
-      'click',
-      document,
-      (event: MouseEvent) => {
-        if (
-          !Faze.Helpers.isMouseOverlapsNodes(event, [
-            ...this.inputsData.map((inputData) => inputData.node),
-            this.hintNode,
-          ])
-        ) {
-          this.hideHint();
-        }
-      },
-      false
-    );
+    Faze.Events.listener('click', document, (event: MouseEvent) => {
+      if (!Faze.Helpers.isMouseOverlapsNodes(event, [...this.inputsData.map((inputData) => inputData.node), this.hintNode])) {
+        this.hideHint();
+      }
+    }, false);
   }
 
   /**
@@ -220,13 +209,9 @@ class Form extends Module {
    * @private
    */
   private checkButtons(): void {
-    const isValid = this.inputsData.some((inputsData: InputData) =>
-      inputsData.rules.some((rule) => !rule.valid)
-    );
+    const isValid = this.inputsData.some((inputsData: InputData) => inputsData.rules.some((rule) => !rule.valid));
 
-    this.buttonsNodes.forEach((buttonNode: HTMLButtonElement) => {
-      buttonNode.disabled = isValid;
-    });
+    this.buttonsNodes.forEach((buttonNode: HTMLButtonElement) => buttonNode.disabled = isValid);
   }
 
   /**
@@ -260,8 +245,8 @@ class Form extends Module {
     // Проверка состояния кнопок
     this.checkButtons();
 
-    // Выполнение пользовательской функции "input"
-    this.inputCallbackCall();
+    // Выполнение пользовательской функции
+    super.call(this.config.callbacks.input, { node: this.node, inputsData: this.inputsData }, 'input');
   }
 
   /**
@@ -276,10 +261,7 @@ class Form extends Module {
   private showHint(inputData: InputData): void {
     // Не выводим подсказку если она отключена у инпута
     // или если нет сообщения для вывода
-    if (
-      inputData.hintDisabled ||
-      !inputData.rules.some((rule) => rule.message)
-    ) {
+    if (inputData.hintDisabled || !inputData.rules.some((rule) => rule.message)) {
       this.hideHint();
       return;
     }
@@ -291,35 +273,25 @@ class Form extends Module {
     this.hintNode.classList.add('active');
 
     // Позиция инпута
-    const position: FazePosition = Faze.Helpers.getElementPosition(
-      inputData.node
-    );
+    const position: FazePosition = Faze.Helpers.getElementPosition(inputData.node);
 
     switch (this.config.hintSide) {
       case 'top':
-        this.hintNode.style.top = `${position.y - this.hintNode.offsetHeight - this.config.hintOffset
-          }px`;
+        this.hintNode.style.top = `${position.y - this.hintNode.offsetHeight - this.config.hintOffset}px`;
         this.hintNode.style.left = `${position.x}px`;
         break;
       case 'bottom':
       default:
-        this.hintNode.style.top = `${position.y +
-          inputData.node.getBoundingClientRect().height +
-          this.config.hintOffset
-          }px`;
+        this.hintNode.style.top = `${position.y + inputData.node.getBoundingClientRect().height + this.config.hintOffset}px`;
         this.hintNode.style.left = `${position.x}px`;
         break;
       case 'left':
         this.hintNode.style.top = `${position.y}px`;
-        this.hintNode.style.left = `${position.x - this.hintNode.offsetWidth - this.config.hintOffset
-          }px`;
+        this.hintNode.style.left = `${position.x - this.hintNode.offsetWidth - this.config.hintOffset}px`;
         break;
       case 'right':
         this.hintNode.style.top = `${position.y}px`;
-        this.hintNode.style.left = `${position.x +
-          inputData.node.getBoundingClientRect().width +
-          this.config.hintOffset
-          }px`;
+        this.hintNode.style.left = `${position.x + inputData.node.getBoundingClientRect().width + this.config.hintOffset}px`;
         break;
     }
   }
@@ -339,8 +311,7 @@ class Form extends Module {
     inputData.rules
       .filter((rule: Rule) => rule.message)
       .forEach((rule: Rule) => {
-        rulesHTML += `<div class="faze-form-rule ${rule.valid ? 'faze-form-rule-valid' : 'faze-form-rule-invalid'
-          }">${rule.message}</div>`;
+        rulesHTML += `<div class="faze-form-rule ${rule.valid ? 'faze-form-rule-valid' : 'faze-form-rule-invalid'}">${rule.message}</div>`;
       });
 
     this.hintNode.innerHTML = rulesHTML;
@@ -373,21 +344,15 @@ class Form extends Module {
       // Проверка на соответствие правилу
       switch (rule.type) {
         case Type.Regex:
-          rule.valid = !!inputData.node.value.match(
-            new RegExp(rule.rule || '')
-          );
+          rule.valid = !!inputData.node.value.match(new RegExp(rule.rule || ''));
 
           break;
         case Type.Same:
           // Ищем специальный инпут для проверки
-          const specialInputNode = document.querySelector<HTMLInputElement>(
-            rule.special || ''
-          );
+          const specialInputNode = document.querySelector<HTMLInputElement>(rule.special || '');
 
           // Если специальный инпут нашелся, ищем его данные
-          const spetialInputData = this.inputsData.find(
-            (inputData) => inputData.node === specialInputNode
-          );
+          const spetialInputData = this.inputsData.find((inputData) => inputData.node === specialInputNode);
 
           // Если данные найдены
           if (spetialInputData) {
@@ -396,9 +361,7 @@ class Form extends Module {
             rule.valid = isSame;
 
             // Обновляем правило найденного инпута
-            const specialRule: Rule | undefined = spetialInputData.rules.find(
-              (rule: Rule) => rule.type === Type.Same
-            );
+            const specialRule: Rule | undefined = spetialInputData.rules.find((rule: Rule) => rule.type === Type.Same);
 
             if (specialRule) {
               specialRule.valid = isSame;
@@ -424,9 +387,7 @@ class Form extends Module {
   private parseRules(inputNode: HTMLInputElement): Rule[] {
     let result: Rule[] = [];
 
-    const jsonData = Faze.Helpers.parseJSON(
-      inputNode.dataset.fazeFormRules?.replace(/\\/g, '|||') || '[]'
-    );
+    const jsonData = Faze.Helpers.parseJSON(inputNode.dataset.fazeFormRules?.replace(/\\/g, '|||') || '[]');
     if (Array.isArray(result)) {
       result = jsonData.map((jsonData: any) => {
         if (jsonData.rule === 'validation') {
@@ -461,49 +422,7 @@ class Form extends Module {
    * @private
    */
   private buildHint(): void {
-    this.hintNode = Faze.Helpers.createElement(
-      'div',
-      {},
-      {},
-      document.body,
-      'faze-form-hint'
-    );
-  }
-
-  /**
-   * Выполнение пользовательской функции "created"
-   *
-   * @private
-   */
-  private createdCallbackCall(): void {
-    if (typeof this.config.callbacks.created === 'function') {
-      try {
-        this.config.callbacks.created({
-          node: this.node,
-          inputsData: this.inputsData,
-        });
-      } catch (error: any) {
-        this.logger.error('created', error);
-      }
-    }
-  }
-
-  /**
-   * Выполнение пользовательской функции "input"
-   *
-   * @private
-   */
-  private inputCallbackCall(): void {
-    if (typeof this.config.callbacks.input === 'function') {
-      try {
-        this.config.callbacks.input({
-          node: this.node,
-          inputsData: this.inputsData,
-        });
-      } catch (error: any) {
-        this.logger.error('input', error);
-      }
-    }
+    this.hintNode = Faze.Helpers.createElement('div', {}, {}, document.body, 'faze-form-hint');
   }
 
   /**

@@ -73,12 +73,14 @@ interface Config {
   fixed: boolean;
   field: string;
   limit: number;
+  delay: number;
   minLength: number;
   class?: string;
   parts?: object;
   callbacks: {
     selected?: (activeTabData: CallbackData) => void;
     entered?: (activeTabData: CallbackData) => void;
+    changed?: (activeTabData: CallbackData) => void;
     option?: (activeTabData: CallbackData) => void;
   };
 }
@@ -110,12 +112,14 @@ class SmartSelect extends Module {
       fixed: false,
       field: 'field',
       limit: 10,
+      delay: 500,
       minLength: 3,
       class: undefined,
       parts: undefined,
       callbacks: {
         selected: undefined,
         entered: undefined,
+        changed: undefined,
       },
     };
 
@@ -216,6 +220,17 @@ class SmartSelect extends Module {
             this.logger.error('entered', error);
           }
         }
+
+        if (typeof this.config.callbacks.changed === 'function') {
+          try {
+            this.config.callbacks.changed({
+              node: this.node,
+              data: item.data,
+            });
+          } catch (error: any) {
+            this.logger.error('changed', error);
+          }
+        }
       });
     });
   }
@@ -305,6 +320,18 @@ class SmartSelect extends Module {
             this.logger.error('entered', error);
           }
         }
+
+        // Вызываем пользовательский метод
+        if (typeof this.config.callbacks.changed === 'function') {
+          try {
+            this.config.callbacks.changed({
+              node: this.node,
+              data: item.data,
+            });
+          } catch (error: any) {
+            this.logger.error('changed', error);
+          }
+        }
       } else {
         item.node.classList.remove('faze-active');
       }
@@ -385,7 +412,7 @@ class SmartSelect extends Module {
             this.open();
           }
         }
-      }, 500);
+      }, this.config.delay);
     });
   }
 
@@ -626,6 +653,7 @@ class SmartSelect extends Module {
       class: node.dataset.fazeSmartselectClass,
       limit: parseInt(node.dataset.fazeSmartselectLimit || '10', 10),
       minLength: parseInt(node.dataset.fazeSmartselectMinLength || '3', 10),
+      delay: parseInt(node.dataset.fazeSmartselectDelay || '500', 10),
     });
   }
 }

@@ -561,7 +561,7 @@ class Helpers {
    * @param parentNode  - DOM элемент родителя, по умолчанию ищем везде, то есть document
    */
   static isCheckboxChecked(name: string, parentNode: HTMLElement | Document = document): boolean {
-    return parentNode.querySelectorAll('input[type="checkbox"]:checked').length > 0;
+    return parentNode.querySelectorAll(`input[type="checkbox"][name="${name}"]:checked`).length > 0;
   }
 
   /**
@@ -571,7 +571,7 @@ class Helpers {
    * @param parentNode  - DOM элемент родителя, по умолчанию ищем везде, то есть document
    */
   static isRadioChecked(name: string, parentNode: HTMLElement | Document = document): boolean {
-    return parentNode.querySelectorAll('input[type="radio"]:checked').length > 0;
+    return parentNode.querySelectorAll(`input[type="radio"][name="${name}"]:checked`).length > 0;
   }
 
   /**

@@ -35,7 +35,11 @@ interface CallbackData {
 interface StepData {
   index: number;
   paths: string[];
-  params: { [key: string]: string }[];
+  params: Array<{
+    name: string;
+    value: string;
+    data: Array<{ name: string; value: string }>;
+  }>;
 }
 
 /**
@@ -275,13 +279,17 @@ class Steps {
    *
    * @private
    */
-  private collectData(bodyNode: HTMLElement): { [key: string]: string }[] {
+  private collectData(bodyNode: HTMLElement): Array<{ name: string; value: string; data: Array<{ name: string; value: string }> }> {
     // DOM элемент у которого собираем данные
     const stepNode = bodyNode.querySelector('.faze-steps-path.faze-steps-path-selected') || bodyNode;
 
     return Array.from(stepNode.querySelectorAll<HTMLInputElement>('input[type="text"], input[type="email"], input[type="tel"], input[type="password"], select, textarea, input[type="checkbox"]:checked, input[type="radio"]:checked')).map((inputNode) => ({
       name: inputNode.dataset.fazeStepsDataName || inputNode.name,
       value: inputNode.value,
+      data: Object.keys(inputNode.dataset).map((key) => ({
+        name: key,
+        value: inputNode.dataset[key] || '',
+      })),
     }));
   }
 

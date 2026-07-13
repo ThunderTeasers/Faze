@@ -49,6 +49,7 @@ interface StepData {
  *     finished - пользовательская функция, исполняющаяся при завершении прохода по шагам
  */
 interface Config {
+  scrollTop: boolean;
   formMode: boolean;
   callbacks: {
     created?: (data: CallbackData) => void;
@@ -100,6 +101,7 @@ class Steps {
 
     // Конфиг по умолчанию
     const defaultConfig: Config = {
+      scrollTop: true,
       formMode: true,
       callbacks: {
         created: undefined,
@@ -441,6 +443,11 @@ class Steps {
     // Активания выбранных ранее путей
     this.activatePaths(this.bodiesNodes[index]);
 
+    // Прокрутка к текущему шагу
+    if (this.config.scrollTop) {
+      this.bodiesNodes[index].scrollIntoView({ behavior: 'smooth' });
+    }
+
     // Вызываем пользовательский метод
     if (typeof this.config.callbacks.changed === 'function' && index !== 0) {
       try {
@@ -480,6 +487,7 @@ class Steps {
   static initializeByDataAttributes(stepsNode: HTMLElement): void {
     new Faze.Steps(stepsNode, {
       formMode: (stepsNode.dataset.fazeStepsFormMode || 'true') === 'true',
+      scrollTop: (stepsNode.dataset.fazeStepsScrollTop || 'true') === 'true',
     });
   }
 

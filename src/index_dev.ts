@@ -413,6 +413,18 @@ Faze.add({
   pluginName: 'Faze.REST Test',
   condition: document.querySelectorAll('.js-rest').length > 0,
   callback: () => {
+    Faze.on('submit', '[data-faze-restapi-form]:not([data-faze-restapi-manual])', (event: any, formNode) => {
+      event.preventDefault();
+
+      Faze.REST.formSubmit(formNode, () => {
+        const redirectUrl = formNode.dataset.redirectUrl;
+        if (redirectUrl) {
+          history.pushState({}, 'title', redirectUrl);
+        }
+      }, event.submitter);
+    });
+
+
     document.querySelector('.js-replace-with')?.addEventListener('click', () => {
       Faze.REST.chain([
         {

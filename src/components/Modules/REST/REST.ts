@@ -158,14 +158,15 @@ class REST {
    *
    * @param formNode - DOM элемент формы из которой оправляем
    * @param callback - пользовательская функция, исполняющаяся ПОСЛЕ всех действий
+   * @param submitter - DOM элемент, который инициировал отправку формы
    */
-  static formSubmit(formNode: HTMLFormElement, callback?: (response?: any) => void): void {
+  static formSubmit(formNode: HTMLFormElement, callback?: (response?: any) => void, submitter?: HTMLElement): void {
     if (!(formNode instanceof HTMLFormElement)) {
       throw new Error('Параметр метода formSubmit не является формой');
     }
 
     // Данные инпутов формы
-    const formData: FormData = new FormData(formNode);
+    const formData: FormData = new FormData(formNode, submitter);
 
     // Поля, имеющие принадлежность к JSON
     const jsonFields: NodeListOf<HTMLElement> = formNode.querySelectorAll('[data-faze-restapi-json-name]');
